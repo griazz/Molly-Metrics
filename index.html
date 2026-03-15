@@ -446,30 +446,50 @@ try {
 
 // --- Rendering Functions ---
 function renderActivityHub(graphs) {
-let style = getComputedStyle(document.body);
-let accent = style.getPropertyValue('--accent-main').trim();
+  let style = getComputedStyle(document.body);
+  let accent = style.getPropertyValue('--accent-main').trim();
+  let muted = style.getPropertyValue('--text-muted').trim();
+  let gridColor = style.getPropertyValue('--border-color').trim();
 
-let leaderContainer = document.getElementById('activity-leaderboard');
-let topActive = [...globalPlayerData].sort((a,b) => b.activityScore - a.activityScore).slice(0, 5);
-let html = "";
-topActive.forEach((p, i) => {
-if(p.activityScore > 0) {
-let actColor = getActivityStatus(p.lastSeenTs).color;
-html += `<div class="board-row"><div style="color:var(--text-muted); width: 24px;">#${i+1}</div><div style="flex:1; display:flex; align-items:center;"><span class="activity-dot" style="background:${actColor}; color:${actColor}; width:6px; height:6px;"></span> ${p.name}</div><div class="board-val">${p.activityScore}</div></div>`;
-}
-});
-leaderContainer.innerHTML = html || "<p style='text-align:center; padding:20px; font-size:12px; color:var(--text-muted);'>Awaiting activity data.</p>";
+  let leaderContainer = document.getElementById('activity-leaderboard');
+  let topActive = [...globalPlayerData].sort((a,b) => b.activityScore - a.activityScore).slice(0, 5);
+  let html = "";
+  topActive.forEach((p, i) => {
+    if(p.activityScore > 0) {
+      let actColor = getActivityStatus(p.lastSeenTs).color;
+      html += `<div class="board-row"><div style="color:var(--text-muted); width: 24px;">#${i+1}</div><div style="flex:1; display:flex; align-items:center;"><span class="activity-dot" style="background:${actColor}; color:${actColor}; width:6px; height:6px;"></span> ${p.name}</div><div class="board-val">${p.activityScore}</div></div>`;
+    }
+  });
+  leaderContainer.innerHTML = html || "<p style='text-align:center; padding:20px; font-size:12px; color:var(--text-muted);'>Awaiting activity data.</p>";
 
-if (!graphs || !graphs.hourly || graphs.hourly.length === 0) return;
-if (chartsRegistry.activityHourly) chartsRegistry.activityHourly.destroy();
-if (chartsRegistry.activityDaily) chartsRegistry.activityDaily.destroy();
+  if (!graphs || !graphs.hourly || graphs.hourly.length === 0) return;
+  if (chartsRegistry.activityHourly) chartsRegistry.activityHourly.destroy();
+  if (chartsRegistry.activityDaily) chartsRegistry.activityDaily.destroy();
 
-const hourlyLabels = ["12A","1A","2A","3A","4A","5A","6A","7A","8A","9A","10A","11A","12P","1P","2P","3P","4P","5P","6P","7P","8P","9P","10P","11P"];
-const dailyLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-let barOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 9 } } }, y: { display: false } } };
+  const hourlyLabels = ["12A","1A","2A","3A","4A","5A","6A","7A","8A","9A","10A","11A","12P","1P","2P","3P","4P","5P","6P","7P","8P","9P","10P","11P"];
+  const dailyLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  
+  let barOpts = { 
+    animation: false,
+    events: [],
+    responsive: true, 
+    maintainAspectRatio: false, 
+    plugins: { legend: { display: false }, tooltip: { enabled: false } }, 
+    scales: { 
+      x: { grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 9 }, color: muted } }, 
+      y: { 
+        display: true, 
+        beginAtZero: true,
+        suggestedMax: 5, // Forces grid lines to appear even if data is 0
+        border: { display: false },
+        grid: { color: gridColor },
+        ticks: { display: false, stepSize: 1 } 
+      } 
+    } 
+  };
 
-chartsRegistry.activityHourly = new Chart(document.getElementById('hourlyActivityChart').getContext('2d'), { type: 'bar', data: { labels: hourlyLabels, datasets: [{ data: graphs.hourly, backgroundColor: accent, borderRadius: 3 }] }, options: barOpts });
-chartsRegistry.activityDaily = new Chart(document.getElementById('dailyActivityChart').getContext('2d'), { type: 'bar', data: { labels: dailyLabels, datasets: [{ data: graphs.daily, backgroundColor: accent, borderRadius: 3 }] }, options: barOpts });
+  chartsRegistry.activityHourly = new Chart(document.getElementById('hourlyActivityChart').getContext('2d'), { type: 'bar', data: { labels: hourlyLabels, datasets: [{ data: graphs.hourly, backgroundColor: accent, borderRadius: 3 }] }, options: barOpts });
+  chartsRegistry.activityDaily = new Chart(document.getElementById('dailyActivityChart').getContext('2d'), { type: 'bar', data: { labels: dailyLabels, datasets: [{ data: graphs.daily, backgroundColor: accent, borderRadius: 3 }] }, options: barOpts });
 }
 
 function filterRoster() {
