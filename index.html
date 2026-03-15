@@ -480,7 +480,7 @@ function renderActivityHub(graphs) {
       y: { 
         display: true, 
         beginAtZero: true,
-        suggestedMax: 5, // Forces grid lines to appear even if data is 0
+        suggestedMax: 5,
         border: { display: false },
         grid: { color: gridColor },
         ticks: { display: false, stepSize: 1 } 
@@ -670,7 +670,11 @@ let thHtml = `<div style="margin-top:16px;">
 allTHs.forEach(th => {
 if (th == 0) return;
 let us = myTHs[th] || 0; let them = oppTHs[th] || 0;
-let usBar = Math.min((us/15)*100, 100); let themBar = Math.min((them/15)*100, 100);
+
+let rosterSize = Math.max(round.myLineup.length, 15);
+let usBar = Math.min((us/rosterSize)*100, 100); 
+let themBar = Math.min((them/rosterSize)*100, 100);
+
 thHtml += `<div style="display:flex; align-items:center; font-size:11px;">
 <div style="flex:1; display:flex; justify-content:flex-end; align-items:center; gap:8px;">
 <span style="color:var(--accent-main);">${us}</span>
