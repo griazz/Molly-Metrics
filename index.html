@@ -63,11 +63,6 @@ background-repeat: no-repeat; transform-origin: 50% 66%; animation: l5 4s infini
 .loader::after { animation-duration: 2s; } @keyframes l5{ 100% {transform:rotate(1turn)} }
 .loader-text { font-family: var(--font-sans); font-size: 12px; font-weight: 400; letter-spacing: 4px; text-transform: uppercase; color: var(--accent-main); }
 
-.header { background: var(--header-bg); backdrop-filter: blur(24px); padding: 24px max(20px, env(safe-area-inset-right, 0px)) 24px max(20px, env(safe-area-inset-left, 0px)); padding-top: calc(24px + env(safe-area-inset-top, 0px)); border-bottom: 1px solid var(--border-color); position: sticky;
-top: 0; z-index: 100; transition: all var(--transition-speed) ease; }
-.header-content { display: flex; justify-content: space-between; align-items: center; max-width: 600px; margin: auto; }
-.header h2 { font-size: 24px; letter-spacing: 2px; color: var(--accent-main); }
-.header-actions { display: flex; gap: 12px; }
 .icon-btn { font-size: 16px; cursor: pointer; user-select: none; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); background: transparent;
 border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--accent-main); }
 .icon-btn:active { transform: scale(0.85); }
@@ -156,15 +151,6 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
 </div>
 
 <div class="main-scroll-area" id="mainScroll">
-<div class="header">
-<div class="header-content">
-<h2>Molly Metrics</h2>
-<div class="header-actions">
-<div class="icon-btn" onclick="forceApiSync()">  ↻  </div>
-<div class="icon-btn" id="themeBtn" onclick="toggleTheme(true)">  ✦  </div>
-</div>
-</div>
-</div>
 
 <div class="container">
 
@@ -329,7 +315,10 @@ Chart.defaults.color = '#8c7e7e'; Chart.defaults.font.family = "'Montserrat', sa
 
 function toggleTheme(userTriggered = false) {
 let isLight = document.body.classList.toggle('light-mode');
-document.getElementById('themeBtn').innerText = isLight ?  '✦'  :  '✧' ;
+let themeBtn = document.getElementById('themeBtn');
+if (themeBtn) {
+    themeBtn.innerText = isLight ?  '✦'  :  '✧' ;
+}
 if(userTriggered) localStorage.setItem('molly-theme', isLight ? 'light' : 'dark');
 let style = getComputedStyle(document.body);
 Chart.defaults.color = style.getPropertyValue('--text-muted').trim();
