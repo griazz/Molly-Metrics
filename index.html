@@ -181,6 +181,7 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
 </div>
 
 <p id="statusMsg" style="text-align: center; margin-top: 32px; font-size: 12px; color: var(--accent-main); letter-spacing: 1px;"></p>
+<p id="syncTimer" style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--text-muted); letter-spacing: 1px;"></p>
 </div>
 
 <h4 class="section-title">Activity Frequency</h4>
@@ -327,9 +328,33 @@ if(document.getElementById('compare-tab').classList.contains('active')) compareP
 }
 }
 
+// Timer setup to run dynamically
+function startSyncTimer() {
+  setInterval(() => {
+    let now = new Date();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
+    
+    // Calculate minutes until the next :00 or :30 mark
+    let nextMin = minutes < 30 ? 30 : 60;
+    let minsLeft = nextMin - minutes - 1;
+    let secsLeft = 60 - seconds;
+    
+    if (secsLeft === 60) {
+      minsLeft += 1;
+      secsLeft = 0;
+    }
+    
+    let timeString = `${minsLeft}:${secsLeft.toString().padStart(2, '0')}`;
+    let el = document.getElementById('syncTimer');
+    if (el) el.innerText = `Next Auto-Sync in: ${timeString}`;
+  }, 1000);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
 if(localStorage.getItem('molly-theme') === 'light') toggleTheme(false);
 Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
+startSyncTimer();
 });
 
 function showLoader(text) { document.getElementById('loaderText').innerText = text || "Fetching API..."; document.getElementById('loaderOverlay').classList.add('active'); }
@@ -355,7 +380,7 @@ if (diffHours < 24) return { color: "var(--dot-yellow)", text: "Active today" };
 return { color: "var(--dot-red)", text: `Active ${Math.floor(diffHours/24)}d ago` };
 }
 
-// --- API Calls (Updated for Fetch) ---
+// --- API Calls ---
 async function forceApiSync() {
 showLoader("Connecting to Supercell API...");
 try {
@@ -529,7 +554,19 @@ let sortedEntities = Object.keys(entityObj).map(name => ({ name: name, pct: ((en
 let labels = sortedEntities.map(e => upgradingCounts[e.name] ? e.name + upgradingCounts[e.name] : e.name);
 let dataPct = sortedEntities.map(e => e.pct.toFixed(1));
 let bgColors = dataPct.map(pct => parseFloat(pct) >= 100 ? '#7a8c66' : style.getPropertyValue('--chart-line').trim());
-return new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4 }] }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { max: 100, display:false }, y: { border: { display: false }, grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 11 } } } } }, plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); ctx.font = '300 11px "Montserrat"'; ctx.textBaseline = 'middle'; chart.getDatasetMeta(0).data.forEach((bar, index) => { 
+return new Chart(ctx, { 
+type: 'bar', 
+data: { labels: labels, datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4 }] }, 
+options: { 
+  indexAxis: 'y', 
+  animation: false, 
+  events: [], 
+  responsive: true, 
+  maintainAspectRatio: false, 
+  plugins: { legend: { display: false }, tooltip: { enabled: false } }, 
+  scales: { x: { max: 100, display:false }, y: { border: { display: false }, grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 11 } } } } 
+}, 
+plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); ctx.font = '300 11px "Montserrat"'; ctx.textBaseline = 'middle'; chart.getDatasetMeta(0).data.forEach((bar, index) => { 
 const val = data.datasets[0].data[index]; const isMaxed = parseFloat(val) >= 100; let displayStr = isMaxed ? "MAX" : parseFloat(val).toString(); const fullTextWidth = ctx.measureText(displayStr).width; const isInside = bar.width > fullTextWidth + 12; let textX; if (isInside) { ctx.textAlign = 'right'; textX = bar.x - 8; ctx.fillStyle = isMaxed ?
 '#0a0505' : '#1a1515'; } else { ctx.textAlign = 'left'; textX = bar.x + 8; ctx.fillStyle = style.getPropertyValue('--text-muted').trim();
 } ctx.fillText(displayStr, textX, bar.y + 1); }); ctx.restore(); } }] });
@@ -540,8 +577,20 @@ let style = getComputedStyle(document.body); let lineColor = style.getPropertyVa
 let grad = ctx.createLinearGradient(0, 0, 0, 200); grad.addColorStop(0, style.getPropertyValue('--chart-fill').trim()); grad.addColorStop(1, 'rgba(255,255,255,0)');
 let pointColors = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? accentColor : lineColor);
 let pointRadii = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? 3.5 : 0);
-return new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: pointColors, pointRadius: pointRadii, pointHoverRadius: 5 }] }, options: { layout: { padding: { top: 35, right: 45, left: 45, bottom: 5 } }, responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: true, grid: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 10, family: 
-'Montserrat', weight: 300, letterSpacing: 1 } } }, y: { display: false } } }, plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body);
+return new Chart(ctx, { 
+type: 'line', 
+data: { labels: labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: pointColors, pointRadius: pointRadii, pointHoverRadius: 5 }] }, 
+options: { 
+  animation: false, 
+  events: [], 
+  layout: { padding: { top: 35, right: 45, left: 45, bottom: 5 } }, 
+  responsive: true, 
+  maintainAspectRatio: false, 
+  interaction: { mode: 'index', intersect: false }, 
+  plugins: { legend: { display: false }, tooltip: { enabled: false } }, 
+  scales: { x: { display: true, grid: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 10, family: 'Montserrat', weight: 300, letterSpacing: 1 } } }, y: { display: false } } 
+}, 
+plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body);
 let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0;
 const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]);
 const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '300 11px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y);
@@ -573,7 +622,7 @@ html += `<div class="board-row" style="color:var(--text-muted); font-size:10px; 
 </div>`;
 cwlPlayers.forEach((p) => {
 let offColor = (p.cwlStats.attacks > 0 && p.cwlStats.threeStars === p.cwlStats.attacks) ? "var(--dot-green)" : "var(--text-muted)";
-let defRatio = p.cwlStats.defenses > 0 ? (p.cwlStats.defStars / p.cwlStats.defenses) : 0;
+let defRatio = p.cwlStats.defenses > 0 ? (p.cwlStats.defStars / p.cwlStats.defenses).toFixed(1) : 0;
 let defColor = defRatio >= 3.0 ? "var(--dot-red)" : "var(--text-muted)";
 
 html += `<div class="board-row">
@@ -749,7 +798,17 @@ document.getElementById('compareDetailsGrid').innerHTML = `
 
 if (!p1.heroes || !p2.heroes) return;
 
-let style = getComputedStyle(document.body); let rOpts = { responsive: true, maintainAspectRatio: false, scales: { r: { max: 100, ticks: { display: false }, grid: { color: 'rgba(212, 175, 55, 0.1)' }, angleLines: { color: 'rgba(212, 175, 55, 0.1)' }, pointLabels: { color: style.getPropertyValue('--text-main').trim(), font: { size: 10, family: 'Montserrat' } } } }, plugins: { legend: { labels: { color: style.getPropertyValue('--text-main').trim(), font: { family: 'Montserrat', size: 12 } } } } };
+let style = getComputedStyle(document.body); 
+let rOpts = { 
+  animation: false,
+  events: [],
+  responsive: true, 
+  maintainAspectRatio: false, 
+  scales: { 
+    r: { max: 100, ticks: { display: false }, grid: { color: 'rgba(212, 175, 55, 0.1)' }, angleLines: { color: 'rgba(212, 175, 55, 0.1)' }, pointLabels: { color: style.getPropertyValue('--text-main').trim(), font: { size: 10, family: 'Montserrat' } } } 
+  }, 
+  plugins: { legend: { labels: { color: style.getPropertyValue('--text-main').trim(), font: { family: 'Montserrat', size: 12 } } } } 
+};
 
 chartsRegistry.radarHero = new Chart(document.getElementById('heroRadar').getContext('2d'), { type: 'radar', data: { labels: heroNames, datasets: [{ label: p1.name, data: heroNames.map(h => ((p1.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(212, 175, 55, 0.4)', 'rgba(212, 175, 55, 0.0)'), borderColor: style.getPropertyValue('--chart-line'), borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: heroNames.map(h => ((p2.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: 'rgba(200, 190, 190, 0.1)', borderColor: style.getPropertyValue('--text-muted'), borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
 chartsRegistry.radarPet = new Chart(document.getElementById('petRadar').getContext('2d'), { type: 'radar', data: { labels: petNames, datasets: [{ label: p1.name, data: petNames.map(p => ((p1.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(212, 175, 55, 0.4)', 'rgba(212, 175, 55, 0.0)'), borderColor: style.getPropertyValue('--chart-line'), borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: petNames.map(p => ((p2.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: 'rgba(200, 190, 190, 0.1)', borderColor: style.getPropertyValue('--text-muted'), borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
