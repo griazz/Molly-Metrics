@@ -38,17 +38,17 @@ body.light-mode {
 }
 
 html, body {
-height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; position: fixed;
-top: 0; left: 0; right: 0; bottom: 0;
-background-color: var(--bg-dark); transition: background-color var(--transition-speed) ease;
-font-family: var(--font-sans); font-weight: 300; color: var(--text-main); -webkit-font-smoothing: antialiased;
--webkit-tap-highlight-color: transparent;
+  height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; position: fixed;
+  top: 0; left: 0;
+  background-color: var(--bg-dark); transition: background-color var(--transition-speed) ease;
+  font-family: var(--font-sans); font-weight: 300; color: var(--text-main); -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1, h2, h3, h4, .section-title, .player-info { font-family: var(--font-serif); font-weight: 400; margin: 0; }
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-dark); } ::-webkit-scrollbar-thumb { background: var(--accent-secondary); border-radius: 3px; }
 
-#app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center;
+#app-background { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center;
 filter: grayscale(80%) sepia(30%) hue-rotate(320deg) brightness(0.25); transition: background-image 0.4s ease-in-out; }
 
 .main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; padding-bottom: 120px; box-sizing: border-box; }
