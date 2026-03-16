@@ -137,6 +137,7 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
 .cwl-round-status { font-size: 9px; color: var(--accent-main); text-transform: uppercase; letter-spacing: 2px; }
 .cwl-round-body { max-height: 0; opacity: 0; padding: 0 20px; transition: all 0.4s ease; overflow: hidden; }
 .cwl-round-body.open { max-height: 2000px; padding: 0 20px 20px 20px; opacity: 1; }
+
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; }
 .badge-rushed { background: rgba(229,57,53,0.15); border: 1px solid rgba(229,57,53,0.35); color: #e57373; }
 .badge-inactive { background: rgba(255,152,0,0.15); border: 1px solid rgba(255,152,0,0.35); color: #ffb74d; }
@@ -216,9 +217,10 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
   <div class="chip" data-filter="rushed" onclick="setRosterFilter('rushed')">⚠ Rushed</div>
   <div class="chip" data-filter="inactive" onclick="setRosterFilter('inactive')">Inactive</div>
   <div class="chip" data-filter="lowdonor" onclick="setRosterFilter('lowdonor')">Low Donor</div>
+  <div class="chip" data-filter="liability" onclick="setRosterFilter('liability')">Liability</div>
 </div>
 <div class="control-row" id="roster-controls" style="display:none;">
-<input type="text" id="searchInput" placeholder="Search CWL Roster..." oninput="debouncedFilterRoster()">
+<input type="text" id="searchInput" placeholder="Search Clan Roster..." oninput="debouncedFilterRoster()">
 <select id="sortSelect" onchange="filterRoster()">
 <option value="comp">Overall %</option>
 <option value="hero">Hero %</option>
@@ -238,6 +240,7 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
 <h4 style="color: var(--text-muted); font-size: 12px; letter-spacing: 4px; text-transform: uppercase;">Weekend Loot</h4>
 <div style="font-size: 42px; color: var(--accent-main); font-family: var(--font-sans); margin: 16px 0;" id="total-capital-loot">0</div>
 <p style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Capital Gold</p>
+<p id="capital-timer" style="font-size: 9px; color: var(--accent-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 8px;"></p>
 </div>
 <h4 class="section-title" style="margin-top: 32px;">Historical Performance</h4>
 <div class="player-card" style="padding: 20px;"><div class="chart-container" style="height: 220px; margin-top:0;"><canvas id="capitalHistoryChart"></canvas></div></div>
@@ -349,14 +352,12 @@ if(document.getElementById('compare-tab').classList.contains('active')) compareP
 }
 }
 
-// Timer setup to run dynamically
 function startSyncTimer() {
   setInterval(() => {
     let now = new Date();
     let minutes = now.getMinutes();
     let seconds = now.getSeconds();
     
-    // Calculate minutes until the next :00 or :30 mark
     let nextMin = minutes < 30 ? 30 : 60;
     let minsLeft = nextMin - minutes - 1;
     let secsLeft = 60 - seconds;
@@ -372,10 +373,49 @@ function startSyncTimer() {
   }, 1000);
 }
 
+// LIVE Capital Raid Timer
+function updateCapitalTimer() {
+  const timerEl = document.getElementById('capital-timer');
+  if (!timerEl) return;
+  
+  // Calculate current time strictly in US Central Time
+  const nowStr = new Date().toLocaleString("en-US", {timeZone: "America/Chicago"});
+  const now = new Date(nowStr);
+  const day = now.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  const hour = now.getHours();
+
+  let isRaidActive = false;
+  if (day === 5 && hour >= 2) isRaidActive = true; 
+  else if (day === 6 || day === 0) isRaidActive = true; 
+  else if (day === 1 && hour < 2) isRaidActive = true; 
+
+  let targetDate = new Date(now);
+  if (isRaidActive) {
+    // Find next Monday 2 AM
+    targetDate.setDate(now.getDate() + ((1 + 7 - day) % 7));
+    if (day === 1) targetDate.setDate(now.getDate()); 
+    targetDate.setHours(2, 0, 0, 0);
+  } else {
+    // Find next Friday 2 AM
+    targetDate.setDate(now.getDate() + ((5 + 7 - day) % 7));
+    if (day === 5) targetDate.setDate(now.getDate() + 7); 
+    targetDate.setHours(2, 0, 0, 0);
+  }
+
+  const diff = targetDate - now;
+  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const m = Math.floor((diff / 1000 / 60) % 60);
+
+  timerEl.innerText = isRaidActive ? `Ends in: ${d}d ${h}h ${m}m` : `Starts in: ${d}d ${h}h ${m}m`;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
 if(localStorage.getItem('molly-theme') === 'light') toggleTheme(false);
 Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
 startSyncTimer();
+updateCapitalTimer();
+setInterval(updateCapitalTimer, 60000); // Check every minute
 });
 
 function showLoader(text) { document.getElementById('loaderText').innerText = text || "Fetching API..."; document.getElementById('loaderOverlay').classList.add('active'); }
@@ -529,8 +569,14 @@ const sortBy = document.getElementById('sortSelect').value;
 let pool;
 if (currentRosterFilter === 'rushed') pool = globalPlayerData.filter(p => p.isRushed);
 else if (currentRosterFilter === 'inactive') pool = globalPlayerData.filter(p => p.isInactive);
-else if (currentRosterFilter === 'lowdonor') pool = globalPlayerData.filter(p => p.isLowDonor);
+else if (currentRosterFilter === 'lowdonor') pool = globalPlayerData.filter(p => (p.donations || 0) === 0);
 else if (currentRosterFilter === 'cwl') pool = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
+else if (currentRosterFilter === 'liability') pool = globalPlayerData.filter(p => {
+    let hr = p.hitRate !== null && p.hitRate !== undefined ? p.hitRate : 0;
+    let isAttackRed = p.cwlStats && p.cwlStats.attacks > 0 && hr < 33;
+    let defRatio = p.cwlStats && p.cwlStats.defenses > 0 ? (p.cwlStats.defStars / p.cwlStats.defenses) : 0;
+    return isAttackRed && (defRatio >= 2.5);
+});
 else pool = globalPlayerData;
 
 displayedPlayerData = pool.filter(p => p.name.toLowerCase().includes(searchTerm));
@@ -549,7 +595,7 @@ function renderPlayerCards(sortBy = 'comp') {
 Object.values(chartsRegistry.history).forEach(c => c && c.destroy()); Object.values(chartsRegistry.hero).forEach(c => c && c.destroy()); Object.values(chartsRegistry.pet).forEach(c => c && c.destroy());
 chartsRegistry.history = {}; chartsRegistry.hero = {}; chartsRegistry.pet = {};
 var container = document.getElementById('roster-container');
-if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; margin-top:32px; color:var(--text-muted); font-size:12px; letter-spacing:2px; text-transform:uppercase;'>No CWL players found.</p>"; return; }
+if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; margin-top:32px; color:var(--text-muted); font-size:12px; letter-spacing:2px; text-transform:uppercase;'>No players found for this filter.</p>"; return; }
 
 let htmlString = "";
 displayedPlayerData.forEach((player, index) => {
@@ -557,11 +603,19 @@ let activity = getActivityStatus(player.lastSeenTs);
 let safeId = player.name.replace(/[^a-zA-Z0-9]/g, '_') + '_' + index;
 let historyLogs = (player.recentlyCompleted && player.recentlyCompleted.length > 0) ?  `<div style="font-size:12px; margin-bottom: 24px;">✔  ${player.recentlyCompleted.slice(-3).join( '<br>✔ ' )}</div>` : '';
 
+// Advanced Liability & Donor Logic
+let hr = player.hitRate !== null && player.hitRate !== undefined ? player.hitRate : 0;
+let isAttackRed = player.cwlStats && player.cwlStats.attacks > 0 && hr < 33;
+let defRatio = player.cwlStats && player.cwlStats.defenses > 0 ? (player.cwlStats.defStars / player.cwlStats.defenses) : 0;
+let isDefRed = defRatio >= 2.5; 
+let isTrueLiability = isAttackRed && isDefRed;
+let isTrueLowDonor = (player.donations || 0) === 0;
+
 let badgesHtml = '';
 if (player.isRushed) badgesHtml += `<span class="status-badge badge-rushed">⚠ Rushed</span>`;
 if (player.isInactive) badgesHtml += `<span class="status-badge badge-inactive">Inactive</span>`;
-if (player.isLowDonor) badgesHtml += `<span class="status-badge badge-low-donor">Low Donor</span>`;
-if (player.isHighLiability) badgesHtml += `<span class="status-badge badge-liability">Liability</span>`;
+if (isTrueLowDonor) badgesHtml += `<span class="status-badge badge-low-donor">Low Donor</span>`;
+if (isTrueLiability) badgesHtml += `<span class="status-badge badge-liability">Liability</span>`;
 if (player.hitRate !== null && player.hitRate !== undefined) badgesHtml += `<span class="status-badge badge-hit-rate">${player.hitRate}% 3★</span>`;
 
 htmlString += `
@@ -666,6 +720,80 @@ let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 2
 ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
+function buildTargetAssignments(round) {
+    if (!round.myLineup || !round.enemyLineup) return '';
+
+    let html = `<div style="margin-top:24px;">
+        <p style="font-size: 11px; color: var(--accent-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; text-align:center; border-top: 1px solid var(--border-color); padding-top: 16px;">Tactical AI Assignments</p>
+        <p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 12px;">Strategic assignment routing based on offensive strike rates vs enemy defensive liabilities.</p>
+        <div style="font-size: 11px; display:flex; flex-direction:column; gap:4px;">`;
+
+    let enemyPool = [...round.enemyLineup].map(e => ({...e, assigned: false}));
+    let assignments = [];
+
+    round.myLineup.forEach(us => {
+        let pData = globalPlayerData.find(p => p.tag === us.tag);
+        let hr = (pData && pData.hitRate !== undefined && pData.hitRate !== null) ? pData.hitRate : 50;
+        let attacks = pData ? (pData.cwlStats ? pData.cwlStats.attacks : 0) : 0;
+        
+        let attackerClass = "Standard";
+        if (attacks > 0 && hr >= 66) attackerClass = "Elite";
+        else if (attacks > 0 && hr < 33) attackerClass = "Struggling";
+
+        assignments.push({ us, attackerClass, hr, target: null });
+    });
+
+    // Sort to give struggling players their pick of weak bases first to prevent mismatches
+    assignments.sort((a,b) => {
+        if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1;
+        if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1;
+        return b.us.th - a.us.th; 
+    });
+
+    assignments.forEach(a => {
+        let candidates = enemyPool.filter(e => !e.assigned);
+        if (candidates.length === 0) return;
+
+        let best = null;
+        if (a.attackerClass === "Struggling") {
+            // Find a weak base (high liability) at or below TH
+            let weakBases = candidates.filter(e => e.isHighLiability && e.th <= a.us.th);
+            if (weakBases.length > 0) best = weakBases.sort((x,y) => y.th - x.th)[0];
+        } else if (a.attackerClass === "Elite") {
+            // Find a strong base at or above TH
+            let strongBases = candidates.filter(e => !e.isHighLiability && e.th >= a.us.th);
+            if (strongBases.length > 0) best = strongBases.sort((x,y) => x.th - y.th)[0];
+        }
+
+        // Fallback: closest TH match
+        if (!best) {
+            candidates.sort((x,y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th));
+            best = candidates[0];
+        }
+
+        best.assigned = true;
+        a.target = best;
+    });
+
+    // Re-sort by map position for final UI presentation
+    assignments.sort((a,b) => a.us.mapPosition - b.us.mapPosition);
+
+    assignments.forEach(a => {
+        if (!a.target) return;
+        let usColor = a.attackerClass === "Elite" ? "var(--dot-green)" : (a.attackerClass === "Struggling" ? "var(--dot-red)" : "var(--text-main)");
+        let tgtColor = a.target.isHighLiability ? "var(--dot-red)" : "var(--text-main)";
+        
+        html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:6px 8px; background:rgba(0,0,0,0.2); border:1px solid rgba(212,175,55,0.1); border-radius:6px;">
+            <div style="color:${usColor}; flex:1;">${a.us.mapPosition}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
+            <div style="color:var(--text-muted); font-size:14px; padding:0 8px;">🎯</div>
+            <div style="color:${tgtColor}; flex:1; text-align:right;">${a.target.mapPosition}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
+        </div>`;
+    });
+
+    html += `</div></div>`;
+    return html;
+}
+
 function renderWar() {
 let container = document.getElementById('war-container');
 let html = "";
@@ -689,8 +817,12 @@ cwlPlayers.forEach((p) => {
 let hr = p.hitRate !== null && p.hitRate !== undefined ? p.hitRate : 0;
 let offColor = hr >= 66 ? "var(--dot-green)" : (hr >= 33 ? "var(--dot-yellow)" : (p.cwlStats.attacks > 0 ? "var(--dot-red)" : "var(--text-muted)"));
 let defRatio = p.cwlStats.defenses > 0 ? (p.cwlStats.defStars / p.cwlStats.defenses).toFixed(1) : 0;
-let defColor = defRatio >= 3.0 ? "var(--dot-red)" : "var(--text-muted)";
-let liabilityBadgeHtml = p.isHighLiability ? ` <span class="status-badge badge-liability" style="font-size:8px; padding:2px 5px;">⚠</span>` : '';
+let defColor = defRatio >= 2.5 ? "var(--dot-red)" : "var(--text-muted)";
+
+// Match strictly against the new true liability constraint
+let isAttackRed = p.cwlStats.attacks > 0 && hr < 33;
+let isDefRed = defRatio >= 2.5; 
+let liabilityBadgeHtml = (isAttackRed && isDefRed) ? ` <span class="status-badge badge-liability" style="font-size:8px; padding:2px 5px;">⚠</span>` : '';
 
 html += `<div class="board-row">
 <div style="flex:1;">${p.name}${liabilityBadgeHtml}</div>
@@ -774,6 +906,10 @@ ${eqHtml}
 </div>`;
 });
 rosterHtml += `</div>`;
+
+if (isCurrent) {
+    rosterHtml += buildTargetAssignments(round);
+}
 
 html += `
 <div class="cwl-round-card">
