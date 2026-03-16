@@ -240,8 +240,7 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
 <h4 style="color: var(--text-muted); font-size: 12px; letter-spacing: 4px; text-transform: uppercase;">Weekend Loot</h4>
 <div style="font-size: 42px; color: var(--accent-main); font-family: var(--font-sans); margin: 16px 0;" id="total-capital-loot">0</div>
 <p style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Capital Gold</p>
-<p id="predicted-medals" style="font-size: 12px; color: var(--accent-secondary); margin-top: 12px; letter-spacing: 1px;">Est. Raid Medals: <span id="medal-count" style="color:var(--text-main); font-weight:500;">...</span></p>
-<p id="capital-timer" style="font-size: 9px; color: var(--accent-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 8px;"></p>
+<p id="capital-timer" style="font-size: 9px; color: var(--accent-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 16px;"></p>
 </div>
 <h4 class="section-title" style="margin-top: 32px;">Historical Performance</h4>
 <div class="player-card" style="padding: 20px;"><div class="chart-container" style="height: 220px; margin-top:0;"><canvas id="capitalHistoryChart"></canvas></div></div>
@@ -379,10 +378,9 @@ function updateCapitalTimer() {
   const timerEl = document.getElementById('capital-timer');
   if (!timerEl) return;
   
-  // Calculate current time strictly in US Central Time
   const nowStr = new Date().toLocaleString("en-US", {timeZone: "America/Chicago"});
   const now = new Date(nowStr);
-  const day = now.getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  const day = now.getDay(); 
   const hour = now.getHours();
 
   let isRaidActive = false;
@@ -392,12 +390,10 @@ function updateCapitalTimer() {
 
   let targetDate = new Date(now);
   if (isRaidActive) {
-    // Find next Monday 2 AM
     targetDate.setDate(now.getDate() + ((1 + 7 - day) % 7));
     if (day === 1) targetDate.setDate(now.getDate()); 
     targetDate.setHours(2, 0, 0, 0);
   } else {
-    // Find next Friday 2 AM
     targetDate.setDate(now.getDate() + ((5 + 7 - day) % 7));
     if (day === 5) targetDate.setDate(now.getDate() + 7); 
     targetDate.setHours(2, 0, 0, 0);
@@ -416,7 +412,7 @@ if(localStorage.getItem('molly-theme') === 'light') toggleTheme(false);
 Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
 startSyncTimer();
 updateCapitalTimer();
-setInterval(updateCapitalTimer, 60000); // Check every minute
+setInterval(updateCapitalTimer, 60000); 
 });
 
 function showLoader(text) { document.getElementById('loaderText').innerText = text || "Fetching API..."; document.getElementById('loaderOverlay').classList.add('active'); }
@@ -819,10 +815,8 @@ let hr = p.hitRate !== null && p.hitRate !== undefined ? p.hitRate : 0;
 let offColor = hr >= 66 ? "var(--dot-green)" : (hr >= 33 ? "var(--dot-yellow)" : (p.cwlStats.attacks > 0 ? "var(--dot-red)" : "var(--text-muted)"));
 let defRatio = p.cwlStats.defenses > 0 ? (p.cwlStats.defStars / p.cwlStats.defenses).toFixed(1) : 0;
 
-// NEW RULE: Text only turns red if 3-starred on ALL defenses (e.g. 3 defenses, 9 stars)
 let defColor = (p.cwlStats.defenses > 0 && p.cwlStats.defStars === p.cwlStats.defenses * 3) ? "var(--dot-red)" : "var(--text-muted)";
 
-// Match strictly against the new true liability constraint
 let isAttackRed = p.cwlStats.attacks > 0 && hr < 33;
 let isDefRed = defRatio >= 2.5; 
 let liabilityBadgeHtml = (isAttackRed && isDefRed) ? ` <span class="status-badge badge-liability" style="font-size:8px; padding:2px 5px;">⚠</span>` : '';
@@ -954,17 +948,6 @@ container.innerHTML = html;
 
 function renderCapitalBoard() {
 document.getElementById('total-capital-loot').innerText = capitalLoot.toLocaleString();
-
-// ML Regression based on Clan's specific 9-week history:
-// Offensive Medals ≈ Total Loot / 387.6
-// Defensive Medals ≈ 287 (Historical Average)
-let predictedMedals = 0;
-if (capitalLoot > 0) {
-  let estOffense = capitalLoot / 387.6;
-  let estDefense = 287;
-  predictedMedals = Math.floor(estOffense + estDefense);
-}
-document.getElementById('medal-count').innerText = "~" + predictedMedals.toLocaleString();
 
 let container = document.getElementById('capital-board-container'), html = "";
 [...globalPlayerData].sort((a,b) => (b.capitalLooted||0) - (a.capitalLooted||0)).forEach((p, i) => {
