@@ -105,9 +105,9 @@ transition: max-height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), padding 0.5s ease, o
 height: 340px; position: relative; width: 100%; box-sizing: border-box; }
 
 .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px); border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 8px 6px; gap: 4px; }
-.nav-btn { flex: 1; padding: 10px 2px; text-align: center; color: var(--text-muted); font-size: 9px; cursor: pointer; transition: all 0.4s ease;
-border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; }
+.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 6px 4px; gap: 2px; }
+.nav-btn { flex: 1; padding: 8px 1px; text-align: center; color: var(--text-muted); font-size: 8px; cursor: pointer; transition: all 0.4s ease;
+border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; }
 .nav-btn span { font-size: 14px; }
 .nav-btn:active { transform: scale(0.92); }
 .nav-btn.active { color: var(--bg-dark); background: var(--accent-main); box-shadow: var(--glow-accent); }
@@ -263,6 +263,16 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
 </div>
 </div>
 
+<div id="records-tab" class="tab-content">
+  <div style="display:flex; gap: 16px; margin-bottom: 24px;">
+    <div style="flex:1;">
+      <label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Select Operator</label>
+      <select id="recordPlayerSelect" onchange="renderPlayerRecord()"><option>Loading...</option></select>
+    </div>
+  </div>
+  <div id="recordDossier" style="display:none;"></div>
+</div>
+
 </div>
 </div>
 
@@ -273,6 +283,7 @@ box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
 <div class="nav-btn" onclick="switchTab('war')"><span> ⚔ </span> War</div>
 <div class="nav-btn" onclick="switchTab('capital')"><span>🏛</span> Capital</div>
 <div class="nav-btn" onclick="switchTab('compare')"><span> ⚖ </span> Compare</div>
+<div class="nav-btn" onclick="switchTab('records')"><span> 📜 </span> Records</div>
 </div>
 </div>
 
@@ -292,8 +303,25 @@ let displayedPlayerData = [];
 let clanData = {};
 let capitalLoot = 0;
 let warInfo = null;
+let legacyData = null; // Will populate from backend later
 let chartsRegistry = { history: {}, hero: {}, pet: {}, radarHero: null, radarPet: null, capitalLine: null, activityHourly: null, activityDaily: null };
 let currentRosterFilter = 'all';
+
+// Dummy data strictly for UI demonstration until backend is complete
+const dummyLegacyData = {
+  "#20YLLYC9P": {
+    name: "bobolob5",
+    totalActivity: 2541,
+    totalDonated: 154820,
+    totalReceived: 83204,
+    totalCapital: 984050,
+    bestDonated: { month: "2025-10", val: 26122 },
+    bestCapital: { month: "2026-02", val: 129009 },
+    bestActivity: { month: "2025-10", val: 417 },
+    momentum: "Heating Up",
+    logisticsRating: "Provider"
+  }
+};
 
 const CWL_TAGS = ["#PG0R8GQPQ", "#YCRV8GP0U", "#RYPU89Y8", "#99JQPVU9Q", "#GRJRUYP0", "#8QGVV099U", "#2RL2JGJPJ", "#Y8LY2VUJ9", "#GYJ00RJ2Q", "#G9YR000R8", "#20YLLYC9P", "#QVCLVUQVY", "#9LGG22Q28", "#GGULC2CR", "#9R0C82GU"];
 
@@ -309,7 +337,7 @@ const ASSETS = {
 "Electro Owl": "https://i.imgur.com/7dZT0vb.png", "Unicorn": "https://i.imgur.com/mZzrIcS.png", "Frosty": "https://i.imgur.com/X7vy4qW.png", "Diggy": "https://i.imgur.com/omgjvWR.png", "Phoenix": "https://i.imgur.com/mBVsYEQ.png", "Spirit Fox": "https://i.imgur.com/cFO8ZUp.png", "Angry Jelly": "https://i.imgur.com/YAWHXJF.png", "Sneezy": "https://i.imgur.com/JiaXMtO.png", "Greedy Raven": "https://i.imgur.com/L48mXb4.png"
 };
 
-const tabBackgrounds = { 'system': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'roster': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'war': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'capital': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'compare': "url('https://i.imgur.com/YCHVLcr.jpeg')" };
+const tabBackgrounds = { 'system': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'roster': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'war': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'capital': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'compare': "url('https://i.imgur.com/YCHVLcr.jpeg')", 'records': "url('https://i.imgur.com/lK3ctDR.jpeg')" };
 
 // --- Utility Functions ---
 function countUp(elId, endVal, isPct, prefix="") {
@@ -428,6 +456,7 @@ document.getElementById('mainScroll').scrollTop = 0;
 
 if ((tab === 'roster' || tab === 'war' || tab === 'capital') && globalPlayerData.length === 0) fetchDashboardData();
 if (tab === 'compare') { if (globalPlayerData.length === 0) fetchDashboardData(populateVersusDropdowns); else populateVersusDropdowns(); }
+if (tab === 'records') { if (globalPlayerData.length === 0) fetchDashboardData(populateRecordsDropdown); else populateRecordsDropdown(); }
 }
 
 function getActivityStatus(ts) {
@@ -468,6 +497,9 @@ try {
     clanData = data;
     capitalLoot = data.clanCapitalLoot || 0;
     warInfo = data.warInfo || { type: "NONE", data: null };
+    
+    // Inject backend legacy data or fallback to demo data
+    legacyData = data.legacyData || dummyLegacyData;
 
     countUp('sys-roster-count', globalPlayerData.length, false);
     let activePlayers = globalPlayerData.filter(p => (new Date().getTime() - p.lastSeenTs) / (1000 * 60 * 60) < 24).length;
@@ -1021,6 +1053,99 @@ let rOpts = {
 
 chartsRegistry.radarHero = new Chart(document.getElementById('heroRadar').getContext('2d'), { type: 'radar', data: { labels: heroNames, datasets: [{ label: p1.name, data: heroNames.map(h => ((p1.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(212, 175, 55, 0.4)', 'rgba(212, 175, 55, 0.0)'), borderColor: style.getPropertyValue('--chart-line'), borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: heroNames.map(h => ((p2.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: 'rgba(200, 190, 190, 0.1)', borderColor: style.getPropertyValue('--text-muted'), borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
 chartsRegistry.radarPet = new Chart(document.getElementById('petRadar').getContext('2d'), { type: 'radar', data: { labels: petNames, datasets: [{ label: p1.name, data: petNames.map(p => ((p1.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(212, 175, 55, 0.4)', 'rgba(212, 175, 55, 0.0)'), borderColor: style.getPropertyValue('--chart-line'), borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: petNames.map(p => ((p2.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: 'rgba(200, 190, 190, 0.1)', borderColor: style.getPropertyValue('--text-muted'), borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
+}
+
+// --- Legacy Records Functions ---
+function populateRecordsDropdown() {
+  let sel = document.getElementById('recordPlayerSelect');
+  if(!sel) return;
+  sel.innerHTML = "";
+  
+  if (!legacyData || Object.keys(legacyData).length === 0) {
+    sel.innerHTML = "<option>Awaiting Backend Sync...</option>";
+    document.getElementById('recordDossier').innerHTML = `<p style='text-align:center; padding:20px; font-size:12px; color:var(--text-muted);'>Historical data processing from CSVs...</p>`;
+    document.getElementById('recordDossier').style.display = 'block';
+    return;
+  }
+  
+  let tags = Object.keys(legacyData);
+  tags.forEach(tag => {
+    sel.add(new Option(legacyData[tag].name, tag));
+  });
+  renderPlayerRecord();
+}
+
+function renderPlayerRecord() {
+  let tag = document.getElementById('recordPlayerSelect').value;
+  if(!legacyData || !legacyData[tag]) return;
+  let rec = legacyData[tag];
+  document.getElementById('recordDossier').style.display = 'block';
+
+  let formatMonth = (m) => {
+    if(!m) return "N/A";
+    let parts = m.split('-');
+    if(parts.length !== 2) return m;
+    let date = new Date(parts[0], parseInt(parts[1]) - 1);
+    return date.toLocaleString('default', { month: 'short', year: 'numeric' });
+  };
+
+  let momBadge = "";
+  if(rec.momentum === "Heating Up") momBadge = `<span class="status-badge" style="background:rgba(255,87,34,0.15); color:#ff5722; border:1px solid rgba(255,87,34,0.35);">🔥 Heating Up</span>`;
+  else if(rec.momentum === "Cooling Off") momBadge = `<span class="status-badge" style="background:rgba(33,150,243,0.15); color:#2196f3; border:1px solid rgba(33,150,243,0.35);">❄️ Cooling Off</span>`;
+
+  let logBadge = "";
+  if(rec.logisticsRating === "Leech") logBadge = `<span class="status-badge badge-liability">🩸 Logistics Leech</span>`;
+  else if(rec.logisticsRating === "Provider") logBadge = `<span class="status-badge badge-hit-rate">📦 Top Provider</span>`;
+
+  document.getElementById('recordDossier').innerHTML = `
+    <div class="player-card" style="padding:0; background: linear-gradient(135deg, rgba(30,10,15,0.9), rgba(10,5,5,0.95)); border: 1px solid var(--accent-secondary);">
+      <div style="padding: 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+          <h2 style="color:var(--accent-main); margin:0;">${rec.name}</h2>
+          <div style="display:flex; gap:6px; flex-direction:column; align-items:flex-end;">
+             ${momBadge}
+             ${logBadge}
+          </div>
+        </div>
+        <p style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-top:8px;">Operator Career Dossier</p>
+      </div>
+
+      <div style="padding: 0 24px 24px 24px;">
+        <h4 class="section-title" style="margin-top:0; text-align:left; font-size:12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">All-Time Impact</h4>
+        <div class="stat-grid" style="grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="stat-box"><div class="stat-label">Total Activity</div><div class="stat-val" style="font-size:18px;">${rec.totalActivity.toLocaleString()}</div></div>
+          <div class="stat-box"><div class="stat-label">Capital Looted</div><div class="stat-val" style="font-size:18px;">${rec.totalCapital.toLocaleString()}</div></div>
+          <div class="stat-box"><div class="stat-label">Troops Donated</div><div class="stat-val" style="font-size:18px; color:var(--dot-green)">${rec.totalDonated.toLocaleString()}</div></div>
+          <div class="stat-box"><div class="stat-label">Troops Received</div><div class="stat-val" style="font-size:18px; color:var(--dot-red)">${rec.totalReceived.toLocaleString()}</div></div>
+        </div>
+
+        <h4 class="section-title" style="margin-top:32px; text-align:left; font-size:12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personal Bests (Wrapped)</h4>
+        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px; padding:16px;">
+           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,175,55,0.1); padding-bottom:12px; margin-bottom:12px;">
+             <div>
+               <div style="font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Best Donation Month</div>
+               <div style="font-size:13px; color:var(--text-main); margin-top:4px;">${formatMonth(rec.bestDonated.month)}</div>
+             </div>
+             <div style="font-size:16px; color:var(--accent-main); font-weight:500;">${rec.bestDonated.val.toLocaleString()}</div>
+           </div>
+           <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,175,55,0.1); padding-bottom:12px; margin-bottom:12px;">
+             <div>
+               <div style="font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Highest Capital Contribution</div>
+               <div style="font-size:13px; color:var(--text-main); margin-top:4px;">${formatMonth(rec.bestCapital.month)}</div>
+             </div>
+             <div style="font-size:16px; color:var(--accent-main); font-weight:500;">${rec.bestCapital.val.toLocaleString()}</div>
+           </div>
+           <div style="display:flex; justify-content:space-between; align-items:center;">
+             <div>
+               <div style="font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Peak Activity Score</div>
+               <div style="font-size:13px; color:var(--text-main); margin-top:4px;">${formatMonth(rec.bestActivity.month)}</div>
+             </div>
+             <div style="font-size:16px; color:var(--accent-main); font-weight:500;">${rec.bestActivity.val.toLocaleString()}</div>
+           </div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 let lastHiddenTime = 0; document.addEventListener('visibilitychange', () => { if (document.hidden) lastHiddenTime = Date.now(); else if (lastHiddenTime > 0 && (Date.now() - lastHiddenTime) / 60000 > 15) { showLoader(); fetchDashboardData(() => { lastHiddenTime = 0; }); } });
