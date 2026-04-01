@@ -74,10 +74,8 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 
 .player-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 24px; box-shadow: var(--card-shadow); overflow: hidden; transition: transform var(--transition-speed) ease;
 backdrop-filter: blur(16px); contain: layout style; }
-.clan-score { font-size: 48px; line-height: 1; letter-spacing: 6px; font-family: var(--font-sans); font-weight: 300; text-align: center; color: var(--accent-main); margin-top: 12px;}
 .card-header { padding: 24px 20px; cursor: pointer; display: flex; flex-direction: column; }
 .player-info { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; font-size: 20px; letter-spacing: 1.5px;}
-.timestamp-sub { font-size: 10px; color: var(--text-muted); margin-bottom: 20px; letter-spacing: 2px; font-family: var(--font-sans); text-transform: uppercase;}
 
 .progress-bg { background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 100px; width: 100%; height: 6px; overflow: hidden; margin-top: 8px; }
 .progress-fill { background: linear-gradient(90deg, #BF953F 0%, #FCF6BA 50%, #BF953F 100%); background-size: 200% 100%; height: 100%; border-radius: 100px;
@@ -121,7 +119,6 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 .unit-icon.max-level { border-color: rgba(212, 175, 55, 0.6); animation: luxuryBreathe 4s linear infinite; }
 @keyframes luxuryBreathe { 0%, 100% { box-shadow: inset 0 0 5px rgba(212, 175, 55, 0.15), 0 0 5px 0 rgba(212, 175, 55, 0.3), 0 0 25px 0 rgba(212, 175, 55, 0.1); } 50% { box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.3), 0 0 5px 0 rgba(212, 175, 55, 0.6), 0 0 25px 0 rgba(212, 175, 55, 0.3); } }
 
-.donation-bar-container { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color); }
 .cwl-round-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 16px; box-shadow: var(--card-shadow); overflow: hidden; }
 .cwl-round-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid transparent; transition: 0.3s; }
 .cwl-round-header.active { border-bottom: 1px solid rgba(212, 175, 55, 0.15); background: rgba(0,0,0,0.25); box-shadow: inset 0 -10px 20px -10px rgba(212, 175, 55, 0.1); }
@@ -138,6 +135,19 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 .chip.active { background: var(--accent-main); color: var(--bg-dark); border-color: var(--accent-main); }
 .chip:active { transform: scale(0.93); }
 .th-alert { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; background: rgba(229,57,53,0.08); border: 1px solid rgba(229,57,53,0.3); border-radius: 8px; margin: 6px 0; font-size: 11px; color: #e57373; letter-spacing: 0.3px; }
+
+/* NEW: Circular Progress CSS */
+.circular-progress {
+  width: 100px; height: 100px; border-radius: 50%;
+  background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg);
+  display: flex; align-items: center; justify-content: center; position: relative;
+  box-shadow: var(--glow-accent); flex-shrink: 0;
+}
+.circular-progress::before {
+  content: ""; position: absolute; inset: 6px; background: var(--bg-card);
+  border-radius: 50%; backdrop-filter: blur(16px);
+}
+.circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
 </style>
 </head>
 <body>
@@ -150,40 +160,28 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 </div>
 
 <div class="main-scroll-area" id="mainScroll">
-
 <div class="container">
 
-<div id="system-tab" class="tab-content">
-<div class="player-card" style="padding: 32px 20px; text-align: center;">
-<h4 style="margin-top:0; color: var(--text-muted); font-size: 12px; letter-spacing: 4px; text-transform: uppercase;">Clan Overview</h4>
-<div style="display:flex; justify-content: space-around; color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-top:24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
-<div>Members<br><span id="sys-roster-count" style="font-size: 28px; color: var(--text-main); display:block; margin-top: 8px;">0</span></div>
-</div>
-
-<div style="margin-top: 24px;">
-<h4 style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Global Completion</h4>
-<div class="clan-score" id="sys-clan-score">0%</div>
-<div class="progress-bg" style="margin-top: 16px; width: 80%; margin-left: auto; margin-right: auto;"><div id="sys-clan-progress" class="progress-fill" style="width: 0%;"></div></div>
-</div>
-
-<div class="donation-bar-container">
-<h4 style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 16px;">Logistics & Supply</h4>
-<div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 8px; color: var(--text-main); font-weight: 500; letter-spacing: 1px;">
-<span>Sent: <span id="sys-donations-sent" style="color: var(--accent-main)">0</span></span>
-<span>Recv: <span id="sys-donations-rec" style="color: var(--text-muted)">0</span></span>
-</div>
-<div style="width: 100%; display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color);">
-<div id="sys-donation-progress" style="width: 50%; background: var(--accent-main); height: 100%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);"></div>
-<div id="sys-received-progress" style="width: 50%; background: rgba(255,255,255,0.15); height: 100%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);"></div>
-</div>
-</div>
-</div>
-</div>
-
 <div id="roster-tab" class="tab-content">
+  
+<div class="player-card" style="padding: 24px; text-align: center;">
+    <h4 style="color: var(--text-muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Active Roster Progression</h4>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
+        <div class="circular-progress" id="global-circle" style="--progress: 0%;">
+            <div class="circular-value" id="global-pct-val">0%</div>
+        </div>
+        <div style="text-align: left;">
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">30-Day Growth</div>
+            <div id="global-change-val" style="font-size: 18px; font-weight: 500;">+0.00%</div>
+            <div style="font-size: 9px; color: var(--text-muted); margin-top: 6px;" id="global-progress-count">0 Operators Advancing</div>
+        </div>
+    </div>
+</div>
+
 <div class="filter-chips" id="roster-filter-chips" style="display:none;">
   <div class="chip active" data-filter="all" onclick="setRosterFilter('all')">All</div>
   <div class="chip" data-filter="cwl" onclick="setRosterFilter('cwl')">CWL</div>
+  <div class="chip" data-filter="inactive" onclick="setRosterFilter('inactive')">Inactive</div>
 </div>
 <div class="control-row" id="roster-controls" style="display:none;">
 <input type="text" id="searchInput" placeholder="Search Clan Roster..." oninput="debouncedFilterRoster()">
@@ -222,7 +220,6 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 
 <div class="bottom-nav-wrapper">
 <div class="bottom-nav">
-<div class="nav-btn" onclick="switchTab('system')"><span style="font-size:18px;"> 🏠 </span> Hub</div>
 <div class="nav-btn" onclick="switchTab('roster')"><span>🛡</span> Roster</div>
 <div class="nav-btn active" onclick="switchTab('war')"><span> ⚔ </span> War</div>
 </div>
@@ -241,6 +238,7 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
 let warInfo = null;
+let legacyData = null;
 let chartsRegistry = { history: {}, hero: {}, pet: {}, radarHero: null, radarPet: null, cwlLineChart: null };
 let currentRosterFilter = 'all';
 
@@ -258,7 +256,7 @@ const ASSETS = {
 "Electro Owl": "https://i.imgur.com/7dZT0vb.png", "Unicorn": "https://i.imgur.com/mZzrIcS.png", "Frosty": "https://i.imgur.com/X7vy4qW.png", "Diggy": "https://i.imgur.com/omgjvWR.png", "Phoenix": "https://i.imgur.com/mBVsYEQ.png", "Spirit Fox": "https://i.imgur.com/cFO8ZUp.png", "Angry Jelly": "https://i.imgur.com/YAWHXJF.png", "Sneezy": "https://i.imgur.com/JiaXMtO.png", "Greedy Raven": "https://i.imgur.com/L48mXb4.png"
 };
 
-const tabBackgrounds = { 'system': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'roster': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'war': "url('https://i.imgur.com/lK3ctDR.jpeg')" };
+const tabBackgrounds = { 'roster': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'war': "url('https://i.imgur.com/lK3ctDR.jpeg')" };
 
 function formatMonth(m) {
     if(!m) return "N/A";
@@ -274,7 +272,7 @@ function formatMonth(m) {
 
 function countUp(elId, endVal, isPct, prefix="") {
 const el = document.getElementById(elId); if(!el) return;
-let duration = 3500, start = 0, startTime = null, end = parseFloat(endVal) || 0;
+let duration = 2500, start = 0, startTime = null, end = parseFloat(endVal) || 0;
 const step = (t) => {
 if(!startTime) startTime = t; let p = Math.min((t - startTime)/duration, 1), ease = 1 - Math.pow(1 - p, 3);
 let curr = start + ease * (end - start);
@@ -311,7 +309,6 @@ if(document.getElementById('roster-compare-section').style.display === 'block') 
 window.addEventListener('DOMContentLoaded', () => {
 if(localStorage.getItem('molly-theme') === 'light') toggleTheme(false);
 Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
-// Automatically fetch dashboard data on load since War is default active
 fetchDashboardData(); 
 });
 
@@ -325,12 +322,11 @@ document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'
 document.getElementById(`${tab}-tab`).classList.add('active');
 document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
 document.getElementById('mainScroll').scrollTop = 0;
-
 if ((tab === 'roster' || tab === 'war') && globalPlayerData.length === 0) fetchDashboardData();
 }
 
 async function fetchDashboardData(callback) {
-showLoader("Crunching Numbers...");
+showLoader("Crunching Roster Data...");
 try {
   let res = await fetch(WEB_APP_URL + "?action=getDashboardData");
   let data = await res.json();
@@ -340,23 +336,37 @@ try {
     globalPlayerData = data.players;
     clanData = data;
     warInfo = data.warInfo || { type: "NONE", data: null };
+    legacyData = data.legacyData || {};
 
-    countUp('sys-roster-count', globalPlayerData.length, false);
-    countUp('sys-clan-score', data.clanPct, true);
-    document.getElementById('sys-clan-progress').style.width = `${data.clanPct}%`;
+    // Calculate Active Roster Progression
+    let progressingPlayers = 0;
+    let currentTotal = 0;
+    let oldTotal = 0;
 
-    let totalDono = data.clanDonations || 0;
-    let totalRec = data.clanReceived || 0;
-    let total = totalDono + totalRec;
-    let donoRatio = total === 0 ? 50 : (totalDono / total) * 100;
-    let recRatio = total === 0 ? 50 : (totalRec / total) * 100;
-    let sentEl = document.getElementById('sys-donations-sent');
-    if(sentEl) {
-      sentEl.innerText = totalDono.toLocaleString();
-      document.getElementById('sys-donations-rec').innerText = totalRec.toLocaleString();
-      document.getElementById('sys-donation-progress').style.width = `${donoRatio}%`;
-      document.getElementById('sys-received-progress').style.width = `${recRatio}%`;
-    }
+    globalPlayerData.forEach(p => {
+        let pcts = p.historyPcts || [];
+        if (pcts.length > 0) {
+            let curr = parseFloat(pcts[pcts.length - 1]);
+            let old = parseFloat(pcts[0]);
+            if (curr > old) {
+                progressingPlayers++;
+                currentTotal += curr;
+                oldTotal += old;
+            }
+        }
+    });
+
+    let currentGlobal = progressingPlayers > 0 ? (currentTotal / progressingPlayers) : 0;
+    let oldGlobal = progressingPlayers > 0 ? (oldTotal / progressingPlayers) : 0;
+    let change = currentGlobal - oldGlobal;
+
+    document.getElementById('global-circle').style.setProperty('--progress', `${currentGlobal}%`);
+    countUp('global-pct-val', currentGlobal, true);
+    
+    let changeEl = document.getElementById('global-change-val');
+    changeEl.innerText = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
+    changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
+    document.getElementById('global-progress-count').innerText = `${progressingPlayers} Operators Advancing`;
 
     document.getElementById('roster-controls').style.display = globalPlayerData.length > 0 ? "flex" : "none";
     document.getElementById('roster-filter-chips').style.display = globalPlayerData.length > 0 ? "flex" : "none";
@@ -384,7 +394,8 @@ const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 const sortBy = document.getElementById('sortSelect').value;
 
 let pool;
-if (currentRosterFilter === 'cwl') pool = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
+if (currentRosterFilter === 'inactive') pool = globalPlayerData.filter(p => p.isInactive);
+else if (currentRosterFilter === 'cwl') pool = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
 else pool = globalPlayerData;
 
 displayedPlayerData = pool.filter(p => p.name.toLowerCase().includes(searchTerm));
@@ -413,6 +424,39 @@ let hr = player.hitRate !== null && player.hitRate !== undefined ? player.hitRat
 let badgesHtml = '';
 if (player.hitRate !== null && player.hitRate !== undefined) badgesHtml += `<span class="status-badge badge-hit-rate">${player.hitRate}% 3★</span>`;
 
+let legacyHtml = "";
+if (legacyData && legacyData[player.tag]) {
+    let rec = legacyData[player.tag];
+    let momBadge = "";
+    if(rec.momentum === "Heating Up") momBadge = `🔥 Heating Up`;
+    else if(rec.momentum === "Cooling Off") momBadge = `❄️ Cooling Off`;
+
+    legacyHtml = `
+    <h4 class="section-title" style="margin-top:32px; text-align:left; font-size:12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Career Dossier <span style="float:right; font-size:10px; color:var(--accent-main); text-transform:none;">${momBadge}</span></h4>
+    <div class="stat-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom:16px;">
+      <div class="stat-box"><div class="stat-label">Total Activity</div><div class="stat-val" style="font-size:15px;">${rec.totalActivity.toLocaleString()}</div></div>
+      <div class="stat-box"><div class="stat-label">Capital Looted</div><div class="stat-val" style="font-size:15px;">${rec.totalCapital.toLocaleString()}</div></div>
+      <div class="stat-box"><div class="stat-label">Troops Donated</div><div class="stat-val" style="font-size:15px; color:var(--dot-green)">${rec.totalDonated.toLocaleString()}</div></div>
+      <div class="stat-box"><div class="stat-label">Troops Received</div><div class="stat-val" style="font-size:15px; color:var(--dot-red)">${rec.totalReceived.toLocaleString()}</div></div>
+    </div>
+    <h4 class="section-title" style="margin-top:24px; text-align:left; font-size:11px; margin-bottom:12px;">Personal Bests (Wrapped)</h4>
+    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:24px;">
+       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,175,55,0.1); padding-bottom:8px; margin-bottom:8px;">
+         <div><div style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Best Donation Month</div><div style="font-size:12px; color:var(--text-main); margin-top:2px;">${formatMonth(rec.bestDonated.month)}</div></div>
+         <div style="font-size:14px; color:var(--accent-main); font-weight:500;">${rec.bestDonated.val.toLocaleString()}</div>
+       </div>
+       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,175,55,0.1); padding-bottom:8px; margin-bottom:8px;">
+         <div><div style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Highest Capital Loot</div><div style="font-size:12px; color:var(--text-main); margin-top:2px;">${formatMonth(rec.bestCapital.month)}</div></div>
+         <div style="font-size:14px; color:var(--accent-main); font-weight:500;">${rec.bestCapital.val.toLocaleString()}</div>
+       </div>
+       <div style="display:flex; justify-content:space-between; align-items:center;">
+         <div><div style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Peak Activity Score</div><div style="font-size:12px; color:var(--text-main); margin-top:2px;">${formatMonth(rec.bestActivity.month)}</div></div>
+         <div style="font-size:14px; color:var(--accent-main); font-weight:500;">${rec.bestActivity.val.toLocaleString()}</div>
+       </div>
+    </div>
+    `;
+}
+
 htmlString += `
 <div class="player-card">
 <div class="card-header" onclick="toggleDetails(this, '${safeId}', ${globalPlayerData.indexOf(player)})">
@@ -432,7 +476,7 @@ ${historyLogs}
 <div class="stat-box"><div class="stat-label">War Stars</div><div class="stat-val">${(player.warStars||0).toLocaleString()}</div></div>
 <div class="stat-box"><div class="stat-label">CWL Hit Rate</div><div class="stat-val">${hr}%</div></div>
 </div>
-
+${legacyHtml}
 ${player.heroes ? `
 <h4 class="section-title">Hero Levels (%)</h4>
 <div class="chart-container" style="height: 220px;"><canvas id="heroBarChart_${safeId}"></canvas></div>
@@ -599,8 +643,6 @@ html += `<div class="board-row" style="color:var(--text-muted); font-size:10px; 
 cwlPlayers.forEach((p) => {
 let hr = p.hitRate !== null && p.hitRate !== undefined ? p.hitRate : 0;
 let offColor = hr >= 66 ? "var(--dot-green)" : (hr >= 33 ? "var(--dot-yellow)" : (p.cwlStats.attacks > 0 ? "var(--dot-red)" : "var(--text-muted)"));
-let defRatio = p.cwlStats.defenses > 0 ? (p.cwlStats.defStars / p.cwlStats.defenses).toFixed(1) : 0;
-
 let defColor = (p.cwlStats.defenses > 0 && p.cwlStats.defStars === p.cwlStats.defenses * 3) ? "var(--dot-red)" : "var(--text-muted)";
 
 html += `<div class="board-row">
@@ -818,8 +860,6 @@ let rOpts = {
 chartsRegistry.radarHero = new Chart(document.getElementById('heroRadar').getContext('2d'), { type: 'radar', data: { labels: heroNames, datasets: [{ label: p1.name, data: heroNames.map(h => ((p1.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(212, 175, 55, 0.4)', 'rgba(212, 175, 55, 0.0)'), borderColor: style.getPropertyValue('--chart-line'), borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: heroNames.map(h => ((p2.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: 'rgba(200, 190, 190, 0.1)', borderColor: style.getPropertyValue('--text-muted'), borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
 chartsRegistry.radarPet = new Chart(document.getElementById('petRadar').getContext('2d'), { type: 'radar', data: { labels: petNames, datasets: [{ label: p1.name, data: petNames.map(p => ((p1.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(212, 175, 55, 0.4)', 'rgba(212, 175, 55, 0.0)'), borderColor: style.getPropertyValue('--chart-line'), borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: petNames.map(p => ((p2.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: 'rgba(200, 190, 190, 0.1)', borderColor: style.getPropertyValue('--text-muted'), borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
 }
-
-let lastHiddenTime = 0; document.addEventListener('visibilitychange', () => { if (document.hidden) lastHiddenTime = Date.now(); else if (lastHiddenTime > 0 && (Date.now() - lastHiddenTime) / 60000 > 15) { showLoader(); fetchDashboardData(() => { lastHiddenTime = 0; }); } });
 </script>
 </body>
 </html>
