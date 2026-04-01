@@ -32,10 +32,8 @@
 --header-bg: rgba(9, 10, 15, 0.85);
 --transition-speed: 0.4s; 
 --glow-accent: 0 0 20px rgba(0, 229, 255, 0.25); 
---glow-border: rgba(0, 229, 255, 0.4);
 --font-sans: 'Montserrat', sans-serif;
 --dot-green: #00ff88; 
---dot-yellow: #ffbb00; 
 --dot-red: #ff3366;
 }
 
@@ -50,7 +48,6 @@ body.light-mode {
 --card-shadow: 0 16px 40px rgba(0, 0, 0, 0.05); 
 --header-bg: rgba(240, 242, 245, 0.85);
 --glow-accent: 0 0 20px rgba(0, 184, 204, 0.15); 
---glow-border: rgba(0, 184, 204, 0.3);
 }
 
 html, body {
@@ -65,8 +62,10 @@ h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-dark); } ::-webkit-scrollbar-thumb { background: var(--accent-secondary); border-radius: 3px; }
 
 #app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center;
-/* Adjusted filters for the new Neon Cyan vibe */
 filter: grayscale(70%) sepia(20%) hue-rotate(190deg) brightness(0.2) contrast(1.2); transition: background-image 0.4s ease-in-out; }
+
+/* The HUD Scanline Overlay */
+#app-background::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.2) 2px, rgba(0,0,0,0.2) 4px); pointer-events: none; }
 
 .main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
 
@@ -89,14 +88,18 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 .compare-btn { flex-shrink:0; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; color:var(--accent-main); font-family:var(--font-sans); font-size:11px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; backdrop-filter: blur(16px); transition: all 0.3s ease; }
 .compare-btn:active { transform: scale(0.95); }
 
-/* V2 Player Cards */
-.player-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 16px; box-shadow: var(--card-shadow); overflow: hidden; transition: transform var(--transition-speed) ease; backdrop-filter: blur(16px); contain: layout style; cursor: pointer; }
+/* V2 Player Cards (Glassmorphism Reflection) */
+.player-card { position: relative; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 16px; box-shadow: var(--card-shadow); overflow: hidden; transition: transform var(--transition-speed) ease; backdrop-filter: blur(16px); contain: layout style; cursor: pointer; }
+.player-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0) 100%); transform: skewX(-20deg); transition: 0.5s; pointer-events: none;}
+.player-card:active::before { left: 150%; transition: 0s; }
 .player-card:active { transform: scale(0.98); }
+
 .card-header { padding: 16px 20px; display: flex; flex-direction: column; }
 .player-info { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; font-size: 18px; letter-spacing: 1.5px;}
 
 .progress-bg { background-color: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 100px; width: 100%; height: 6px; overflow: hidden; margin-top: 8px; }
-.progress-fill { background: linear-gradient(90deg, var(--accent-secondary) 0%, var(--accent-main) 100%); background-size: 200% 100%; height: 100%; border-radius: 100px; transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: var(--glow-accent); animation: shimmerLiquid 4s infinite linear; will-change: width; }
+/* Flawless Looping Gradient */
+.progress-fill { background: linear-gradient(90deg, var(--accent-main) 0%, var(--accent-secondary) 50%, var(--accent-main) 100%); background-size: 200% 100%; height: 100%; border-radius: 100px; box-shadow: var(--glow-accent); animation: shimmerLiquid 3s linear infinite; will-change: background-position; }
 @keyframes shimmerLiquid { 0% { background-position: 200% 0; } 100% { background-position: 0 0; } }
 
 /* V2 Bottom Sheet Modal & Close Button */
@@ -110,7 +113,7 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; margin-bottom: 24px;}
 .stat-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; }
 .stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-.stat-val { font-size: 13px; color: var(--accent-main); font-family: var(--font-sans); }
+.stat-val { font-size: 13px; color: var(--accent-main); font-family: var(--font-sans); font-weight:500; }
 
 .chart-container { margin-top: 24px; position: relative; width: 100%; }
 .compare-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
@@ -119,12 +122,14 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 .compare-val.winner { color: var(--accent-main); }
 .radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px; height: 340px; position: relative; width: 100%; box-sizing: border-box; }
 
+/* V2 Glowing Bottom Nav */
 .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px); border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 6px 4px; gap: 2px; }
-.nav-btn { flex: 1; padding: 8px 1px; text-align: center; color: var(--text-muted); font-size: 8px; cursor: pointer; transition: all 0.4s ease; border-radius: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; }
-.nav-btn span { font-size: 16px; margin-bottom: 2px;}
-.nav-btn:active { transform: scale(0.92); }
-.nav-btn.active { color: var(--bg-dark); background: var(--accent-main); box-shadow: var(--glow-accent); }
+.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 8px; justify-content: space-around; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 16px; border-radius: 12px;}
+.nav-btn span { font-size: 20px; transition: transform 0.3s ease; }
+.nav-btn.active { color: var(--accent-main); }
+.nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 8px var(--accent-main)); }
+.nav-btn.active::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--accent-main); box-shadow: 0 0 10px var(--accent-main); }
 
 .tab-content { display: none; animation: tabEnter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); min-height: calc(100% + 1px); }
 .tab-content.active { display: block; }
@@ -132,7 +137,6 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 
 .section-title { text-align: center; color: var(--text-muted); margin-top: 32px; margin-bottom: 24px; text-transform:uppercase; font-size: 16px; letter-spacing: 4px; }
 .board-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(0, 229, 255, 0.1); align-items: center; font-size: 13px;}
-.board-val { color: var(--accent-main); font-family: var(--font-sans); }
 
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; }
 .badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
@@ -198,8 +202,8 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 
 <div id="roster-compare-section" style="display:none;">
   <div style="display:flex; gap: 16px; margin-bottom: 24px;">
-  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Player 1</label><select id="player1Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
-  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Player 2</label><select id="player2Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
+  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 1</label><select id="player1Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
+  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 2</label><select id="player2Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
   </div>
   <div id="radarSection" style="display:none;">
   <h4 class="section-title" style="margin-top:0;">Head-to-Head Stats</h4>
@@ -419,16 +423,29 @@ displayedPlayerData.forEach((player, index) => {
 let badgesHtml = '';
 if (player.hitRate !== null && player.hitRate !== undefined) badgesHtml += `<span class="status-badge badge-hit-rate">${player.hitRate}% 3★</span>`;
 
+let roleText = "OP";
+if (player.role === "leader") roleText = "CMD";
+if (player.role === "coLeader") roleText = "EXEC";
+if (player.role === "admin") roleText = "OFFICER";
+
+let leagueImg = player.leagueIcon ? `<img src="${player.leagueIcon}" style="width:24px; height:24px; margin-right:12px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));">` : "";
+
 let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
 
 htmlString += `
 <div class="player-card" onclick="openBottomSheet(${realIndex})">
 <div class="card-header" style="padding: 20px;">
 <div class="player-info">
-<div style="display:flex; align-items:center;">${player.name}</div>
-<div><span style="font-weight:500; font-family:var(--font-sans);">${parseFloat(player.percentage)}%</span></div>
+<div style="display:flex; align-items:center;">
+    ${leagueImg} 
+    <div style="display:flex; flex-direction:column;">
+        <span style="font-weight:600; font-size:16px;">${player.name}</span>
+        <span style="font-size:9px; color:var(--text-muted); letter-spacing:1px; margin-top:4px;">[${roleText}]</span>
+    </div>
 </div>
-${badgesHtml ? `<div style="margin-top: 4px; display:flex; flex-wrap: wrap; gap: 4px;">${badgesHtml}</div>` : ''}
+<div><span style="font-weight:600; font-family:var(--font-sans); color:var(--accent-main);">${parseFloat(player.percentage)}%</span></div>
+</div>
+${badgesHtml ? `<div style="margin-top: 8px; display:flex; flex-wrap: wrap; gap: 4px;">${badgesHtml}</div>` : ''}
 <div class="progress-bg"><div class="progress-fill" style="width: ${player.percentage}%;"></div></div>
 </div>
 </div>`;
@@ -619,7 +636,6 @@ let oppStars = activeRound.enemyStars !== undefined ? activeRound.enemyStars : "
 let myAtks = activeRound.myAttacks !== undefined ? activeRound.myAttacks : "...";
 let rosterSize = Math.max(activeRound.myLineup.length, 15);
 
-// API Badges (Placeholders until backend sends them)
 let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png"; 
 let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 
@@ -645,7 +661,6 @@ html += `<div class="war-room-header">
     <div class="progress-bg" style="width: 85%; margin: 0 auto; height: 4px;"><div class="progress-fill" style="width: ${myAtks === "..." ? 0 : (myAtks/rosterSize)*100}%;"></div></div>
 </div>`;
 
-// The Hit List
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
 if (activeRound.state === "inWar" && hitList.length > 0) {
     html += `<h4 style="margin-top:0; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Pending Strikes (${hitList.length})</h4>
@@ -656,7 +671,6 @@ if (activeRound.state === "inWar" && hitList.length > 0) {
 
 html += `<h4 class="section-title" style="margin-top:16px;">CWL Matrix</h4>`;
 
-// Carousel Container
 html += `<div class="cwl-carousel" id="cwlCarousel">`;
 
 warInfo.cwlDetails.forEach((round, index) => {
