@@ -74,8 +74,10 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 
 .player-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 24px; box-shadow: var(--card-shadow); overflow: hidden; transition: transform var(--transition-speed) ease;
 backdrop-filter: blur(16px); contain: layout style; }
+.clan-score { font-size: 48px; line-height: 1; letter-spacing: 6px; font-family: var(--font-sans); font-weight: 300; text-align: center; color: var(--accent-main); margin-top: 12px;}
 .card-header { padding: 24px 20px; cursor: pointer; display: flex; flex-direction: column; }
 .player-info { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; font-size: 20px; letter-spacing: 1.5px;}
+.timestamp-sub { font-size: 10px; color: var(--text-muted); margin-bottom: 20px; letter-spacing: 2px; font-family: var(--font-sans); text-transform: uppercase;}
 
 .progress-bg { background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 100px; width: 100%; height: 6px; overflow: hidden; margin-top: 8px; }
 .progress-fill { background: linear-gradient(90deg, #BF953F 0%, #FCF6BA 50%, #BF953F 100%); background-size: 200% 100%; height: 100%; border-radius: 100px;
@@ -136,7 +138,7 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 .chip:active { transform: scale(0.93); }
 .th-alert { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; background: rgba(229,57,53,0.08); border: 1px solid rgba(229,57,53,0.3); border-radius: 8px; margin: 6px 0; font-size: 11px; color: #e57373; letter-spacing: 0.3px; }
 
-/* NEW: Circular Progress CSS */
+/* Circular Progress CSS */
 .circular-progress {
   width: 100px; height: 100px; border-radius: 50%;
   background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg);
@@ -148,6 +150,8 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
   border-radius: 50%; backdrop-filter: blur(16px);
 }
 .circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
+
+.time-to-max-banner { background: rgba(212, 175, 55, 0.1); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; text-align: center; margin-bottom: 16px; margin-top: 12px;}
 </style>
 </head>
 <body>
@@ -181,7 +185,6 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 <div class="filter-chips" id="roster-filter-chips" style="display:none;">
   <div class="chip active" data-filter="all" onclick="setRosterFilter('all')">All</div>
   <div class="chip" data-filter="cwl" onclick="setRosterFilter('cwl')">CWL</div>
-  <div class="chip" data-filter="inactive" onclick="setRosterFilter('inactive')">Inactive</div>
 </div>
 <div class="control-row" id="roster-controls" style="display:none;">
 <input type="text" id="searchInput" placeholder="Search Clan Roster..." oninput="debouncedFilterRoster()">
@@ -338,7 +341,6 @@ try {
     warInfo = data.warInfo || { type: "NONE", data: null };
     legacyData = data.legacyData || {};
 
-    // Calculate Active Roster Progression
     let progressingPlayers = 0;
     let currentTotal = 0;
     let oldTotal = 0;
@@ -394,8 +396,7 @@ const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 const sortBy = document.getElementById('sortSelect').value;
 
 let pool;
-if (currentRosterFilter === 'inactive') pool = globalPlayerData.filter(p => p.isInactive);
-else if (currentRosterFilter === 'cwl') pool = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
+if (currentRosterFilter === 'cwl') pool = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
 else pool = globalPlayerData;
 
 displayedPlayerData = pool.filter(p => p.name.toLowerCase().includes(searchTerm));
@@ -423,6 +424,22 @@ let historyLogs = (player.recentlyCompleted && player.recentlyCompleted.length >
 let hr = player.hitRate !== null && player.hitRate !== undefined ? player.hitRate : 0;
 let badgesHtml = '';
 if (player.hitRate !== null && player.hitRate !== undefined) badgesHtml += `<span class="status-badge badge-hit-rate">${player.hitRate}% 3★</span>`;
+
+let growth = 0;
+if (player.historyPcts && player.historyPcts.length > 1) {
+    let oldest = parseFloat(player.historyPcts[0]);
+    let newest = parseFloat(player.historyPcts[player.historyPcts.length - 1]);
+    growth = newest - oldest;
+}
+let estMaxText = "Awaiting Data";
+if (growth > 0 && player.percentage < 100) {
+    let monthsLeft = (100 - player.percentage) / growth;
+    let d = new Date();
+    d.setMonth(d.getMonth() + monthsLeft);
+    estMaxText = d.toLocaleString('default', { month: 'short', year: 'numeric' });
+} else if (player.percentage >= 100) {
+    estMaxText = "MAXED";
+}
 
 let legacyHtml = "";
 if (legacyData && legacyData[player.tag]) {
@@ -468,6 +485,10 @@ ${badgesHtml ? `<div style="margin-bottom: 6px; display:flex; flex-wrap: wrap; g
 <div class="progress-bg"><div class="progress-fill" style="width: ${player.percentage}%;"></div></div>
 </div>
 <div class="upgrade-details">
+<div class="time-to-max-banner">
+    <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Projected 100% Max</div>
+    <div style="font-size: 14px; color: var(--accent-main); font-weight: 500;">${estMaxText} <span style="font-size:10px; color:var(--text-muted);">(${growth > 0 ? '+'+growth.toFixed(2)+'% / mo' : ''})</span></div>
+</div>
 ${historyLogs}
 <div class="stat-grid">
 <div class="stat-box"><div class="stat-label">Heroes</div><div class="stat-val">${player.heroStats}</div></div>
@@ -713,15 +734,22 @@ let rosterHtml = `<div style="margin-top:16px;">
 <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Enemy Roster</p>`;
 (round.enemyLineup || []).forEach(e => {
 let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red);">⚔️</span>` : `<span style="color:var(--text-muted);">💤</span>`;
+
+let equipHtml = '';
+if (e.equipment && e.equipment.length > 0) {
+    equipHtml = `<div style="font-size:8px; color:#b372c4; margin-top:4px;">⚙️ Equip: ${e.equipment.join(', ')}</div>`;
+} else if (e.epicEquip && e.epicEquip.length > 0) {
+    equipHtml = `<div style="font-size:8px; color:#b372c4; margin-top:4px;">Max Epics: ${e.epicEquip.join(', ')}</div>`;
+}
+
 let stHtml = (e.superTroops && e.superTroops.length > 0) ? `<br><span style="color:var(--accent-secondary); font-size:9px;">Boosts: ${e.superTroops.join(', ')}</span>` : '';
-let eqHtml = (e.epicEquip && e.epicEquip.length > 0) ? `<br><span style="color:#b372c4; font-size:9px;">Max Epics: ${e.epicEquip.join(', ')}</span>` : '';
 
 rosterHtml += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(212,175,55,0.1); font-size:11px;">
 <div>
 <span style="color:var(--text-muted); width:24px; display:inline-block;">#${e.mapPosition}</span>
 ${e.name} <span style="color:var(--accent-main); font-size:9px; margin-left:4px;">TH${e.th}</span>
 ${stHtml}
-${eqHtml}
+${equipHtml}
 </div>
 <div>${atkStatus}</div>
 </div>`;
