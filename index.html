@@ -20,9 +20,9 @@
 
 <style>
 :root {
-/* V2.3 NEON OBSIDIAN THEME */
+/* V2.4 NEON OBSIDIAN THEME */
 --bg-dark: #090a0f; 
---bg-card: rgba(12, 14, 20, 0.6); 
+--bg-card: rgba(18, 20, 28, 0.75); 
 --accent-main: #00e5ff; 
 --accent-secondary: #b300ff;
 --text-main: #ffffff; 
@@ -64,7 +64,7 @@ h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
 #app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center;
 filter: grayscale(75%) sepia(25%) hue-rotate(190deg) brightness(0.2) contrast(1.3); transition: background-image 0.4s ease-in-out; }
 
-/* V2.3 Topographic Grid & HUD Scanlines */
+/* Interactive Topographic Grid */
 #app-background::after { 
     content: ''; position: absolute; inset: 0; 
     background-image: 
@@ -77,7 +77,6 @@ filter: grayscale(75%) sepia(25%) hue-rotate(190deg) brightness(0.2) contrast(1.
 
 .main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
 
-/* V2.3 Orbital Loader */
 .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 10, 15, 0.9); backdrop-filter: blur(16px);
 z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
 .loader-overlay.active { opacity: 1; pointer-events: all; }
@@ -90,48 +89,21 @@ z-index: 1000; display: flex; flex-direction: column; align-items: center; justi
 @keyframes textPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
 
 .container { padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); max-width: 600px; margin: auto; }
-input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main);
-box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
+input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main); box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
 .control-row { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; }
 .control-row input { flex: 1; margin-bottom: 0; }
-.control-row select { flex-shrink: 0; width: auto; font-size: 11px; letter-spacing: 1px; margin-bottom: 0;}
 .compare-btn { flex-shrink:0; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; color:var(--accent-main); font-family:var(--font-sans); font-size:11px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; backdrop-filter: blur(16px); transition: all 0.3s ease; }
 .compare-btn:active { transform: scale(0.95); }
 
-/* V2.3 Geometric Plasma Cards ("Lava Lamp" effect) */
-.player-card { 
-    position: relative; background: var(--bg-card); border: 1px solid var(--border-color); 
-    border-radius: 16px; margin-bottom: 12px; box-shadow: var(--card-shadow); 
-    overflow: hidden; transition: transform var(--transition-speed) ease, border-color 0.3s ease; 
-    cursor: pointer; backdrop-filter: blur(12px);
-}
-.player-card::before {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: radial-gradient(circle at 30% 30%, rgba(0, 229, 255, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 70% 70%, rgba(179, 0, 255, 0.12) 0%, transparent 40%);
-    animation: geometricPlasma 15s ease-in-out infinite alternate;
-    z-index: 0; pointer-events: none;
-}
-.player-card:hover { border-color: rgba(0, 229, 255, 0.5); }
-.player-card:active { transform: scale(0.98); }
-.player-card > * { position: relative; z-index: 1; }
+/* Cleaned up Player Cards (Removed Lava Lamp for stability) */
+.player-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 12px; box-shadow: var(--card-shadow); overflow: hidden; backdrop-filter: blur(16px); }
 
-@keyframes geometricPlasma {
-    0% { transform: translate(0, 0) rotate(0deg) scale(1); }
-    33% { transform: translate(5%, 10%) rotate(15deg) scale(1.1); }
-    66% { transform: translate(-5%, 5%) rotate(-5deg) scale(0.95); }
-    100% { transform: translate(-10%, -10%) rotate(10deg) scale(1.05); }
-}
-
-.card-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; }
-.player-info { display: flex; align-items: center; gap: 12px; }
-
-/* V2.3 Mini HUD Rings */
+/* Mini HUD Rings */
 .mini-ring { width: 44px; height: 44px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 10px rgba(0, 229, 255, 0.15); flex-shrink: 0; }
 .mini-ring::before { content: ""; position: absolute; inset: 3px; background: #101219; border-radius: 50%; }
 .mini-ring span { position: relative; font-size: 11px; font-weight: 600; color: var(--text-main); font-family: var(--font-sans); }
 
-/* Bottom Sheet Modal */
+/* Bottom Sheet Modal & Close Button */
 .sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
 .bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-bg); backdrop-filter: blur(24px); border-top-left-radius: 24px; border-top-right-radius: 24px; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 85vh; overflow-y: auto; padding: 40px 20px 20px 20px; box-sizing: border-box; border-top: 1px solid var(--border-color); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
@@ -150,7 +122,7 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 .compare-val { font-size: 16px; width: 30%; text-align: center; transition: color 0.4s ease; font-family: var(--font-sans); letter-spacing: 1px;}
 .radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px; height: 340px; position: relative; width: 100%; box-sizing: border-box; }
 
-/* V2.3 Glowing Bottom Nav */
+/* Glowing Bottom Nav */
 .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px); border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 8px; justify-content: space-around; }
 .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 16px; border-radius: 12px;}
@@ -159,18 +131,15 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 .nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 8px var(--accent-main)); }
 .nav-btn.active::after { content: ''; position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--accent-main); box-shadow: 0 0 10px var(--accent-main); }
 
-/* Micro-Glitch Tab Transition */
+/* V2.4 Smooth Tab Transition (Glitch Removed) */
 .tab-content { display: none; min-height: calc(100% + 1px); }
-.tab-content.active { display: block; animation: tabEnterGlitch 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-@keyframes tabEnterGlitch {
-    0% { opacity: 0; transform: translateY(10px) scale(0.98); text-shadow: 3px 0 var(--accent-main), -3px 0 var(--accent-secondary); filter: blur(4px); }
-    30% { opacity: 0.5; transform: translateY(-2px) scale(1.01); text-shadow: -3px 0 var(--accent-main), 3px 0 var(--accent-secondary); filter: blur(2px); }
-    60% { opacity: 0.8; transform: translateY(1px) scale(0.99); text-shadow: 1px 0 var(--accent-main), -1px 0 var(--accent-secondary); filter: blur(1px); }
-    100% { opacity: 1; transform: translateY(0) scale(1); text-shadow: none; filter: blur(0); }
+.tab-content.active { display: block; animation: tabEnter 0.4s ease-out forwards; }
+@keyframes tabEnter {
+    0% { opacity: 0; transform: translateY(10px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
 .section-title { text-align: center; color: var(--text-muted); margin-top: 32px; margin-bottom: 24px; text-transform:uppercase; font-size: 16px; letter-spacing: 4px; }
-
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; }
 .badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
 
@@ -181,16 +150,14 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 .war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
 .strike-pill { flex-shrink:0; background:rgba(0,0,0,0.6); border:1px solid var(--border-color); padding:8px 16px; border-radius:100px; font-size:11px; color:var(--text-main); font-family:var(--font-sans); }
 
-/* V2.3 Holographic Target Locks (Replaces Sonar Pings) */
+/* Holographic Target Locks */
 .holo-wrapper { position: relative; display: inline-flex; align-items: center; justify-content: center; padding: 12px; margin-bottom: 4px;}
 .holo-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px dashed rgba(0, 229, 255, 0.6); animation: holoSpin 15s linear infinite; pointer-events: none; }
 .holo-ring::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid rgba(0, 229, 255, 0.2); animation: holoPulse 4s ease-in-out infinite alternate; }
 .holo-ring::after { content: ''; position: absolute; inset: 4px; border-radius: 50%; border: 1px solid rgba(0, 229, 255, 0.1); animation: holoSpinReverse 10s linear infinite; }
-
 .holo-wrapper.enemy .holo-ring { border-color: rgba(255, 51, 102, 0.6); }
 .holo-wrapper.enemy .holo-ring::before { border-color: rgba(255, 51, 102, 0.2); }
 .holo-wrapper.enemy .holo-ring::after { border-color: rgba(255, 51, 102, 0.1); }
-
 @keyframes holoSpin { 100% { transform: rotate(360deg); } }
 @keyframes holoSpinReverse { 100% { transform: rotate(-360deg); } }
 @keyframes holoPulse { 0% { transform: scale(0.95); opacity: 0.5; } 100% { transform: scale(1.05); opacity: 1; } }
@@ -200,7 +167,7 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 .circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
 .time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px; margin-top: 8px;}
 
-/* V2.3 Segmented Energy Bar */
+/* Segmented Energy Bar */
 .energy-bar-container { display: flex; gap: 2px; height: 8px; width: 85%; margin: 0 auto; }
 .energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 1px; transition: background 0.3s ease; }
 .energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 5px var(--accent-main); }
@@ -237,13 +204,18 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 </div>
 
 <div class="control-row" id="roster-controls" style="display:none;">
-<input type="text" id="searchInput" placeholder="Search Clan Roster..." oninput="debouncedFilterRoster()">
-<select id="sortSelect" onchange="filterRoster()">
-<option value="comp">Overall %</option>
-<option value="hero">Hero %</option>
-<option value="pet">Pet %</option>
-</select>
-<button class="compare-btn" onclick="toggleCompareMode()">Compare</button>
+  <input type="text" id="searchInput" placeholder="Search Matrix..." oninput="debouncedFilterRoster()">
+  <button class="compare-btn" onclick="toggleCompareMode()">Compare</button>
+</div>
+
+<h4 class="section-title" style="margin-top:0; text-align:left; font-size:12px; margin-bottom:12px;" id="radarTitle">Operator Matrix</h4>
+<div id="roster-container">
+    <div class="player-card" style="padding: 16px; cursor: default;">
+        <div class="chart-container" style="height: 450px; margin-top:0;">
+            <canvas id="rosterRadarMap"></canvas>
+        </div>
+        <p style="font-size:9px; color:var(--text-muted); text-align:center; margin-top:16px;">Tap a node to inspect operator dossier.</p>
+    </div>
 </div>
 
 <div id="roster-compare-section" style="display:none;">
@@ -263,7 +235,6 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
   </div>
 </div>
 
-<div id="roster-container"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px;">Preparing roster...</p></div>
 </div>
 
 <div id="war-tab" class="tab-content active">
@@ -271,11 +242,10 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 </div>
 
 </div>
-</div>
 
 <div class="bottom-nav-wrapper">
 <div class="bottom-nav">
-<div class="nav-btn" onclick="switchTab('roster')"><span>🛡</span> Roster</div>
+<div class="nav-btn" onclick="switchTab('roster')"><span>🛡</span> Matrix</div>
 <div class="nav-btn active" onclick="switchTab('war')"><span>⚔</span> War Room</div>
 </div>
 </div>
@@ -299,9 +269,8 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
 let warInfo = null;
-let chartsRegistry = { radarHero: null, radarPet: null, cwlLineChart: null };
+let chartsRegistry = { radarHero: null, radarPet: null, cwlLineChart: null, rosterMap: null };
 let sheetCharts = { history: null, hero: null, pet: null }; 
-let currentRosterFilter = 'all';
 
 const CWL_TAGS = ["#PG0R8GQPQ", "#YCRV8GP0U", "#RYPU89Y8", "#99JQPVU9Q", "#GRJRUYP0", "#8QGVV099U", "#2RL2JGJPJ", "#Y8LY2VUJ9", "#GYJ00RJ2Q", "#G9YR000R8", "#20YLLYC9P", "#QVCLVUQVY", "#9LGG22Q28", "#GGULC2CR", "#9R0C82GU"];
 
@@ -338,7 +307,6 @@ if(p < 1) requestAnimationFrame(step); else el.innerText = prefix + (isPct ? end
 Chart.defaults.color = '#8b949e'; Chart.defaults.font.family = "'Montserrat', sans-serif";
 
 window.addEventListener('DOMContentLoaded', () => {
-if(localStorage.getItem('molly-theme') === 'light') document.body.classList.add('light-mode');
 Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
 fetchDashboardData(); 
 });
@@ -421,61 +389,105 @@ try {
 
 function filterRoster() {
 const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-const sortBy = document.getElementById('sortSelect').value;
-
-let pool = globalPlayerData;
-displayedPlayerData = pool.filter(p => p.name.toLowerCase().includes(searchTerm));
-
-displayedPlayerData.sort((a, b) => {
-if (sortBy === 'comp') return b.percentage - a.percentage;
-if (sortBy === 'hero') { let aH = parseInt((a.heroStats||"0").split('/')[0]); let bH = parseInt((b.heroStats||"0").split('/')[0]); return bH - aH; }
-if (sortBy === 'pet') { let aP = parseInt((a.petStats||"0").split('/')[0]); let bP = parseInt((b.petStats||"0").split('/')[0]); return bP - aP; }
-return 0;
-});
-renderPlayerCards();
+displayedPlayerData = globalPlayerData.filter(p => p.name.toLowerCase().includes(searchTerm));
+renderRosterMap();
 }
 
-function renderPlayerCards() {
-var container = document.getElementById('roster-container');
-if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; margin-top:32px; color:var(--text-muted); font-size:12px; letter-spacing:2px; text-transform:uppercase;'>No players found.</p>"; return; }
+// V2.4 TACTICAL MAP RENDERER
+function renderRosterMap() {
+    let ctxEl = document.getElementById('rosterRadarMap');
+    if(!ctxEl) return;
+    let ctx = ctxEl.getContext('2d');
+    if(chartsRegistry.rosterMap) chartsRegistry.rosterMap.destroy();
 
-let htmlString = "";
-displayedPlayerData.forEach((player, index) => {
-let badgesHtml = '';
-if (player.hitRate !== null && player.hitRate !== undefined) badgesHtml += `<span class="status-badge badge-hit-rate">${player.hitRate}% 3★</span>`;
+    let style = getComputedStyle(document.body); 
+    let cyan = style.getPropertyValue('--accent-main').trim();
+    let red = style.getPropertyValue('--dot-red').trim();
+    let green = style.getPropertyValue('--dot-green').trim();
 
-let roleText = "OP";
-if (player.role === "leader") roleText = "CMD";
-if (player.role === "coLeader") roleText = "EXEC";
-if (player.role === "admin") roleText = "OFFICER";
+    let dataPoints = displayedPlayerData.map(p => {
+        let hr = p.hitRate !== null && p.hitRate !== undefined ? p.hitRate : 50;
+        let color = cyan;
+        if(p.cwlStats && p.cwlStats.attacks > 0) {
+            if(hr >= 66) color = green;
+            else if(hr < 33) color = red;
+        }
 
-let leagueImg = player.leagueIcon ? `<img src="${player.leagueIcon}" style="width:24px; height:24px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));">` : "";
-let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
+        // Calculate Activity Score fallback (using total donations if actual score missing)
+        let act = (p.donations||0) + (p.donationsReceived||0) + (p.warStars||0)*10; 
 
-// V2.3 Geometric Plasma Cards (Inner wrapper handles the glassmorphism)
-htmlString += `
-<div class="player-card" onclick="openBottomSheet(${realIndex})">
-    <div class="player-card-inner" style="padding: 16px 20px;">
-        <div style="display:flex; align-items:center; gap:12px; flex:1;">
-            ${leagueImg} 
-            <div style="display:flex; flex-direction:column;">
-                <span style="font-weight:600; font-size:16px; color:var(--text-main);">${player.name}</span>
-                <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
-                    <span style="font-size:9px; color:var(--accent-secondary); letter-spacing:1px; font-weight:600;">[${roleText}]</span>
-                    ${badgesHtml}
-                </div>
-            </div>
-        </div>
-        <div class="mini-ring" style="--pct: ${player.percentage}%;">
-            <span>${Math.floor(player.percentage)}%</span>
-        </div>
-    </div>
-</div>`;
-});
-container.innerHTML = htmlString;
+        return {
+            x: parseFloat(p.percentage),
+            y: act,
+            player: p,
+            backgroundColor: color
+        };
+    });
+
+    chartsRegistry.rosterMap = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [{
+                label: 'Operators',
+                data: dataPoints,
+                pointBackgroundColor: dataPoints.map(d => d.backgroundColor),
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 1,
+                pointRadius: 6,
+                pointHoverRadius: 9,
+                pointHoverBackgroundColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            animation: { duration: 800, easing: 'easeOutQuart' },
+            onClick: (e, elements) => {
+                if(elements.length > 0) {
+                    let idx = elements[0].index;
+                    let p = dataPoints[idx].player;
+                    let realIndex = globalPlayerData.findIndex(gp => gp.tag === p.tag);
+                    openBottomSheet(realIndex);
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(9, 10, 15, 0.9)',
+                    titleColor: cyan,
+                    bodyColor: '#ffffff',
+                    borderColor: cyan,
+                    borderWidth: 1,
+                    displayColors: false,
+                    callbacks: {
+                        label: (ctx) => {
+                            let p = ctx.raw.player;
+                            return [
+                                p.name,
+                                `Progression: ${parseFloat(p.percentage)}%`,
+                                `Role: ${p.role || 'Member'}`
+                            ];
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { 
+                    title: { display: true, text: 'Base Progression (%)', color: style.getPropertyValue('--text-muted').trim(), font: {family: 'Montserrat', size:10, weight:500} },
+                    grid: { color: 'rgba(0, 229, 255, 0.1)', drawBorder: false },
+                    ticks: { color: style.getPropertyValue('--text-muted').trim(), font: {family: 'Montserrat', size:9} },
+                    min: 0, max: 100
+                },
+                y: { 
+                    title: { display: true, text: 'Activity Volume', color: style.getPropertyValue('--text-muted').trim(), font: {family: 'Montserrat', size:10, weight:500} },
+                    grid: { color: 'rgba(0, 229, 255, 0.1)', drawBorder: false },
+                    ticks: { display: false } // Hide Y values, just show relative position
+                }
+            }
+        }
+    });
 }
 
-// Data Scramble Animation Utility
 function scrambleText(elementId, finalValue) {
     const el = document.getElementById(elementId);
     if (!el) return;
@@ -514,11 +526,22 @@ function openBottomSheet(index) {
       estMaxText = d.toLocaleString('default', { month: 'short', year: 'numeric' });
   } else if (player.percentage >= 100) { estMaxText = "MAXED"; }
 
+  let roleText = "OP";
+  if (player.role === "leader") roleText = "CMD";
+  if (player.role === "coLeader") roleText = "EXEC";
+  if (player.role === "admin") roleText = "OFFICER";
+  let leagueImg = player.leagueIcon ? `<img src="${player.leagueIcon}" style="width:32px; height:32px; margin-right:12px; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));">` : "";
+
   let html = `
-    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px;">
-        <div>
-            <h2 style="color:var(--text-main); margin:0; font-size:24px; font-family:var(--font-sans); font-weight:600;">${player.name}</h2>
-            <div style="color:var(--accent-main); font-size:12px; margin-top:4px; font-weight:500;">TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%</div>
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px;">
+        <div style="display:flex; align-items:center;">
+            ${leagueImg}
+            <div>
+                <h2 style="color:var(--text-main); margin:0; font-size:24px; font-family:var(--font-sans); font-weight:600;">${player.name}</h2>
+                <div style="color:var(--accent-main); font-size:12px; margin-top:4px; font-weight:500;">
+                    <span style="color:var(--accent-secondary);">[${roleText}]</span> • TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
+                </div>
+            </div>
         </div>
     </div>
     
@@ -551,7 +574,6 @@ function openBottomSheet(index) {
   document.getElementById('sheetBackdrop').classList.add('active');
   document.body.style.overflow = 'hidden';
 
-  // Execute Scramble Effects
   setTimeout(() => {
       scrambleText('bs_hr', hr + '%');
       scrambleText('bs_dest', avgDest);
@@ -691,7 +713,6 @@ let rosterSize = Math.max(activeRound.myLineup.length, 15);
 let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png"; 
 let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 
-// V2.3 War Room Header with Holographic Locks
 let attackSegments = "";
 if(myAtks !== "...") {
     let totalSegments = 20; 
@@ -825,7 +846,7 @@ if (clanData.cwlHistoricalStats && clanData.cwlHistoricalStats.length > 0) {
   clanData.cwlHistoricalStats.forEach(season => {
     let posColor = season.position === 1 ? "var(--accent-main)" : (season.position <= 2 ? "var(--dot-green)" : (season.position >= 7 ? "var(--dot-red)" : "var(--text-main)"));
     html += `
-    <div class="player-card" style="margin-bottom:12px;">
+    <div class="player-card" style="margin-bottom:12px; padding: 1px;">
       <div class="player-card-inner" style="flex-direction:column; align-items:stretch;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div style="font-size:13px; font-weight:500;">${formatMonth(season.season)} <span style="font-size:9px; color:var(--text-muted); font-weight:normal; margin-left:8px; text-transform:uppercase;">${season.league}</span></div>
@@ -859,13 +880,17 @@ if (clanData.cwlHistoricalStats && clanData.cwlHistoricalStats.length > 0) {
 function toggleCompareMode() {
     let compSec = document.getElementById('roster-compare-section');
     let rosterCont = document.getElementById('roster-container');
+    let mapTitle = document.getElementById('radarTitle');
+    
     if (compSec.style.display === 'none') {
         compSec.style.display = 'block';
         rosterCont.style.display = 'none';
+        if(mapTitle) mapTitle.style.display = 'none';
         populateVersusDropdowns();
     } else {
         compSec.style.display = 'none';
         rosterCont.style.display = 'block';
+        if(mapTitle) mapTitle.style.display = 'block';
     }
 }
 
