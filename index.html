@@ -63,10 +63,6 @@ background-repeat: no-repeat; transform-origin: 50% 66%; animation: l5 4s infini
 .loader::after { animation-duration: 2s; } @keyframes l5{ 100% {transform:rotate(1turn)} }
 .loader-text { font-family: var(--font-sans); font-size: 12px; font-weight: 400; letter-spacing: 4px; text-transform: uppercase; color: var(--accent-main); }
 
-.icon-btn { font-size: 16px; cursor: pointer; user-select: none; transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); background: transparent;
-border: 1px solid var(--border-color); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--accent-main); }
-.icon-btn:active { transform: scale(0.85); }
-
 .container { padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); max-width: 600px; margin: auto; }
 input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main);
 box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
@@ -78,11 +74,10 @@ box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s eas
 
 .player-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; margin-bottom: 24px; box-shadow: var(--card-shadow); overflow: hidden; transition: transform var(--transition-speed) ease;
 backdrop-filter: blur(16px); contain: layout style; }
-.clan-score { font-size: 48px; line-height: 1; letter-spacing: 6px; font-family: var(--font-sans); font-weight: 300; }
+.clan-score { font-size: 48px; line-height: 1; letter-spacing: 6px; font-family: var(--font-sans); font-weight: 300; text-align: center; color: var(--accent-main); margin-top: 12px;}
 .card-header { padding: 24px 20px; cursor: pointer; display: flex; flex-direction: column; }
 .player-info { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; font-size: 20px; letter-spacing: 1.5px;}
 .timestamp-sub { font-size: 10px; color: var(--text-muted); margin-bottom: 20px; letter-spacing: 2px; font-family: var(--font-sans); text-transform: uppercase;}
-.activity-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px currentColor; margin-right: 8px; }
 
 .progress-bg { background-color: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 100px; width: 100%; height: 6px; overflow: hidden; margin-top: 8px; }
 .progress-fill { background: linear-gradient(90deg, #BF953F 0%, #FCF6BA 50%, #BF953F 100%); background-size: 200% 100%; height: 100%; border-radius: 100px;
@@ -136,13 +131,13 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 .cwl-round-body.open { max-height: 2000px; padding: 0 20px 20px 20px; opacity: 1; }
 
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 400; letter-spacing: 1.5px; text-transform: uppercase; }
-.badge-inactive { background: rgba(255,152,0,0.15); border: 1px solid rgba(255,152,0,0.35); color: #ffb74d; }
 .badge-hit-rate { background: rgba(76,175,80,0.15); border: 1px solid rgba(76,175,80,0.35); color: #81c784; }
 .filter-chips { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0 12px; scrollbar-width: none; -ms-overflow-style: none; }
 .filter-chips::-webkit-scrollbar { display: none; }
 .chip { flex-shrink: 0; padding: 6px 14px; border-radius: 100px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border-color); color: var(--text-muted); background: transparent; transition: all 0.3s ease; }
 .chip.active { background: var(--accent-main); color: var(--bg-dark); border-color: var(--accent-main); }
 .chip:active { transform: scale(0.93); }
+.th-alert { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; background: rgba(229,57,53,0.08); border: 1px solid rgba(229,57,53,0.3); border-radius: 8px; margin: 6px 0; font-size: 11px; color: #e57373; letter-spacing: 0.3px; }
 </style>
 </head>
 <body>
@@ -158,19 +153,16 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 
 <div class="container">
 
-<div id="system-tab" class="tab-content active">
-<div class="player-card" style="padding: 32px 20px; text-align: center; margin-bottom: 32px; cursor: default;">
-<h4 style="margin-top:0; color: var(--accent-main); font-size: 16px; letter-spacing: 4px; text-transform: uppercase;">Command Center</h4>
-<p style="font-size: 12px; color: var(--text-muted); line-height: 1.6; font-family: var(--font-sans);">Welcome back. Live connection to Supercell API established.</p>
-
-<div style="display:flex; justify-content: space-around; color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-top:32px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
+<div id="system-tab" class="tab-content">
+<div class="player-card" style="padding: 32px 20px; text-align: center;">
+<h4 style="margin-top:0; color: var(--text-muted); font-size: 12px; letter-spacing: 4px; text-transform: uppercase;">Clan Overview</h4>
+<div style="display:flex; justify-content: space-around; color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin-top:24px; padding-bottom: 24px; border-bottom: 1px solid var(--border-color);">
 <div>Members<br><span id="sys-roster-count" style="font-size: 28px; color: var(--text-main); display:block; margin-top: 8px;">0</span></div>
-<div>Active Today<br><span id="sys-active-count" style="font-size: 28px; color: var(--text-main); display:block; margin-top: 8px;">0</span></div>
 </div>
 
 <div style="margin-top: 24px;">
 <h4 style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Global Completion</h4>
-<div class="clan-score" id="sys-clan-score" style="margin-top: 12px; color: var(--accent-main);">0%</div>
+<div class="clan-score" id="sys-clan-score">0%</div>
 <div class="progress-bg" style="margin-top: 16px; width: 80%; margin-left: auto; margin-right: auto;"><div id="sys-clan-progress" class="progress-fill" style="width: 0%;"></div></div>
 </div>
 
@@ -185,33 +177,13 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 <div id="sys-received-progress" style="width: 50%; background: rgba(255,255,255,0.15); height: 100%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);"></div>
 </div>
 </div>
-
-<p id="statusMsg" style="text-align: center; margin-top: 32px; font-size: 12px; color: var(--accent-main); letter-spacing: 1px;"></p>
-<p id="syncTimer" style="text-align: center; margin-top: 8px; font-size: 10px; color: var(--text-muted); letter-spacing: 1px;"></p>
 </div>
-
-<div id="clanLegacyContainer" style="display:none;">
-<h4 class="section-title">All-Time Clan Activity</h4>
-<div class="player-card" style="padding: 20px;"><div class="chart-container" style="height: 220px; margin-top:0;"><canvas id="clanLegacyActivityChart"></canvas></div></div>
-</div>
-
-<h4 class="section-title">Activity Frequency</h4>
-<div class="player-card" style="padding: 24px 20px;">
-<h4 style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom:12px;">Hourly Trends (TX Time)</h4>
-<div class="chart-container" style="height: 180px; margin-top:0;"><canvas id="hourlyActivityChart"></canvas></div>
-<h4 style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom:12px; margin-top: 32px;">Daily Trends</h4>
-<div class="chart-container" style="height: 180px; margin-top:0;"><canvas id="dailyActivityChart"></canvas></div>
-</div>
-
-<h4 class="section-title">Most Active Operators</h4>
-<div class="player-card" style="padding: 0 20px;" id="activity-leaderboard"></div>
 </div>
 
 <div id="roster-tab" class="tab-content">
 <div class="filter-chips" id="roster-filter-chips" style="display:none;">
   <div class="chip active" data-filter="all" onclick="setRosterFilter('all')">All</div>
   <div class="chip" data-filter="cwl" onclick="setRosterFilter('cwl')">CWL</div>
-  <div class="chip" data-filter="inactive" onclick="setRosterFilter('inactive')">Inactive</div>
 </div>
 <div class="control-row" id="roster-controls" style="display:none;">
 <input type="text" id="searchInput" placeholder="Search Clan Roster..." oninput="debouncedFilterRoster()">
@@ -219,7 +191,6 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 <option value="comp">Overall %</option>
 <option value="hero">Hero %</option>
 <option value="pet">Pet %</option>
-<option value="activity">Activity</option>
 </select>
 <button class="compare-btn" onclick="toggleCompareMode()">Compare</button>
 </div>
@@ -242,21 +213,8 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 <div id="roster-container"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px;">Preparing roster...</p></div>
 </div>
 
-<div id="war-tab" class="tab-content">
+<div id="war-tab" class="tab-content active">
 <div id="war-container"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px;">Fetching CWL Database...</p></div>
-</div>
-
-<div id="capital-tab" class="tab-content">
-<div class="player-card" style="padding: 32px 20px; text-align: center;">
-<h4 style="color: var(--text-muted); font-size: 12px; letter-spacing: 4px; text-transform: uppercase;">Weekend Loot</h4>
-<div style="font-size: 42px; color: var(--accent-main); font-family: var(--font-sans); margin: 16px 0;" id="total-capital-loot">0</div>
-<p style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px;">Capital Gold</p>
-<p id="capital-timer" style="font-size: 9px; color: var(--accent-secondary); text-transform: uppercase; letter-spacing: 2px; margin-top: 16px;"></p>
-</div>
-<h4 class="section-title" style="margin-top: 32px;">Historical Performance</h4>
-<div class="player-card" style="padding: 20px;"><div class="chart-container" style="height: 220px; margin-top:0;"><canvas id="capitalHistoryChart"></canvas></div></div>
-<h4 class="section-title" style="margin-top: 32px;">Raid Leaderboard</h4>
-<div class="player-card" style="padding: 0 20px;" id="capital-board-container"></div>
 </div>
 
 </div>
@@ -264,15 +222,13 @@ border-radius: 12px; display: flex; flex-direction: column; align-items: center;
 
 <div class="bottom-nav-wrapper">
 <div class="bottom-nav">
-<div class="nav-btn active" onclick="switchTab('system')"><span style="font-size:18px;"> 🏠 </span> Hub</div>
+<div class="nav-btn" onclick="switchTab('system')"><span style="font-size:18px;"> 🏠 </span> Hub</div>
 <div class="nav-btn" onclick="switchTab('roster')"><span>🛡</span> Roster</div>
-<div class="nav-btn" onclick="switchTab('war')"><span> ⚔ </span> War</div>
-<div class="nav-btn" onclick="switchTab('capital')"><span>🏛</span> Capital</div>
+<div class="nav-btn active" onclick="switchTab('war')"><span> ⚔ </span> War</div>
 </div>
 </div>
 
 <script>
-// --- Configuration & Variables ---
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
 function debounce(fn, delay) {
@@ -284,10 +240,8 @@ const debouncedFilterRoster = debounce(() => filterRoster(), 250);
 let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
-let capitalLoot = 0;
 let warInfo = null;
-let legacyData = null;
-let chartsRegistry = { history: {}, hero: {}, pet: {}, radarHero: null, radarPet: null, capitalLine: null, activityHourly: null, activityDaily: null, clanLegacyActivityChart: null, cwlLineChart: null };
+let chartsRegistry = { history: {}, hero: {}, pet: {}, radarHero: null, radarPet: null, cwlLineChart: null };
 let currentRosterFilter = 'all';
 
 const CWL_TAGS = ["#PG0R8GQPQ", "#YCRV8GP0U", "#RYPU89Y8", "#99JQPVU9Q", "#GRJRUYP0", "#8QGVV099U", "#2RL2JGJPJ", "#Y8LY2VUJ9", "#GYJ00RJ2Q", "#G9YR000R8", "#20YLLYC9P", "#QVCLVUQVY", "#9LGG22Q28", "#GGULC2CR", "#9R0C82GU"];
@@ -304,15 +258,12 @@ const ASSETS = {
 "Electro Owl": "https://i.imgur.com/7dZT0vb.png", "Unicorn": "https://i.imgur.com/mZzrIcS.png", "Frosty": "https://i.imgur.com/X7vy4qW.png", "Diggy": "https://i.imgur.com/omgjvWR.png", "Phoenix": "https://i.imgur.com/mBVsYEQ.png", "Spirit Fox": "https://i.imgur.com/cFO8ZUp.png", "Angry Jelly": "https://i.imgur.com/YAWHXJF.png", "Sneezy": "https://i.imgur.com/JiaXMtO.png", "Greedy Raven": "https://i.imgur.com/L48mXb4.png"
 };
 
-const tabBackgrounds = { 'system': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'roster': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'war': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'capital': "url('https://i.imgur.com/bHVXaoS.jpeg')" };
+const tabBackgrounds = { 'system': "url('https://i.imgur.com/lK3ctDR.jpeg')", 'roster': "url('https://i.imgur.com/bHVXaoS.jpeg')", 'war': "url('https://i.imgur.com/lK3ctDR.jpeg')" };
 
-// Safely converts raw ISO strings or YYYY-MM into clean readable "Mar 2026"
 function formatMonth(m) {
     if(!m) return "N/A";
     let d = new Date(m);
-    if (!isNaN(d.getTime())) {
-        return d.toLocaleString('default', { month: 'short', year: 'numeric' });
-    }
+    if (!isNaN(d.getTime())) return d.toLocaleString('default', { month: 'short', year: 'numeric' });
     let parts = m.toString().split('-');
     if(parts.length >= 2) {
         let date = new Date(parts[0], parseInt(parts[1]) - 1);
@@ -357,66 +308,11 @@ if(document.getElementById('roster-compare-section').style.display === 'block') 
 }
 }
 
-function startSyncTimer() {
-  setInterval(() => {
-    let now = new Date();
-    let minutes = now.getMinutes();
-    let seconds = now.getSeconds();
-    
-    let nextMin = minutes < 30 ? 30 : 60;
-    let minsLeft = nextMin - minutes - 1;
-    let secsLeft = 60 - seconds;
-    
-    if (secsLeft === 60) {
-      minsLeft += 1;
-      secsLeft = 0;
-    }
-    
-    let timeString = `${minsLeft}:${secsLeft.toString().padStart(2, '0')}`;
-    let el = document.getElementById('syncTimer');
-    if (el) el.innerText = `Next Auto-Sync in: ${timeString}`;
-  }, 1000);
-}
-
-function updateCapitalTimer() {
-  const timerEl = document.getElementById('capital-timer');
-  if (!timerEl) return;
-  
-  const nowStr = new Date().toLocaleString("en-US", {timeZone: "America/Chicago"});
-  const now = new Date(nowStr);
-  const day = now.getDay(); 
-  const hour = now.getHours();
-
-  let isRaidActive = false;
-  if (day === 5 && hour >= 2) isRaidActive = true; 
-  else if (day === 6 || day === 0) isRaidActive = true; 
-  else if (day === 1 && hour < 2) isRaidActive = true; 
-
-  let targetDate = new Date(now);
-  if (isRaidActive) {
-    targetDate.setDate(now.getDate() + ((1 + 7 - day) % 7));
-    if (day === 1) targetDate.setDate(now.getDate()); 
-    targetDate.setHours(2, 0, 0, 0);
-  } else {
-    targetDate.setDate(now.getDate() + ((5 + 7 - day) % 7));
-    if (day === 5) targetDate.setDate(now.getDate() + 7); 
-    targetDate.setHours(2, 0, 0, 0);
-  }
-
-  const diff = targetDate - now;
-  const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const h = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const m = Math.floor((diff / 1000 / 60) % 60);
-
-  timerEl.innerText = isRaidActive ? `Ends in: ${d}d ${h}h ${m}m` : `Starts in: ${d}d ${h}h ${m}m`;
-}
-
 window.addEventListener('DOMContentLoaded', () => {
 if(localStorage.getItem('molly-theme') === 'light') toggleTheme(false);
 Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
-startSyncTimer();
-updateCapitalTimer();
-setInterval(updateCapitalTimer, 60000); 
+// Automatically fetch dashboard data on load since War is default active
+fetchDashboardData(); 
 });
 
 function showLoader(text) { document.getElementById('loaderText').innerText = text || "Fetching API..."; document.getElementById('loaderOverlay').classList.add('active'); }
@@ -430,32 +326,7 @@ document.getElementById(`${tab}-tab`).classList.add('active');
 document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
 document.getElementById('mainScroll').scrollTop = 0;
 
-if ((tab === 'roster' || tab === 'war' || tab === 'capital') && globalPlayerData.length === 0) fetchDashboardData();
-}
-
-function getActivityStatus(ts) {
-if (!ts || ts === 0) return { color: "var(--dot-red)", text: "Inactive 24h+" };
-const diffHours = (new Date().getTime() - ts) / (1000 * 60 * 60);
-if (diffHours < 2) return { color: "var(--dot-green)", text: "Active recently" };
-if (diffHours < 24) return { color: "var(--dot-yellow)", text: "Active today" };
-return { color: "var(--dot-red)", text: `Active ${Math.floor(diffHours/24)}d ago` };
-}
-
-async function forceApiSync() {
-showLoader("Connecting to Supercell API...");
-try {
-  let res = await fetch(WEB_APP_URL + "?action=syncClanData");
-  let data = await res.json();
-  if (data.error) throw new Error(data.error);
-
-  let d = new Date(); 
-  document.getElementById("statusMsg").innerText = `Last synced at ${d.getHours() + ':' + (d.getMinutes() < 10 ? '0' : '') + d.getMinutes()}`;
-  fetchDashboardData();
-} catch (err) {
-  hideLoader(); 
-  document.getElementById("statusMsg").innerText = "Error: " + err.message; 
-  alert("Backend Error: " + err.message);
-}
+if ((tab === 'roster' || tab === 'war') && globalPlayerData.length === 0) fetchDashboardData();
 }
 
 async function fetchDashboardData(callback) {
@@ -468,14 +339,9 @@ try {
   if(data && data.players) {
     globalPlayerData = data.players;
     clanData = data;
-    capitalLoot = data.clanCapitalLoot || 0;
     warInfo = data.warInfo || { type: "NONE", data: null };
-    
-    legacyData = data.legacyData || {};
 
     countUp('sys-roster-count', globalPlayerData.length, false);
-    let activePlayers = globalPlayerData.filter(p => (new Date().getTime() - p.lastSeenTs) / (1000 * 60 * 60) < 24).length;
-    countUp('sys-active-count', activePlayers, false);
     countUp('sys-clan-score', data.clanPct, true);
     document.getElementById('sys-clan-progress').style.width = `${data.clanPct}%`;
 
@@ -495,81 +361,14 @@ try {
     document.getElementById('roster-controls').style.display = globalPlayerData.length > 0 ? "flex" : "none";
     document.getElementById('roster-filter-chips').style.display = globalPlayerData.length > 0 ? "flex" : "none";
 
-    renderActivityHub(data.activityGraphs);
-    filterRoster(); renderCapitalBoard(); renderWar();
+    filterRoster(); renderWar();
   }
   hideLoader();
   if(callback) callback();
 } catch (err) {
   hideLoader(); 
-  document.getElementById("statusMsg").innerText = "Crash Error: " + err.message; 
   alert("Backend Crash: " + err.message);
 }
-}
-
-function renderActivityHub(graphs) {
-  let style = getComputedStyle(document.body);
-  let accent = style.getPropertyValue('--accent-main').trim();
-  let muted = style.getPropertyValue('--text-muted').trim();
-  let gridColor = style.getPropertyValue('--border-color').trim();
-
-  let leaderContainer = document.getElementById('activity-leaderboard');
-  let topActive = [...globalPlayerData].sort((a,b) => b.activityScore - a.activityScore).slice(0, 5);
-  let html = "";
-  topActive.forEach((p, i) => {
-    if(p.activityScore > 0) {
-      let actColor = getActivityStatus(p.lastSeenTs).color;
-      html += `<div class="board-row"><div style="color:var(--text-muted); width: 24px;">#${i+1}</div><div style="flex:1; display:flex; align-items:center;"><span class="activity-dot" style="background:${actColor}; color:${actColor}; width:6px; height:6px;"></span> ${p.name}</div><div class="board-val">${p.activityScore}</div></div>`;
-    }
-  });
-  leaderContainer.innerHTML = html || "<p style='text-align:center; padding:20px; font-size:12px; color:var(--text-muted);'>Awaiting activity data.</p>";
-
-  if (!graphs || !graphs.hourly || graphs.hourly.length === 0) return;
-  if (chartsRegistry.activityHourly) chartsRegistry.activityHourly.destroy();
-  if (chartsRegistry.activityDaily) chartsRegistry.activityDaily.destroy();
-
-  const hourlyLabels = ["12A","1A","2A","3A","4A","5A","6A","7A","8A","9A","10A","11A","12P","1P","2P","3P","4P","5P","6P","7P","8P","9P","10P","11P"];
-  const dailyLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  
-  let barOpts = { 
-    animation: false,
-    events: [],
-    responsive: true, 
-    maintainAspectRatio: false, 
-    plugins: { legend: { display: false }, tooltip: { enabled: false } }, 
-    scales: { 
-      x: { grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 9 }, color: muted } }, 
-      y: { display: true, beginAtZero: true, suggestedMax: 5, border: { display: false }, grid: { color: gridColor }, ticks: { display: false, stepSize: 1 } } 
-    } 
-  };
-
-  chartsRegistry.activityHourly = new Chart(document.getElementById('hourlyActivityChart').getContext('2d'), { type: 'bar', data: { labels: hourlyLabels, datasets: [{ data: graphs.hourly, backgroundColor: accent, borderRadius: 3 }] }, options: barOpts });
-  chartsRegistry.activityDaily = new Chart(document.getElementById('dailyActivityChart').getContext('2d'), { type: 'bar', data: { labels: dailyLabels, datasets: [{ data: graphs.daily, backgroundColor: accent, borderRadius: 3 }] }, options: barOpts });
-
-  // NEW: Historical Clan Activity Chart
-  if (legacyData && Object.keys(legacyData).length > 0) {
-      document.getElementById('clanLegacyContainer').style.display = 'block';
-      let monthlyAct = {};
-      Object.values(legacyData).forEach(p => {
-          if (p.history) {
-              p.history.forEach(h => {
-                  let d = new Date(h.month);
-                  let mKey = isNaN(d.getTime()) ? h.month : `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-                  monthlyAct[mKey] = (monthlyAct[mKey] || 0) + (h.act || 0);
-              });
-          }
-      });
-      let sortedMonths = Object.keys(monthlyAct).sort();
-      let labels = sortedMonths.map(m => formatMonth(m));
-      let dataPts = sortedMonths.map(m => monthlyAct[m]);
-      
-      if (chartsRegistry.clanLegacyActivityChart) chartsRegistry.clanLegacyActivityChart.destroy();
-      if (labels.length > 0) {
-          chartsRegistry.clanLegacyActivityChart = renderLineChart(document.getElementById('clanLegacyActivityChart').getContext('2d'), labels, dataPts, 'Total Clan Activity');
-      }
-  } else {
-      document.getElementById('clanLegacyContainer').style.display = 'none';
-  }
 }
 
 function setRosterFilter(filter) {
@@ -585,15 +384,13 @@ const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 const sortBy = document.getElementById('sortSelect').value;
 
 let pool;
-if (currentRosterFilter === 'inactive') pool = globalPlayerData.filter(p => p.isInactive);
-else if (currentRosterFilter === 'cwl') pool = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
+if (currentRosterFilter === 'cwl') pool = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
 else pool = globalPlayerData;
 
 displayedPlayerData = pool.filter(p => p.name.toLowerCase().includes(searchTerm));
 
 displayedPlayerData.sort((a, b) => {
 if (sortBy === 'comp') return b.percentage - a.percentage;
-if (sortBy === 'activity') return b.activityScore - a.activityScore;
 if (sortBy === 'hero') { let aH = parseInt((a.heroStats||"0").split('/')[0]); let bH = parseInt((b.heroStats||"0").split('/')[0]); return bH - aH; }
 if (sortBy === 'pet') { let aP = parseInt((a.petStats||"0").split('/')[0]); let bP = parseInt((b.petStats||"0").split('/')[0]); return bP - aP; }
 return 0;
@@ -609,71 +406,33 @@ if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-ali
 
 let htmlString = "";
 displayedPlayerData.forEach((player, index) => {
-let activity = getActivityStatus(player.lastSeenTs);
 let safeId = player.name.replace(/[^a-zA-Z0-9]/g, '_') + '_' + index;
 let historyLogs = (player.recentlyCompleted && player.recentlyCompleted.length > 0) ?  `<div style="font-size:12px; margin-bottom: 24px;">✔  ${player.recentlyCompleted.slice(-3).join( '<br>✔ ' )}</div>` : '';
 
 let hr = player.hitRate !== null && player.hitRate !== undefined ? player.hitRate : 0;
-
 let badgesHtml = '';
-if (player.isInactive) badgesHtml += `<span class="status-badge badge-inactive">Inactive</span>`;
 if (player.hitRate !== null && player.hitRate !== undefined) badgesHtml += `<span class="status-badge badge-hit-rate">${player.hitRate}% 3★</span>`;
-
-let legacyHtml = "";
-if (legacyData && legacyData[player.tag]) {
-    let rec = legacyData[player.tag];
-    let momBadge = "";
-    if(rec.momentum === "Heating Up") momBadge = `🔥 Heating Up`;
-    else if(rec.momentum === "Cooling Off") momBadge = `❄️ Cooling Off`;
-
-    legacyHtml = `
-    <h4 class="section-title" style="margin-top:32px; text-align:left; font-size:12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Career Dossier <span style="float:right; font-size:10px; color:var(--accent-main); text-transform:none;">${momBadge}</span></h4>
-    <div class="stat-grid" style="grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom:16px;">
-      <div class="stat-box"><div class="stat-label">Total Activity</div><div class="stat-val" style="font-size:15px;">${rec.totalActivity.toLocaleString()}</div></div>
-      <div class="stat-box"><div class="stat-label">Capital Looted</div><div class="stat-val" style="font-size:15px;">${rec.totalCapital.toLocaleString()}</div></div>
-      <div class="stat-box"><div class="stat-label">Troops Donated</div><div class="stat-val" style="font-size:15px; color:var(--dot-green)">${rec.totalDonated.toLocaleString()}</div></div>
-      <div class="stat-box"><div class="stat-label">Troops Received</div><div class="stat-val" style="font-size:15px; color:var(--dot-red)">${rec.totalReceived.toLocaleString()}</div></div>
-    </div>
-    <h4 class="section-title" style="margin-top:24px; text-align:left; font-size:11px; margin-bottom:12px;">Personal Bests (Wrapped)</h4>
-    <div style="background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:24px;">
-       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,175,55,0.1); padding-bottom:8px; margin-bottom:8px;">
-         <div><div style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Best Donation Month</div><div style="font-size:12px; color:var(--text-main); margin-top:2px;">${formatMonth(rec.bestDonated.month)}</div></div>
-         <div style="font-size:14px; color:var(--accent-main); font-weight:500;">${rec.bestDonated.val.toLocaleString()}</div>
-       </div>
-       <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(212,175,55,0.1); padding-bottom:8px; margin-bottom:8px;">
-         <div><div style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Highest Capital Loot</div><div style="font-size:12px; color:var(--text-main); margin-top:2px;">${formatMonth(rec.bestCapital.month)}</div></div>
-         <div style="font-size:14px; color:var(--accent-main); font-weight:500;">${rec.bestCapital.val.toLocaleString()}</div>
-       </div>
-       <div style="display:flex; justify-content:space-between; align-items:center;">
-         <div><div style="font-size:9px; color:var(--text-muted); text-transform:uppercase;">Peak Activity Score</div><div style="font-size:12px; color:var(--text-main); margin-top:2px;">${formatMonth(rec.bestActivity.month)}</div></div>
-         <div style="font-size:14px; color:var(--accent-main); font-weight:500;">${rec.bestActivity.val.toLocaleString()}</div>
-       </div>
-    </div>
-    `;
-}
 
 htmlString += `
 <div class="player-card">
 <div class="card-header" onclick="toggleDetails(this, '${safeId}', ${globalPlayerData.indexOf(player)})">
 <div class="player-info">
-<div style="display:flex; align-items:center;"><span class="activity-dot" style="color: ${activity.color}; background: ${activity.color};"></span>${player.name}</div>
+<div style="display:flex; align-items:center;">${player.name}</div>
 <div><span>${parseFloat(player.percentage)}%</span></div>
 </div>
 ${badgesHtml ? `<div style="margin-bottom: 6px; display:flex; flex-wrap: wrap; gap: 4px;">${badgesHtml}</div>` : ''}
-<div class="timestamp-sub">${activity.text}</div>
 <div class="progress-bg"><div class="progress-fill" style="width: ${player.percentage}%;"></div></div>
 </div>
 <div class="upgrade-details">
 ${historyLogs}
 <div class="stat-grid">
-<div class="stat-box"><div class="stat-label">Activity</div><div class="stat-val">${player.activityScore || 0}</div></div>
 <div class="stat-box"><div class="stat-label">Heroes</div><div class="stat-val">${player.heroStats}</div></div>
 <div class="stat-box"><div class="stat-label">Pets</div><div class="stat-val">${player.petStats}</div></div>
 <div class="stat-box"><div class="stat-label">Donations</div><div class="stat-val">${(player.donations||0).toLocaleString()}</div></div>
 <div class="stat-box"><div class="stat-label">War Stars</div><div class="stat-val">${(player.warStars||0).toLocaleString()}</div></div>
 <div class="stat-box"><div class="stat-label">CWL Hit Rate</div><div class="stat-val">${hr}%</div></div>
 </div>
-${legacyHtml}
+
 ${player.heroes ? `
 <h4 class="section-title">Hero Levels (%)</h4>
 <div class="chart-container" style="height: 220px;"><canvas id="heroBarChart_${safeId}"></canvas></div>
@@ -772,7 +531,6 @@ function buildTargetAssignments(round) {
         assignments.push({ us, attackerClass, hr, target: null });
     });
 
-    // Give struggling players priority on lowest remaining THs
     assignments.sort((a,b) => {
         if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1;
         if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1;
@@ -786,10 +544,10 @@ function buildTargetAssignments(round) {
         let best = null;
         if (a.attackerClass === "Struggling") {
             let weakBases = candidates.filter(e => e.th <= a.us.th);
-            if (weakBases.length > 0) best = weakBases.sort((x,y) => y.th - x.th)[0]; // Lowest available
+            if (weakBases.length > 0) best = weakBases.sort((x,y) => y.th - x.th)[0]; 
         } else if (a.attackerClass === "Elite") {
             let strongBases = candidates.filter(e => e.th >= a.us.th);
-            if (strongBases.length > 0) best = strongBases.sort((x,y) => x.th - y.th)[0]; // Highest available
+            if (strongBases.length > 0) best = strongBases.sort((x,y) => x.th - y.th)[0]; 
         }
 
         if (!best) {
@@ -841,6 +599,8 @@ html += `<div class="board-row" style="color:var(--text-muted); font-size:10px; 
 cwlPlayers.forEach((p) => {
 let hr = p.hitRate !== null && p.hitRate !== undefined ? p.hitRate : 0;
 let offColor = hr >= 66 ? "var(--dot-green)" : (hr >= 33 ? "var(--dot-yellow)" : (p.cwlStats.attacks > 0 ? "var(--dot-red)" : "var(--text-muted)"));
+let defRatio = p.cwlStats.defenses > 0 ? (p.cwlStats.defStars / p.cwlStats.defenses).toFixed(1) : 0;
+
 let defColor = (p.cwlStats.defenses > 0 && p.cwlStats.defStars === p.cwlStats.defenses * 3) ? "var(--dot-red)" : "var(--text-muted)";
 
 html += `<div class="board-row">
@@ -947,20 +707,6 @@ ${rosterHtml}
 </div>
 </div>`;
 });
-} else if (clanData.cwlHistory && clanData.cwlHistory.length > 0) {
-html += `<div style="text-align:center; margin-bottom:32px;"><h4 style="color: var(--text-muted); letter-spacing: 4px; text-transform: uppercase; font-size: 14px;">Historical Archives</h4></div>`;
-clanData.cwlHistory.forEach((season, index) => {
-html += `
-<div class="cwl-round-card">
-<div class="cwl-round-header" onclick="this.nextElementSibling.classList.toggle('open')">
-<div class="cwl-team-vs">Season: ${formatMonth(season.season)}</div>
-<div class="cwl-round-status">${season.state}</div>
-</div>
-<div class="cwl-round-body">
-<p style="font-size: 12px; color: var(--text-muted); text-align: center;">Deep analytics not available for archived seasons.</p>
-</div>
-</div>`;
-});
 } else {
 html = `<div class="player-card" style="padding: 32px 20px; text-align: center;"><h4 style="color: var(--accent-main); letter-spacing: 4px; text-transform: uppercase;">Awaiting Database Sync</h4><p style="font-size: 12px; color: var(--text-muted); margin-top: 16px;">The CWL Analytics engine is standing by.</p></div>`;
 }
@@ -1000,26 +746,6 @@ if (clanData.cwlHistoricalStats && clanData.cwlHistoricalStats.length > 0) {
       if (chartsRegistry.cwlLineChart) chartsRegistry.cwlLineChart.destroy();
       chartsRegistry.cwlLineChart = renderLineChart(ctx.getContext('2d'), dates, stars, 'CWL Stars');
   }
-}
-}
-
-function renderCapitalBoard() {
-document.getElementById('total-capital-loot').innerText = capitalLoot.toLocaleString();
-
-let container = document.getElementById('capital-board-container'), html = "";
-[...globalPlayerData].sort((a,b) => (b.capitalLooted||0) - (a.capitalLooted||0)).forEach((p, i) => {
-if ((p.capitalLooted||0) === 0 && p.capitalAttacks === "0/6") return;
-html += `<div class="board-row"><div style="color:var(--text-muted); width: 24px;">#${i+1}</div><div style="flex:1;">${p.name}</div><div class="board-val">${(p.capitalLooted||0).toLocaleString()} <span style="font-size:10px; color:var(--text-muted); padding:2px 6px;">${p.capitalAttacks}</span></div></div>`;
-});
-container.innerHTML = html || "<p style='text-align:center; padding: 20px; font-size:12px;'>No raid data available.</p>";
-
-if (clanData.capitalHistory && clanData.capitalHistory.length > 0) {
-let dates = clanData.capitalHistory.map(c => formatMonth(c.date)); let loots = clanData.capitalHistory.map(c => c.loot);
-if (chartsRegistry.capitalLine) chartsRegistry.capitalLine.destroy();
-chartsRegistry.capitalLine = renderLineChart(document.getElementById('capitalHistoryChart').getContext('2d'), dates, loots, 'Capital Gold');
-} else {
-let ctx = document.getElementById('capitalHistoryChart');
-if (ctx) ctx.parentElement.innerHTML = "<p style='text-align:center; font-size:10px; color:var(--text-muted); margin-top: 80px;'>Awaiting backend historical fetch.</p>";
 }
 }
 
