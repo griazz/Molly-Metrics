@@ -90,18 +90,22 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .compare-btn:active { transform: scale(0.95); }
 .view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center; align-items:center; gap:8px;}
 
-/* V3.0 HEX-GRID (HONEYCOMB) ROSTER */
-.honeycomb-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; padding: 12px 0;}
-.hex-card { width: 104px; height: 116px; background-color: var(--bg-card); border: 1px solid var(--border-color); clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; margin: -14px 2px; backdrop-filter: blur(12px); box-sizing: border-box; padding: 10px;}
-.hex-card:hover { background: rgba(0, 229, 255, 0.15); transform: scale(1.05); z-index: 10; }
-.hex-card:active { transform: scale(0.95); }
-.hex-ring { width: 36px; height: 36px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 6px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
-.hex-ring::before { content: ""; position: absolute; inset: 2px; background: #0c0e14; border-radius: 50%; }
-.hex-ring span { position: relative; font-size: 9px; font-weight: 600; color: var(--text-main); }
-.hex-name { font-size: 10px; font-weight: 600; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
-.hex-role { font-size: 7px; color: var(--accent-secondary); letter-spacing: 1px; margin-top: 2px; text-transform: uppercase; font-weight:600;}
+/* V3.1 SCI-FI CUT-CORNER DATAPADS */
+.scifi-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; padding: 12px 0;}
+.scifi-card { width: calc(33% - 8px); aspect-ratio: 1; background-color: var(--bg-card); border: 1px solid var(--border-color); 
+    /* The Cyberpunk Angled Corners */
+    clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-sizing: border-box; padding: 10px; position: relative;}
+.scifi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 15px; height: 15px; border-top: 2px solid var(--accent-main); border-left: 2px solid var(--accent-main); opacity: 0.5; }
+.scifi-card::after { content: ''; position: absolute; bottom: 0; right: 0; width: 15px; height: 15px; border-bottom: 2px solid var(--accent-main); border-right: 2px solid var(--accent-main); opacity: 0.5; }
+.scifi-card:hover { background: rgba(0, 229, 255, 0.15); transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,229,255,0.1); z-index: 10; }
+.scifi-card:active { transform: scale(0.95); }
+.scifi-ring { width: 44px; height: 44px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 8px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.2); }
+.scifi-ring::before { content: ""; position: absolute; inset: 2.5px; background: #0c0e14; border-radius: 50%; }
+.scifi-ring span { position: relative; font-size: 10px; font-weight: 600; color: var(--text-main); }
+.scifi-name { font-size: 10px; font-weight: 600; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); letter-spacing: 0.5px;}
 
-/* V2.5 FLAWLESS ORBITAL RADAR MAP */
+/* V3.1 ORBITAL RADAR MAP */
 .radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(0, 229, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
 .radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.15); border-radius: 50%; pointer-events: none;}
 .radar-ring.r1 { width: 33%; height: 33%; }
@@ -111,7 +115,6 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .radar-crosshair.v { top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); }
 .radar-crosshair.h { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
 .radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--accent-main); border-radius: 50%; box-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); z-index: 10;}
-/* Slowed Down Sweep */
 .radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.4) 100%); animation: radarSweep 10s linear infinite; pointer-events: none; z-index: 1;}
 @keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 .map-node { position: absolute; width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 5; transition: transform 0.2s; box-shadow: 0 0 5px rgba(255,255,255,0.2);}
@@ -136,7 +139,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .chart-container { margin-top: 24px; position: relative; width: 100%; }
 .compare-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
 .compare-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); flex: 1; text-align: center; letter-spacing: 1px;}
-.compare-val { font-size: 16px; width: 30%; text-align: center; transition: color 0.4s ease; font-family: var(--font-sans); letter-spacing: 1px;}
+.compare-val { font-size: 16px; width: 30%; text-align: center; font-family: var(--font-sans); letter-spacing: 1px;}
 .radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px; height: 340px; position: relative; width: 100%; box-sizing: border-box; }
 
 .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px); border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -154,8 +157,8 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom:4px; }
 .badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
 
-/* V3.0 HOLOGRAPHIC 3D WAR PIPELINE */
-.cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 0 40px 0; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
+/* V3.1 HOLOGRAPHIC 3D WAR PIPELINE (Fixed Padding) */
+.cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
 .carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
 .carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: var(--accent-main); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15); }
@@ -175,8 +178,6 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .circular-progress::before { content: ""; position: absolute; inset: 6px; background: #12141c; border-radius: 50%; backdrop-filter: blur(16px); }
 .circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
 .time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px; margin-top: 8px;}
-
-/* Segmented Energy Bar */
 .energy-bar-container { display: flex; gap: 2px; height: 8px; width: 85%; margin: 0 auto; }
 .energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 1px; transition: background 0.3s ease; }
 .energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 5px var(--accent-main); }
@@ -189,7 +190,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-ring"></div>
     <div class="loader-terminal">
-        <div class="term-line">> INITIALIZING MOLLY_OS V3.0...</div>
+        <div class="term-line">> INITIALIZING MOLLY_OS V3.1...</div>
         <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
         <div class="term-line">> DECRYPTING PACKETS...</div>
         <div class="term-line blink">> AWAITING HANDSHAKE...</div>
@@ -201,18 +202,16 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 
 <div id="roster-tab" class="tab-content">
   
-<div class="player-card" style="text-align: center; cursor: default; margin-bottom: 24px; border-radius:16px;">
-    <div style="padding: 24px; background:var(--bg-card); border-radius:16px;">
-        <h4 style="color: var(--text-muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Active Roster Progression</h4>
-        <div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
-            <div class="circular-progress" id="global-circle" style="--progress: 0%;">
-                <div class="circular-value" id="global-pct-val">0%</div>
-            </div>
-            <div style="text-align: left;">
-                <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">30-Day Growth</div>
-                <div id="global-change-val" style="font-size: 18px; font-weight: 500; color: var(--dot-green);">+0.00%</div>
-                <div style="font-size: 9px; color: var(--text-muted); margin-top: 6px;" id="global-progress-count">0 Operators Advancing</div>
-            </div>
+<div style="text-align: center; cursor: default; margin-bottom: 24px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding: 24px; backdrop-filter: blur(12px);">
+    <h4 style="color: var(--text-muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Active Roster Progression</h4>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
+        <div class="circular-progress" id="global-circle" style="--progress: 0%;">
+            <div class="circular-value" id="global-pct-val">0%</div>
+        </div>
+        <div style="text-align: left;">
+            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">30-Day Growth</div>
+            <div id="global-change-val" style="font-size: 18px; font-weight: 500; color: var(--dot-green);">+0.00%</div>
+            <div style="font-size: 9px; color: var(--text-muted); margin-top: 6px;" id="global-progress-count">0 Operators Advancing</div>
         </div>
     </div>
 </div>
@@ -255,7 +254,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
     <div id="radar-nodes"></div>
 </div>
 
-<div id="roster-container" class="honeycomb-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px;">Preparing roster...</p></div>
+<div id="roster-container" class="scifi-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px;">Preparing roster...</p></div>
 </div>
 
 <div id="war-tab" class="tab-content active">
@@ -352,7 +351,6 @@ if(tab === 'war') {
 }
 }
 
-// Intersects Carousel to handle 3D Rotation
 function init3DCarousel() {
     setTimeout(() => {
         const carousel = document.getElementById('cwlCarousel');
@@ -368,6 +366,7 @@ function init3DCarousel() {
         }, { root: carousel, threshold: 0.6 });
         slides.forEach(s => observer.observe(s));
         let activeSlide = carousel.querySelector('.carousel-slide.active');
+        // Subtract 16px to center with the new padding
         if (activeSlide) carousel.scrollTo({ left: activeSlide.offsetLeft - 16, behavior: 'smooth' });
     }, 150);
 }
@@ -438,7 +437,7 @@ function toggleMapView() {
     let controls = document.getElementById('roster-controls');
 
     if (isMapView) {
-        btn.innerHTML = "<span>☰</span> Switch to Honeycomb";
+        btn.innerHTML = "<span>☰</span> Switch to Datapad Grid";
         map.style.display = "block";
         list.style.display = "none";
         controls.style.display = "none";
@@ -446,7 +445,7 @@ function toggleMapView() {
     } else {
         btn.innerHTML = "<span>◎</span> Switch to Sector Map";
         map.style.display = "none";
-        list.style.display = "flex"; // For Hex Flex Grid
+        list.style.display = "flex"; 
         controls.style.display = "flex";
         renderPlayerCards();
     }
@@ -481,27 +480,20 @@ function renderRosterMap() {
     container.innerHTML = html;
 }
 
-// V3.0 HONEYCOMB HEX GRID
+// V3.1 SCI-FI DATAPAD GRID
 function renderPlayerCards() {
 var container = document.getElementById('roster-container');
-if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; margin-top:32px; color:var(--text-muted); width:100%;'>No players found.</p>"; return; }
+if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); width:100%;'>No players found.</p>"; return; }
 
 let htmlString = "";
 displayedPlayerData.forEach((player, index) => {
-let roleText = "OP";
-if (player.role === "leader") roleText = "CMD";
-if (player.role === "coLeader") roleText = "EXEC";
-if (player.role === "admin") roleText = "OFFICER";
-
 let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
-
 htmlString += `
-<div class="hex-card" onclick="openBottomSheet(${realIndex})">
-    <div class="hex-ring" style="--pct: ${player.percentage}%;">
+<div class="scifi-card" onclick="openBottomSheet(${realIndex})">
+    <div class="scifi-ring" style="--pct: ${player.percentage}%;">
         <span>${Math.floor(player.percentage)}%</span>
     </div>
-    <div class="hex-name">${player.name}</div>
-    <div class="hex-role">${roleText}</div>
+    <div class="scifi-name">${player.name}</div>
 </div>`;
 });
 container.innerHTML = htmlString;
@@ -526,6 +518,11 @@ function openBottomSheet(index) {
   let avgDest = (player.cwlStats && player.cwlStats.avgDestruction) ? player.cwlStats.avgDestruction + "%" : "N/A";
   let speed = (player.cwlStats && player.cwlStats.avgDuration) ? player.cwlStats.avgDuration + "s" : "N/A";
   
+  let roleText = "OP";
+  if (player.role === "leader") roleText = "CMD";
+  if (player.role === "coLeader") roleText = "EXEC";
+  if (player.role === "admin") roleText = "OFFICER";
+
   let growth = 0;
   if (player.historyPcts && player.historyPcts.length > 1) growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
   let estMaxText = "Awaiting Data";
@@ -539,7 +536,10 @@ function openBottomSheet(index) {
     <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px;">
         <div>
             <h2 style="color:var(--text-main); margin:0; font-size:24px; font-family:var(--font-sans); font-weight:600;">${player.name}</h2>
-            <div style="color:var(--accent-main); font-size:12px; margin-top:4px; font-weight:500;">TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%</div>
+            <div style="color:var(--accent-main); font-size:12px; margin-top:4px; font-weight:500;">
+                <span style="color:var(--accent-secondary); margin-right:8px;">[${roleText}]</span>
+                TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
+            </div>
         </div>
     </div>
     
@@ -650,7 +650,6 @@ function buildTargetAssignments(round) {
     html += `</div></div>`; return html;
 }
 
-// V3.0 STAR MAP DRAWING
 function setStarMapFilter(f) {
     currentStarMapFilter = f;
     document.querySelectorAll('.map-legend span').forEach(el => el.style.color = 'var(--text-muted)');
@@ -662,68 +661,44 @@ function setStarMapFilter(f) {
 
 function drawStarMap() {
     if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
-    
-    let container = document.getElementById('starMapNodes');
-    let canvas = document.getElementById('starMapCanvas');
+    let container = document.getElementById('starMapNodes'); let canvas = document.getElementById('starMapCanvas');
     if(!container || !canvas) return;
     
     container.innerHTML = '';
-    let ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let myClanTag = decodeURIComponent("#YQP0GJ9"); 
 
-    let myClanTag = decodeURIComponent("#YQP0GJ9"); // Using const clan tag
-
-    // Filter nodes
     let nodesToDraw = [];
     warInfo.starMap.forEach(p => {
         let isUs = (p.clanTag === myClanTag);
         if (currentStarMapFilter === 'us' && !isUs) return;
         if (currentStarMapFilter === 'them' && isUs) return;
         
-        let maxStars = 21;
-        let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
-        let r = rPct * (canvas.width / 2 * 0.85); // 85% of radius to keep inside
-        
+        let maxStars = 21; let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
+        let r = rPct * (canvas.width / 2 * 0.85); 
         let effPos = p.basePos + p.avgDelta;
         let angle = ((effPos - 1) / 15) * Math.PI * 2 - (Math.PI / 2);
-
-        let cx = canvas.width / 2;
-        let cy = canvas.height / 2;
-        let x = cx + r * Math.cos(angle);
-        let y = cy + r * Math.sin(angle);
-
+        let cx = canvas.width / 2; let cy = canvas.height / 2;
+        let x = cx + r * Math.cos(angle); let y = cy + r * Math.sin(angle);
         nodesToDraw.push({ ...p, isUs: isUs, x: x, y: y });
     });
 
-    // Draw Lines for Clans
     let clans = {};
-    nodesToDraw.forEach(n => {
-        if(!clans[n.clanTag]) clans[n.clanTag] = [];
-        clans[n.clanTag].push(n);
-    });
+    nodesToDraw.forEach(n => { if(!clans[n.clanTag]) clans[n.clanTag] = []; clans[n.clanTag].push(n); });
 
     Object.keys(clans).forEach(cTag => {
-        let members = clans[cTag];
-        members.sort((a,b) => a.basePos - b.basePos);
+        let members = clans[cTag]; members.sort((a,b) => a.basePos - b.basePos);
         ctx.beginPath();
-        members.forEach((m, i) => {
-            if(i===0) ctx.moveTo(m.x, m.y);
-            else ctx.lineTo(m.x, m.y);
-        });
+        members.forEach((m, i) => { if(i===0) ctx.moveTo(m.x, m.y); else ctx.lineTo(m.x, m.y); });
         ctx.strokeStyle = (cTag === myClanTag) ? 'rgba(0, 229, 255, 0.4)' : 'rgba(255, 51, 102, 0.4)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        ctx.lineWidth = 2; ctx.stroke();
     });
 
-    // Render HTML Nodes
     let html = '';
     nodesToDraw.forEach(n => {
         let color = n.isUs ? 'var(--accent-main)' : 'var(--dot-red)';
-        let left = (n.x / canvas.width) * 100;
-        let top = (n.y / canvas.height) * 100;
-        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};">
-            <span class="star-label" style="color:${color};">${n.name}</span>
-        </div>`;
+        let left = (n.x / canvas.width) * 100; let top = (n.y / canvas.height) * 100;
+        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${n.name}</span></div>`;
     });
     container.innerHTML = html;
 }
@@ -777,7 +752,6 @@ if (activeRound.state === "inWar" && hitList.length > 0) {
     html += `</div>`;
 }
 
-// V3.0 The CWL Constellation Map
 html += `
 <h4 class="section-title" style="margin-top:32px;">CWL Constellation</h4>
 <p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">Mapping complete league trajectories. Center = 21 Stars. Rotational shifts indicate avg target reach/dip.</p>
@@ -843,13 +817,10 @@ let rosterHtml = `<div style="margin-top:32px;">
 <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Enemy Roster</p>`;
 (round.enemyLineup || []).forEach(e => {
 let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red);">⚔️</span>` : `<span style="color:var(--text-muted);">💤</span>`;
-let ironCladHtml = (e.defenses && e.defenses > 1) ? `<span style="background:rgba(179,0,255,0.15); color:var(--accent-secondary); border:1px solid rgba(179,0,255,0.3); padding:2px 6px; border-radius:4px; font-size:8px; margin-left:4px;">🛡️ Iron Clad (${e.defenses})</span>` : '';
-
 rosterHtml += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0, 229, 255, 0.1); font-size:12px; align-items:center;">
 <div>
 <span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.mapPosition}</span>
 <span style="font-weight:500;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:4px; font-weight:500;">TH${e.th}</span>
-${ironCladHtml}
 </div>
 <div>${atkStatus}</div>
 </div>`;
@@ -861,7 +832,7 @@ if (isCurrent) rosterHtml += buildTargetAssignments(round);
 html += `
 <div class="carousel-slide ${isCurrent ? 'active' : ''}">
   <div style="display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
-    <div style="font-size:15px; font-weight:600;">Round ${index + 1}: ${round.opponent.name}</div>
+    <div style="font-size:15px; font-weight:600; font-family:var(--font-sans);">Round ${index + 1}: ${round.opponent.name}</div>
     <div style="font-size:9px; color:var(--accent-main); text-transform:uppercase; letter-spacing:1px; font-weight:600;">${round.state}</div>
   </div>
   ${patHtml}
