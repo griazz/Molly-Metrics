@@ -90,7 +90,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .compare-btn:active { transform: scale(0.95); }
 .view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center; align-items:center; gap:8px;}
 
-/* GLASS SLATE GRID */
+/* FIXED GLASS SLATE GRID */
 .glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px 0; width: 100%;}
 .glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow); text-align:center;}
 .glass-card:hover { transform: translateY(-4px); border-color: var(--accent-main); box-shadow: 0 10px 20px rgba(0,229,255,0.15); z-index: 10; }
@@ -155,7 +155,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom:4px; }
 .badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
 
-/* CWL Carousel & War Room */
+/* V3.5 HOLOGRAPHIC 3D WAR PIPELINE */
 .cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
 .carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
@@ -175,6 +175,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--glow-accent); flex-shrink: 0; }
 .circular-progress::before { content: ""; position: absolute; inset: 6px; background: #12141c; border-radius: 50%; backdrop-filter: blur(16px); }
 .circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
+.time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px; margin-top: 8px;}
 
 /* Segmented Energy Bar */
 .energy-bar-container { display: flex; gap: 2px; height: 8px; width: 85%; margin: 0 auto; }
@@ -199,7 +200,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-ring"></div>
     <div class="loader-terminal">
-        <div class="term-line">> INITIALIZING MOLLY_OS V3.6...</div>
+        <div class="term-line">> INITIALIZING MOLLY_OS V3.7...</div>
         <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
         <div class="term-line">> DECRYPTING PACKETS...</div>
         <div class="term-line blink">> AWAITING HANDSHAKE...</div>
@@ -299,7 +300,7 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
 let warInfo = null;
-let chartsRegistry = { radarHero: null, radarPet: null, cwlLineChart: null, operatorQuadrant: null };
+let chartsRegistry = { radarHero: null, radarPet: null, operatorQuadrant: null };
 let sheetCharts = { history: null, hero: null, pet: null }; 
 let currentRosterFilter = 'all';
 let isMapView = false;
@@ -491,6 +492,7 @@ function renderRosterMap() {
     container.innerHTML = html;
 }
 
+// V3.7 GLASS SLATE GRID WITH PROGRESS INDICATOR
 function renderPlayerCards() {
 var container = document.getElementById('roster-container');
 if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); width:100%; grid-column: span 3;'>No players found.</p>"; return; }
@@ -632,9 +634,9 @@ options: { animation: false, events: [], layout: { padding: { top: 25, right: 35
 plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body); let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '500 10px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2)); if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '500 11px "Montserrat"'; let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 15; ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
+// V3.7: Smart Tactical Assignments
 function buildTargetAssignments(round) {
     if (!round.myLineup || !round.enemyLineup) return '';
-    let html = `<div style="margin-top:32px;"><p style="font-size: 11px; color: var(--accent-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; text-align:center; border-top: 1px solid var(--border-color); padding-top: 24px;">Tactical AI Assignments</p><div style="font-size: 11px; display:flex; flex-direction:column; gap:6px;">`;
     let enemyPool = [...round.enemyLineup].map(e => ({...e, assigned: false}));
     let assignments = [];
     round.myLineup.forEach(us => {
@@ -656,16 +658,77 @@ function buildTargetAssignments(round) {
         best.assigned = true; a.target = best;
     });
     assignments.sort((a,b) => a.us.mapPosition - b.us.mapPosition);
+    
+    let swapsHtml = '';
+    let swapCount = 0;
     assignments.forEach(a => {
         if (!a.target) return;
-        let usColor = a.attackerClass === "Elite" ? "var(--dot-green)" : (a.attackerClass === "Struggling" ? "var(--dot-red)" : "var(--text-main)");
-        html += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
-            <div style="color:${usColor}; flex:1; font-weight:500;">${a.us.mapPosition}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
-            <div style="color:var(--accent-main); font-size:16px;">⌖</div>
-            <div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.mapPosition}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
-        </div>`;
+        if (a.us.mapPosition !== a.target.mapPosition) {
+            swapCount++;
+            let usColor = a.attackerClass === "Elite" ? "var(--dot-green)" : (a.attackerClass === "Struggling" ? "var(--dot-red)" : "var(--text-main)");
+            let reasoning = a.attackerClass === "Elite" ? "Covering liability" : "Optimizing hit rate";
+            
+            swapsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
+                <div style="color:${usColor}; flex:1; font-weight:500;">${a.us.mapPosition}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
+                <div style="color:var(--text-muted); font-size:12px; padding:0 8px;">➔</div>
+                <div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.mapPosition}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
+            </div>
+            <div style="font-size:8px; color:var(--text-muted); text-align:right; margin-top:-4px; margin-bottom:4px; padding-right:12px;">└ ${reasoning}</div>`;
+        }
     });
+
+    let html = `<div style="margin-top:32px;"><p style="font-size: 11px; color: var(--accent-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; text-align:center; border-top: 1px solid var(--border-color); padding-top: 24px;">Tactical AI Assignments</p><div style="font-size: 11px; display:flex; flex-direction:column; gap:6px;">`;
+    
+    if (swapCount === 0) {
+        html += `<div style="text-align:center; padding:12px; border:1px dashed rgba(0,229,255,0.3); border-radius:8px; color:var(--accent-main); font-size:10px; font-weight:500;">[STANDARD MIRROR PROTOCOL]<br><span style="color:var(--text-muted); font-weight:300;">No positional swaps required based on current metrics.</span></div>`;
+    } else {
+        html += swapsHtml;
+    }
+    
     html += `</div></div>`; return html;
+}
+
+// V3.7: Combat Effectiveness Matrix (Scatter Plot)
+function drawOperatorQuadrant() {
+    let ctx = document.getElementById('operatorQuadrantChart');
+    if (!ctx || !warInfo || !warInfo.starMap) return;
+
+    let usData = []; let themData = [];
+    let myClanTag = decodeURIComponent("#YQP0GJ9");
+
+    warInfo.starMap.forEach(p => {
+        let hitRate = p.attacks > 0 ? (p.threeStars / p.attacks) * 100 : 0;
+        let dest = p.avgDest || 0;
+        if(dest >= 50) { 
+            let pt = { x: dest, y: hitRate, name: p.name };
+            if (p.clanTag === myClanTag) usData.push(pt); else themData.push(pt);
+        }
+    });
+
+    if(chartsRegistry.operatorQuadrant) chartsRegistry.operatorQuadrant.destroy();
+
+    const crosshairPlugin = {
+        id: 'crosshair',
+        beforeDraw: chart => {
+            let ctx = chart.ctx; let xAxis = chart.scales.x; let yAxis = chart.scales.y;
+            ctx.save(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
+            ctx.beginPath(); ctx.moveTo(xAxis.getPixelForValue(80), yAxis.top); ctx.lineTo(xAxis.getPixelForValue(80), yAxis.bottom); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(xAxis.left, yAxis.getPixelForValue(50)); ctx.lineTo(xAxis.right, yAxis.getPixelForValue(50)); ctx.stroke();
+            ctx.font = '10px Montserrat'; ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; ctx.textAlign = 'center';
+            ctx.fillText('VANGUARD', xAxis.getPixelForValue(90), yAxis.getPixelForValue(75));
+            ctx.fillText('DEMOLITION', xAxis.getPixelForValue(90), yAxis.getPixelForValue(25));
+            ctx.fillText('SNIPERS', xAxis.getPixelForValue(65), yAxis.getPixelForValue(75));
+            ctx.fillText('INEFFECTIVE', xAxis.getPixelForValue(65), yAxis.getPixelForValue(25));
+            ctx.restore();
+        }
+    };
+
+    chartsRegistry.operatorQuadrant = new Chart(ctx.getContext('2d'), {
+        type: 'scatter',
+        data: { datasets: [ { label: 'Us', data: usData, backgroundColor: 'rgba(0, 229, 255, 0.8)', borderColor: '#00e5ff', pointRadius: 4, pointHoverRadius: 6 }, { label: 'Them', data: themData, backgroundColor: 'rgba(255, 51, 102, 0.8)', borderColor: '#ff3366', pointRadius: 4, pointHoverRadius: 6 } ] },
+        options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw.name}: ${ctx.raw.y.toFixed(0)}% 3★, ${ctx.raw.x.toFixed(1)}% Dest` } } }, scales: { x: { min: 50, max: 100, title: { display: true, text: 'Average Destruction %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } }, y: { min: 0, max: 100, title: { display: true, text: '3★ Hit Rate %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } } } },
+        plugins: [crosshairPlugin]
+    });
 }
 
 function setStarMapFilter(f) {
@@ -716,76 +779,7 @@ function drawStarMap() {
     container.innerHTML = html;
 }
 
-function drawOperatorQuadrant() {
-    let ctx = document.getElementById('operatorQuadrantChart');
-    if (!ctx || !warInfo || !warInfo.starMap) return;
-
-    let usData = []; let themData = [];
-    let myClanTag = decodeURIComponent("#YQP0GJ9");
-
-    warInfo.starMap.forEach(p => {
-        let hitRate = p.attacks > 0 ? (p.threeStars / p.attacks) * 100 : 0;
-        let dest = p.avgDest || 0;
-        let pt = { x: dest, y: hitRate, name: p.name };
-        if (p.clanTag === myClanTag) usData.push(pt);
-        else themData.push(pt);
-    });
-
-    if(chartsRegistry.operatorQuadrant) chartsRegistry.operatorQuadrant.destroy();
-
-    const crosshairPlugin = {
-        id: 'crosshair',
-        beforeDraw: chart => {
-            let ctx = chart.ctx;
-            let xAxis = chart.scales.x;
-            let yAxis = chart.scales.y;
-            
-            ctx.save();
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.lineWidth = 1;
-            ctx.setLineDash([5, 5]);
-
-            ctx.beginPath();
-            ctx.moveTo(xAxis.getPixelForValue(50), yAxis.top);
-            ctx.lineTo(xAxis.getPixelForValue(50), yAxis.bottom);
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.moveTo(xAxis.left, yAxis.getPixelForValue(50));
-            ctx.lineTo(xAxis.right, yAxis.getPixelForValue(50));
-            ctx.stroke();
-
-            ctx.font = '10px Montserrat';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.textAlign = 'center';
-            ctx.fillText('VANGUARD', xAxis.getPixelForValue(75), yAxis.getPixelForValue(75));
-            ctx.fillText('DEMOLITION', xAxis.getPixelForValue(75), yAxis.getPixelForValue(25));
-            ctx.fillText('SNIPERS', xAxis.getPixelForValue(25), yAxis.getPixelForValue(75));
-            ctx.fillText('INEFFECTIVE', xAxis.getPixelForValue(25), yAxis.getPixelForValue(25));
-            ctx.restore();
-        }
-    };
-
-    chartsRegistry.operatorQuadrant = new Chart(ctx.getContext('2d'), {
-        type: 'scatter',
-        data: {
-            datasets: [
-                { label: 'Us', data: usData, backgroundColor: 'rgba(0, 229, 255, 0.8)', borderColor: '#00e5ff', pointRadius: 4, pointHoverRadius: 6 },
-                { label: 'Them', data: themData, backgroundColor: 'rgba(255, 51, 102, 0.8)', borderColor: '#ff3366', pointRadius: 4, pointHoverRadius: 6 }
-            ]
-        },
-        options: {
-            animation: false, responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw.name}: ${ctx.raw.y.toFixed(0)}% 3★, ${ctx.raw.x.toFixed(1)}% Dest` } } },
-            scales: {
-                x: { min: 0, max: 100, title: { display: true, text: 'Average Destruction %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } },
-                y: { min: 0, max: 100, title: { display: true, text: '3★ Hit Rate %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } }
-            }
-        },
-        plugins: [crosshairPlugin]
-    });
-}
-
+// V3.7 League Rankings with Hero Power Factor
 function renderLeagueRankings() {
     let filter = document.getElementById('leagueRankFilter').value;
     let container = document.getElementById('leagueRankingsContainer');
@@ -794,18 +788,26 @@ function renderLeagueRankings() {
         return;
     }
 
-    let pool = [...warInfo.starMap];
+    // Try to attach hero power from global data
+    let pool = warInfo.starMap.map(p => {
+        let match = globalPlayerData.find(g => g.tag === p.tag);
+        let heroPwr = 0;
+        if (match && match.heroStats) { heroPwr = parseInt(match.heroStats.split('/')[0]); }
+        return { ...p, heroPower: heroPwr };
+    });
+
     if (filter === 'attackers') {
-        pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest);
+        pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest || b.heroPower - a.heroPower);
     } else {
         pool = pool.filter(p => p.defenses > 0);
-        pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest);
+        pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest || a.heroPower - b.heroPower);
     }
 
     let html = ``;
     pool.slice(0, 15).forEach((p, i) => {
         let primaryStat = filter === 'attackers' ? `${p.stars}★` : `${p.defStars}★`;
         let subStat = filter === 'attackers' ? `${p.avgDest || 0}% Dest` : `${p.defAvgDest || 0}% Dest`;
+        let pwrStat = p.heroPower > 0 ? `| Pwr: ${p.heroPower}` : ``;
         let isUs = p.clanTag === decodeURIComponent("#YQP0GJ9");
         let nameColor = isUs ? "var(--accent-main)" : "var(--text-main)";
 
@@ -816,7 +818,7 @@ function renderLeagueRankings() {
                     <div style="font-size:14px; font-weight:600; color:var(--text-muted); width:20px;">#${i+1}</div>
                     <div style="display:flex; flex-direction:column;">
                         <span style="font-weight:600; font-size:13px; color:${nameColor};">${p.name}</span>
-                        <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${p.clanName} (TH${p.th})</span>
+                        <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${p.clanName} (TH${p.th}) ${pwrStat}</span>
                     </div>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-end;">
@@ -863,7 +865,7 @@ let rosterSize = activeRound.teamSize || 15;
 let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png"; 
 let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 
-// V3.6 Win Probability Algorithm
+// V3.7 Win Probability & Clinch Math
 let winProbHtml = "";
 if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     let oppAtksLeft = rosterSize - oppAtks;
@@ -874,6 +876,9 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     let oppProjected = oppStars + (oppAtksLeft * oppPace);
     let myProjected = myStars + (myAtksLeft * myPace);
     
+    let myDest = 0, oppDest = 0;
+    if (warInfo.myCwlStats) { Object.values(warInfo.myCwlStats).forEach(p => myDest += (p.totalDestruction || 0)); }
+
     let winProb = 50;
     if (myProjected > oppProjected) winProb = 50 + ((myProjected - oppProjected) / rosterSize) * 50;
     else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
@@ -895,7 +900,7 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
             <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">AI Win Probability</div>
             <div style="font-size:14px; font-weight:600; color:var(--accent-main);">${winProb}%</div>
         </div>
-        <div style="font-size:10px; color:var(--text-muted); text-align:left; margin-top:8px;">Min 3★ Needed to Clinch: <span style="color:var(--text-main); font-weight:600; margin-left:4px;">${clinchTxt}</span></div>
+        <div style="font-size:10px; color:var(--text-muted); text-align:left; margin-top:8px;">Min 3★ Needed to Win: <span style="color:var(--text-main); font-weight:600; margin-left:4px;">${clinchTxt}</span></div>
     </div>`;
 }
 
@@ -924,6 +929,18 @@ html += `<div class="war-room-header">
 </div>`;
 
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
+
+// V3.7 Defensive Liabilities (Compromised Bases)
+let liabilitiesHtml = '';
+activeRound.myLineup.forEach(p => {
+    if(warInfo.starMap) {
+        let sData = warInfo.starMap.find(s => s.tag === p.tag);
+        if (sData && sData.defenses > 0 && sData.defStars >= sData.defenses * 2.8) { 
+            liabilitiesHtml += `<div class="strike-pill" style="border-color:var(--dot-red); color:var(--dot-red);">⚠️ ${p.name} (Change Layout)</div>`;
+        }
+    }
+});
+
 if (activeRound.state === "inWar" && hitList.length > 0) {
     html += `<h4 style="margin-top:0; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Pending Strikes (${hitList.length})</h4>
     <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">`;
@@ -931,7 +948,12 @@ if (activeRound.state === "inWar" && hitList.length > 0) {
     html += `</div>`;
 }
 
-// V3.6: Tactical Combat Quadrant
+if (liabilitiesHtml !== '') {
+    html += `<h4 style="margin-top:0; font-size:11px; color:var(--dot-red); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Compromised Bases</h4>
+    <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">${liabilitiesHtml}</div>`;
+}
+
+// V3.7 Tactical Combat Quadrant
 html += `
 <h4 class="section-title" style="margin-top:32px;">Combat Effectiveness Matrix</h4>
 <p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide scatter plot evaluating operator lethality.</p>
@@ -967,12 +989,17 @@ let myPat = round.myAttackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0
 let myHitRate = myPat.total > 0 ? Math.round((myPat.threeStars/myPat.total)*100) : 0;
 
 let patHtml = "";
-// V3.6 Preparation Logic - Show League Averages
+// V3.7: Prep Phase explicit scouting
 if (round.state === "preparation") {
-    // Calculate our clan's total league averages from the starMap
-    let usHits = 0, usTotalAtks = 0;
-    warInfo.starMap.forEach(p => { if (p.clanTag === decodeURIComponent("#YQP0GJ9")) { usHits += p.threeStars; usTotalAtks += p.attacks; } });
+    let usHits = 0, usTotalAtks = 0, usTotalDest = 0;
+    warInfo.starMap.forEach(p => { if (p.clanTag === decodeURIComponent("#YQP0GJ9")) { usHits += p.threeStars; usTotalAtks += p.attacks; usTotalDest += p.totalDest; } });
     let usTotalHitRate = usTotalAtks > 0 ? Math.round((usHits / usTotalAtks)*100) : 0;
+    let usTotalAvgDest = usTotalAtks > 0 ? (usTotalDest / usTotalAtks).toFixed(1) : 0;
+    
+    let oppHits = 0, oppTotalAtks = 0, oppTotalDest = 0;
+    warInfo.starMap.forEach(p => { if (p.clanTag === round.opponent.tag) { oppHits += p.threeStars; oppTotalAtks += p.attacks; oppTotalDest += p.totalDest; } });
+    let oppLeagueHitRate = oppTotalAtks > 0 ? Math.round((oppHits / oppTotalAtks)*100) : 0;
+    let oppLeagueAvgDest = oppTotalAtks > 0 ? (oppTotalDest / oppTotalAtks).toFixed(1) : 0;
 
     patHtml = `
     <div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
@@ -983,235 +1010,9 @@ if (round.state === "preparation") {
             <span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
         </div>
         <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">-</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Avg Mirrors</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${Math.round(oppPat.mirrors / Math.max(1, index))}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">-</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Avg Dips</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${Math.round(oppPat.dips / Math.max(1, index))}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
             <span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalHitRate}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Hit Rate</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppHitRate}%</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">3★ Hit Rate</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueHitRate}%</span>
         </div>
-    </div>`;
-} else {
-    // Normal US vs THEM
-    patHtml = `
-    <div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
-        <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Attack Profile Comparison</p>
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.mirrors}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Mirrors</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.mirrors}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.dips}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Dips</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.dips}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.reaches}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Reaches</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.reaches}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myHitRate}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Hit Rate</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppHitRate}%</span>
-        </div>
-    </div>`;
-}
-
-let rosterHtml = `<div style="margin-top:32px;">
-<p style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Enemy Roster</p>`;
-(round.enemyLineup || []).forEach(e => {
-let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px;">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
-rosterHtml += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0, 229, 255, 0.1); font-size:12px; align-items:center;">
-<div>
-<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.mapPosition}</span>
-<span style="font-weight:500;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:4px; font-weight:500;">TH${e.th}</span>
-</div>
-<div>${atkStatus}</div>
-</div>`;
-});
-rosterHtml += `</div>`;
-
-if (isCurrent) rosterHtml += buildTargetAssignments(round);
-
-let prevSeasonHtml = "";
-if (round.opponent.prevLeague) {
-    prevSeasonHtml = `<div style="font-size:8px; color:var(--text-muted); margin-top:4px;">Prev Season: ${round.opponent.prevLeague} (Pos: ${round.opponent.prevPos})</div>`;
-}
-
-html += `
-<div class="carousel-slide ${isCurrent ? 'active' : ''}">
-  <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
-    <div>
-        <div style="font-size:15px; font-weight:600; font-family:var(--font-sans);">Round ${index + 1}: ${round.opponent.name}</div>
-        ${prevSeasonHtml}
-    </div>
-    <div style="font-size:9px; color:var(--accent-main); text-transform:uppercase; letter-spacing:1px; font-weight:600;">${round.state}</div>
-  </div>
-  ${patHtml}
-  ${rosterHtml}
-</div>`;
-});
-html += `</div>`; 
-
-// LEAGUE TOP OPERATORS
-html += `
-<h4 class="section-title" style="margin-top:48px;">League Top Operators</h4>
-<div class="control-row" style="margin-bottom: 16px;">
-    <select id="leagueRankFilter" onchange="renderLeagueRankings()">
-        <option value="attackers">Best Attackers</option>
-        <option value="defenders">Best Defenders</option>
-    </select>
-</div>
-<div id="leagueRankingsContainer"></div>
-`;
-
-container.innerHTML = html;
-init3DCarousel();
-if(warInfo.starMap && warInfo.starMap.length > 0) {
-    drawStarMap();
-    drawOperatorQuadrant();
-}
-
-renderLeagueRankings();
-}
-
-function renderLeagueRankings() {
-    let filter = document.getElementById('leagueRankFilter').value;
-    let container = document.getElementById('leagueRankingsContainer');
-    if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) {
-        container.innerHTML = `<p style="font-size:10px; color:var(--text-muted); text-align:center;">Awaiting League Database Sync...</p>`;
-        return;
-    }
-
-    let pool = [...warInfo.starMap];
-    if (filter === 'attackers') {
-        pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest);
-    } else {
-        pool = pool.filter(p => p.defenses > 0);
-        pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest);
-    }
-
-    let html = ``;
-    pool.slice(0, 15).forEach((p, i) => {
-        let primaryStat = filter === 'attackers' ? `${p.stars}★` : `${p.defStars}★`;
-        let subStat = filter === 'attackers' ? `${p.avgDest || 0}% Dest` : `${p.defAvgDest || 0}% Dest`;
-        let isUs = p.clanTag === decodeURIComponent("#YQP0GJ9");
-        let nameColor = isUs ? "var(--accent-main)" : "var(--text-main)";
-
-        html += `
-        <div class="rank-card">
-            <div class="rank-header" onclick="this.nextElementSibling.classList.toggle('open')">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="font-size:14px; font-weight:600; color:var(--text-muted); width:20px;">#${i+1}</div>
-                    <div style="display:flex; flex-direction:column;">
-                        <span style="font-weight:600; font-size:13px; color:${nameColor};">${p.name}</span>
-                        <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${p.clanName} (TH${p.th})</span>
-                    </div>
-                </div>
-                <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                    <span style="font-weight:600; font-size:14px; color:var(--text-main);">${primaryStat}</span>
-                    <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${subStat}</span>
-                </div>
-            </div>
-            <div class="rank-details">
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span>Total Attacks/Defs:</span> <span class="rank-val">${filter === 'attackers' ? p.attacks : p.defenses}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span>3★ Count:</span> <span class="rank-val">${p.threeStars || 0}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span>2★ Count:</span> <span class="rank-val">${p.twoStars || 0}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between;">
-                    <span>1★ Count:</span> <span class="rank-val">${p.oneStar || 0}</span>
-                </div>
-            </div>
-        </div>`;
-    });
-    container.innerHTML = html;
-}
-
-function toggleCompareMode() {
-    let compSec = document.getElementById('roster-compare-section');
-    let rosterCont = document.getElementById('roster-container');
-    let mapCont = document.getElementById('roster-map');
-    
-    if (compSec.style.display === 'none') {
-        compSec.style.display = 'block';
-        rosterCont.style.display = 'none';
-        mapCont.style.display = 'none';
-        populateVersusDropdowns();
-    } else {
-        compSec.style.display = 'none';
-        if (isMapView) mapCont.style.display = 'block';
-        else rosterCont.style.display = 'grid';
-    }
-}
-
-function populateVersusDropdowns() {
-var sel1 = document.getElementById('player1Select'), sel2 = document.getElementById('player2Select');
-sel1.innerHTML = ""; sel2.innerHTML = "";
-let validPlayers = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
-if (validPlayers.length === 0) validPlayers = globalPlayerData;
-validPlayers.forEach((p, i) => { sel1.add(new Option(p.name, i)); sel2.add(new Option(p.name, i)); });
-if(validPlayers.length > 1) sel2.selectedIndex = 1; comparePlayers();
-}
-
-const getRadarGradient = (context, colorStart, colorEnd) => {
-const chartArea = context.chart.chartArea; if (!chartArea) return colorStart; const ctx = context.chart.ctx; const centerX = (chartArea.left + chartArea.right) / 2;
-const centerY = (chartArea.top + chartArea.bottom) / 2; const r = Math.min(chartArea.right - chartArea.left, chartArea.bottom - chartArea.top) / 2;
-const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, r); gradient.addColorStop(0, colorStart); gradient.addColorStop(1, colorEnd); return gradient;
-};
-
-function comparePlayers() {
-let validPlayers = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
-if (validPlayers.length === 0) validPlayers = globalPlayerData;
-let p1 = validPlayers[document.getElementById('player1Select').value], p2 = validPlayers[document.getElementById('player2Select').value];
-if(!p1 || !p2) return;
-document.getElementById('radarSection').style.display = "block";
-if (chartsRegistry.radarHero) chartsRegistry.radarHero.destroy(); if (chartsRegistry.radarPet) chartsRegistry.radarPet.destroy();
-
-let p1H = parseInt((p1.heroStats||"0").split('/')[0]), p2H = parseInt((p2.heroStats||"0").split('/')[0]);
-let p1P = parseInt((p1.petStats||"0").split('/')[0]), p2P = parseInt((p2.petStats||"0").split('/')[0]);
-
-const getWin = (v1, v2) => v1 > v2 ? ['winner', ''] : (v2 > v1 ? ['', 'winner'] : ['', '']);
-let [c1, c2] = getWin(p1.percentage, p2.percentage); let [h1, h2] = getWin(p1H, p2H); let [pt1, pt2] = getWin(p1P, p2P);
-let [d1, d2] = getWin(p1.donations||0, p2.donations||0); let [s1, s2] = getWin(p1.warStars||0, p2.warStars||0);
-
-document.getElementById('compareDetailsGrid').innerHTML = `
-<div class="player-card-inner" style="display:block;">
-    <div class="compare-row"><div class="compare-val ${c1}">${parseFloat(p1.percentage)}%</div><div class="compare-label">Overall Completion</div><div class="compare-val ${c2}" style="color:var(--accent-secondary);">${parseFloat(p2.percentage)}%</div></div>
-    <div class="compare-row"><div class="compare-val ${h1}">${p1.heroStats}</div><div class="compare-label">Total Hero Levels</div><div class="compare-val ${h2}" style="color:var(--accent-secondary);">${p2.heroStats}</div></div>
-    <div class="compare-row"><div class="compare-val ${pt1}">${p1.petStats}</div><div class="compare-label">Total Pet Levels</div><div class="compare-val ${pt2}" style="color:var(--accent-secondary);">${p2.petStats}</div></div>
-    <div class="compare-row"><div class="compare-val ${d1}">${(p1.donations||0).toLocaleString()}</div><div class="compare-label">Donations</div><div class="compare-val ${d2}" style="color:var(--accent-secondary);">${(p2.donations||0).toLocaleString()}</div></div>
-    <div class="compare-row" style="border:none;"><div class="compare-val ${s1}">${(p1.warStars||0).toLocaleString()}</div><div class="compare-label">War Stars</div><div class="compare-val ${s2}" style="color:var(--accent-secondary);">${(p2.warStars||0).toLocaleString()}</div></div>
-</div>`;
-
-if (!p1.heroes || !p2.heroes) return;
-let style = getComputedStyle(document.body); 
-let c1Border = style.getPropertyValue('--accent-main').trim();
-let c2Border = style.getPropertyValue('--accent-secondary').trim();
-
-let rOpts = { animation: false, events: [], responsive: true, maintainAspectRatio: false, scales: { r: { max: 100, ticks: { display: false }, grid: { color: 'rgba(0, 229, 255, 0.1)' }, angleLines: { color: 'rgba(0, 229, 255, 0.1)' }, pointLabels: { color: style.getPropertyValue('--text-main').trim(), font: { size: 10, family: 'Montserrat' } } } }, plugins: { legend: { labels: { color: style.getPropertyValue('--text-main').trim(), font: { family: 'Montserrat', size: 12 } } } } };
-
-chartsRegistry.radarHero = new Chart(document.getElementById('heroRadar').getContext('2d'), { type: 'radar', data: { labels: heroNames, datasets: [{ label: p1.name, data: heroNames.map(h => ((p1.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(0, 229, 255, 0.4)', 'rgba(0, 229, 255, 0.0)'), borderColor: c1Border, borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: heroNames.map(h => ((p2.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(179, 0, 255, 0.4)', 'rgba(179, 0, 255, 0.0)'), borderColor: c2Border, borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
-chartsRegistry.radarPet = new Chart(document.getElementById('petRadar').getContext('2d'), { type: 'radar', data: { labels: petNames, datasets: [{ label: p1.name, data: petNames.map(p => ((p1.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(0, 229, 255, 0.4)', 'rgba(0, 229, 255, 0.0)'), borderColor: c1Border, borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: petNames.map(p => ((p2.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(179, 0, 255, 0.4)', 'rgba(179, 0, 255, 0.0)'), borderColor: c2Border, borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
-}
-</script>
-</body>
-</html>
+        <div style="display:flex; justify-content:space-between; font-size:12px;">
+            <span style="color:var(--accent-main); width
