@@ -1015,4 +1015,151 @@ if (round.state === "preparation") {
             <span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueHitRate}%</span>
         </div>
         <div style="display:flex; justify-content:space-between; font-size:12px;">
-            <span style="color:var(--accent-main); width
+            <span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalAvgDest}%</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Avg Destruction</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueAvgDest}%</span>
+        </div>
+    </div>`;
+} else {
+    patHtml = `
+    <div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
+        <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Attack Profile Comparison</p>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
+            <span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.mirrors}</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Mirrors</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.mirrors}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.dips}</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Dips</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.dips}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.reaches}</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Reaches</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.reaches}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
+            <span style="color:var(--accent-main); width:30%; text-align:center;">${myHitRate}%</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Hit Rate</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppHitRate}%</span>
+        </div>
+    </div>`;
+}
+
+let rosterHtml = `<div style="margin-top:32px;">
+<p style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Enemy Roster</p>`;
+(round.enemyLineup || []).forEach(e => {
+let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px;">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
+rosterHtml += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0, 229, 255, 0.1); font-size:12px; align-items:center;">
+<div>
+<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.mapPosition}</span>
+<span style="font-weight:500;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:4px; font-weight:500;">TH${e.th}</span>
+</div>
+<div>${atkStatus}</div>
+</div>`;
+});
+rosterHtml += `</div>`;
+
+if (isCurrent) rosterHtml += buildTargetAssignments(round);
+
+let prevSeasonHtml = "";
+if (round.opponent.prevLeague) {
+    prevSeasonHtml = `<div style="font-size:8px; color:var(--text-muted); margin-top:4px;">Prev Season: ${round.opponent.prevLeague} (Pos: ${round.opponent.prevPos})</div>`;
+}
+
+html += `
+<div class="carousel-slide ${isCurrent ? 'active' : ''}">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+    <div>
+        <div style="font-size:15px; font-weight:600; font-family:var(--font-sans);">Round ${index + 1}: ${round.opponent.name}</div>
+        ${prevSeasonHtml}
+    </div>
+    <div style="font-size:9px; color:var(--accent-main); text-transform:uppercase; letter-spacing:1px; font-weight:600;">${round.state}</div>
+  </div>
+  ${patHtml}
+  ${rosterHtml}
+</div>`;
+});
+html += `</div>`; 
+
+// LEAGUE TOP OPERATORS
+html += `
+<h4 class="section-title" style="margin-top:48px;">League Top Operators</h4>
+<div class="control-row" style="margin-bottom: 16px;">
+    <select id="leagueRankFilter" onchange="renderLeagueRankings()">
+        <option value="attackers">Best Attackers</option>
+        <option value="defenders">Best Defenders</option>
+    </select>
+</div>
+<div id="leagueRankingsContainer"></div>
+`;
+
+container.innerHTML = html;
+init3DCarousel();
+if(warInfo.starMap && warInfo.starMap.length > 0) {
+    drawStarMap();
+    drawOperatorQuadrant();
+}
+
+renderLeagueRankings();
+}
+
+// V3.7 League Rankings Table toggle
+function toggleCompareMode() {
+    let compSec = document.getElementById('roster-compare-section');
+    let rosterCont = document.getElementById('roster-container');
+    let mapCont = document.getElementById('roster-map');
+    
+    if (compSec.style.display === 'none') {
+        compSec.style.display = 'block';
+        rosterCont.style.display = 'none';
+        mapCont.style.display = 'none';
+        populateVersusDropdowns();
+    } else {
+        compSec.style.display = 'none';
+        if (isMapView) mapCont.style.display = 'block';
+        else rosterCont.style.display = 'grid';
+    }
+}
+
+function populateVersusDropdowns() {
+var sel1 = document.getElementById('player1Select'), sel2 = document.getElementById('player2Select');
+sel1.innerHTML = ""; sel2.innerHTML = "";
+let validPlayers = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
+if (validPlayers.length === 0) validPlayers = globalPlayerData;
+validPlayers.forEach((p, i) => { sel1.add(new Option(p.name, i)); sel2.add(new Option(p.name, i)); });
+if(validPlayers.length > 1) sel2.selectedIndex = 1; comparePlayers();
+}
+
+function comparePlayers() {
+let validPlayers = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
+if (validPlayers.length === 0) validPlayers = globalPlayerData;
+let p1 = validPlayers[document.getElementById('player1Select').value], p2 = validPlayers[document.getElementById('player2Select').value];
+if(!p1 || !p2) return;
+document.getElementById('radarSection').style.display = "block";
+
+let p1H = parseInt((p1.heroStats||"0").split('/')[0]), p2H = parseInt((p2.heroStats||"0").split('/')[0]);
+let p1P = parseInt((p1.petStats||"0").split('/')[0]), p2P = parseInt((p2.petStats||"0").split('/')[0]);
+
+const getWin = (v1, v2) => v1 > v2 ? ['winner', ''] : (v2 > v1 ? ['', 'winner'] : ['', '']);
+let [c1, c2] = getWin(p1.percentage, p2.percentage); let [h1, h2] = getWin(p1H, p2H); let [pt1, pt2] = getWin(p1P, p2P);
+let [d1, d2] = getWin(p1.donations||0, p2.donations||0); let [s1, s2] = getWin(p1.warStars||0, p2.warStars||0);
+
+document.getElementById('compareDetailsGrid').innerHTML = `
+<div class="player-card-inner" style="display:block;">
+    <div class="compare-row"><div class="compare-val ${c1}">${parseFloat(p1.percentage)}%</div><div class="compare-label">Overall Completion</div><div class="compare-val ${c2}" style="color:var(--accent-secondary);">${parseFloat(p2.percentage)}%</div></div>
+    <div class="compare-row"><div class="compare-val ${h1}">${p1.heroStats}</div><div class="compare-label">Total Hero Levels</div><div class="compare-val ${h2}" style="color:var(--accent-secondary);">${p2.heroStats}</div></div>
+    <div class="compare-row"><div class="compare-val ${pt1}">${p1.petStats}</div><div class="compare-label">Total Pet Levels</div><div class="compare-val ${pt2}" style="color:var(--accent-secondary);">${p2.petStats}</div></div>
+    <div class="compare-row"><div class="compare-val ${d1}">${(p1.donations||0).toLocaleString()}</div><div class="compare-label">Donations</div><div class="compare-val ${d2}" style="color:var(--accent-secondary);">${(p2.donations||0).toLocaleString()}</div></div>
+    <div class="compare-row" style="border:none;"><div class="compare-val ${s1}">${(p1.warStars||0).toLocaleString()}</div><div class="compare-label">War Stars</div><div class="compare-val ${s2}" style="color:var(--accent-secondary);">${(p2.warStars||0).toLocaleString()}</div></div>
+</div>`;
+}
+</script>
+</body>
+</html>
