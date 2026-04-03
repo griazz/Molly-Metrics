@@ -34,7 +34,6 @@
 --font-sans: 'Montserrat', sans-serif;
 --dot-green: #00ff88; 
 --dot-red: #ff3366;
---dot-blue: #0088ff;
 }
 
 body.light-mode {
@@ -73,14 +72,6 @@ h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
 .loader-ring::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--text-main); animation: spin 1s ease-in-out infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 260px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,229,255,0.05); }
-.term-line { margin-bottom: 6px; opacity: 0; animation: typeLine 0.1s forwards; letter-spacing: 1px;}
-.term-line:nth-child(1) { animation-delay: 0.2s; }
-.term-line:nth-child(2) { animation-delay: 1.2s; }
-.term-line:nth-child(3) { animation-delay: 2.0s; }
-.term-line.blink { animation: typeLine 0.1s forwards 2.8s, blink 1s infinite 2.8s; }
-@keyframes typeLine { to { opacity: 1; } }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .container { padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); max-width: 600px; margin: auto; }
 input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main); box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
@@ -103,6 +94,15 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .glass-th { font-size: 9px; color: var(--text-muted); margin-top: 4px; font-weight:500; display:flex; align-items:center; justify-content:center;}
 .growth-indicator { color: var(--dot-green); font-size: 10px; margin-left: 4px; text-shadow: 0 0 5px var(--dot-green); animation: pulseGrow 2s infinite alternate;}
 @keyframes pulseGrow { 0% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
+
+/* POLYGON RADAR MAP */
+.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--card-shadow); margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
+.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
+.star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
+.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor; transition: transform 0.2s;}
+.star-node:active { transform: translate(-50%, -50%) scale(1.5); }
+.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
+.map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:16px;}
 
 /* Bottom Sheet Modal */
 .sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
@@ -137,19 +137,11 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom:4px; }
 .badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
 
-/* V4.0 HOLOGRAPHIC 3D WAR PIPELINE */
+/* CWL Carousel & War Room */
 .cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
 .carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
 .carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: var(--accent-main); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15); }
-
-/* THE STAR MAP (CWL Constellation) */
-.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(179, 0, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(179, 0, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(179, 0, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-top: 32px; display: block; backdrop-filter: blur(8px);}
-.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
-.star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
-.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor;}
-.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
-.map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:32px;}
 
 .war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
 .strike-pill { flex-shrink:0; background:rgba(0,0,0,0.6); border:1px solid var(--border-color); padding:8px 16px; border-radius:100px; font-size:11px; color:var(--text-main); font-family:var(--font-sans); }
@@ -157,6 +149,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--glow-accent); flex-shrink: 0; }
 .circular-progress::before { content: ""; position: absolute; inset: 6px; background: #12141c; border-radius: 50%; backdrop-filter: blur(16px); }
 .circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
+.time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px; margin-top: 8px;}
 
 /* Segmented Energy Bar */
 .energy-bar-container { display: flex; gap: 2px; height: 8px; width: 85%; margin: 0 auto; }
@@ -172,10 +165,6 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 
 /* Quadrant Scatter Styling */
 .quadrant-bg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 16px; margin-top: 24px;}
-
-/* V4.0 Siege Network Nodes */
-.siege-network-container { position: relative; width: 100%; padding-bottom: 100%; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-bottom: 24px; backdrop-filter: blur(8px);}
-.siege-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
 </style>
 </head>
 <body>
@@ -184,12 +173,6 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 
 <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-ring"></div>
-    <div class="loader-terminal">
-        <div class="term-line">> INITIALIZING MOLLY_OS V4.1...</div>
-        <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
-        <div class="term-line">> DECRYPTING PACKETS...</div>
-        <div class="term-line blink">> AWAITING HANDSHAKE...</div>
-    </div>
 </div>
 
 <div class="main-scroll-area" id="mainScroll">
@@ -210,6 +193,10 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
         </div>
     </div>
 </div>
+
+<button class="view-toggle-btn" onclick="toggleMapView()" id="mapToggleBtn">
+    <span>◎</span> Switch to Sector Map
+</button>
 
 <div class="control-row" id="roster-controls" style="display:none;">
 <input type="text" id="searchInput" placeholder="Search Operators..." oninput="debouncedFilterRoster()">
@@ -236,6 +223,11 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
   <h4 class="section-title">Pet Distribution (%)</h4>
   <div class="radar-container"><canvas id="petRadar"></canvas></div>
   </div>
+</div>
+
+<div id="roster-map" class="radar-map-container" style="display:none;">
+    <canvas id="rosterMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
+    <div id="radar-nodes" class="star-map-nodes"></div>
 </div>
 
 <div id="roster-container" class="glass-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; grid-column: span 3;">Preparing roster...</p></div>
@@ -277,6 +269,7 @@ let warInfo = null;
 let chartsRegistry = { radarHero: null, radarPet: null, operatorQuadrant: null };
 let sheetCharts = { history: null, hero: null, pet: null }; 
 let currentRosterFilter = 'all';
+let isMapView = false;
 let currentStarMapFilter = 'us';
 
 const CWL_TAGS = ["#PG0R8GQPQ", "#YCRV8GP0U", "#RYPU89Y8", "#99JQPVU9Q", "#GRJRUYP0", "#8QGVV099U", "#2RL2JGJPJ", "#Y8LY2VUJ9", "#GYJ00RJ2Q", "#G9YR000R8", "#20YLLYC9P", "#QVCLVUQVY", "#9LGG22Q28", "#GGULC2CR", "#9R0C82GU"];
@@ -330,10 +323,9 @@ if ((tab === 'roster' || tab === 'war') && globalPlayerData.length === 0) fetchD
 
 if(tab === 'war') {
     init3DCarousel();
-    if(warInfo && warInfo.starMap && warInfo.starMap.length > 0) {
+    if(warInfo && warInfo.starMap) {
         drawStarMap();
         drawOperatorQuadrant();
-        drawSiegeNetwork();
     }
 }
 }
@@ -412,10 +404,80 @@ if (sortBy === 'hero') { let aH = parseInt((a.heroStats||"0").split('/')[0]); le
 if (sortBy === 'pet') { let aP = parseInt((a.petStats||"0").split('/')[0]); let bP = parseInt((b.petStats||"0").split('/')[0]); return bP - aP; }
 return 0;
 });
-renderPlayerCards();
+if (isMapView) renderRosterMap(); else renderPlayerCards();
 }
 
-// V4.1 GLASS SLATE GRID WITH PROGRESS INDICATOR
+function toggleMapView() {
+    isMapView = !isMapView;
+    let btn = document.getElementById('mapToggleBtn');
+    let map = document.getElementById('roster-map');
+    let list = document.getElementById('roster-container');
+    let controls = document.getElementById('roster-controls');
+
+    if (isMapView) {
+        btn.innerHTML = "<span>☰</span> Switch to Slate Grid";
+        map.style.display = "block";
+        list.style.display = "none";
+        controls.style.display = "none";
+        renderRosterMap();
+    } else {
+        btn.innerHTML = "<span>◎</span> Switch to Sector Map";
+        map.style.display = "none";
+        list.style.display = "grid"; 
+        controls.style.display = "flex";
+        renderPlayerCards();
+    }
+}
+
+// Draw the generic radar map for the Roster tab (This keeps the simple circular node look)
+function renderRosterMap() {
+    let container = document.getElementById('radar-nodes');
+    let canvas = document.getElementById('rosterMapCanvas');
+    let html = '';
+    
+    if(canvas) {
+        let ctx = canvas.getContext('2d');
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        let cx = canvas.width/2; let cy = canvas.height/2; let maxR = canvas.width/2 * 0.85;
+        
+        ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; ctx.lineWidth = 1;
+        [0.33, 0.66, 1.0].forEach(scale => {
+            ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI*2); ctx.stroke();
+        });
+        
+        ctx.beginPath(); ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy); ctx.stroke();
+        
+        ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2);
+        ctx.fillStyle = 'var(--accent-main)'; ctx.shadowColor = 'var(--accent-main)'; ctx.shadowBlur = 10; ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+
+    displayedPlayerData.forEach((player) => {
+        let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
+        let pct = parseFloat(player.percentage);
+        let rPct = 100 - pct; 
+        let r = (rPct / 100) * 45; 
+
+        let hash = 0;
+        for(let i=0; i<player.tag.length; i++) hash += player.tag.charCodeAt(i);
+        let theta = (hash % 360) * (Math.PI / 180);
+
+        let left = 50 + (r * Math.cos(theta));
+        let top = 50 + (r * Math.sin(theta));
+
+        let growth = 0;
+        if (player.historyPcts && player.historyPcts.length > 1) growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
+
+        let nodeClass = "map-node";
+        if (pct >= 100) nodeClass += " maxed";
+        else if (growth > 0) nodeClass += " growing";
+
+        html += `<div class="${nodeClass}" style="left: ${left}%; top: ${top}%;" onclick="openBottomSheet(${realIndex})"><span class="node-label">${player.name}</span></div>`;
+    });
+    container.innerHTML = html;
+}
+
 function renderPlayerCards() {
 var container = document.getElementById('roster-container');
 if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); width:100%; grid-column: span 3;'>No players found.</p>"; return; }
@@ -557,12 +619,13 @@ options: { animation: false, events: [], layout: { padding: { top: 25, right: 35
 plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body); let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '500 10px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2)); if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '500 11px "Montserrat"'; let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 15; ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
-// V4.1: Smart Tactical Assignments (Relative Positions)
-function buildTargetAssignments(round) {
-    if (!round.myLineup || !round.enemyLineup) return '';
+// RELATIVE POSITION ASSIGNMENTS
+function buildTargetAssignments(myLineup, enemyLineup) {
+    if (!myLineup || !enemyLineup) return '';
 
-    let enemyPool = [...round.enemyLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((e, index) => ({...e, relativePos: index + 1, assigned: false}));
-    let myPool = [...round.myLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((u, index) => ({...u, relativePos: index + 1}));
+    // STRICT 1-15 MAPPING TO PREVENT SUB-IN GLITCH
+    let enemyPool = [...enemyLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((e, index) => ({...e, relativePos: index + 1, assigned: false}));
+    let myPool = [...myLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((u, index) => ({...u, relativePos: index + 1}));
 
     let assignments = [];
     myPool.forEach(us => {
@@ -616,110 +679,46 @@ function buildTargetAssignments(round) {
     html += `</div></div>`; return html;
 }
 
-// V4.1: Dynamic Combat Effectiveness Matrix & Comet Tails
+// COMBAT EFFECTIVENESS MATRIX (Standard View)
 function drawOperatorQuadrant() {
     let ctx = document.getElementById('operatorQuadrantChart');
     if (!ctx || !warInfo || !warInfo.starMap) return;
 
     let usData = []; let themData = [];
     let myClanTag = decodeURIComponent("#YQP0GJ9");
-    
-    let minX = 3.0; let minY = 100;
 
     warInfo.starMap.forEach(p => {
-        let starsPerAtk = p.attacks > 0 ? (p.stars / p.attacks) : 0;
+        let hitRate = p.attacks > 0 ? (p.threeStars / p.attacks) * 100 : 0;
         let dest = p.avgDest || 0;
         if(dest >= 40) { 
-            // Calculate Color Spectrum based on Delta
-            let delta = p.avgDelta || 0;
-            let dotColor = '#ffffff'; 
-            if (delta > 0) {
-                let intensity = Math.min(1, delta / 5); 
-                dotColor = `rgba(255, ${Math.round((1-intensity)*51)}, ${Math.round((1-intensity)*102)}, 0.8)`; 
-            } else if (delta < 0) {
-                let intensity = Math.min(1, Math.abs(delta) / 5);
-                dotColor = `rgba(${Math.round((1-intensity)*0)}, ${Math.round((1-intensity)*136 + 119)}, 255, 0.8)`; 
-            }
-
-            let pt = { x: starsPerAtk, y: dest, name: p.name, dotColor: dotColor };
+            let pt = { x: dest, y: hitRate, name: p.name };
             if (p.clanTag === myClanTag) usData.push(pt); else themData.push(pt);
-            
-            if (starsPerAtk < minX) minX = starsPerAtk;
-            if (dest < minY) minY = dest;
         }
     });
 
     if(chartsRegistry.operatorQuadrant) chartsRegistry.operatorQuadrant.destroy();
-    
-    let dynMinX = Math.max(0, Math.floor(minX - 0.2));
-    let dynMinY = Math.max(0, Math.floor(minY / 10) * 10);
 
-    const customZonePlugin = {
-        id: 'customZones',
+    const crosshairPlugin = {
+        id: 'crosshair',
         beforeDraw: chart => {
             let ctx = chart.ctx; let xAxis = chart.scales.x; let yAxis = chart.scales.y;
-            ctx.save();
-            
-            // Net-Positive Threshold Line
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
-            ctx.beginPath();
-            ctx.moveTo(xAxis.left, yAxis.bottom); 
-            ctx.lineTo(xAxis.right, yAxis.top);   
-            ctx.stroke();
-
-            // Golden Zone Shading (>2.0 Stars, >80% Dest)
-            let goldX = xAxis.getPixelForValue(2.0);
-            let goldY = yAxis.getPixelForValue(80);
-            if (goldX && goldY) {
-                ctx.fillStyle = 'rgba(0, 255, 136, 0.05)';
-                ctx.fillRect(goldX, yAxis.top, xAxis.right - goldX, goldY - yAxis.top);
-                ctx.font = '8px Montserrat'; ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; ctx.textAlign = 'right';
-                ctx.fillText('ELITE', xAxis.right - 10, yAxis.top + 15);
-            }
-
-            ctx.textAlign = 'left';
-            ctx.fillText('NET NEGATIVE', xAxis.left + 10, yAxis.bottom - 10);
-            
-            // Draw V4.1 Comet Tails
-            warInfo.starMap.forEach(p => {
-                let starsPerAtk = p.attacks > 0 ? (p.stars / p.attacks) : 0;
-                let dest = p.avgDest || 0;
-                if(dest >= 40 && p.r1AvgStars !== undefined && p.r1AvgDest !== undefined && p.r1AvgStars > 0) {
-                    let startX = xAxis.getPixelForValue(p.r1AvgStars);
-                    let startY = yAxis.getPixelForValue(p.r1AvgDest);
-                    let endX = xAxis.getPixelForValue(starsPerAtk);
-                    let endY = yAxis.getPixelForValue(dest);
-                    
-                    let grad = ctx.createLinearGradient(startX, startY, endX, endY);
-                    grad.addColorStop(0, 'rgba(255,255,255,0)');
-                    let isUs = p.clanTag === myClanTag;
-                    grad.addColorStop(1, isUs ? 'rgba(0, 229, 255, 0.5)' : 'rgba(255, 51, 102, 0.5)');
-                    
-                    ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(endX, endY);
-                    ctx.strokeStyle = grad; ctx.lineWidth = 1.5; ctx.setLineDash([]); ctx.stroke();
-                }
-            });
+            ctx.save(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
+            ctx.beginPath(); ctx.moveTo(xAxis.getPixelForValue(80), yAxis.top); ctx.lineTo(xAxis.getPixelForValue(80), yAxis.bottom); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(xAxis.left, yAxis.getPixelForValue(50)); ctx.lineTo(xAxis.right, yAxis.getPixelForValue(50)); ctx.stroke();
+            ctx.font = '10px Montserrat'; ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; ctx.textAlign = 'center';
+            ctx.fillText('VANGUARD', xAxis.getPixelForValue(90), yAxis.getPixelForValue(75));
+            ctx.fillText('DEMOLITION', xAxis.getPixelForValue(90), yAxis.getPixelForValue(25));
+            ctx.fillText('SNIPERS', xAxis.getPixelForValue(65), yAxis.getPixelForValue(75));
+            ctx.fillText('INEFFECTIVE', xAxis.getPixelForValue(65), yAxis.getPixelForValue(25));
             ctx.restore();
         }
     };
 
     chartsRegistry.operatorQuadrant = new Chart(ctx.getContext('2d'), {
         type: 'scatter',
-        data: { 
-            datasets: [ 
-                { label: 'Us', data: usData, pointBackgroundColor: usData.map(d => d.dotColor), borderColor: '#ffffff', borderWidth: 1, pointRadius: 5, pointHoverRadius: 7 }, 
-                { label: 'Them', data: themData, pointBackgroundColor: themData.map(d => d.dotColor), borderColor: 'transparent', pointRadius: 4, pointHoverRadius: 6 } 
-            ] 
-        },
-        options: { 
-            animation: false, responsive: true, maintainAspectRatio: false, 
-            plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw.name}: ${ctx.raw.x.toFixed(2)}★, ${ctx.raw.y.toFixed(1)}% Dest` } } }, 
-            scales: { 
-                x: { min: dynMinX, max: 3.0, title: { display: true, text: 'Average Stars per Attack', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } }, 
-                y: { min: dynMinY, max: 100, title: { display: true, text: 'Average Destruction %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } } 
-            } 
-        },
-        plugins: [customZonePlugin]
+        data: { datasets: [ { label: 'Us', data: usData, backgroundColor: 'rgba(0, 229, 255, 0.8)', borderColor: '#00e5ff', pointRadius: 4, pointHoverRadius: 6 }, { label: 'Them', data: themData, backgroundColor: 'rgba(255, 51, 102, 0.8)', borderColor: '#ff3366', pointRadius: 4, pointHoverRadius: 6 } ] },
+        options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw.name}: ${ctx.raw.y.toFixed(0)}% 3★, ${ctx.raw.x.toFixed(1)}% Dest` } } }, scales: { x: { min: 50, max: 100, title: { display: true, text: 'Average Destruction %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } }, y: { min: 0, max: 100, title: { display: true, text: '3★ Hit Rate %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } } } },
+        plugins: [crosshairPlugin]
     });
 }
 
@@ -732,148 +731,103 @@ function setStarMapFilter(f) {
     drawStarMap();
 }
 
+// NEW: MULTI-AXIS POLYGON (HEPTAGON/OCTAGON) CONSTELLATION MAP
 function drawStarMap() {
-    let container = document.getElementById('starMapNodes'); let canvas = document.getElementById('starMapCanvas');
+    if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
+    let container = document.getElementById('starMapNodes'); 
+    let canvas = document.getElementById('starMapCanvas');
     if(!container || !canvas) return;
     
-    if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) {
-        container.innerHTML = '<p style="color:var(--accent-main); font-size:10px; text-align:center; padding-top:180px; letter-spacing:2px;">[ AWAITING SECURE TOPOLOGY SYNC ]</p>';
-        return;
-    }
-    
+    let ctx = canvas.getContext('2d'); 
+    let w = canvas.width; let h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
     container.innerHTML = '';
-    let ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
     let myClanTag = decodeURIComponent("#YQP0GJ9"); 
+    
+    // Find unique clans to build the polygon axes
+    let uniqueClans = [...new Set(warInfo.starMap.map(p => p.clanTag))];
+    let numSides = uniqueClans.length || 8; 
+    let cx = w / 2; let cy = h / 2;
+    let maxR = (w / 2) * 0.85; 
 
-    let nodesToDraw = [];
+    // Draw the Polygon Web
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)';
+    ctx.lineWidth = 1;
+    [0.33, 0.66, 1.0].forEach(scale => {
+        ctx.beginPath();
+        for(let i=0; i<=numSides; i++) {
+            let angle = i * (Math.PI * 2 / numSides) - Math.PI / 2;
+            let px = cx + Math.cos(angle) * (maxR * scale);
+            let py = cy + Math.sin(angle) * (maxR * scale);
+            if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+    });
+
+    // Draw the Axes Lines
+    uniqueClans.forEach((clan, i) => {
+        let angle = i * (Math.PI * 2 / numSides) - Math.PI / 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(angle) * maxR, cy + Math.sin(angle) * maxR);
+        ctx.stroke();
+    });
+
+    // Draw the Victory Core
+    ctx.beginPath();
+    ctx.arc(cx, cy, 12, 0, Math.PI*2);
+    ctx.fillStyle = 'var(--accent-secondary)';
+    ctx.shadowColor = 'var(--accent-secondary)';
+    ctx.shadowBlur = 20;
+    ctx.fill();
+    ctx.shadowBlur = 0; // reset shadow
+
+    let html = '';
     warInfo.starMap.forEach(p => {
         let isUs = (p.clanTag === myClanTag);
         if (currentStarMapFilter === 'us' && !isUs) return;
         if (currentStarMapFilter === 'them' && isUs) return;
         
-        let maxStars = 21; let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
-        let r = rPct * (canvas.width / 2 * 0.85); 
+        let clanIndex = uniqueClans.indexOf(p.clanTag);
+        let baseAngle = clanIndex * (Math.PI * 2 / numSides) - Math.PI / 2;
+
+        let maxStars = 21; 
+        let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
+        let r = rPct * maxR; 
         
-        let rosterSize = 15; 
-        if (warInfo && warInfo.cwlDetails && warInfo.cwlDetails.length > 0) rosterSize = warInfo.cwlDetails[0].teamSize || 15;
-        
-        let baseAngle = (p.basePos / rosterSize) * Math.PI * 2 - (Math.PI / 2);
-        let deltaAngle = (p.avgDelta / rosterSize) * Math.PI * 2;
-        let angle = baseAngle + (deltaAngle * 0.4); 
+        // Spread players slightly so they don't pile up exactly on the line
+        let spread = ((p.basePos - 8) / 15) * (Math.PI / numSides);
+        let finalAngle = baseAngle + spread; 
 
-        let cx = canvas.width / 2; let cy = canvas.height / 2;
-        let x = cx + r * Math.cos(angle); let y = cy + r * Math.sin(angle);
-        nodesToDraw.push({ ...p, isUs: isUs, x: x, y: y, cx: cx, cy: cy, baseAngle: baseAngle });
+        let x = cx + r * Math.cos(finalAngle); 
+        let y = cy + r * Math.sin(finalAngle);
+
+        let color = isUs ? 'var(--accent-main)' : 'var(--dot-red)';
+        let left = (x / w) * 100; let top = (y / h) * 100;
+        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${p.name}</span></div>`;
     });
 
-    // V4.1 Comet Tails for Constellation
-    nodesToDraw.forEach(n => {
-        if(n.r1Stars !== undefined && n.r1Stars > 0) {
-            let rStart = Math.max(0, (21 - n.r1Stars) / 21) * (canvas.width / 2 * 0.85);
-            let startX = n.cx + rStart * Math.cos(n.baseAngle);
-            let startY = n.cy + rStart * Math.sin(n.baseAngle);
-            
-            let grad = ctx.createLinearGradient(startX, startY, n.x, n.y);
-            grad.addColorStop(0, 'rgba(255,255,255,0)');
-            grad.addColorStop(1, n.isUs ? 'rgba(0, 229, 255, 0.6)' : 'rgba(255, 51, 102, 0.6)');
-            
-            ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(n.x, n.y);
-            ctx.strokeStyle = grad; ctx.lineWidth = 1; ctx.stroke();
-        }
-    });
-
-    let html = '';
-    nodesToDraw.forEach(n => {
-        let color = n.isUs ? 'var(--accent-main)' : 'var(--dot-red)';
-        let left = (n.x / canvas.width) * 100; let top = (n.y / canvas.height) * 100;
-        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${n.name}</span></div>`;
-    });
     container.innerHTML = html;
 }
 
-// V4.1 Holographic Siege Network (Live Drawing)
-function drawSiegeNetwork() {
-    let canvas = document.getElementById('siegeCanvas');
-    if (!canvas || !warInfo) return;
-    let ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    if (!warInfo.leagueTopology || !warInfo.leagueTopology.nodes) {
-        ctx.font = '10px Montserrat'; ctx.fillStyle = 'rgba(0, 229, 255, 0.6)'; ctx.textAlign = 'center';
-        ctx.fillText('[ AWAITING SECURE TOPOLOGY SYNC ]', canvas.width/2, canvas.height/2);
-        return;
-    }
-
-    let nodes = warInfo.leagueTopology.nodes.sort((a,b) => b.stars - a.stars);
-    let links = warInfo.leagueTopology.links;
-    
-    let cx = canvas.width / 2; let cy = canvas.height / 2;
-    let radius = 130;
-    let nodeCoords = {};
-
-    nodes.forEach((n, i) => {
-        let nx = cx, ny = cy;
-        if (i > 0) {
-            let angle = ((i - 1) / (nodes.length - 1)) * Math.PI * 2 - (Math.PI / 2);
-            nx = cx + radius * Math.cos(angle);
-            ny = cy + radius * Math.sin(angle);
-        }
-        nodeCoords[n.id] = { x: nx, y: ny, ...n };
-    });
-
-    // Draw Holographic Links
-    links.forEach(link => {
-        let src = nodeCoords[link.source]; let tgt = nodeCoords[link.target];
-        if(src && tgt) {
-            let intensity = Math.min(1, link.value / 40); 
-            ctx.beginPath(); ctx.moveTo(src.x, src.y); ctx.lineTo(tgt.x, tgt.y);
-            ctx.strokeStyle = `rgba(0, 229, 255, ${intensity * 0.8})`;
-            ctx.lineWidth = Math.max(0.5, intensity * 4);
-            ctx.stroke();
-        }
-    });
-
-    // Draw HTML Nodes
-    let html = '';
-    let mapContainer = document.getElementById('siegeNodesContainer');
-    if(!mapContainer) {
-        mapContainer = document.createElement('div'); mapContainer.id = 'siegeNodesContainer';
-        mapContainer.style.position = 'absolute'; mapContainer.style.top = '0'; mapContainer.style.left = '0';
-        mapContainer.style.width = '100%'; mapContainer.style.height = '100%'; mapContainer.style.pointerEvents = 'none';
-        canvas.parentNode.appendChild(mapContainer);
-    }
-    
-    Object.values(nodeCoords).forEach(n => {
-        let isCenter = n.x === cx && n.y === cy;
-        let color = n.isUs ? 'var(--accent-main)' : (isCenter ? 'var(--text-main)' : 'var(--dot-red)');
-        let size = isCenter ? 24 : 16;
-        let left = (n.x / canvas.width) * 100; let top = (n.y / canvas.height) * 100;
-        
-        html += `<div style="position:absolute; left:${left}%; top:${top}%; transform:translate(-50%, -50%); width:${size}px; height:${size}px; background:rgba(0,0,0,0.8); border:2px solid ${color}; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 0 15px ${color};">
-            <span style="position:absolute; top:120%; font-size:8px; color:var(--text-main); white-space:nowrap; text-shadow:1px 1px 2px #000;">${n.name}</span>
-            <span style="font-size:${size/2.5}px; color:${color}; font-weight:bold;">${n.stars}</span>
-        </div>`;
-    });
-    mapContainer.innerHTML = html;
-}
-
+// League Rankings without Attack Power
 function renderLeagueRankings() {
     let filter = document.getElementById('leagueRankFilter').value;
     let container = document.getElementById('leagueRankingsContainer');
     if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) {
-        container.innerHTML = `<p style="color:var(--accent-main); font-size:10px; text-align:center; padding-top:40px; letter-spacing:2px;">[ AWAITING SECURE TOPOLOGY SYNC ]</p>`;
+        container.innerHTML = `<p style="font-size:10px; color:var(--text-muted); text-align:center;">Awaiting League Database Sync...</p>`;
         return;
     }
 
-    let pool = warInfo.starMap.map(p => {
-        let match = globalPlayerData.find(g => g.tag === p.tag);
-        let heroPwr = 0;
-        if (match && match.heroStats) { heroPwr = parseInt(match.heroStats.split('/')[0]); }
-        return { ...p, heroPower: heroPwr };
-    });
+    let pool = [...warInfo.starMap];
 
-    if (filter === 'attackers') { pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest); } 
-    else { pool = pool.filter(p => p.defenses > 0); pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest); }
+    if (filter === 'attackers') {
+        pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest);
+    } else {
+        pool = pool.filter(p => p.defenses > 0);
+        pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest);
+    }
 
     let html = ``;
     pool.slice(0, 15).forEach((p, i) => {
@@ -995,15 +949,8 @@ html += `<div class="war-room-header">
     <div class="energy-bar-container">${attackSegments}</div>
 </div>`;
 
-// V4.1 Siege Network
-html += `
-<h4 class="section-title" style="margin-top:32px;">Siege Network</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide attack topology. Link intensity reflects star volume.</p>
-<div class="siege-network-container">
-    <canvas id="siegeCanvas" class="siege-canvas" width="400" height="400"></canvas>
-</div>`;
-
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
+
 let liabilitiesHtml = '';
 activeRound.myLineup.forEach(p => {
     if(warInfo.starMap) {
@@ -1028,14 +975,14 @@ if (liabilitiesHtml !== '') {
 
 html += `
 <h4 class="section-title" style="margin-top:32px;">Combat Effectiveness Matrix</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide scatter plot. Color spectrum evaluates targeting discipline (Blue = Reaching, Red = Dipping).</p>
+<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide scatter plot evaluating operator lethality.</p>
 <div class="quadrant-bg">
     <div class="chart-container" style="height: 300px; margin-top:0;"><canvas id="operatorQuadrantChart"></canvas></div>
 </div>`;
 
 html += `
 <h4 class="section-title" style="margin-top:40px;">CWL Constellation</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">Mapping complete league trajectories. Center = 21 Stars. Rotational shifts indicate avg target reach/dip.</p>
+<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">A multi-axis polygon mapping clan progression. The core is 21 Stars (Victory).</p>
 <div class="map-legend">
     <span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:600;" onclick="setStarMapFilter('us')">Our Clan</span>
     <span id="leg-them" style="cursor:pointer;" onclick="setStarMapFilter('them')">Opponent</span>
@@ -1043,9 +990,6 @@ html += `
 </div>
 <div class="star-map-wrapper">
     <canvas id="starMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
-    <div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
-    <div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
-    <div class="radar-core" style="background:var(--accent-secondary); box-shadow: 0 0 20px var(--accent-secondary);"></div>
     <div id="starMapNodes" class="star-map-nodes"></div>
 </div>`;
 
@@ -1123,6 +1067,7 @@ if (round.state === "preparation") {
     </div>`;
 }
 
+// Fixed relative lineup mapping for roster
 let oppLineupMap = [...(round.enemyLineup || [])].sort((a,b)=>a.mapPosition - b.mapPosition).map((e,i)=>({...e, relativePos: i+1}));
 
 let rosterHtml = `<div style="margin-top:32px;">
@@ -1139,7 +1084,7 @@ rosterHtml += `<div style="display:flex; justify-content:space-between; padding:
 });
 rosterHtml += `</div>`;
 
-if (isCurrent) rosterHtml += buildTargetAssignments(round);
+if (isCurrent) rosterHtml += buildTargetAssignments(round.myLineup, round.enemyLineup);
 
 let prevSeasonHtml = "";
 if (round.opponent.prevLeague) {
@@ -1177,8 +1122,8 @@ init3DCarousel();
 if(warInfo.starMap && warInfo.starMap.length > 0) {
     drawStarMap();
     drawOperatorQuadrant();
-    drawSiegeNetwork();
 }
+
 renderLeagueRankings();
 }
 
