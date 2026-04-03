@@ -72,6 +72,14 @@ h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
 .loader-ring::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--text-main); animation: spin 1s ease-in-out infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 260px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,229,255,0.05); }
+.term-line { margin-bottom: 6px; opacity: 0; animation: typeLine 0.1s forwards; letter-spacing: 1px;}
+.term-line:nth-child(1) { animation-delay: 0.2s; }
+.term-line:nth-child(2) { animation-delay: 1.2s; }
+.term-line:nth-child(3) { animation-delay: 2.0s; }
+.term-line.blink { animation: typeLine 0.1s forwards 2.8s, blink 1s infinite 2.8s; }
+@keyframes typeLine { to { opacity: 1; } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .container { padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); max-width: 600px; margin: auto; }
 input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main); box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
@@ -82,7 +90,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .compare-btn:active { transform: scale(0.95); }
 .view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center; align-items:center; gap:8px;}
 
-/* GLASS SLATE GRID */
+/* FIXED GLASS SLATE GRID */
 .glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px 0; width: 100%;}
 .glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow); text-align:center;}
 .glass-card:hover { transform: translateY(-4px); border-color: var(--accent-main); box-shadow: 0 10px 20px rgba(0,229,255,0.15); z-index: 10; }
@@ -95,14 +103,24 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .growth-indicator { color: var(--dot-green); font-size: 10px; margin-left: 4px; text-shadow: 0 0 5px var(--dot-green); animation: pulseGrow 2s infinite alternate;}
 @keyframes pulseGrow { 0% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
 
-/* POLYGON RADAR MAP */
-.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--card-shadow); margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
-.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
-.star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
-.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor; transition: transform 0.2s;}
-.star-node:active { transform: translate(-50%, -50%) scale(1.5); }
-.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
-.map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:16px;}
+/* ORBITAL RADAR MAP */
+.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(0, 229, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
+.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.15); border-radius: 50%; pointer-events: none;}
+.radar-ring.r1 { width: 33%; height: 33%; }
+.radar-ring.r2 { width: 66%; height: 66%; }
+.radar-ring.r3 { width: 100%; height: 100%; border-style: solid; border-color: rgba(0, 229, 255, 0.3);}
+.radar-crosshair { position: absolute; background: rgba(0, 229, 255, 0.1); pointer-events: none;}
+.radar-crosshair.v { top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); }
+.radar-crosshair.h { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
+.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--accent-main); border-radius: 50%; box-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); z-index: 10;}
+.radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.4) 100%); animation: radarSweep 10s linear infinite; pointer-events: none; z-index: 1;}
+@keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.map-node { position: absolute; width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 5; transition: transform 0.2s; box-shadow: 0 0 5px rgba(255,255,255,0.2);}
+.map-node:active { transform: translate(-50%, -50%) scale(1.5); }
+.map-node.growing { background: var(--accent-main); box-shadow: 0 0 10px var(--accent-main); animation: nodePulse 2s infinite alternate;}
+.map-node.maxed { background: var(--dot-green); box-shadow: 0 0 15px var(--dot-green); }
+@keyframes nodePulse { 0% { box-shadow: 0 0 5px var(--accent-main); } 100% { box-shadow: 0 0 15px var(--accent-main), 0 0 30px rgba(0, 229, 255, 0.4); } }
+.node-label { position: absolute; left: 12px; top: -6px; font-size: 8px; color: var(--text-main); font-family: var(--font-sans); white-space: nowrap; pointer-events: none; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
 
 /* Bottom Sheet Modal */
 .sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
@@ -137,11 +155,19 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom:4px; }
 .badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
 
-/* CWL Carousel & War Room */
+/* V3.5 HOLOGRAPHIC 3D WAR PIPELINE */
 .cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
 .carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
 .carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: var(--accent-main); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15); }
+
+/* THE STAR MAP (CWL Constellation) */
+.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(179, 0, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(179, 0, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(179, 0, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-top: 32px; display: block; backdrop-filter: blur(8px);}
+.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
+.star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
+.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor;}
+.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
+.map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:32px;}
 
 .war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
 .strike-pill { flex-shrink:0; background:rgba(0,0,0,0.6); border:1px solid var(--border-color); padding:8px 16px; border-radius:100px; font-size:11px; color:var(--text-main); font-family:var(--font-sans); }
@@ -173,6 +199,12 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 
 <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-ring"></div>
+    <div class="loader-terminal">
+        <div class="term-line">> INITIALIZING MOLLY_OS V3.7...</div>
+        <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
+        <div class="term-line">> DECRYPTING PACKETS...</div>
+        <div class="term-line blink">> AWAITING HANDSHAKE...</div>
+    </div>
 </div>
 
 <div class="main-scroll-area" id="mainScroll">
@@ -225,9 +257,11 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
   </div>
 </div>
 
-<div id="roster-map" class="radar-map-container" style="display:none;">
-    <canvas id="rosterMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
-    <div id="radar-nodes" class="star-map-nodes"></div>
+<div id="roster-map" class="radar-map-container">
+    <div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
+    <div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
+    <div class="radar-core"></div><div class="radar-sweep"></div>
+    <div id="radar-nodes"></div>
 </div>
 
 <div id="roster-container" class="glass-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; grid-column: span 3;">Preparing roster...</p></div>
@@ -429,29 +463,9 @@ function toggleMapView() {
     }
 }
 
-// Draw the generic radar map for the Roster tab (This keeps the simple circular node look)
 function renderRosterMap() {
     let container = document.getElementById('radar-nodes');
-    let canvas = document.getElementById('rosterMapCanvas');
     let html = '';
-    
-    if(canvas) {
-        let ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        let cx = canvas.width/2; let cy = canvas.height/2; let maxR = canvas.width/2 * 0.85;
-        
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; ctx.lineWidth = 1;
-        [0.33, 0.66, 1.0].forEach(scale => {
-            ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI*2); ctx.stroke();
-        });
-        
-        ctx.beginPath(); ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy); ctx.stroke();
-        
-        ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2);
-        ctx.fillStyle = 'var(--accent-main)'; ctx.shadowColor = 'var(--accent-main)'; ctx.shadowBlur = 10; ctx.fill();
-        ctx.shadowBlur = 0;
-    }
 
     displayedPlayerData.forEach((player) => {
         let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
@@ -478,6 +492,7 @@ function renderRosterMap() {
     container.innerHTML = html;
 }
 
+// V3.7 GLASS SLATE GRID WITH PROGRESS INDICATOR
 function renderPlayerCards() {
 var container = document.getElementById('roster-container');
 if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); width:100%; grid-column: span 3;'>No players found.</p>"; return; }
@@ -619,16 +634,12 @@ options: { animation: false, events: [], layout: { padding: { top: 25, right: 35
 plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body); let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '500 10px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2)); if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '500 11px "Montserrat"'; let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 15; ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
-// RELATIVE POSITION ASSIGNMENTS
-function buildTargetAssignments(myLineup, enemyLineup) {
-    if (!myLineup || !enemyLineup) return '';
-
-    // STRICT 1-15 MAPPING TO PREVENT SUB-IN GLITCH
-    let enemyPool = [...enemyLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((e, index) => ({...e, relativePos: index + 1, assigned: false}));
-    let myPool = [...myLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((u, index) => ({...u, relativePos: index + 1}));
-
+// V3.7: Smart Tactical Assignments
+function buildTargetAssignments(round) {
+    if (!round.myLineup || !round.enemyLineup) return '';
+    let enemyPool = [...round.enemyLineup].map(e => ({...e, assigned: false}));
     let assignments = [];
-    myPool.forEach(us => {
+    round.myLineup.forEach(us => {
         let pData = globalPlayerData.find(p => p.tag === us.tag);
         let hr = (pData && pData.hitRate !== undefined && pData.hitRate !== null) ? pData.hitRate : 50;
         let attacks = pData ? (pData.cwlStats ? pData.cwlStats.attacks : 0) : 0;
@@ -637,9 +648,7 @@ function buildTargetAssignments(myLineup, enemyLineup) {
         else if (attacks > 0 && hr < 33) attackerClass = "Struggling";
         assignments.push({ us, attackerClass, hr, target: null });
     });
-
     assignments.sort((a,b) => { if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1; if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1; return b.us.th - a.us.th; });
-    
     assignments.forEach(a => {
         let candidates = enemyPool.filter(e => !e.assigned); if (candidates.length === 0) return;
         let best = null;
@@ -648,22 +657,21 @@ function buildTargetAssignments(myLineup, enemyLineup) {
         if (!best) { candidates.sort((x,y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th)); best = candidates[0]; }
         best.assigned = true; a.target = best;
     });
-
-    assignments.sort((a,b) => a.us.relativePos - b.us.relativePos);
+    assignments.sort((a,b) => a.us.mapPosition - b.us.mapPosition);
     
     let swapsHtml = '';
     let swapCount = 0;
     assignments.forEach(a => {
         if (!a.target) return;
-        if (a.us.relativePos !== a.target.relativePos) {
+        if (a.us.mapPosition !== a.target.mapPosition) {
             swapCount++;
             let usColor = a.attackerClass === "Elite" ? "var(--dot-green)" : (a.attackerClass === "Struggling" ? "var(--dot-red)" : "var(--text-main)");
             let reasoning = a.attackerClass === "Elite" ? "Covering liability" : "Optimizing hit rate";
             
             swapsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
-                <div style="color:${usColor}; flex:1; font-weight:500;">${a.us.relativePos}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
+                <div style="color:${usColor}; flex:1; font-weight:500;">${a.us.mapPosition}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
                 <div style="color:var(--text-muted); font-size:12px; padding:0 8px;">➔</div>
-                <div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.relativePos}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
+                <div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.mapPosition}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
             </div>
             <div style="font-size:8px; color:var(--text-muted); text-align:right; margin-top:-4px; margin-bottom:4px; padding-right:12px;">└ ${reasoning}</div>`;
         }
@@ -676,10 +684,11 @@ function buildTargetAssignments(myLineup, enemyLineup) {
     } else {
         html += swapsHtml;
     }
+    
     html += `</div></div>`; return html;
 }
 
-// COMBAT EFFECTIVENESS MATRIX (Standard View)
+// V3.7: Combat Effectiveness Matrix (Scatter Plot)
 function drawOperatorQuadrant() {
     let ctx = document.getElementById('operatorQuadrantChart');
     if (!ctx || !warInfo || !warInfo.starMap) return;
@@ -690,7 +699,7 @@ function drawOperatorQuadrant() {
     warInfo.starMap.forEach(p => {
         let hitRate = p.attacks > 0 ? (p.threeStars / p.attacks) * 100 : 0;
         let dest = p.avgDest || 0;
-        if(dest >= 40) { 
+        if(dest >= 50) { 
             let pt = { x: dest, y: hitRate, name: p.name };
             if (p.clanTag === myClanTag) usData.push(pt); else themData.push(pt);
         }
@@ -731,87 +740,46 @@ function setStarMapFilter(f) {
     drawStarMap();
 }
 
-// NEW: MULTI-AXIS POLYGON (HEPTAGON/OCTAGON) CONSTELLATION MAP
 function drawStarMap() {
     if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
-    let container = document.getElementById('starMapNodes'); 
-    let canvas = document.getElementById('starMapCanvas');
+    let container = document.getElementById('starMapNodes'); let canvas = document.getElementById('starMapCanvas');
     if(!container || !canvas) return;
     
-    let ctx = canvas.getContext('2d'); 
-    let w = canvas.width; let h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
     container.innerHTML = '';
-    
+    let ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
     let myClanTag = decodeURIComponent("#YQP0GJ9"); 
-    
-    // Find unique clans to build the polygon axes
-    let uniqueClans = [...new Set(warInfo.starMap.map(p => p.clanTag))];
-    let numSides = uniqueClans.length || 8; 
-    let cx = w / 2; let cy = h / 2;
-    let maxR = (w / 2) * 0.85; 
 
-    // Draw the Polygon Web
-    ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)';
-    ctx.lineWidth = 1;
-    [0.33, 0.66, 1.0].forEach(scale => {
-        ctx.beginPath();
-        for(let i=0; i<=numSides; i++) {
-            let angle = i * (Math.PI * 2 / numSides) - Math.PI / 2;
-            let px = cx + Math.cos(angle) * (maxR * scale);
-            let py = cy + Math.sin(angle) * (maxR * scale);
-            if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-    });
-
-    // Draw the Axes Lines
-    uniqueClans.forEach((clan, i) => {
-        let angle = i * (Math.PI * 2 / numSides) - Math.PI / 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(angle) * maxR, cy + Math.sin(angle) * maxR);
-        ctx.stroke();
-    });
-
-    // Draw the Victory Core
-    ctx.beginPath();
-    ctx.arc(cx, cy, 12, 0, Math.PI*2);
-    ctx.fillStyle = 'var(--accent-secondary)';
-    ctx.shadowColor = 'var(--accent-secondary)';
-    ctx.shadowBlur = 20;
-    ctx.fill();
-    ctx.shadowBlur = 0; // reset shadow
-
-    let html = '';
+    let nodesToDraw = [];
     warInfo.starMap.forEach(p => {
         let isUs = (p.clanTag === myClanTag);
         if (currentStarMapFilter === 'us' && !isUs) return;
         if (currentStarMapFilter === 'them' && isUs) return;
         
-        let clanIndex = uniqueClans.indexOf(p.clanTag);
-        let baseAngle = clanIndex * (Math.PI * 2 / numSides) - Math.PI / 2;
-
-        let maxStars = 21; 
-        let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
-        let r = rPct * maxR; 
+        let maxStars = 21; let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
+        let r = rPct * (canvas.width / 2 * 0.85); 
         
-        // Spread players slightly so they don't pile up exactly on the line
-        let spread = ((p.basePos - 8) / 15) * (Math.PI / numSides);
-        let finalAngle = baseAngle + spread; 
+        let rosterSize = 15; 
+        if (warInfo && warInfo.cwlDetails && warInfo.cwlDetails.length > 0) rosterSize = warInfo.cwlDetails[0].teamSize || 15;
+        
+        let baseAngle = (p.basePos / rosterSize) * Math.PI * 2 - (Math.PI / 2);
+        let deltaAngle = (p.avgDelta / rosterSize) * Math.PI * 2;
+        let angle = baseAngle + (deltaAngle * 0.4); 
 
-        let x = cx + r * Math.cos(finalAngle); 
-        let y = cy + r * Math.sin(finalAngle);
-
-        let color = isUs ? 'var(--accent-main)' : 'var(--dot-red)';
-        let left = (x / w) * 100; let top = (y / h) * 100;
-        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${p.name}</span></div>`;
+        let cx = canvas.width / 2; let cy = canvas.height / 2;
+        let x = cx + r * Math.cos(angle); let y = cy + r * Math.sin(angle);
+        nodesToDraw.push({ ...p, isUs: isUs, x: x, y: y });
     });
 
+    let html = '';
+    nodesToDraw.forEach(n => {
+        let color = n.isUs ? 'var(--accent-main)' : 'var(--dot-red)';
+        let left = (n.x / canvas.width) * 100; let top = (n.y / canvas.height) * 100;
+        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${n.name}</span></div>`;
+    });
     container.innerHTML = html;
 }
 
-// League Rankings without Attack Power
+// V3.7 League Rankings with Hero Power Factor
 function renderLeagueRankings() {
     let filter = document.getElementById('leagueRankFilter').value;
     let container = document.getElementById('leagueRankingsContainer');
@@ -820,19 +788,26 @@ function renderLeagueRankings() {
         return;
     }
 
-    let pool = [...warInfo.starMap];
+    // Try to attach hero power from global data
+    let pool = warInfo.starMap.map(p => {
+        let match = globalPlayerData.find(g => g.tag === p.tag);
+        let heroPwr = 0;
+        if (match && match.heroStats) { heroPwr = parseInt(match.heroStats.split('/')[0]); }
+        return { ...p, heroPower: heroPwr };
+    });
 
     if (filter === 'attackers') {
-        pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest);
+        pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest || b.heroPower - a.heroPower);
     } else {
         pool = pool.filter(p => p.defenses > 0);
-        pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest);
+        pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest || a.heroPower - b.heroPower);
     }
 
     let html = ``;
     pool.slice(0, 15).forEach((p, i) => {
         let primaryStat = filter === 'attackers' ? `${p.stars}★` : `${p.defStars}★`;
         let subStat = filter === 'attackers' ? `${p.avgDest || 0}% Dest` : `${p.defAvgDest || 0}% Dest`;
+        let pwrStat = p.heroPower > 0 ? `| Pwr: ${p.heroPower}` : ``;
         let isUs = p.clanTag === decodeURIComponent("#YQP0GJ9");
         let nameColor = isUs ? "var(--accent-main)" : "var(--text-main)";
 
@@ -843,7 +818,7 @@ function renderLeagueRankings() {
                     <div style="font-size:14px; font-weight:600; color:var(--text-muted); width:20px;">#${i+1}</div>
                     <div style="display:flex; flex-direction:column;">
                         <span style="font-weight:600; font-size:13px; color:${nameColor};">${p.name}</span>
-                        <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${p.clanName} (TH${p.th})</span>
+                        <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${p.clanName} (TH${p.th}) ${pwrStat}</span>
                     </div>
                 </div>
                 <div style="display:flex; flex-direction:column; align-items:flex-end;">
@@ -890,6 +865,7 @@ let rosterSize = activeRound.teamSize || 15;
 let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png"; 
 let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 
+// V3.7 Win Probability & Clinch Math
 let winProbHtml = "";
 if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     let oppAtksLeft = rosterSize - oppAtks;
@@ -900,6 +876,9 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     let oppProjected = oppStars + (oppAtksLeft * oppPace);
     let myProjected = myStars + (myAtksLeft * myPace);
     
+    let myDest = 0, oppDest = 0;
+    if (warInfo.myCwlStats) { Object.values(warInfo.myCwlStats).forEach(p => myDest += (p.totalDestruction || 0)); }
+
     let winProb = 50;
     if (myProjected > oppProjected) winProb = 50 + ((myProjected - oppProjected) / rosterSize) * 50;
     else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
@@ -951,6 +930,7 @@ html += `<div class="war-room-header">
 
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
 
+// V3.7 Defensive Liabilities (Compromised Bases)
 let liabilitiesHtml = '';
 activeRound.myLineup.forEach(p => {
     if(warInfo.starMap) {
@@ -973,6 +953,7 @@ if (liabilitiesHtml !== '') {
     <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">${liabilitiesHtml}</div>`;
 }
 
+// V3.7 Tactical Combat Quadrant
 html += `
 <h4 class="section-title" style="margin-top:32px;">Combat Effectiveness Matrix</h4>
 <p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide scatter plot evaluating operator lethality.</p>
@@ -982,7 +963,7 @@ html += `
 
 html += `
 <h4 class="section-title" style="margin-top:40px;">CWL Constellation</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">A multi-axis polygon mapping clan progression. The core is 21 Stars (Victory).</p>
+<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">Mapping complete league trajectories. Center = 21 Stars. Rotational shifts indicate avg target reach/dip.</p>
 <div class="map-legend">
     <span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:600;" onclick="setStarMapFilter('us')">Our Clan</span>
     <span id="leg-them" style="cursor:pointer;" onclick="setStarMapFilter('them')">Opponent</span>
@@ -990,6 +971,9 @@ html += `
 </div>
 <div class="star-map-wrapper">
     <canvas id="starMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
+    <div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
+    <div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
+    <div class="radar-core" style="background:var(--accent-secondary); box-shadow: 0 0 20px var(--accent-secondary);"></div>
     <div id="starMapNodes" class="star-map-nodes"></div>
 </div>`;
 
@@ -1005,6 +989,7 @@ let myPat = round.myAttackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0
 let myHitRate = myPat.total > 0 ? Math.round((myPat.threeStars/myPat.total)*100) : 0;
 
 let patHtml = "";
+// V3.7: Prep Phase explicit scouting
 if (round.state === "preparation") {
     let usHits = 0, usTotalAtks = 0, usTotalDest = 0;
     warInfo.starMap.forEach(p => { if (p.clanTag === decodeURIComponent("#YQP0GJ9")) { usHits += p.threeStars; usTotalAtks += p.attacks; usTotalDest += p.totalDest; } });
@@ -1067,16 +1052,13 @@ if (round.state === "preparation") {
     </div>`;
 }
 
-// Fixed relative lineup mapping for roster
-let oppLineupMap = [...(round.enemyLineup || [])].sort((a,b)=>a.mapPosition - b.mapPosition).map((e,i)=>({...e, relativePos: i+1}));
-
 let rosterHtml = `<div style="margin-top:32px;">
 <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Enemy Roster</p>`;
-oppLineupMap.forEach(e => {
+(round.enemyLineup || []).forEach(e => {
 let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px;">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
 rosterHtml += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0, 229, 255, 0.1); font-size:12px; align-items:center;">
 <div>
-<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.relativePos}</span>
+<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.mapPosition}</span>
 <span style="font-weight:500;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:4px; font-weight:500;">TH${e.th}</span>
 </div>
 <div>${atkStatus}</div>
@@ -1084,7 +1066,7 @@ rosterHtml += `<div style="display:flex; justify-content:space-between; padding:
 });
 rosterHtml += `</div>`;
 
-if (isCurrent) rosterHtml += buildTargetAssignments(round.myLineup, round.enemyLineup);
+if (isCurrent) rosterHtml += buildTargetAssignments(round);
 
 let prevSeasonHtml = "";
 if (round.opponent.prevLeague) {
@@ -1106,6 +1088,7 @@ html += `
 });
 html += `</div>`; 
 
+// LEAGUE TOP OPERATORS
 html += `
 <h4 class="section-title" style="margin-top:48px;">League Top Operators</h4>
 <div class="control-row" style="margin-bottom: 16px;">
@@ -1127,6 +1110,7 @@ if(warInfo.starMap && warInfo.starMap.length > 0) {
 renderLeagueRankings();
 }
 
+// V3.7 League Rankings Table toggle
 function toggleCompareMode() {
     let compSec = document.getElementById('roster-compare-section');
     let rosterCont = document.getElementById('roster-container');
