@@ -20,33 +20,33 @@
 
 <style>
 :root {
---bg-dark: #090a0f;
---bg-card: rgba(18, 20, 28, 0.75);
---accent-main: #00e5ff;
+--bg-dark: #090a0f; 
+--bg-card: rgba(18, 20, 28, 0.75); 
+--accent-main: #00e5ff; 
 --accent-secondary: #b300ff;
---text-main: #ffffff;
---text-muted: #8b949e;
---border-color: rgba(0, 229, 255, 0.2);
+--text-main: #ffffff; 
+--text-muted: #8b949e; 
+--border-color: rgba(0, 229, 255, 0.2); 
 --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
 --header-bg: rgba(9, 10, 15, 0.85);
---transition-speed: 0.4s;
---glow-accent: 0 0 20px rgba(0, 229, 255, 0.35);
+--transition-speed: 0.4s; 
+--glow-accent: 0 0 20px rgba(0, 229, 255, 0.35); 
 --font-sans: 'Montserrat', sans-serif;
---dot-green: #00ff88;
+--dot-green: #00ff88; 
 --dot-red: #ff3366;
 }
 
 body.light-mode {
---bg-dark: #f0f2f5;
---bg-card: rgba(255, 255, 255, 0.8);
+--bg-dark: #f0f2f5; 
+--bg-card: rgba(255, 255, 255, 0.8); 
 --accent-main: #00b8cc;
 --accent-secondary: #8a00c2;
---text-main: #1a1c23;
---text-muted: #6b7280;
+--text-main: #1a1c23; 
+--text-muted: #6b7280; 
 --border-color: rgba(0, 184, 204, 0.3);
---card-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
+--card-shadow: 0 12px 30px rgba(0, 0, 0, 0.05); 
 --header-bg: rgba(240, 242, 245, 0.85);
---glow-accent: 0 0 20px rgba(0, 184, 204, 0.15);
+--glow-accent: 0 0 20px rgba(0, 184, 204, 0.15); 
 }
 
 html, body {
@@ -60,27 +60,19 @@ font-family: var(--font-sans); font-weight: 300; color: var(--text-main); -webki
 h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-dark); } ::-webkit-scrollbar-thumb { background: var(--accent-secondary); border-radius: 3px; }
 
-#app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center;
-filter: grayscale(75%) sepia(25%) hue-rotate(190deg) brightness(0.2) contrast(1.3); transition: background-image 0.4s ease-in-out; }
-#app-background::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px), linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
-background-size: 100% 100%, 30px 30px, 30px 30px; pointer-events: none; z-index: 1; }
+#app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center; filter: grayscale(75%) sepia(25%) hue-rotate(190deg) brightness(0.2) contrast(1.3); transition: background-image 0.4s ease-in-out; }
+#app-background::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px), linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px); background-size: 100% 100%, 30px 30px, 30px 30px; pointer-events: none; z-index: 1; }
 
-.main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none;
-padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+.main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
 
-.loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 10, 15, 0.95); backdrop-filter: blur(16px);
-z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+.loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 10, 15, 0.95); backdrop-filter: blur(16px); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
 .loader-overlay.active { opacity: 1; pointer-events: all; }
-.loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent-main); border-bottom-color: var(--accent-secondary);
-animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; position: relative; margin-bottom: 24px; }
-.loader-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; border: 3px solid transparent; border-left-color: var(--accent-main); border-right-color: var(--accent-secondary);
-animation: spin-reverse 2s linear infinite; }
-.loader-ring::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--text-main);
-animation: spin 1s ease-in-out infinite; }
+.loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent-main); border-bottom-color: var(--accent-secondary); animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; position: relative; margin-bottom: 24px; }
+.loader-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; border: 3px solid transparent; border-left-color: var(--accent-main); border-right-color: var(--accent-secondary); animation: spin-reverse 2s linear infinite; }
+.loader-ring::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--text-main); animation: spin 1s ease-in-out infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 260px; background: rgba(0, 229, 255, 0.05);
-border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,229,255,0.05); }
+.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 260px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,229,255,0.05); }
 .term-line { margin-bottom: 6px; opacity: 0; animation: typeLine 0.1s forwards; letter-spacing: 1px;}
 .term-line:nth-child(1) { animation-delay: 0.2s; }
 .term-line:nth-child(2) { animation-delay: 1.2s; }
@@ -90,27 +82,20 @@ border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .container { padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); max-width: 600px; margin: auto; }
-input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main);
-box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
+input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main); box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
 .control-row { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; }
 .control-row input { flex: 1; margin-bottom: 0; }
 .control-row select { flex-shrink: 0; width: auto; font-size: 11px; letter-spacing: 1px; margin-bottom: 0;}
-.compare-btn { flex-shrink:0; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; color:var(--accent-main); font-family:var(--font-sans); font-size:11px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; backdrop-filter: blur(16px);
-transition: all 0.3s ease; }
+.compare-btn { flex-shrink:0; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; color:var(--accent-main); font-family:var(--font-sans); font-size:11px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; backdrop-filter: blur(16px); transition: all 0.3s ease; }
 .compare-btn:active { transform: scale(0.95); }
-.view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main);
-font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center;
-align-items:center; gap:8px;}
+.view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center; align-items:center; gap:8px;}
 
-/* FIXED GLASS SLATE GRID */
+/* GLASS SLATE GRID */
 .glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px 0; width: 100%;}
-.glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px;
-padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow);
-text-align:center;}
+.glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow); text-align:center;}
 .glass-card:hover { transform: translateY(-4px); border-color: var(--accent-main); box-shadow: 0 10px 20px rgba(0,229,255,0.15); z-index: 10; }
 .glass-card:active { transform: scale(0.95); }
-.glass-ring { width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center;
-position: relative; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); flex-shrink:0;}
+.glass-ring { width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); flex-shrink:0;}
 .glass-ring::before { content: ""; position: absolute; inset: 2.5px; background: var(--bg-dark); border-radius: 50%; }
 .glass-ring span { position: relative; font-size: 10px; font-weight: 600; color: var(--text-main); font-family: var(--font-sans);}
 .glass-name { font-size: 11px; font-weight: 600; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); letter-spacing: 0.5px;}
@@ -118,44 +103,36 @@ position: relative; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 229, 255, 
 .growth-indicator { color: var(--dot-green); font-size: 10px; margin-left: 4px; text-shadow: 0 0 5px var(--dot-green); animation: pulseGrow 2s infinite alternate;}
 @keyframes pulseGrow { 0% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
 
+/* V5.1 NEURAL SIEGE WEB */
+.spiderweb-bg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 0; margin-top: 24px; position: relative; overflow: hidden; height: 400px; display: flex; justify-content: center; align-items: center; cursor: crosshair;}
+#spiderWebCanvas { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 1;}
+.web-tooltip { position: absolute; background: rgba(9, 10, 15, 0.95); border: 1px solid var(--accent-main); padding: 8px 12px; border-radius: 8px; color: #fff; font-family: var(--font-sans); font-size: 10px; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; box-shadow: 0 0 15px rgba(0,229,255,0.2); white-space: nowrap; z-index: 10; text-align: center; transform: translate(-50%, -100%);}
+
 /* ORBITAL RADAR MAP */
-.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%); border-radius: 50%;
-border: 1px solid rgba(0, 229, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5);
-margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
-.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.15); border-radius: 50%;
-pointer-events: none;}
+.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(0, 229, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
+.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.15); border-radius: 50%; pointer-events: none;}
 .radar-ring.r1 { width: 33%; height: 33%; }
 .radar-ring.r2 { width: 66%; height: 66%; }
 .radar-ring.r3 { width: 100%; height: 100%; border-style: solid; border-color: rgba(0, 229, 255, 0.3);}
 .radar-crosshair { position: absolute; background: rgba(0, 229, 255, 0.1); pointer-events: none;}
 .radar-crosshair.v { top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); }
 .radar-crosshair.h { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
-.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--accent-main); border-radius: 50%;
-box-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); z-index: 10;}
-.radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.4) 100%);
-animation: radarSweep 10s linear infinite; pointer-events: none; z-index: 1;}
+.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--accent-main); border-radius: 50%; box-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); z-index: 10;}
+.radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.4) 100%); animation: radarSweep 10s linear infinite; pointer-events: none; z-index: 1;}
 @keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.map-node { position: absolute; width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 5;
-transition: transform 0.2s; box-shadow: 0 0 5px rgba(255,255,255,0.2);}
+.map-node { position: absolute; width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 5; transition: transform 0.2s; box-shadow: 0 0 5px rgba(255,255,255,0.2);}
 .map-node:active { transform: translate(-50%, -50%) scale(1.5); }
 .map-node.growing { background: var(--accent-main); box-shadow: 0 0 10px var(--accent-main); animation: nodePulse 2s infinite alternate;}
 .map-node.maxed { background: var(--dot-green); box-shadow: 0 0 15px var(--dot-green); }
-@keyframes nodePulse { 0% { box-shadow: 0 0 5px var(--accent-main);
-} 100% { box-shadow: 0 0 15px var(--accent-main), 0 0 30px rgba(0, 229, 255, 0.4); } }
-.node-label { position: absolute; left: 12px; top: -6px; font-size: 8px; color: var(--text-main); font-family: var(--font-sans); white-space: nowrap; pointer-events: none;
-text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
+@keyframes nodePulse { 0% { box-shadow: 0 0 5px var(--accent-main); } 100% { box-shadow: 0 0 15px var(--accent-main), 0 0 30px rgba(0, 229, 255, 0.4); } }
+.node-label { position: absolute; left: 12px; top: -6px; font-size: 8px; color: var(--text-main); font-family: var(--font-sans); white-space: nowrap; pointer-events: none; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
 
 /* Bottom Sheet Modal */
-.sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none;
-transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
+.sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
-.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-bg); backdrop-filter: blur(24px); border-top-left-radius: 24px; border-top-right-radius: 24px; z-index: 2000;
-transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 85vh; overflow-y: auto; padding: 40px 20px 20px 20px; box-sizing: border-box;
-border-top: 1px solid var(--border-color); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
+.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-bg); backdrop-filter: blur(24px); border-top-left-radius: 24px; border-top-right-radius: 24px; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 85vh; overflow-y: auto; padding: 40px 20px 20px 20px; box-sizing: border-box; border-top: 1px solid var(--border-color); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
 .bottom-sheet.open { transform: translateY(0); }
-.close-btn { position: absolute; top: 16px; right: 20px; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 50%;
-display: flex; align-items: center; justify-content: center; color: var(--accent-main); font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); transition: background 0.3s; z-index: 10;
-font-weight: 600;}
+.close-btn { position: absolute; top: 16px; right: 20px; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-main); font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); transition: background 0.3s; z-index: 10; font-weight: 600;}
 
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; margin-bottom: 24px;}
 .stat-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; position: relative; overflow: hidden;}
@@ -166,14 +143,11 @@ font-weight: 600;}
 .compare-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
 .compare-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); flex: 1; text-align: center; letter-spacing: 1px;}
 .compare-val { font-size: 16px; width: 30%; text-align: center; transition: color 0.4s ease; font-family: var(--font-sans); letter-spacing: 1px;}
-.radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px;
-height: 340px; position: relative; width: 100%; box-sizing: border-box; }
+.radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px; height: 340px; position: relative; width: 100%; box-sizing: border-box; }
 
-.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px);
-border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px); border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 8px; justify-content: space-around; }
-.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
-transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 16px; border-radius: 12px;}
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 16px; border-radius: 12px;}
 .nav-btn span { font-size: 20px; transition: transform 0.3s ease; }
 .nav-btn.active { color: var(--accent-main); }
 .nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 8px var(--accent-main)); }
@@ -183,39 +157,28 @@ transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; p
 @keyframes tabFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 .section-title { text-align: center; color: var(--text-muted); margin-top: 32px; margin-bottom: 24px; text-transform:uppercase; font-size: 16px; letter-spacing: 4px; }
-.status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px;
-text-transform: uppercase; margin-bottom:4px; }
-.badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
 
-/* V3.5 HOLOGRAPHIC 3D WAR PIPELINE */
-.cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none;
-margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
+/* CWL Carousel & War Room */
+.cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
-.carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow);
-backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
+.carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
 .carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: var(--accent-main); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15); }
 
 /* THE STAR MAP (CWL Constellation) */
-.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(179, 0, 255, 0.05) 0%, transparent 70%); border-radius: 50%;
-border: 1px solid rgba(179, 0, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(179, 0, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5);
-margin-top: 32px; display: block; backdrop-filter: blur(8px);}
+.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(179, 0, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(179, 0, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(179, 0, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-top: 32px; display: block; backdrop-filter: blur(8px);}
 .star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
 .star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
 .star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor;}
-.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000;
-letter-spacing: 0.5px;}
+.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
 .map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:32px;}
 
-.war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;
-box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
+.war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
 .strike-pill { flex-shrink:0; background:rgba(0,0,0,0.6); border:1px solid var(--border-color); padding:8px 16px; border-radius:100px; font-size:11px; color:var(--text-main); font-family:var(--font-sans); }
 
-.circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center;
-position: relative; box-shadow: var(--glow-accent); flex-shrink: 0; }
+.circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--glow-accent); flex-shrink: 0; }
 .circular-progress::before { content: ""; position: absolute; inset: 6px; background: #12141c; border-radius: 50%; backdrop-filter: blur(16px); }
 .circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
-.time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px;
-margin-top: 8px;}
+.time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px; margin-top: 8px;}
 
 /* Segmented Energy Bar */
 .energy-bar-container { display: flex; gap: 2px; height: 8px; width: 85%; margin: 0 auto; }
@@ -223,15 +186,11 @@ margin-top: 8px;}
 .energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 5px var(--accent-main); }
 
 /* League Rankings Expansion */
-.rank-card { background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; overflow: hidden; transition: all 0.3s ease; cursor: pointer;
-}
+.rank-card { background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; }
 .rank-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
 .rank-details { max-height: 0; padding: 0 16px; opacity: 0; transition: all 0.3s ease; font-size: 11px; color: var(--text-muted); }
 .rank-details.open { max-height: 200px; padding: 0 16px 16px 16px; opacity: 1; border-top: 1px solid rgba(0,229,255,0.1); margin-top: 8px; padding-top: 12px; }
 .rank-val { color: var(--text-main); font-weight: 500; }
-
-/* Quadrant Scatter Styling */
-.quadrant-bg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 16px; margin-top: 24px;}
 </style>
 </head>
 <body>
@@ -241,7 +200,7 @@ margin-top: 8px;}
 <div class="loader-overlay" id="loaderOverlay">
 <div class="loader-ring"></div>
 <div class="loader-terminal">
-<div class="term-line">> INITIALIZING MOLLY_OS V3.7...</div>
+<div class="term-line">> INITIALIZING MOLLY_OS V5.1...</div>
 <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
 <div class="term-line">> DECRYPTING PACKETS...</div>
 <div class="term-line blink">> AWAITING HANDSHAKE...</div>
@@ -299,10 +258,8 @@ margin-top: 8px;}
 </div>
 
 <div id="roster-map" class="radar-map-container">
-<div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
-<div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
-<div class="radar-core"></div><div class="radar-sweep"></div>
-<div id="radar-nodes"></div>
+<canvas id="rosterMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
+<div id="radar-nodes" class="star-map-nodes"></div>
 </div>
 
 <div id="roster-container" class="glass-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; grid-column: span 3;">Preparing roster...</p></div>
@@ -341,11 +298,14 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
 let warInfo = null;
-let chartsRegistry = { radarHero: null, radarPet: null, operatorQuadrant: null };
+let chartsRegistry = { radarHero: null, radarPet: null };
 let sheetCharts = { history: null, hero: null, pet: null };
 let currentRosterFilter = 'all';
 let isMapView = false;
 let currentStarMapFilter = 'us';
+
+let webRotation = 0;
+let spiderWebReq = null;
 
 const CWL_TAGS = ["#PG0R8GQPQ", "#YCRV8GP0U", "#RYPU89Y8", "#99JQPVU9Q", "#GRJRUYP0", "#8QGVV099U", "#2RL2JGJPJ", "#Y8LY2VUJ9", "#GYJ00RJ2Q", "#G9YR000R8", "#20YLLYC9P", "#QVCLVUQVY", "#9LGG22Q28", "#GGULC2CR", "#9R0C82GU"];
 
@@ -400,7 +360,7 @@ if(tab === 'war') {
 init3DCarousel();
 if(warInfo && warInfo.starMap) {
 drawStarMap();
-drawOperatorQuadrant();
+drawSpiderWeb();
 }
 }
 }
@@ -506,7 +466,25 @@ renderPlayerCards();
 
 function renderRosterMap() {
 let container = document.getElementById('radar-nodes');
+let canvas = document.getElementById('rosterMapCanvas');
 let html = '';
+
+if(canvas) {
+let ctx = canvas.getContext('2d');
+ctx.clearRect(0,0,canvas.width,canvas.height);
+let cx = canvas.width/2; let cy = canvas.height/2; let maxR = canvas.width/2 * 0.85;
+
+ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; ctx.lineWidth = 1;
+[0.33, 0.66, 1.0].forEach(scale => {
+ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI*2); ctx.stroke();
+});
+ctx.beginPath(); ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR); ctx.stroke();
+ctx.beginPath(); ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy); ctx.stroke();
+
+ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2);
+ctx.fillStyle = 'var(--accent-main)'; ctx.shadowColor = 'var(--accent-main)'; ctx.shadowBlur = 10; ctx.fill();
+ctx.shadowBlur = 0;
+}
 
 displayedPlayerData.forEach((player) => {
 let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
@@ -685,11 +663,15 @@ let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 1
 ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
+// V5.1 Smart Tactical Assignments (Relative Positions for Strict Sub-in Integrity)
 function buildTargetAssignments(round) {
 if (!round.myLineup || !round.enemyLineup) return '';
-let enemyPool = [...round.enemyLineup].map(e => ({...e, assigned: false}));
+
+let enemyPool = [...round.enemyLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((e, index) => ({...e, relativePos: index + 1, assigned: false}));
+let myPool = [...round.myLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((u, index) => ({...u, relativePos: index + 1}));
+
 let assignments = [];
-round.myLineup.forEach(us => {
+myPool.forEach(us => {
 let pData = globalPlayerData.find(p => p.tag === us.tag);
 let hr = (pData && pData.hitRate !== undefined && pData.hitRate !== null) ? pData.hitRate : 50;
 let attacks = pData ? (pData.cwlStats ? pData.cwlStats.attacks : 0) : 0;
@@ -698,7 +680,9 @@ if (attacks > 0 && hr >= 66) attackerClass = "Elite";
 else if (attacks > 0 && hr < 33) attackerClass = "Struggling";
 assignments.push({ us, attackerClass, hr, target: null });
 });
+
 assignments.sort((a,b) => { if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1; if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1; return b.us.th - a.us.th; });
+
 assignments.forEach(a => {
 let candidates = enemyPool.filter(e => !e.assigned); if (candidates.length === 0) return;
 let best = null;
@@ -709,21 +693,23 @@ if (strongBases.length > 0) best = strongBases.sort((x,y) => x.th - y.th)[0]; }
 if (!best) { candidates.sort((x,y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th)); best = candidates[0]; }
 best.assigned = true; a.target = best;
 });
-assignments.sort((a,b) => a.us.mapPosition - b.us.mapPosition);
+
+assignments.sort((a,b) => a.us.relativePos - b.us.relativePos);
 
 let swapsHtml = '';
 let swapCount = 0;
 assignments.forEach(a => {
 if (!a.target) return;
-if (a.us.mapPosition !== a.target.mapPosition) {
+// Use relativePos to enforce strict 1-15 mirror logic despite API substitutions
+if (a.us.relativePos !== a.target.relativePos) {
 swapCount++;
 let usColor = a.attackerClass === "Elite" ? "var(--dot-green)" : (a.attackerClass === "Struggling" ? "var(--dot-red)" : "var(--text-main)");
 let reasoning = a.attackerClass === "Elite" ? "Covering liability" : "Optimizing hit rate";
 
 swapsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
-<div style="color:${usColor}; flex:1; font-weight:500;">${a.us.mapPosition}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
+<div style="color:${usColor}; flex:1; font-weight:500;">${a.us.relativePos}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
 <div style="color:var(--text-muted); font-size:12px; padding:0 8px;">➔</div>
-<div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.mapPosition}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
+<div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.relativePos}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
 </div>
 <div style="font-size:8px; color:var(--text-muted); text-align:right; margin-top:-4px; margin-bottom:4px; padding-right:12px;">└ ${reasoning}</div>`;
 }
@@ -740,46 +726,155 @@ html += swapsHtml;
 html += `</div></div>`; return html;
 }
 
-function drawOperatorQuadrant() {
-let ctx = document.getElementById('operatorQuadrantChart');
-if (!ctx || !warInfo || !warInfo.starMap) return;
+// V5.1: NEURAL SIEGE WEB (Spiderweb Replacement for Matrix)
+function drawSpiderWeb() {
+    const canvas = document.getElementById('spiderWebCanvas');
+    const tooltip = document.getElementById('spiderWebTooltip');
+    if(!canvas || !warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
+    const ctx = canvas.getContext('2d');
 
-let usData = []; let themData = [];
-let myClanTag = decodeURIComponent("#YQP0GJ9");
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width * 2;
+    canvas.height = rect.height * 2;
+    ctx.scale(2, 2);
+    const w = rect.width, h = rect.height;
+    const cx = w/2, cy = h/2;
 
-warInfo.starMap.forEach(p => {
-let hitRate = p.attacks > 0 ? (p.threeStars / p.attacks) * 100 : 0;
-let dest = p.avgDest || 0;
-if(dest >= 50) {
-let pt = { x: dest, y: hitRate, name: p.name };
-if (p.clanTag === myClanTag) usData.push(pt); else themData.push(pt);
-}
-});
+    // Group players by clan and sum their stars
+    let clanData = {};
+    warInfo.starMap.forEach(p => {
+        if(!clanData[p.clanTag]) clanData[p.clanTag] = { tag: p.clanTag, name: p.clanName, stars: 0, players: [] };
+        clanData[p.clanTag].stars += p.stars;
+        clanData[p.clanTag].players.push(p);
+    });
 
-if(chartsRegistry.operatorQuadrant) chartsRegistry.operatorQuadrant.destroy();
+    let sortedClans = Object.values(clanData).sort((a,b) => b.stars - a.stars);
+    let myClanTag = decodeURIComponent("#YQP0GJ9");
 
-const crosshairPlugin = {
-id: 'crosshair',
-beforeDraw: chart => {
-let ctx = chart.ctx; let xAxis = chart.scales.x; let yAxis = chart.scales.y;
-ctx.save(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
-ctx.beginPath(); ctx.moveTo(xAxis.getPixelForValue(80), yAxis.top); ctx.lineTo(xAxis.getPixelForValue(80), yAxis.bottom); ctx.stroke();
-ctx.beginPath(); ctx.moveTo(xAxis.left, yAxis.getPixelForValue(50)); ctx.lineTo(xAxis.right, yAxis.getPixelForValue(50)); ctx.stroke();
-ctx.font = '10px Montserrat'; ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; ctx.textAlign = 'center';
-ctx.fillText('VANGUARD', xAxis.getPixelForValue(90), yAxis.getPixelForValue(75));
-ctx.fillText('DEMOLITION', xAxis.getPixelForValue(90), yAxis.getPixelForValue(25));
-ctx.fillText('SNIPERS', xAxis.getPixelForValue(65), yAxis.getPixelForValue(75));
-ctx.fillText('INEFFECTIVE', xAxis.getPixelForValue(65), yAxis.getPixelForValue(25));
-ctx.restore();
-}
-};
+    const orbitRadius = Math.min(w, h) * 0.35; 
+    const playerOrbitRadius = 35; 
 
-chartsRegistry.operatorQuadrant = new Chart(ctx.getContext('2d'), {
-type: 'scatter',
-data: { datasets: [ { label: 'Us', data: usData, backgroundColor: 'rgba(0, 229, 255, 0.8)', borderColor: '#00e5ff', pointRadius: 4, pointHoverRadius: 6 }, { label: 'Them', data: themData, backgroundColor: 'rgba(255, 51, 102, 0.8)', borderColor: '#ff3366', pointRadius: 4, pointHoverRadius: 6 } ] },
-options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw.name}: ${ctx.raw.y.toFixed(0)}% 3★, ${ctx.raw.x.toFixed(1)}% Dest` } } }, scales: { x: { min: 50, max: 100, title: { display: true, text: 'Average Destruction %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } }, y: { min: 0, max: 100, title: { display: true, text: '3★ Hit Rate %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } } } },
-plugins: [crosshairPlugin]
-});
+    let playerNodes = [];
+
+    // Assign base coordinates to clans and their players
+    sortedClans.forEach((clan, i) => {
+        let clanCx, clanCy;
+        if (i === 0) {
+            clanCx = cx; clanCy = cy; // Top clan holds the center
+        } else {
+            let angle = ((i - 1) / (sortedClans.length - 1)) * Math.PI * 2 - Math.PI/2;
+            clanCx = cx + orbitRadius * Math.cos(angle);
+            clanCy = cy + orbitRadius * Math.sin(angle);
+        }
+
+        clan.players.forEach((p, pIdx) => {
+            playerNodes.push({ ...p, clanAngle: i===0 ? 0 : ((i - 1) / (sortedClans.length - 1)) * Math.PI * 2 - Math.PI/2, pIdx: pIdx, totalClanPlayers: clan.players.length, clanCenter: i === 0 });
+        });
+    });
+
+    let hoverNode = null;
+    canvas.onmousemove = (e) => {
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+        let found = null;
+        playerNodes.forEach(n => {
+            if(n.currentX && n.currentY && Math.hypot(mx - n.currentX, my - n.currentY) < 12) found = n;
+        });
+        hoverNode = found;
+        if(found) {
+            tooltip.style.opacity = 1;
+            tooltip.style.left = (mx + 15) + 'px';
+            tooltip.style.top = (my - 25) + 'px';
+            tooltip.innerHTML = `<span style="color:var(--accent-main); font-weight:600; font-size:12px;">${found.name}</span><br/><span style="color:var(--text-muted);">${found.stars}★ | TH${found.th}</span>`;
+        } else {
+            tooltip.style.opacity = 0;
+        }
+    };
+    
+    canvas.onmouseleave = () => { hoverNode = null; tooltip.style.opacity = 0; };
+
+    function render() {
+        ctx.clearRect(0,0,w,h);
+        webRotation += 0.0008; 
+
+        // Update real-time coordinates
+        playerNodes.forEach(n => {
+            let clanCx = cx, clanCy = cy;
+            if (!n.clanCenter) {
+                let rotAngle = n.clanAngle + webRotation;
+                clanCx = cx + orbitRadius * Math.cos(rotAngle);
+                clanCy = cy + orbitRadius * Math.sin(rotAngle);
+            }
+            
+            let pAngle = (n.pIdx / n.totalClanPlayers) * Math.PI * 2 + (webRotation * 2);
+            let dist = playerOrbitRadius - ((n.stars / 21) * (playerOrbitRadius * 0.5)); // High stars pull tighter to core
+            n.currentX = clanCx + dist * Math.cos(pAngle);
+            n.currentY = clanCy + dist * Math.sin(pAngle);
+            n.currentCx = clanCx;
+            n.currentCy = clanCy;
+        });
+
+        // Tangled Web Data-Streams (Connect players with identical stars)
+        let starGroups = {};
+        playerNodes.forEach(n => {
+            if(n.stars > 0) { 
+                if(!starGroups[n.stars]) starGroups[n.stars] = [];
+                starGroups[n.stars].push(n);
+            }
+        });
+
+        ctx.lineWidth = 0.5;
+        Object.keys(starGroups).forEach(starVal => {
+            let group = starGroups[starVal];
+            let intensity = starVal / 21; 
+            ctx.strokeStyle = `rgba(0, 229, 255, ${intensity * 0.4})`;
+            ctx.beginPath();
+            for(let i=0; i<group.length; i++) {
+                for(let j=i+1; j<group.length; j++) {
+                    ctx.moveTo(group[i].currentX, group[i].currentY);
+                    ctx.quadraticCurveTo(cx, cy, group[j].currentX, group[j].currentY); 
+                }
+            }
+            ctx.stroke();
+        });
+
+        // Draw structural clan tethers
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+        ctx.beginPath();
+        playerNodes.forEach(n => {
+            ctx.moveTo(n.currentCx, n.currentCy); 
+            ctx.lineTo(n.currentX, n.currentY);
+        });
+        ctx.stroke();
+
+        // Draw Player Nodes
+        playerNodes.forEach(n => {
+            let isUs = n.clanTag === myClanTag;
+            ctx.fillStyle = isUs ? '#00e5ff' : '#ff3366';
+            
+            if(hoverNode && hoverNode.tag === n.tag) {
+                ctx.shadowBlur = 15; ctx.shadowColor = ctx.fillStyle;
+                ctx.beginPath(); ctx.arc(n.currentX, n.currentY, 6, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+            } else if (hoverNode && hoverNode.stars === n.stars && n.stars > 0) {
+                ctx.beginPath(); ctx.arc(n.currentX, n.currentY, 4, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 1.5;
+                ctx.beginPath(); 
+                ctx.moveTo(hoverNode.currentX, hoverNode.currentY);
+                ctx.quadraticCurveTo(cx, cy, n.currentX, n.currentY);
+                ctx.stroke();
+            } else {
+                ctx.globalAlpha = hoverNode ? 0.1 : 1;
+                ctx.beginPath(); ctx.arc(n.currentX, n.currentY, 2.5, 0, Math.PI*2); ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        });
+
+        spiderWebReq = requestAnimationFrame(render);
+    }
+
+    if(spiderWebReq) cancelAnimationFrame(spiderWebReq);
+    render();
 }
 
 function setStarMapFilter(f) {
@@ -791,6 +886,7 @@ if(f==='all') document.getElementById('leg-all').style.color = 'var(--text-main)
 drawStarMap();
 }
 
+// PRISTINE V5.0 CIRCULAR CONSTELLATION MAP
 function drawStarMap() {
 if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
 let container = document.getElementById('starMapNodes'); let canvas = document.getElementById('starMapCanvas');
@@ -800,6 +896,14 @@ container.innerHTML = '';
 let ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
 let myClanTag = decodeURIComponent("#YQP0GJ9");
 
+let cx = canvas.width / 2; let cy = canvas.height / 2; let maxR = canvas.width / 2 * 0.85;
+
+// Strict Circular Radar Base
+ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; ctx.lineWidth = 1;
+[0.33, 0.66, 1.0].forEach(scale => {
+    ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI*2); ctx.stroke();
+});
+
 let nodesToDraw = [];
 warInfo.starMap.forEach(p => {
 let isUs = (p.clanTag === myClanTag);
@@ -807,7 +911,7 @@ if (currentStarMapFilter === 'us' && !isUs) return;
 if (currentStarMapFilter === 'them' && isUs) return;
 
 let maxStars = 21; let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
-let r = rPct * (canvas.width / 2 * 0.85);
+let r = rPct * maxR;
 
 let rosterSize = 15;
 if (warInfo && warInfo.cwlDetails && warInfo.cwlDetails.length > 0) rosterSize = warInfo.cwlDetails[0].teamSize || 15;
@@ -816,7 +920,6 @@ let baseAngle = (p.basePos / rosterSize) * Math.PI * 2 - (Math.PI / 2);
 let deltaAngle = (p.avgDelta / rosterSize) * Math.PI * 2;
 let angle = baseAngle + (deltaAngle * 0.4);
 
-let cx = canvas.width / 2; let cy = canvas.height / 2;
 let x = cx + r * Math.cos(angle); let y = cy + r * Math.sin(angle);
 nodesToDraw.push({ ...p, isUs: isUs, x: x, y: y });
 });
@@ -970,6 +1073,15 @@ ${winProbHtml}
 <div class="energy-bar-container">${attackSegments}</div>
 </div>`;
 
+// V5.1 Neural Siege Web HTML Injection
+html += `
+<h4 class="section-title" style="margin-top:32px;">Siege Network Web</h4>
+<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide neural web. Nodes represent operators. Data-threads connect operators with identical star yields.</p>
+<div class="spiderweb-bg">
+    <canvas id="spiderWebCanvas" width="600" height="400"></canvas>
+    <div id="spiderWebTooltip" class="web-tooltip"></div>
+</div>`;
+
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
 
 let liabilitiesHtml = '';
@@ -993,13 +1105,6 @@ if (liabilitiesHtml !== '') {
 html += `<h4 style="margin-top:0; font-size:11px; color:var(--dot-red); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Compromised Bases</h4>
 <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">${liabilitiesHtml}</div>`;
 }
-
-html += `
-<h4 class="section-title" style="margin-top:32px;">Combat Effectiveness Matrix</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide scatter plot evaluating operator lethality.</p>
-<div class="quadrant-bg">
-<div class="chart-container" style="height: 300px; margin-top:0;"><canvas id="operatorQuadrantChart"></canvas></div>
-</div>`;
 
 html += `
 <h4 class="section-title" style="margin-top:40px;">CWL Constellation</h4>
@@ -1091,6 +1196,7 @@ patHtml = `
 </div>`;
 }
 
+// Strict Relative Mapping for Roster UI
 let oppLineupMap = [...(round.enemyLineup || [])].sort((a,b)=>a.mapPosition - b.mapPosition).map((e,i)=>({...e, relativePos: i+1}));
 
 let rosterHtml = `<div style="margin-top:32px;">
@@ -1099,7 +1205,7 @@ oppLineupMap.forEach(e => {
 let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px;">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
 rosterHtml += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0, 229, 255, 0.1); font-size:12px; align-items:center;">
 <div>
-<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.mapPosition}</span>
+<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.relativePos}</span>
 <span style="font-weight:500;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:4px; font-weight:500;">TH${e.th}</span>
 </div>
 <div>${atkStatus}</div>
@@ -1144,7 +1250,7 @@ container.innerHTML = html;
 init3DCarousel();
 if(warInfo.starMap && warInfo.starMap.length > 0) {
 drawStarMap();
-drawOperatorQuadrant();
+drawSpiderWeb();
 }
 
 renderLeagueRankings();
