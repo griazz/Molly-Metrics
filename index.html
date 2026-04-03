@@ -20,33 +20,33 @@
 
 <style>
 :root {
---bg-dark: #090a0f; 
---bg-card: rgba(18, 20, 28, 0.75); 
---accent-main: #00e5ff; 
+--bg-dark: #090a0f;
+--bg-card: rgba(18, 20, 28, 0.75);
+--accent-main: #00e5ff;
 --accent-secondary: #b300ff;
---text-main: #ffffff; 
---text-muted: #8b949e; 
---border-color: rgba(0, 229, 255, 0.2); 
+--text-main: #ffffff;
+--text-muted: #8b949e;
+--border-color: rgba(0, 229, 255, 0.2);
 --card-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
 --header-bg: rgba(9, 10, 15, 0.85);
---transition-speed: 0.4s; 
---glow-accent: 0 0 20px rgba(0, 229, 255, 0.35); 
+--transition-speed: 0.4s;
+--glow-accent: 0 0 20px rgba(0, 229, 255, 0.35);
 --font-sans: 'Montserrat', sans-serif;
---dot-green: #00ff88; 
+--dot-green: #00ff88;
 --dot-red: #ff3366;
 }
 
 body.light-mode {
---bg-dark: #f0f2f5; 
---bg-card: rgba(255, 255, 255, 0.8); 
+--bg-dark: #f0f2f5;
+--bg-card: rgba(255, 255, 255, 0.8);
 --accent-main: #00b8cc;
 --accent-secondary: #8a00c2;
---text-main: #1a1c23; 
---text-muted: #6b7280; 
+--text-main: #1a1c23;
+--text-muted: #6b7280;
 --border-color: rgba(0, 184, 204, 0.3);
---card-shadow: 0 12px 30px rgba(0, 0, 0, 0.05); 
+--card-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);
 --header-bg: rgba(240, 242, 245, 0.85);
---glow-accent: 0 0 20px rgba(0, 184, 204, 0.15); 
+--glow-accent: 0 0 20px rgba(0, 184, 204, 0.15);
 }
 
 html, body {
@@ -60,19 +60,27 @@ font-family: var(--font-sans); font-weight: 300; color: var(--text-main); -webki
 h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
 ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-dark); } ::-webkit-scrollbar-thumb { background: var(--accent-secondary); border-radius: 3px; }
 
-#app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center; filter: grayscale(75%) sepia(25%) hue-rotate(190deg) brightness(0.2) contrast(1.3); transition: background-image 0.4s ease-in-out; }
-#app-background::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px), linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px); background-size: 100% 100%, 30px 30px, 30px 30px; pointer-events: none; z-index: 1; }
+#app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center;
+filter: grayscale(75%) sepia(25%) hue-rotate(190deg) brightness(0.2) contrast(1.3); transition: background-image 0.4s ease-in-out; }
+#app-background::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px), linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px);
+background-size: 100% 100%, 30px 30px, 30px 30px; pointer-events: none; z-index: 1; }
 
-.main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+.main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none;
+padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
 
-.loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 10, 15, 0.95); backdrop-filter: blur(16px); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+.loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 10, 15, 0.95); backdrop-filter: blur(16px);
+z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
 .loader-overlay.active { opacity: 1; pointer-events: all; }
-.loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent-main); border-bottom-color: var(--accent-secondary); animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; position: relative; margin-bottom: 24px; }
-.loader-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; border: 3px solid transparent; border-left-color: var(--accent-main); border-right-color: var(--accent-secondary); animation: spin-reverse 2s linear infinite; }
-.loader-ring::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--text-main); animation: spin 1s ease-in-out infinite; }
+.loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent-main); border-bottom-color: var(--accent-secondary);
+animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; position: relative; margin-bottom: 24px; }
+.loader-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; border: 3px solid transparent; border-left-color: var(--accent-main); border-right-color: var(--accent-secondary);
+animation: spin-reverse 2s linear infinite; }
+.loader-ring::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--text-main);
+animation: spin 1s ease-in-out infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 260px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,229,255,0.05); }
+.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 260px; background: rgba(0, 229, 255, 0.05);
+border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,229,255,0.05); }
 .term-line { margin-bottom: 6px; opacity: 0; animation: typeLine 0.1s forwards; letter-spacing: 1px;}
 .term-line:nth-child(1) { animation-delay: 0.2s; }
 .term-line:nth-child(2) { animation-delay: 1.2s; }
@@ -82,20 +90,27 @@ h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .container { padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); max-width: 600px; margin: auto; }
-input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main); box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
+input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main);
+box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
 .control-row { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; }
 .control-row input { flex: 1; margin-bottom: 0; }
 .control-row select { flex-shrink: 0; width: auto; font-size: 11px; letter-spacing: 1px; margin-bottom: 0;}
-.compare-btn { flex-shrink:0; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; color:var(--accent-main); font-family:var(--font-sans); font-size:11px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; backdrop-filter: blur(16px); transition: all 0.3s ease; }
+.compare-btn { flex-shrink:0; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; color:var(--accent-main); font-family:var(--font-sans); font-size:11px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; backdrop-filter: blur(16px);
+transition: all 0.3s ease; }
 .compare-btn:active { transform: scale(0.95); }
-.view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center; align-items:center; gap:8px;}
+.view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main);
+font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center;
+align-items:center; gap:8px;}
 
-/* GLASS SLATE GRID */
+/* FIXED GLASS SLATE GRID */
 .glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px 0; width: 100%;}
-.glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow); text-align:center;}
+.glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px;
+padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow);
+text-align:center;}
 .glass-card:hover { transform: translateY(-4px); border-color: var(--accent-main); box-shadow: 0 10px 20px rgba(0,229,255,0.15); z-index: 10; }
 .glass-card:active { transform: scale(0.95); }
-.glass-ring { width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); flex-shrink:0;}
+.glass-ring { width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center;
+position: relative; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); flex-shrink:0;}
 .glass-ring::before { content: ""; position: absolute; inset: 2.5px; background: var(--bg-dark); border-radius: 50%; }
 .glass-ring span { position: relative; font-size: 10px; font-weight: 600; color: var(--text-main); font-family: var(--font-sans);}
 .glass-name { font-size: 11px; font-weight: 600; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); letter-spacing: 0.5px;}
@@ -104,25 +119,43 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 @keyframes pulseGrow { 0% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
 
 /* ORBITAL RADAR MAP */
-.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--card-shadow); margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
-.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
-.star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
-.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor; transition: transform 0.2s;}
-.star-node:active { transform: translate(-50%, -50%) scale(1.5); }
-.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
-.map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:16px;}
-
-/* V3.9 NEURAL SIEGE WEB */
-.spiderweb-bg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 0; margin-top: 24px; position: relative; overflow: hidden; height: 400px; display: flex; justify-content: center; align-items: center;}
-#spiderWebCanvas { width: 100%; height: 100%; cursor: crosshair; position: absolute; top:0; left:0; z-index: 1;}
-.web-tooltip { position: absolute; background: rgba(9, 10, 15, 0.9); border: 1px solid var(--accent-main); padding: 8px 12px; border-radius: 8px; color: #fff; font-family: var(--font-sans); font-size: 10px; pointer-events: none; opacity: 0; transition: opacity 0.2s; box-shadow: 0 0 10px rgba(0,229,255,0.2); white-space: nowrap; z-index: 10; text-align: center;}
+.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%); border-radius: 50%;
+border: 1px solid rgba(0, 229, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5);
+margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
+.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.15); border-radius: 50%;
+pointer-events: none;}
+.radar-ring.r1 { width: 33%; height: 33%; }
+.radar-ring.r2 { width: 66%; height: 66%; }
+.radar-ring.r3 { width: 100%; height: 100%; border-style: solid; border-color: rgba(0, 229, 255, 0.3);}
+.radar-crosshair { position: absolute; background: rgba(0, 229, 255, 0.1); pointer-events: none;}
+.radar-crosshair.v { top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); }
+.radar-crosshair.h { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
+.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--accent-main); border-radius: 50%;
+box-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); z-index: 10;}
+.radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.4) 100%);
+animation: radarSweep 10s linear infinite; pointer-events: none; z-index: 1;}
+@keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.map-node { position: absolute; width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 5;
+transition: transform 0.2s; box-shadow: 0 0 5px rgba(255,255,255,0.2);}
+.map-node:active { transform: translate(-50%, -50%) scale(1.5); }
+.map-node.growing { background: var(--accent-main); box-shadow: 0 0 10px var(--accent-main); animation: nodePulse 2s infinite alternate;}
+.map-node.maxed { background: var(--dot-green); box-shadow: 0 0 15px var(--dot-green); }
+@keyframes nodePulse { 0% { box-shadow: 0 0 5px var(--accent-main);
+} 100% { box-shadow: 0 0 15px var(--accent-main), 0 0 30px rgba(0, 229, 255, 0.4); } }
+.node-label { position: absolute; left: 12px; top: -6px; font-size: 8px; color: var(--text-main); font-family: var(--font-sans); white-space: nowrap; pointer-events: none;
+text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
 
 /* Bottom Sheet Modal */
-.sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
+.sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none;
+transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
-.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-bg); backdrop-filter: blur(24px); border-top-left-radius: 24px; border-top-right-radius: 24px; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 85vh; overflow-y: auto; padding: 40px 20px 20px 20px; box-sizing: border-box; border-top: 1px solid var(--border-color); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
+.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-bg); backdrop-filter: blur(24px); border-top-left-radius: 24px; border-top-right-radius: 24px; z-index: 2000;
+transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 85vh; overflow-y: auto; padding: 40px 20px 20px 20px; box-sizing: border-box;
+border-top: 1px solid var(--border-color); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
 .bottom-sheet.open { transform: translateY(0); }
-.close-btn { position: absolute; top: 16px; right: 20px; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-main); font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); transition: background 0.3s; z-index: 10; font-weight: 600;}
+.close-btn { position: absolute; top: 16px; right: 20px; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 50%;
+display: flex; align-items: center; justify-content: center; color: var(--accent-main); font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); transition: background 0.3s; z-index: 10;
+font-weight: 600;}
 
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; margin-bottom: 24px;}
 .stat-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; position: relative; overflow: hidden;}
@@ -133,11 +166,14 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .compare-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
 .compare-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); flex: 1; text-align: center; letter-spacing: 1px;}
 .compare-val { font-size: 16px; width: 30%; text-align: center; transition: color 0.4s ease; font-family: var(--font-sans); letter-spacing: 1px;}
-.radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px; height: 340px; position: relative; width: 100%; box-sizing: border-box; }
+.radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px;
+height: 340px; position: relative; width: 100%; box-sizing: border-box; }
 
-.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px); border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px);
+border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 8px; justify-content: space-around; }
-.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 16px; border-radius: 12px;}
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 16px; border-radius: 12px;}
 .nav-btn span { font-size: 20px; transition: transform 0.3s ease; }
 .nav-btn.active { color: var(--accent-main); }
 .nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 8px var(--accent-main)); }
@@ -147,27 +183,55 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 @keyframes tabFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 .section-title { text-align: center; color: var(--text-muted); margin-top: 32px; margin-bottom: 24px; text-transform:uppercase; font-size: 16px; letter-spacing: 4px; }
-.status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom:4px; }
+.status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px;
+text-transform: uppercase; margin-bottom:4px; }
 .badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
 
-/* CWL Carousel & War Room */
-.cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
+/* V3.5 HOLOGRAPHIC 3D WAR PIPELINE */
+.cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none;
+margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
-.carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
+.carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow);
+backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
 .carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: var(--accent-main); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15); }
 
-.war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
+/* THE STAR MAP (CWL Constellation) */
+.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(179, 0, 255, 0.05) 0%, transparent 70%); border-radius: 50%;
+border: 1px solid rgba(179, 0, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(179, 0, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5);
+margin-top: 32px; display: block; backdrop-filter: blur(8px);}
+.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
+.star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
+.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor;}
+.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000;
+letter-spacing: 0.5px;}
+.map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:32px;}
+
+.war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;
+box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
 .strike-pill { flex-shrink:0; background:rgba(0,0,0,0.6); border:1px solid var(--border-color); padding:8px 16px; border-radius:100px; font-size:11px; color:var(--text-main); font-family:var(--font-sans); }
 
-.circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--glow-accent); flex-shrink: 0; }
+.circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center;
+position: relative; box-shadow: var(--glow-accent); flex-shrink: 0; }
 .circular-progress::before { content: ""; position: absolute; inset: 6px; background: #12141c; border-radius: 50%; backdrop-filter: blur(16px); }
 .circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
-.time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px; margin-top: 8px;}
+.time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px;
+margin-top: 8px;}
 
 /* Segmented Energy Bar */
 .energy-bar-container { display: flex; gap: 2px; height: 8px; width: 85%; margin: 0 auto; }
 .energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 1px; transition: background 0.3s ease; }
 .energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 5px var(--accent-main); }
+
+/* League Rankings Expansion */
+.rank-card { background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; overflow: hidden; transition: all 0.3s ease; cursor: pointer;
+}
+.rank-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
+.rank-details { max-height: 0; padding: 0 16px; opacity: 0; transition: all 0.3s ease; font-size: 11px; color: var(--text-muted); }
+.rank-details.open { max-height: 200px; padding: 0 16px 16px 16px; opacity: 1; border-top: 1px solid rgba(0,229,255,0.1); margin-top: 8px; padding-top: 12px; }
+.rank-val { color: var(--text-main); font-weight: 500; }
+
+/* Quadrant Scatter Styling */
+.quadrant-bg { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 16px; margin-top: 24px;}
 </style>
 </head>
 <body>
@@ -177,7 +241,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 <div class="loader-overlay" id="loaderOverlay">
 <div class="loader-ring"></div>
 <div class="loader-terminal">
-<div class="term-line">> INITIALIZING MOLLY_OS V3.9...</div>
+<div class="term-line">> INITIALIZING MOLLY_OS V3.7...</div>
 <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
 <div class="term-line">> DECRYPTING PACKETS...</div>
 <div class="term-line blink">> AWAITING HANDSHAKE...</div>
@@ -188,23 +252,23 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 <div class="container">
 
 <div id="roster-tab" class="tab-content">
-  
+
 <div style="text-align: center; cursor: default; margin-bottom: 24px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding: 24px; backdrop-filter: blur(12px); box-shadow:var(--card-shadow);">
-    <h4 style="color: var(--text-muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Active Roster Progression</h4>
-    <div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
-        <div class="circular-progress" id="global-circle" style="--progress: 0%;">
-            <div class="circular-value" id="global-pct-val">0%</div>
-        </div>
-        <div style="text-align: left;">
-            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">30-Day Growth</div>
-            <div id="global-change-val" style="font-size: 18px; font-weight: 500; color: var(--dot-green);">+0.00%</div>
-            <div style="font-size: 9px; color: var(--text-muted); margin-top: 6px;" id="global-progress-count">0 Operators Advancing</div>
-        </div>
-    </div>
+<h4 style="color: var(--text-muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Active Roster Progression</h4>
+<div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
+<div class="circular-progress" id="global-circle" style="--progress: 0%;">
+<div class="circular-value" id="global-pct-val">0%</div>
+</div>
+<div style="text-align: left;">
+<div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">30-Day Growth</div>
+<div id="global-change-val" style="font-size: 18px; font-weight: 500; color: var(--dot-green);">+0.00%</div>
+<div style="font-size: 9px; color: var(--text-muted); margin-top: 6px;" id="global-progress-count">0 Operators Advancing</div>
+</div>
+</div>
 </div>
 
 <button class="view-toggle-btn" onclick="toggleMapView()" id="mapToggleBtn">
-    <span>◎</span> Switch to Sector Map
+<span>◎</span> Switch to Sector Map
 </button>
 
 <div class="control-row" id="roster-controls" style="display:none;">
@@ -218,25 +282,27 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 </div>
 
 <div id="roster-compare-section" style="display:none;">
-  <div style="display:flex; gap: 16px; margin-bottom: 24px;">
-  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 1</label><select id="player1Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
-  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 2</label><select id="player2Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
-  </div>
-  <div id="radarSection" style="display:none;">
-  <h4 class="section-title" style="margin-top:0;">Head-to-Head Stats</h4>
-  <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; margin-bottom:24px;">
-      <div style="padding: 0 20px;" id="compareDetailsGrid"></div>
-  </div>
-  <h4 class="section-title">Hero Distribution (%)</h4>
-  <div class="radar-container"><canvas id="heroRadar"></canvas></div>
-  <h4 class="section-title">Pet Distribution (%)</h4>
-  <div class="radar-container"><canvas id="petRadar"></canvas></div>
-  </div>
+<div style="display:flex; gap: 16px; margin-bottom: 24px;">
+<div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 1</label><select id="player1Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
+<div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 2</label><select id="player2Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
+</div>
+<div id="radarSection" style="display:none;">
+<h4 class="section-title" style="margin-top:0;">Head-to-Head Stats</h4>
+<div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; margin-bottom:24px;">
+<div style="padding: 0 20px;" id="compareDetailsGrid"></div>
+</div>
+<h4 class="section-title">Hero Distribution (%)</h4>
+<div class="radar-container"><canvas id="heroRadar"></canvas></div>
+<h4 class="section-title">Pet Distribution (%)</h4>
+<div class="radar-container"><canvas id="petRadar"></canvas></div>
+</div>
 </div>
 
 <div id="roster-map" class="radar-map-container">
-    <canvas id="rosterMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
-    <div id="radar-nodes" class="star-map-nodes"></div>
+<div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
+<div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
+<div class="radar-core"></div><div class="radar-sweep"></div>
+<div id="radar-nodes"></div>
 </div>
 
 <div id="roster-container" class="glass-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; grid-column: span 3;">Preparing roster...</p></div>
@@ -258,16 +324,16 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 
 <div id="sheetBackdrop" class="sheet-backdrop" onclick="closeBottomSheet()"></div>
 <div id="playerBottomSheet" class="bottom-sheet">
-  <div class="close-btn" onclick="closeBottomSheet()">✕</div>
-  <div id="bottomSheetContent"></div>
+<div class="close-btn" onclick="closeBottomSheet()">✕</div>
+<div id="bottomSheetContent"></div>
 </div>
 
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
 function debounce(fn, delay) {
-  let timer;
-  return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
+let timer;
+return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
 }
 const debouncedFilterRoster = debounce(() => filterRoster(), 250);
 
@@ -275,12 +341,11 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
 let warInfo = null;
-let chartsRegistry = { radarHero: null, radarPet: null };
-let sheetCharts = { history: null, hero: null, pet: null }; 
+let chartsRegistry = { radarHero: null, radarPet: null, operatorQuadrant: null };
+let sheetCharts = { history: null, hero: null, pet: null };
 let currentRosterFilter = 'all';
 let isMapView = false;
 let currentStarMapFilter = 'us';
-let spiderWebReq = null;
 
 const CWL_TAGS = ["#PG0R8GQPQ", "#YCRV8GP0U", "#RYPU89Y8", "#99JQPVU9Q", "#GRJRUYP0", "#8QGVV099U", "#2RL2JGJPJ", "#Y8LY2VUJ9", "#GYJ00RJ2Q", "#G9YR000R8", "#20YLLYC9P", "#QVCLVUQVY", "#9LGG22Q28", "#GGULC2CR", "#9R0C82GU"];
 
@@ -303,12 +368,12 @@ if(p < 1) requestAnimationFrame(step); else el.innerText = prefix + (isPct ? end
 }
 
 function formatMonth(m) {
-    if(!m) return "N/A";
-    let d = new Date(m);
-    if (!isNaN(d.getTime())) return d.toLocaleString('default', { month: 'short', year: 'numeric' });
-    let parts = m.toString().split('-');
-    if(parts.length >= 2) return new Date(parts[0], parseInt(parts[1]) - 1).toLocaleString('default', { month: 'short', year: 'numeric' });
-    return m;
+if(!m) return "N/A";
+let d = new Date(m);
+if (!isNaN(d.getTime())) return d.toLocaleString('default', { month: 'short', year: 'numeric' });
+let parts = m.toString().split('-');
+if(parts.length >= 2) return new Date(parts[0], parseInt(parts[1]) - 1).toLocaleString('default', { month: 'short', year: 'numeric' });
+return m;
 }
 
 Chart.defaults.color = '#8b949e'; Chart.defaults.font.family = "'Montserrat', sans-serif";
@@ -316,7 +381,7 @@ Chart.defaults.color = '#8b949e'; Chart.defaults.font.family = "'Montserrat', sa
 window.addEventListener('DOMContentLoaded', () => {
 if(localStorage.getItem('molly-theme') === 'light') document.body.classList.add('light-mode');
 Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
-fetchDashboardData(); 
+fetchDashboardData();
 });
 
 function showLoader() { document.getElementById('loaderOverlay').classList.add('active'); }
@@ -332,72 +397,72 @@ document.getElementById('mainScroll').scrollTop = 0;
 if ((tab === 'roster' || tab === 'war') && globalPlayerData.length === 0) fetchDashboardData();
 
 if(tab === 'war') {
-    init3DCarousel();
-    if(warInfo && warInfo.starMap) {
-        drawStarMap();
-        drawSpiderWeb();
-    }
+init3DCarousel();
+if(warInfo && warInfo.starMap) {
+drawStarMap();
+drawOperatorQuadrant();
+}
 }
 }
 
 function init3DCarousel() {
-    setTimeout(() => {
-        const carousel = document.getElementById('cwlCarousel');
-        if (!carousel) return;
-        const slides = carousel.querySelectorAll('.carousel-slide');
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    slides.forEach(s => s.classList.remove('active'));
-                    entry.target.classList.add('active');
-                }
-            });
-        }, { root: carousel, threshold: 0.6 });
-        slides.forEach(s => observer.observe(s));
-        let activeSlide = carousel.querySelector('.carousel-slide.active');
-        if (activeSlide) carousel.scrollTo({ left: activeSlide.offsetLeft - 16, behavior: 'smooth' });
-    }, 150);
+setTimeout(() => {
+const carousel = document.getElementById('cwlCarousel');
+if (!carousel) return;
+const slides = carousel.querySelectorAll('.carousel-slide');
+const observer = new IntersectionObserver((entries) => {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+slides.forEach(s => s.classList.remove('active'));
+entry.target.classList.add('active');
+}
+});
+}, { root: carousel, threshold: 0.6 });
+slides.forEach(s => observer.observe(s));
+let activeSlide = carousel.querySelector('.carousel-slide.active');
+if (activeSlide) carousel.scrollTo({ left: activeSlide.offsetLeft - 16, behavior: 'smooth' });
+}, 150);
 }
 
 async function fetchDashboardData(callback) {
 showLoader();
 try {
-  let res = await fetch(WEB_APP_URL + "?action=getDashboardData");
-  let data = await res.json();
-  if (data.error) throw new Error(data.error);
+let res = await fetch(WEB_APP_URL + "?action=getDashboardData");
+let data = await res.json();
+if (data.error) throw new Error(data.error);
 
-  if(data && data.players) {
-    globalPlayerData = data.players;
-    clanData = data;
-    warInfo = data.warInfo || { type: "NONE", data: null, starMap: [] };
+if(data && data.players) {
+globalPlayerData = data.players;
+clanData = data;
+warInfo = data.warInfo || { type: "NONE", data: null, starMap: [] };
 
-    let progressingPlayers = 0, currentTotal = 0, oldTotal = 0;
-    globalPlayerData.forEach(p => {
-        let pcts = p.historyPcts || [];
-        if (pcts.length > 0) {
-            let curr = parseFloat(pcts[pcts.length - 1]), old = parseFloat(pcts[0]);
-            if (curr > old) { progressingPlayers++; currentTotal += curr; oldTotal += old; }
-        }
-    });
+let progressingPlayers = 0, currentTotal = 0, oldTotal = 0;
+globalPlayerData.forEach(p => {
+let pcts = p.historyPcts || [];
+if (pcts.length > 0) {
+let curr = parseFloat(pcts[pcts.length - 1]), old = parseFloat(pcts[0]);
+if (curr > old) { progressingPlayers++; currentTotal += curr; oldTotal += old; }
+}
+});
 
-    let currentGlobal = progressingPlayers > 0 ? (currentTotal / progressingPlayers) : 0;
-    let oldGlobal = progressingPlayers > 0 ? (oldTotal / progressingPlayers) : 0;
-    let change = currentGlobal - oldGlobal;
+let currentGlobal = progressingPlayers > 0 ? (currentTotal / progressingPlayers) : 0;
+let oldGlobal = progressingPlayers > 0 ? (oldTotal / progressingPlayers) : 0;
+let change = currentGlobal - oldGlobal;
 
-    document.getElementById('global-circle').style.setProperty('--progress', `${currentGlobal}%`);
-    countUp('global-pct-val', currentGlobal, true);
-    
-    let changeEl = document.getElementById('global-change-val');
-    changeEl.innerText = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
-    changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
-    document.getElementById('global-progress-count').innerText = `${progressingPlayers} Operators Advancing`;
+document.getElementById('global-circle').style.setProperty('--progress', `${currentGlobal}%`);
+countUp('global-pct-val', currentGlobal, true);
 
-    document.getElementById('roster-controls').style.display = globalPlayerData.length > 0 ? "flex" : "none";
+let changeEl = document.getElementById('global-change-val');
+changeEl.innerText = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
+changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
+document.getElementById('global-progress-count').innerText = `${progressingPlayers} Operators Advancing`;
 
-    filterRoster(); renderWar();
-  }
-  hideLoader();
-  if(callback) callback();
+document.getElementById('roster-controls').style.display = globalPlayerData.length > 0 ? "flex" : "none";
+
+filterRoster(); renderWar();
+}
+hideLoader();
+if(callback) callback();
 } catch (err) { hideLoader(); alert("Backend Crash: " + err.message); }
 }
 
@@ -418,72 +483,54 @@ if (isMapView) renderRosterMap(); else renderPlayerCards();
 }
 
 function toggleMapView() {
-    isMapView = !isMapView;
-    let btn = document.getElementById('mapToggleBtn');
-    let map = document.getElementById('roster-map');
-    let list = document.getElementById('roster-container');
-    let controls = document.getElementById('roster-controls');
+isMapView = !isMapView;
+let btn = document.getElementById('mapToggleBtn');
+let map = document.getElementById('roster-map');
+let list = document.getElementById('roster-container');
+let controls = document.getElementById('roster-controls');
 
-    if (isMapView) {
-        btn.innerHTML = "<span>☰</span> Switch to Slate Grid";
-        map.style.display = "block";
-        list.style.display = "none";
-        controls.style.display = "none";
-        renderRosterMap();
-    } else {
-        btn.innerHTML = "<span>◎</span> Switch to Sector Map";
-        map.style.display = "none";
-        list.style.display = "grid"; 
-        controls.style.display = "flex";
-        renderPlayerCards();
-    }
+if (isMapView) {
+btn.innerHTML = "<span>☰</span> Switch to Slate Grid";
+map.style.display = "block";
+list.style.display = "none";
+controls.style.display = "none";
+renderRosterMap();
+} else {
+btn.innerHTML = "<span>◎</span> Switch to Sector Map";
+map.style.display = "none";
+list.style.display = "grid";
+controls.style.display = "flex";
+renderPlayerCards();
+}
 }
 
 function renderRosterMap() {
-    let container = document.getElementById('radar-nodes');
-    let canvas = document.getElementById('rosterMapCanvas');
-    let html = '';
-    
-    if(canvas) {
-        let ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        let cx = canvas.width/2; let cy = canvas.height/2; let maxR = canvas.width/2 * 0.85;
-        
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; ctx.lineWidth = 1;
-        [0.33, 0.66, 1.0].forEach(scale => {
-            ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI*2); ctx.stroke();
-        });
-        ctx.beginPath(); ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy); ctx.stroke();
-        
-        ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2);
-        ctx.fillStyle = 'var(--accent-main)'; ctx.shadowColor = 'var(--accent-main)'; ctx.shadowBlur = 10; ctx.fill();
-        ctx.shadowBlur = 0;
-    }
+let container = document.getElementById('radar-nodes');
+let html = '';
 
-    displayedPlayerData.forEach((player) => {
-        let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
-        let pct = parseFloat(player.percentage);
-        let rPct = 100 - pct; 
-        let r = (rPct / 100) * 45; 
+displayedPlayerData.forEach((player) => {
+let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
+let pct = parseFloat(player.percentage);
+let rPct = 100 - pct;
+let r = (rPct / 100) * 45;
 
-        let hash = 0;
-        for(let i=0; i<player.tag.length; i++) hash += player.tag.charCodeAt(i);
-        let theta = (hash % 360) * (Math.PI / 180);
+let hash = 0;
+for(let i=0; i<player.tag.length; i++) hash += player.tag.charCodeAt(i);
+let theta = (hash % 360) * (Math.PI / 180);
 
-        let left = 50 + (r * Math.cos(theta));
-        let top = 50 + (r * Math.sin(theta));
+let left = 50 + (r * Math.cos(theta));
+let top = 50 + (r * Math.sin(theta));
 
-        let growth = 0;
-        if (player.historyPcts && player.historyPcts.length > 1) growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
+let growth = 0;
+if (player.historyPcts && player.historyPcts.length > 1) growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
 
-        let nodeClass = "map-node";
-        if (pct >= 100) nodeClass += " maxed";
-        else if (growth > 0) nodeClass += " growing";
+let nodeClass = "map-node";
+if (pct >= 100) nodeClass += " maxed";
+else if (growth > 0) nodeClass += " growing";
 
-        html += `<div class="${nodeClass}" style="left: ${left}%; top: ${top}%;" onclick="openBottomSheet(${realIndex})"><span class="node-label">${player.name}</span></div>`;
-    });
-    container.innerHTML = html;
+html += `<div class="${nodeClass}" style="left: ${left}%; top: ${top}%;" onclick="openBottomSheet(${realIndex})"><span class="node-label">${player.name}</span></div>`;
+});
+container.innerHTML = html;
 }
 
 function renderPlayerCards() {
@@ -496,112 +543,112 @@ let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
 
 let growth = 0;
 if (player.historyPcts && player.historyPcts.length > 1) {
-    growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
+growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
 }
 let growthIndicator = growth > 0 ? `<span class="growth-indicator">▲</span>` : '';
 
 htmlString += `
 <div class="glass-card" onclick="openBottomSheet(${realIndex})">
-    <div class="glass-ring" style="--pct: ${player.percentage}%;">
-        <span>${Math.floor(player.percentage)}%</span>
-    </div>
-    <div class="glass-name">${player.name}</div>
-    <div class="glass-th">TH${player.thLevel || player.th || '?'} ${growthIndicator}</div>
+<div class="glass-ring" style="--pct: ${player.percentage}%;">
+<span>${Math.floor(player.percentage)}%</span>
+</div>
+<div class="glass-name">${player.name}</div>
+<div class="glass-th">TH${player.thLevel || player.th || '?'} ${growthIndicator}</div>
 </div>`;
 });
 container.innerHTML = htmlString;
 }
 
 function scrambleText(elementId, finalValue) {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    const chars = "0123456789!@#$%^&*()_+{}|[]<>?";
-    let iterations = 0;
-    const interval = setInterval(() => {
-        let text = "";
-        for(let i = 0; i < finalValue.toString().length; i++) text += chars[Math.floor(Math.random() * chars.length)];
-        el.innerText = text; iterations++;
-        if (iterations >= 8) { clearInterval(interval); el.innerText = finalValue; }
-    }, 40);
+const el = document.getElementById(elementId);
+if (!el) return;
+const chars = "0123456789!@#$%^&*()_+{}|[]<>?";
+let iterations = 0;
+const interval = setInterval(() => {
+let text = "";
+for(let i = 0; i < finalValue.toString().length; i++) text += chars[Math.floor(Math.random() * chars.length)];
+el.innerText = text; iterations++;
+if (iterations >= 8) { clearInterval(interval); el.innerText = finalValue; }
+}, 40);
 }
 
 function openBottomSheet(index) {
-  let player = globalPlayerData[index];
-  let hr = player.hitRate !== null && player.hitRate !== undefined ? player.hitRate : 0;
-  let avgDest = (player.cwlStats && player.cwlStats.avgDestruction) ? player.cwlStats.avgDestruction + "%" : "N/A";
-  let speed = (player.cwlStats && player.cwlStats.avgDuration) ? player.cwlStats.avgDuration + "s" : "N/A";
-  
-  let roleText = "OP";
-  if (player.role === "leader") roleText = "CMD";
-  if (player.role === "coLeader") roleText = "EXEC";
-  if (player.role === "admin") roleText = "OFFICER";
+let player = globalPlayerData[index];
+let hr = player.hitRate !== null && player.hitRate !== undefined ? player.hitRate : 0;
+let avgDest = (player.cwlStats && player.cwlStats.avgDestruction) ? player.cwlStats.avgDestruction + "%" : "N/A";
+let speed = (player.cwlStats && player.cwlStats.avgDuration) ? player.cwlStats.avgDuration + "s" : "N/A";
 
-  let growth = 0;
-  if (player.historyPcts && player.historyPcts.length > 1) growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
-  let estMaxText = "Awaiting Data";
-  if (growth > 0 && player.percentage < 100) {
-      let monthsLeft = (100 - player.percentage) / growth;
-      let d = new Date(); d.setMonth(d.getMonth() + monthsLeft);
-      estMaxText = d.toLocaleString('default', { month: 'short', year: 'numeric' });
-  } else if (player.percentage >= 100) { estMaxText = "MAXED"; }
+let roleText = "OP";
+if (player.role === "leader") roleText = "CMD";
+if (player.role === "coLeader") roleText = "EXEC";
+if (player.role === "admin") roleText = "OFFICER";
 
-  let html = `
-    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px;">
-        <div>
-            <h2 style="color:var(--text-main); margin:0; font-size:24px; font-family:var(--font-sans); font-weight:600;">${player.name}</h2>
-            <div style="color:var(--accent-main); font-size:12px; margin-top:4px; font-weight:500;">
-                <span style="color:var(--accent-secondary); margin-right:8px;">[${roleText}]</span>
-                TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
-            </div>
-        </div>
-    </div>
-    
-    <div class="time-to-max-banner">
-        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Projected 100% Max</div>
-        <div style="font-size: 14px; color: var(--accent-main); font-weight: 600;">${estMaxText} <span style="font-size:10px; color:var(--text-muted); font-weight:400;">(${growth > 0 ? '+'+growth.toFixed(2)+'% / mo' : ''})</span></div>
-    </div>
+let growth = 0;
+if (player.historyPcts && player.historyPcts.length > 1) growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
+let estMaxText = "Awaiting Data";
+if (growth > 0 && player.percentage < 100) {
+let monthsLeft = (100 - player.percentage) / growth;
+let d = new Date(); d.setMonth(d.getMonth() + monthsLeft);
+estMaxText = d.toLocaleString('default', { month: 'short', year: 'numeric' });
+} else if (player.percentage >= 100) { estMaxText = "MAXED"; }
 
-    <div class="stat-grid">
-      <div class="stat-box"><div class="stat-label">Hit Rate</div><div class="stat-val" id="bs_hr">...</div></div>
-      <div class="stat-box"><div class="stat-label">Avg Dest</div><div class="stat-val" id="bs_dest">...</div></div>
-      <div class="stat-box"><div class="stat-label">Speed</div><div class="stat-val" id="bs_spd">...</div></div>
-      <div class="stat-box"><div class="stat-label">War Stars</div><div class="stat-val" id="bs_ws">...</div></div>
-      <div class="stat-box"><div class="stat-label">Heroes</div><div class="stat-val" id="bs_hero">...</div></div>
-      <div class="stat-box"><div class="stat-label">Pets</div><div class="stat-val" id="bs_pet">...</div></div>
-    </div>
-    
-    ${player.heroes ? `
-    <h4 class="section-title" style="margin-top:32px;">Hero Levels (%)</h4>
-    <div class="chart-container" style="height: 180px;"><canvas id="bsHeroChart"></canvas></div>
-    <h4 class="section-title">Pet Levels (%)</h4>
-    <div class="chart-container" style="height: 180px;"><canvas id="bsPetChart"></canvas></div>
-    <h4 class="section-title">30-Day History</h4>
-    <div class="chart-container" style="height: 180px; margin-bottom:32px;"><canvas id="bsHistoryChart"></canvas></div>
-    ` : `<p style='text-align:center; font-size:10px; color:var(--text-muted); padding:32px 0;'>Charts await backend sync.</p>`}
-  `;
+let html = `
+<div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px;">
+<div>
+<h2 style="color:var(--text-main); margin:0; font-size:24px; font-family:var(--font-sans); font-weight:600;">${player.name}</h2>
+<div style="color:var(--accent-main); font-size:12px; margin-top:4px; font-weight:500;">
+<span style="color:var(--accent-secondary); margin-right:8px;">[${roleText}]</span>
+TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
+</div>
+</div>
+</div>
 
-  document.getElementById('bottomSheetContent').innerHTML = html;
-  document.getElementById('playerBottomSheet').classList.add('open');
-  document.getElementById('sheetBackdrop').classList.add('active');
-  document.body.style.overflow = 'hidden';
+<div class="time-to-max-banner">
+<div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Projected 100% Max</div>
+<div style="font-size: 14px; color: var(--accent-main); font-weight: 600;">${estMaxText} <span style="font-size:10px; color:var(--text-muted); font-weight:400;">(${growth > 0 ? '+'+growth.toFixed(2)+'% / mo' : ''})</span></div>
+</div>
 
-  setTimeout(() => {
-      scrambleText('bs_hr', hr + '%'); scrambleText('bs_dest', avgDest); scrambleText('bs_spd', speed);
-      scrambleText('bs_ws', (player.warStars||0).toLocaleString()); scrambleText('bs_hero', player.heroStats); scrambleText('bs_pet', player.petStats);
-  }, 50);
+<div class="stat-grid">
+<div class="stat-box"><div class="stat-label">Hit Rate</div><div class="stat-val" id="bs_hr">...</div></div>
+<div class="stat-box"><div class="stat-label">Avg Dest</div><div class="stat-val" id="bs_dest">...</div></div>
+<div class="stat-box"><div class="stat-label">Speed</div><div class="stat-val" id="bs_spd">...</div></div>
+<div class="stat-box"><div class="stat-label">War Stars</div><div class="stat-val" id="bs_ws">...</div></div>
+<div class="stat-box"><div class="stat-label">Heroes</div><div class="stat-val" id="bs_hero">...</div></div>
+<div class="stat-box"><div class="stat-label">Pets</div><div class="stat-val" id="bs_pet">...</div></div>
+</div>
 
-  if (player.heroes) {
-      if(sheetCharts.hero) sheetCharts.hero.destroy(); if(sheetCharts.pet) sheetCharts.pet.destroy(); if(sheetCharts.history) sheetCharts.history.destroy();
-      sheetCharts.hero = renderEntityBarChart(document.getElementById('bsHeroChart').getContext('2d'), player.heroes);
-      sheetCharts.pet = renderEntityBarChart(document.getElementById('bsPetChart').getContext('2d'), player.pets);
-      sheetCharts.history = renderLineChart(document.getElementById('bsHistoryChart').getContext('2d'), player.historyDates||[], player.historyPcts||[], 'Completion %');
-  }
+${player.heroes ? `
+<h4 class="section-title" style="margin-top:32px;">Hero Levels (%)</h4>
+<div class="chart-container" style="height: 180px;"><canvas id="bsHeroChart"></canvas></div>
+<h4 class="section-title">Pet Levels (%)</h4>
+<div class="chart-container" style="height: 180px;"><canvas id="bsPetChart"></canvas></div>
+<h4 class="section-title">30-Day History</h4>
+<div class="chart-container" style="height: 180px; margin-bottom:32px;"><canvas id="bsHistoryChart"></canvas></div>
+` : `<p style='text-align:center; font-size:10px; color:var(--text-muted); padding:32px 0;'>Charts await backend sync.</p>`}
+`;
+
+document.getElementById('bottomSheetContent').innerHTML = html;
+document.getElementById('playerBottomSheet').classList.add('open');
+document.getElementById('sheetBackdrop').classList.add('active');
+document.body.style.overflow = 'hidden';
+
+setTimeout(() => {
+scrambleText('bs_hr', hr + '%'); scrambleText('bs_dest', avgDest); scrambleText('bs_spd', speed);
+scrambleText('bs_ws', (player.warStars||0).toLocaleString()); scrambleText('bs_hero', player.heroStats); scrambleText('bs_pet', player.petStats);
+}, 50);
+
+if (player.heroes) {
+if(sheetCharts.hero) sheetCharts.hero.destroy(); if(sheetCharts.pet) sheetCharts.pet.destroy(); if(sheetCharts.history) sheetCharts.history.destroy();
+sheetCharts.hero = renderEntityBarChart(document.getElementById('bsHeroChart').getContext('2d'), player.heroes);
+sheetCharts.pet = renderEntityBarChart(document.getElementById('bsPetChart').getContext('2d'), player.pets);
+sheetCharts.history = renderLineChart(document.getElementById('bsHistoryChart').getContext('2d'), player.historyDates||[], player.historyPcts||[], 'Completion %');
+}
 }
 
 function closeBottomSheet() {
-  document.getElementById('playerBottomSheet').classList.remove('open');
-  document.getElementById('sheetBackdrop').classList.remove('active');
-  document.body.style.overflow = 'auto';
+document.getElementById('playerBottomSheet').classList.remove('open');
+document.getElementById('sheetBackdrop').classList.remove('active');
+document.body.style.overflow = 'auto';
 }
 
 function renderEntityBarChart(ctx, entityObj) {
@@ -610,10 +657,12 @@ let sortedEntities = Object.keys(entityObj).map(name => ({ name: name, pct: ((en
 let labels = sortedEntities.map(e => e.name); let dataPct = sortedEntities.map(e => e.pct.toFixed(1));
 let bgColors = dataPct.map(pct => parseFloat(pct) >= 100 ? style.getPropertyValue('--dot-green').trim() : style.getPropertyValue('--accent-main').trim());
 
-return new Chart(ctx, { 
-type: 'bar', data: { labels: labels, datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4 }] }, 
-options: { indexAxis: 'y', animation: false, events: [], responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { max: 100, display:false }, y: { border: { display: false }, grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 10 } } } } }, 
-plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); ctx.font = '500 10px "Montserrat"'; ctx.textBaseline = 'middle'; chart.getDatasetMeta(0).data.forEach((bar, index) => { const val = data.datasets[0].data[index]; const isMaxed = parseFloat(val) >= 100; let displayStr = isMaxed ? "MAX" : parseFloat(val).toString(); const fullTextWidth = ctx.measureText(displayStr).width; const isInside = bar.width > fullTextWidth + 12; let textX; if (isInside) { ctx.textAlign = 'right'; textX = bar.x - 8; ctx.fillStyle = isMaxed ? '#090a0f' : '#090a0f'; } else { ctx.textAlign = 'left'; textX = bar.x + 8; ctx.fillStyle = style.getPropertyValue('--text-muted').trim(); } ctx.fillText(displayStr, textX, bar.y + 1); }); ctx.restore(); } }] });
+return new Chart(ctx, {
+type: 'bar', data: { labels: labels, datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4 }] },
+options: { indexAxis: 'y', animation: false, events: [], responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { max: 100, display:false }, y: { border: { display: false }, grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 10 } } } } },
+plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); ctx.font = '500 10px "Montserrat"';
+ctx.textBaseline = 'middle'; chart.getDatasetMeta(0).data.forEach((bar, index) => { const val = data.datasets[0].data[index]; const isMaxed = parseFloat(val) >= 100; let displayStr = isMaxed ? "MAX" : parseFloat(val).toString(); const fullTextWidth = ctx.measureText(displayStr).width; const isInside = bar.width > fullTextWidth + 12; let textX; if (isInside) { ctx.textAlign = 'right'; textX = bar.x - 8; ctx.fillStyle = isMaxed ? '#090a0f' : '#090a0f'; } else { ctx.textAlign = 'left'; textX = bar.x + 8; ctx.fillStyle = style.getPropertyValue('--text-muted').trim(); } ctx.fillText(displayStr, textX, bar.y + 1); });
+ctx.restore(); } }] });
 }
 
 function renderLineChart(ctx, labels, dataPoints, labelName) {
@@ -621,295 +670,229 @@ let style = getComputedStyle(document.body); let lineColor = style.getPropertyVa
 let grad = ctx.createLinearGradient(0, 0, 0, 200); grad.addColorStop(0, style.getPropertyValue('--border-color').trim()); grad.addColorStop(1, 'rgba(0,0,0,0)');
 let pointColors = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? accentColor : lineColor);
 let pointRadii = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? 3.5 : 0);
-return new Chart(ctx, { 
-type: 'line', data: { labels: labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: pointColors, pointRadius: pointRadii, pointHoverRadius: 5 }] }, 
-options: { animation: false, events: [], layout: { padding: { top: 25, right: 35, left: 35, bottom: 5 } }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: true, grid: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 9, family: 'Montserrat' } } }, y: { display: false } } }, 
-plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body); let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '500 10px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2)); if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '500 11px "Montserrat"'; let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 15; ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
+return new Chart(ctx, {
+type: 'line', data: { labels: labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: pointColors, pointRadius: pointRadii, pointHoverRadius: 5 }] },
+options: { animation: false, events: [], layout: { padding: { top: 25, right: 35, left: 35, bottom: 5 } }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: true, grid: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 9, family: 'Montserrat' } } }, y: { display: false } } },
+plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0);
+if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body); let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim();
+ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx];
+const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '500 10px "Montserrat"'; ctx.textAlign = 'left';
+ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right';
+ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2));
+if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center';
+ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '500 11px "Montserrat"';
+let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 15;
+ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
 function buildTargetAssignments(round) {
-    if (!round.myLineup || !round.enemyLineup) return '';
+if (!round.myLineup || !round.enemyLineup) return '';
+let enemyPool = [...round.enemyLineup].map(e => ({...e, assigned: false}));
+let assignments = [];
+round.myLineup.forEach(us => {
+let pData = globalPlayerData.find(p => p.tag === us.tag);
+let hr = (pData && pData.hitRate !== undefined && pData.hitRate !== null) ? pData.hitRate : 50;
+let attacks = pData ? (pData.cwlStats ? pData.cwlStats.attacks : 0) : 0;
+let attackerClass = "Standard";
+if (attacks > 0 && hr >= 66) attackerClass = "Elite";
+else if (attacks > 0 && hr < 33) attackerClass = "Struggling";
+assignments.push({ us, attackerClass, hr, target: null });
+});
+assignments.sort((a,b) => { if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1; if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1; return b.us.th - a.us.th; });
+assignments.forEach(a => {
+let candidates = enemyPool.filter(e => !e.assigned); if (candidates.length === 0) return;
+let best = null;
+if (a.attackerClass === "Struggling") { let weakBases = candidates.filter(e => e.th <= a.us.th);
+if (weakBases.length > 0) best = weakBases.sort((x,y) => y.th - x.th)[0]; }
+else if (a.attackerClass === "Elite") { let strongBases = candidates.filter(e => e.th >= a.us.th);
+if (strongBases.length > 0) best = strongBases.sort((x,y) => x.th - y.th)[0]; }
+if (!best) { candidates.sort((x,y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th)); best = candidates[0]; }
+best.assigned = true; a.target = best;
+});
+assignments.sort((a,b) => a.us.mapPosition - b.us.mapPosition);
 
-    let enemyPool = [...round.enemyLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((e, index) => ({...e, relativePos: index + 1, assigned: false}));
-    let myPool = [...round.myLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((u, index) => ({...u, relativePos: index + 1}));
+let swapsHtml = '';
+let swapCount = 0;
+assignments.forEach(a => {
+if (!a.target) return;
+if (a.us.mapPosition !== a.target.mapPosition) {
+swapCount++;
+let usColor = a.attackerClass === "Elite" ? "var(--dot-green)" : (a.attackerClass === "Struggling" ? "var(--dot-red)" : "var(--text-main)");
+let reasoning = a.attackerClass === "Elite" ? "Covering liability" : "Optimizing hit rate";
 
-    let assignments = [];
-    myPool.forEach(us => {
-        let pData = globalPlayerData.find(p => p.tag === us.tag);
-        let hr = (pData && pData.hitRate !== undefined && pData.hitRate !== null) ? pData.hitRate : 50;
-        let attacks = pData ? (pData.cwlStats ? pData.cwlStats.attacks : 0) : 0;
-        let attackerClass = "Standard";
-        if (attacks > 0 && hr >= 66) attackerClass = "Elite";
-        else if (attacks > 0 && hr < 33) attackerClass = "Struggling";
-        assignments.push({ us, attackerClass, hr, target: null });
-    });
+swapsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
+<div style="color:${usColor}; flex:1; font-weight:500;">${a.us.mapPosition}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
+<div style="color:var(--text-muted); font-size:12px; padding:0 8px;">➔</div>
+<div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.mapPosition}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
+</div>
+<div style="font-size:8px; color:var(--text-muted); text-align:right; margin-top:-4px; margin-bottom:4px; padding-right:12px;">└ ${reasoning}</div>`;
+}
+});
 
-    assignments.sort((a,b) => { if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1; if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1; return b.us.th - a.us.th; });
-    
-    assignments.forEach(a => {
-        let candidates = enemyPool.filter(e => !e.assigned); if (candidates.length === 0) return;
-        let best = null;
-        if (a.attackerClass === "Struggling") { let weakBases = candidates.filter(e => e.th <= a.us.th); if (weakBases.length > 0) best = weakBases.sort((x,y) => y.th - x.th)[0]; } 
-        else if (a.attackerClass === "Elite") { let strongBases = candidates.filter(e => e.th >= a.us.th); if (strongBases.length > 0) best = strongBases.sort((x,y) => x.th - y.th)[0]; }
-        if (!best) { candidates.sort((x,y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th)); best = candidates[0]; }
-        best.assigned = true; a.target = best;
-    });
+let html = `<div style="margin-top:32px;"><p style="font-size: 11px; color: var(--accent-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; text-align:center; border-top: 1px solid var(--border-color); padding-top: 24px;">Tactical AI Assignments</p><div style="font-size: 11px; display:flex; flex-direction:column; gap:6px;">`;
 
-    assignments.sort((a,b) => a.us.relativePos - b.us.relativePos);
-    
-    let swapsHtml = '';
-    let swapCount = 0;
-    assignments.forEach(a => {
-        if (!a.target) return;
-        if (a.us.relativePos !== a.target.relativePos) {
-            swapCount++;
-            let usColor = a.attackerClass === "Elite" ? "var(--dot-green)" : (a.attackerClass === "Struggling" ? "var(--dot-red)" : "var(--text-main)");
-            let reasoning = a.attackerClass === "Elite" ? "Covering liability" : "Optimizing hit rate";
-            
-            swapsHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
-                <div style="color:${usColor}; flex:1; font-weight:500;">${a.us.relativePos}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
-                <div style="color:var(--text-muted); font-size:12px; padding:0 8px;">➔</div>
-                <div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.relativePos}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
-            </div>
-            <div style="font-size:8px; color:var(--text-muted); text-align:right; margin-top:-4px; margin-bottom:4px; padding-right:12px;">└ ${reasoning}</div>`;
-        }
-    });
+if (swapCount === 0) {
+html += `<div style="text-align:center; padding:12px; border:1px dashed rgba(0,229,255,0.3); border-radius:8px; color:var(--accent-main); font-size:10px; font-weight:500;">[STANDARD MIRROR PROTOCOL]<br><span style="color:var(--text-muted); font-weight:300;">No positional swaps required based on current metrics.</span></div>`;
+} else {
+html += swapsHtml;
+}
 
-    let html = `<div style="margin-top:32px;"><p style="font-size: 11px; color: var(--accent-main); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 2px; text-align:center; border-top: 1px solid var(--border-color); padding-top: 24px;">Tactical AI Assignments</p><div style="font-size: 11px; display:flex; flex-direction:column; gap:6px;">`;
-    
-    if (swapCount === 0) {
-        html += `<div style="text-align:center; padding:12px; border:1px dashed rgba(0,229,255,0.3); border-radius:8px; color:var(--accent-main); font-size:10px; font-weight:500;">[STANDARD MIRROR PROTOCOL]<br><span style="color:var(--text-muted); font-weight:300;">No positional swaps required based on current metrics.</span></div>`;
-    } else {
-        html += swapsHtml;
-    }
-    html += `</div></div>`; return html;
+html += `</div></div>`; return html;
+}
+
+function drawOperatorQuadrant() {
+let ctx = document.getElementById('operatorQuadrantChart');
+if (!ctx || !warInfo || !warInfo.starMap) return;
+
+let usData = []; let themData = [];
+let myClanTag = decodeURIComponent("#YQP0GJ9");
+
+warInfo.starMap.forEach(p => {
+let hitRate = p.attacks > 0 ? (p.threeStars / p.attacks) * 100 : 0;
+let dest = p.avgDest || 0;
+if(dest >= 50) {
+let pt = { x: dest, y: hitRate, name: p.name };
+if (p.clanTag === myClanTag) usData.push(pt); else themData.push(pt);
+}
+});
+
+if(chartsRegistry.operatorQuadrant) chartsRegistry.operatorQuadrant.destroy();
+
+const crosshairPlugin = {
+id: 'crosshair',
+beforeDraw: chart => {
+let ctx = chart.ctx; let xAxis = chart.scales.x; let yAxis = chart.scales.y;
+ctx.save(); ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
+ctx.beginPath(); ctx.moveTo(xAxis.getPixelForValue(80), yAxis.top); ctx.lineTo(xAxis.getPixelForValue(80), yAxis.bottom); ctx.stroke();
+ctx.beginPath(); ctx.moveTo(xAxis.left, yAxis.getPixelForValue(50)); ctx.lineTo(xAxis.right, yAxis.getPixelForValue(50)); ctx.stroke();
+ctx.font = '10px Montserrat'; ctx.fillStyle = 'rgba(255, 255, 255, 0.3)'; ctx.textAlign = 'center';
+ctx.fillText('VANGUARD', xAxis.getPixelForValue(90), yAxis.getPixelForValue(75));
+ctx.fillText('DEMOLITION', xAxis.getPixelForValue(90), yAxis.getPixelForValue(25));
+ctx.fillText('SNIPERS', xAxis.getPixelForValue(65), yAxis.getPixelForValue(75));
+ctx.fillText('INEFFECTIVE', xAxis.getPixelForValue(65), yAxis.getPixelForValue(25));
+ctx.restore();
+}
+};
+
+chartsRegistry.operatorQuadrant = new Chart(ctx.getContext('2d'), {
+type: 'scatter',
+data: { datasets: [ { label: 'Us', data: usData, backgroundColor: 'rgba(0, 229, 255, 0.8)', borderColor: '#00e5ff', pointRadius: 4, pointHoverRadius: 6 }, { label: 'Them', data: themData, backgroundColor: 'rgba(255, 51, 102, 0.8)', borderColor: '#ff3366', pointRadius: 4, pointHoverRadius: 6 } ] },
+options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => `${ctx.raw.name}: ${ctx.raw.y.toFixed(0)}% 3★, ${ctx.raw.x.toFixed(1)}% Dest` } } }, scales: { x: { min: 50, max: 100, title: { display: true, text: 'Average Destruction %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } }, y: { min: 0, max: 100, title: { display: true, text: '3★ Hit Rate %', color: '#8b949e', font: {size: 10, family: 'Montserrat'} }, grid: { display: false } } } },
+plugins: [crosshairPlugin]
+});
 }
 
 function setStarMapFilter(f) {
-    currentStarMapFilter = f;
-    document.querySelectorAll('.map-legend span').forEach(el => el.style.color = 'var(--text-muted)');
-    if(f==='us') document.getElementById('leg-us').style.color = 'var(--accent-main)';
-    if(f==='them') document.getElementById('leg-them').style.color = 'var(--dot-red)';
-    if(f==='all') document.getElementById('leg-all').style.color = 'var(--text-main)';
-    drawStarMap();
+currentStarMapFilter = f;
+document.querySelectorAll('.map-legend span').forEach(el => el.style.color = 'var(--text-muted)');
+if(f==='us') document.getElementById('leg-us').style.color = 'var(--accent-main)';
+if(f==='them') document.getElementById('leg-them').style.color = 'var(--dot-red)';
+if(f==='all') document.getElementById('leg-all').style.color = 'var(--text-main)';
+drawStarMap();
 }
 
 function drawStarMap() {
-    if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
-    let container = document.getElementById('starMapNodes'); 
-    let canvas = document.getElementById('starMapCanvas');
-    if(!container || !canvas) return;
-    
-    let ctx = canvas.getContext('2d'); 
-    let w = canvas.width; let h = canvas.height;
-    ctx.clearRect(0, 0, w, h);
-    container.innerHTML = '';
-    
-    let myClanTag = decodeURIComponent("#YQP0GJ9"); 
-    
-    let uniqueClans = [...new Set(warInfo.starMap.map(p => p.clanTag))];
-    let numSides = Math.max(uniqueClans.length, 3); 
-    let cx = w / 2; let cy = h / 2;
-    let maxR = (w / 2) * 0.85; 
+if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
+let container = document.getElementById('starMapNodes'); let canvas = document.getElementById('starMapCanvas');
+if(!container || !canvas) return;
 
-    ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)';
-    ctx.lineWidth = 1;
-    [0.33, 0.66, 1.0].forEach(scale => {
-        ctx.beginPath();
-        for(let i=0; i<=numSides; i++) {
-            let angle = i * (Math.PI * 2 / numSides) - Math.PI / 2;
-            let px = cx + Math.cos(angle) * (maxR * scale);
-            let py = cy + Math.sin(angle) * (maxR * scale);
-            if(i===0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
-        }
-        ctx.stroke();
-    });
+container.innerHTML = '';
+let ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
+let myClanTag = decodeURIComponent("#YQP0GJ9");
 
-    uniqueClans.forEach((clan, i) => {
-        let angle = i * (Math.PI * 2 / numSides) - Math.PI / 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(cx + Math.cos(angle) * maxR, cy + Math.sin(angle) * maxR);
-        ctx.stroke();
-    });
+let nodesToDraw = [];
+warInfo.starMap.forEach(p => {
+let isUs = (p.clanTag === myClanTag);
+if (currentStarMapFilter === 'us' && !isUs) return;
+if (currentStarMapFilter === 'them' && isUs) return;
 
-    ctx.beginPath();
-    ctx.arc(cx, cy, 12, 0, Math.PI*2);
-    ctx.fillStyle = 'var(--accent-secondary)';
-    ctx.shadowColor = 'var(--accent-secondary)';
-    ctx.shadowBlur = 20;
-    ctx.fill();
-    ctx.shadowBlur = 0; 
+let maxStars = 21; let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
+let r = rPct * (canvas.width / 2 * 0.85);
 
-    let html = '';
-    warInfo.starMap.forEach(p => {
-        let isUs = (p.clanTag === myClanTag);
-        if (currentStarMapFilter === 'us' && !isUs) return;
-        if (currentStarMapFilter === 'them' && isUs) return;
-        
-        let clanIndex = uniqueClans.indexOf(p.clanTag);
-        let baseAngle = clanIndex * (Math.PI * 2 / numSides) - Math.PI / 2;
+let rosterSize = 15;
+if (warInfo && warInfo.cwlDetails && warInfo.cwlDetails.length > 0) rosterSize = warInfo.cwlDetails[0].teamSize || 15;
 
-        let maxStars = 21; 
-        let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
-        let r = rPct * maxR; 
-        
-        let spread = ((p.basePos - 8) / 15) * (Math.PI / numSides);
-        let finalAngle = baseAngle + spread; 
+let baseAngle = (p.basePos / rosterSize) * Math.PI * 2 - (Math.PI / 2);
+let deltaAngle = (p.avgDelta / rosterSize) * Math.PI * 2;
+let angle = baseAngle + (deltaAngle * 0.4);
 
-        let x = cx + r * Math.cos(finalAngle); 
-        let y = cy + r * Math.sin(finalAngle);
+let cx = canvas.width / 2; let cy = canvas.height / 2;
+let x = cx + r * Math.cos(angle); let y = cy + r * Math.sin(angle);
+nodesToDraw.push({ ...p, isUs: isUs, x: x, y: y });
+});
 
-        let color = isUs ? 'var(--accent-main)' : 'var(--dot-red)';
-        let left = (x / w) * 100; let top = (y / h) * 100;
-        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${p.name}</span></div>`;
-    });
-
-    container.innerHTML = html;
+let html = '';
+nodesToDraw.forEach(n => {
+let color = n.isUs ? 'var(--accent-main)' : 'var(--dot-red)';
+let left = (n.x / canvas.width) * 100; let top = (n.y / canvas.height) * 100;
+html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${n.name}</span></div>`;
+});
+container.innerHTML = html;
 }
 
-// V3.9: NEURAL SIEGE WEB
-function drawSpiderWeb() {
-    const canvas = document.getElementById('spiderWebCanvas');
-    const tooltip = document.getElementById('spiderWebTooltip');
-    if(!canvas || !warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
-    const ctx = canvas.getContext('2d');
-    
-    // Handle High-DPI Displays
-    const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width * 2;
-    canvas.height = rect.height * 2;
-    ctx.scale(2, 2);
-    const w = rect.width, h = rect.height;
-    const cx = w/2, cy = h/2;
-    const maxR = Math.min(w, h) / 2 * 0.85;
-    
-    let clans = [...new Set(warInfo.starMap.map(p => p.clanTag))];
-    let numAxes = Math.max(clans.length, 3);
-    
-    let nodes = [];
-    warInfo.starMap.forEach(p => {
-        let axisIdx = clans.indexOf(p.clanTag);
-        let r = (p.stars / 21) * maxR; 
-        nodes.push({...p, axisIdx, r});
-    });
+function renderLeagueRankings() {
+let filter = document.getElementById('leagueRankFilter').value;
+let container = document.getElementById('leagueRankingsContainer');
+if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) {
+container.innerHTML = `<p style="font-size:10px; color:var(--text-muted); text-align:center;">Awaiting League Database Sync...</p>`;
+return;
+}
 
-    let hoverNode = null;
-    canvas.onmousemove = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const mx = e.clientX - rect.left;
-        const my = e.clientY - rect.top;
-        let found = null;
-        nodes.forEach(n => {
-            let angle = (n.axisIdx * (Math.PI * 2) / numAxes) + webRotation - Math.PI/2;
-            let nx = cx + n.r * Math.cos(angle);
-            let ny = cy + n.r * Math.sin(angle);
-            if(Math.hypot(mx - nx, my - ny) < 15) found = n;
-        });
-        hoverNode = found;
-        if(found) {
-            tooltip.style.opacity = 1;
-            tooltip.style.left = (mx + 15) + 'px';
-            tooltip.style.top = (my - 25) + 'px';
-            tooltip.innerHTML = `<span style="color:var(--accent-main); font-weight:600; font-size:12px;">${found.name}</span><br/><span style="color:var(--text-muted);">${found.stars}★ | TH${found.th}</span>`;
-        } else {
-            tooltip.style.opacity = 0;
-        }
-    };
-    
-    function render() {
-        ctx.clearRect(0,0,w,h);
-        webRotation += 0.001; 
-        
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.1)';
-        ctx.lineWidth = 1;
-        for(let step = 1; step <= 5; step++) {
-            let r = maxR * (step/5);
-            ctx.beginPath();
-            for(let i=0; i<=numAxes; i++) {
-                let a = (i * (Math.PI * 2) / numAxes) + webRotation - Math.PI/2;
-                let px = cx + r * Math.cos(a);
-                let py = cy + r * Math.sin(a);
-                if(i===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-            }
-            ctx.stroke();
-        }
-        
-        for(let i=0; i<numAxes; i++) {
-            let a = (i * (Math.PI * 2) / numAxes) + webRotation - Math.PI/2;
-            ctx.beginPath(); ctx.moveTo(cx, cy);
-            ctx.lineTo(cx + maxR * Math.cos(a), cy + maxR * Math.sin(a));
-            ctx.stroke();
-        }
+let pool = [...warInfo.starMap];
 
-        // Tangled Web Data-Streams (Connect players with identical stars)
-        ctx.strokeStyle = 'rgba(179, 0, 255, 0.15)';
-        ctx.lineWidth = 0.5;
-        ctx.beginPath();
-        let starsGroups = {};
-        nodes.forEach(n => {
-            if(!starsGroups[n.stars]) starsGroups[n.stars] = [];
-            starsGroups[n.stars].push(n);
-        });
-        Object.values(starsGroups).forEach(group => {
-            if(group.length > 1) {
-                for(let i=0; i<group.length; i++) {
-                    for(let j=i+1; j<group.length; j++) {
-                        let n1 = group[i], n2 = group[j];
-                        let a1 = (n1.axisIdx * (Math.PI * 2) / numAxes) + webRotation - Math.PI/2;
-                        let a2 = (n2.axisIdx * (Math.PI * 2) / numAxes) + webRotation - Math.PI/2;
-                        let x1 = cx + n1.r * Math.cos(a1), y1 = cy + n1.r * Math.sin(a1);
-                        let x2 = cx + n2.r * Math.cos(a2), y2 = cy + n2.r * Math.sin(a2);
-                        
-                        ctx.moveTo(x1, y1);
-                        ctx.quadraticCurveTo(cx, cy, x2, y2); // Curve through center
-                    }
-                }
-            }
-        });
-        ctx.stroke();
-        
-        // Draw Nodes
-        let myClanTag = decodeURIComponent("%23YQP0GJ9");
-        nodes.forEach(n => {
-            let a = (n.axisIdx * (Math.PI * 2) / numAxes) + webRotation - Math.PI/2;
-            let nx = cx + n.r * Math.cos(a), ny = cy + n.r * Math.sin(a);
-            
-            let isUs = n.clanTag === myClanTag;
-            ctx.fillStyle = isUs ? '#00e5ff' : '#ff3366';
-            
-            if(hoverNode && hoverNode.tag === n.tag) {
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = ctx.fillStyle;
-                ctx.beginPath(); ctx.arc(nx, ny, 5, 0, Math.PI*2); ctx.fill();
-                ctx.shadowBlur = 0;
-            } else if (hoverNode && hoverNode.stars === n.stars) {
-                ctx.beginPath(); ctx.arc(nx, ny, 3, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = ctx.fillStyle; ctx.lineWidth = 1.5;
-                ctx.beginPath(); 
-                let ha = (hoverNode.axisIdx * (Math.PI * 2) / numAxes) + webRotation - Math.PI/2;
-                ctx.moveTo(cx + hoverNode.r * Math.cos(ha), cy + hoverNode.r * Math.sin(ha));
-                ctx.quadraticCurveTo(cx, cy, nx, ny);
-                ctx.stroke();
-            } else {
-                ctx.globalAlpha = hoverNode ? 0.2 : 1;
-                ctx.beginPath(); ctx.arc(nx, ny, 2, 0, Math.PI*2); ctx.fill();
-                ctx.globalAlpha = 1;
-            }
-        });
-        
-        spiderWebReq = requestAnimationFrame(render);
-    }
-    
-    if(spiderWebReq) cancelAnimationFrame(spiderWebReq);
-    render();
+if (filter === 'attackers') {
+pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest);
+} else {
+pool = pool.filter(p => p.defenses > 0);
+pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest);
+}
+
+let html = ``;
+pool.slice(0, 15).forEach((p, i) => {
+let primaryStat = filter === 'attackers' ? `${p.stars}★` : `${p.defStars}★`;
+let subStat = filter === 'attackers' ? `${p.avgDest || 0}% Dest` : `${p.defAvgDest || 0}% Dest`;
+let isUs = p.clanTag === decodeURIComponent("#YQP0GJ9");
+let nameColor = isUs ? "var(--accent-main)" : "var(--text-main)";
+
+html += `
+<div class="rank-card">
+<div class="rank-header" onclick="this.nextElementSibling.classList.toggle('open')">
+<div style="display:flex; align-items:center; gap:12px;">
+<div style="font-size:14px; font-weight:600; color:var(--text-muted); width:20px;">#${i+1}</div>
+<div style="display:flex; flex-direction:column;">
+<span style="font-weight:600; font-size:13px; color:${nameColor};">${p.name}</span>
+<span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${p.clanName} (TH${p.th})</span>
+</div>
+</div>
+<div style="display:flex; flex-direction:column; align-items:flex-end;">
+<span style="font-weight:600; font-size:14px; color:var(--text-main);">${primaryStat}</span>
+<span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${subStat}</span>
+</div>
+</div>
+<div class="rank-details">
+<div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+<span>Total Attacks/Defs:</span> <span class="rank-val">${filter === 'attackers' ? p.attacks : p.defenses}</span>
+</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+<span>3★ Count:</span> <span class="rank-val">${p.threeStars || 0}</span>
+</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+<span>2★ Count:</span> <span class="rank-val">${p.twoStars || 0}</span>
+</div>
+<div style="display:flex; justify-content:space-between;">
+<span>1★ Count:</span> <span class="rank-val">${p.oneStar || 0}</span>
+</div>
+</div>
+</div>`;
+});
+container.innerHTML = html;
 }
 
 function renderWar() {
 let container = document.getElementById('war-container');
 if (!warInfo || warInfo.type !== "CWL" || !warInfo.cwlDetails || warInfo.cwlDetails.length === 0) {
-    container.innerHTML = `<div style="padding: 32px 20px; text-align: center; margin-top:40px;"><h4 style="color: var(--accent-main); letter-spacing: 4px; text-transform: uppercase;">Awaiting Database Sync</h4><p style="font-size: 12px; color: var(--text-muted); margin-top: 16px;">The CWL Analytics engine is standing by.</p></div>`;
-    return;
+container.innerHTML = `<div style="padding: 32px 20px; text-align: center; margin-top:40px;"><h4 style="color: var(--accent-main); letter-spacing: 4px; text-transform: uppercase;">Awaiting Database Sync</h4><p style="font-size: 12px; color: var(--text-muted); margin-top: 16px;">The CWL Analytics engine is standing by.</p></div>`;
+return;
 }
 
 let html = "";
@@ -927,107 +910,111 @@ let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 
 let winProbHtml = "";
 if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
-    let oppAtksLeft = rosterSize - oppAtks;
-    let myAtksLeft = rosterSize - myAtks;
-    let oppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
-    let myPace = myAtks > 0 ? myStars / myAtks : 2.0;
-    
-    let oppProjected = oppStars + (oppAtksLeft * oppPace);
-    let myProjected = myStars + (myAtksLeft * myPace);
-    
-    let winProb = 50;
-    if (myProjected > oppProjected) winProb = 50 + ((myProjected - oppProjected) / rosterSize) * 50;
-    else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
-    winProb = Math.max(1, Math.min(99, Math.round(winProb)));
+let oppAtksLeft = rosterSize - oppAtks;
+let myAtksLeft = rosterSize - myAtks;
+let oppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
+let myPace = myAtks > 0 ? myStars / myAtks : 2.0;
 
-    let myMaxStars = myStars + (myAtksLeft * 3);
-    let oppMaxStars = oppStars + (oppAtksLeft * 3);
-    let starsToClinch = oppMaxStars + 1 - myStars;
-    let req3Stars = Math.ceil(starsToClinch / 3);
-    
-    let clinchTxt = "";
-    if (myMaxStars < oppStars) clinchTxt = `<span style="color:var(--dot-red);">[IMPOSSIBLE]</span>`;
-    else if (myStars > oppMaxStars) clinchTxt = `<span style="color:var(--dot-green);">0 (SECURED)</span>`;
-    else clinchTxt = `${req3Stars} × 3★`;
+let oppProjected = oppStars + (oppAtksLeft * oppPace);
+let myProjected = myStars + (myAtksLeft * myPace);
 
-    winProbHtml = `
-    <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">AI Win Probability</div>
-            <div style="font-size:14px; font-weight:600; color:var(--accent-main);">${winProb}%</div>
-        </div>
-        <div style="font-size:10px; color:var(--text-muted); text-align:left; margin-top:8px;">Min 3★ Needed to Win: <span style="color:var(--text-main); font-weight:600; margin-left:4px;">${clinchTxt}</span></div>
-    </div>`;
+let myDest = 0, oppDest = 0;
+if (warInfo.myCwlStats) { Object.values(warInfo.myCwlStats).forEach(p => myDest += (p.totalDestruction || 0)); }
+
+let winProb = 50;
+if (myProjected > oppProjected) winProb = 50 + ((myProjected - oppProjected) / rosterSize) * 50;
+else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
+winProb = Math.max(1, Math.min(99, Math.round(winProb)));
+
+let myMaxStars = myStars + (myAtksLeft * 3);
+let oppMaxStars = oppStars + (oppAtksLeft * 3);
+let starsToClinch = oppMaxStars + 1 - myStars;
+let req3Stars = Math.ceil(starsToClinch / 3);
+
+let clinchTxt = "";
+if (myMaxStars < oppStars) clinchTxt = `<span style="color:var(--dot-red);">[IMPOSSIBLE]</span>`;
+else if (myStars > oppMaxStars) clinchTxt = `<span style="color:var(--dot-green);">0 (SECURED)</span>`;
+else clinchTxt = `${req3Stars} × 3★`;
+
+winProbHtml = `
+<div style="background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+<div style="display:flex; justify-content:space-between; align-items:center;">
+<div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">AI Win Probability</div>
+<div style="font-size:14px; font-weight:600; color:var(--accent-main);">${winProb}%</div>
+</div>
+<div style="font-size:10px; color:var(--text-muted); text-align:left; margin-top:8px;">Min 3★ Needed to Win: <span style="color:var(--text-main); font-weight:600; margin-left:4px;">${clinchTxt}</span></div>
+</div>`;
 }
 
 let attackSegments = "";
 if(myAtks !== "...") {
-    let filledSegments = Math.floor((myAtks / rosterSize) * rosterSize);
-    for(let i=0; i<rosterSize; i++) attackSegments += `<div class="energy-segment ${i < filledSegments ? 'filled' : ''}"></div>`;
+let filledSegments = Math.floor((myAtks / rosterSize) * rosterSize);
+for(let i=0; i<rosterSize; i++) attackSegments += `<div class="energy-segment ${i < filledSegments ? 'filled' : ''}"></div>`;
 }
 
 html += `<div class="war-room-header">
-    <h4 style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin:0;">Live War Room</h4>
-    <div style="display: flex; justify-content: center; align-items: center; gap: 24px; margin: 24px 0;">
-        <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-            <img src="${myBadgeUrl}" style="width: 56px; height: 56px; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4)); margin-bottom: 8px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-            <span style="font-size: 32px; font-weight: 600; color: var(--accent-main); line-height:1;">${myStars}</span>
-        </div>
-        <div style="font-size: 18px; color: var(--text-muted); font-weight: 600;">VS</div>
-        <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-            <img src="${oppBadgeUrl}" style="width: 56px; height: 56px; filter: drop-shadow(0 0 10px rgba(255, 51, 102, 0.4)); margin-bottom: 8px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-            <span style="font-size: 32px; font-weight: 600; color: var(--dot-red); line-height:1;">${oppStars}</span>
-        </div>
-    </div>
-    ${winProbHtml}
-    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; font-weight:500;">Attacks Remaining: ${myAtks !== "..." ? rosterSize - myAtks : "..."}</div>
-    <div class="energy-bar-container">${attackSegments}</div>
+<h4 style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin:0;">Live War Room</h4>
+<div style="display: flex; justify-content: center; align-items: center; gap: 24px; margin: 24px 0;">
+<div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+<img src="${myBadgeUrl}" style="width: 56px; height: 56px; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4)); margin-bottom: 8px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
+<span style="font-size: 32px; font-weight: 600; color: var(--accent-main); line-height:1;">${myStars}</span>
+</div>
+<div style="font-size: 18px; color: var(--text-muted); font-weight: 600;">VS</div>
+<div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+<img src="${oppBadgeUrl}" style="width: 56px; height: 56px; filter: drop-shadow(0 0 10px rgba(255, 51, 102, 0.4)); margin-bottom: 8px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
+<span style="font-size: 32px; font-weight: 600; color: var(--dot-red); line-height:1;">${oppStars}</span>
+</div>
+</div>
+${winProbHtml}
+<div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; font-weight:500;">Attacks Remaining: ${myAtks !== "..." ? rosterSize - myAtks : "..."}</div>
+<div class="energy-bar-container">${attackSegments}</div>
 </div>`;
 
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
 
 let liabilitiesHtml = '';
 activeRound.myLineup.forEach(p => {
-    if(warInfo.starMap) {
-        let sData = warInfo.starMap.find(s => s.tag === p.tag);
-        if (sData && sData.defenses > 0 && sData.defStars >= sData.defenses * 2.8) { 
-            liabilitiesHtml += `<div class="strike-pill" style="border-color:var(--dot-red); color:var(--dot-red);">⚠️ ${p.name} (Change Layout)</div>`;
-        }
-    }
+if(warInfo.starMap) {
+let sData = warInfo.starMap.find(s => s.tag === p.tag);
+if (sData && sData.defenses > 0 && sData.defStars >= sData.defenses * 2.8) {
+liabilitiesHtml += `<div class="strike-pill" style="border-color:var(--dot-red); color:var(--dot-red);">⚠️ ${p.name} (Change Layout)</div>`;
+}
+}
 });
 
 if (activeRound.state === "inWar" && hitList.length > 0) {
-    html += `<h4 style="margin-top:0; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Pending Strikes (${hitList.length})</h4>
-    <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">`;
-    hitList.forEach(p => { html += `<div class="strike-pill">${p.name}</div>`; });
-    html += `</div>`;
+html += `<h4 style="margin-top:0; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Pending Strikes (${hitList.length})</h4>
+<div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">`;
+hitList.forEach(p => { html += `<div class="strike-pill">${p.name}</div>`; });
+html += `</div>`;
 }
 
 if (liabilitiesHtml !== '') {
-    html += `<h4 style="margin-top:0; font-size:11px; color:var(--dot-red); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Compromised Bases</h4>
-    <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">${liabilitiesHtml}</div>`;
+html += `<h4 style="margin-top:0; font-size:11px; color:var(--dot-red); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Compromised Bases</h4>
+<div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">${liabilitiesHtml}</div>`;
 }
 
-// V3.9 Neural Siege Web
 html += `
-<h4 class="section-title" style="margin-top:32px;">Siege Network Web</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide neural web. Nodes represent operators. Data-threads connect operators with identical star yields.</p>
-<div class="spiderweb-bg">
-    <canvas id="spiderWebCanvas" width="600" height="400"></canvas>
-    <div id="spiderWebTooltip" class="web-tooltip"></div>
+<h4 class="section-title" style="margin-top:32px;">Combat Effectiveness Matrix</h4>
+<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">League-wide scatter plot evaluating operator lethality.</p>
+<div class="quadrant-bg">
+<div class="chart-container" style="height: 300px; margin-top:0;"><canvas id="operatorQuadrantChart"></canvas></div>
 </div>`;
 
 html += `
 <h4 class="section-title" style="margin-top:40px;">CWL Constellation</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">A multi-axis polygon mapping clan progression. The core is 21 Stars (Victory).</p>
+<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">Mapping complete league trajectories. Center = 21 Stars. Rotational shifts indicate avg target reach/dip.</p>
 <div class="map-legend">
-    <span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:600;" onclick="setStarMapFilter('us')">Our Clan</span>
-    <span id="leg-them" style="cursor:pointer;" onclick="setStarMapFilter('them')">Opponent</span>
-    <span id="leg-all" style="cursor:pointer;" onclick="setStarMapFilter('all')">League</span>
+<span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:600;" onclick="setStarMapFilter('us')">Our Clan</span>
+<span id="leg-them" style="cursor:pointer;" onclick="setStarMapFilter('them')">Opponent</span>
+<span id="leg-all" style="cursor:pointer;" onclick="setStarMapFilter('all')">League</span>
 </div>
 <div class="star-map-wrapper">
-    <canvas id="starMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
-    <div id="starMapNodes" class="star-map-nodes"></div>
+<canvas id="starMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
+<div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
+<div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
+<div class="radar-core" style="background:var(--accent-secondary); box-shadow: 0 0 20px var(--accent-secondary);"></div>
+<div id="starMapNodes" class="star-map-nodes"></div>
 </div>`;
 
 html += `<h4 class="section-title" style="margin-top:40px;">CWL Matrix Pipeline</h4>`;
@@ -1043,65 +1030,65 @@ let myHitRate = myPat.total > 0 ? Math.round((myPat.threeStars/myPat.total)*100)
 
 let patHtml = "";
 if (round.state === "preparation") {
-    let usHits = 0, usTotalAtks = 0, usTotalDest = 0;
-    warInfo.starMap.forEach(p => { if (p.clanTag === decodeURIComponent("#YQP0GJ9")) { usHits += p.threeStars; usTotalAtks += p.attacks; usTotalDest += p.totalDest; } });
-    let usTotalHitRate = usTotalAtks > 0 ? Math.round((usHits / usTotalAtks)*100) : 0;
-    let usTotalAvgDest = usTotalAtks > 0 ? (usTotalDest / usTotalAtks).toFixed(1) : 0;
-    
-    let oppHits = 0, oppTotalAtks = 0, oppTotalDest = 0;
-    warInfo.starMap.forEach(p => { if (p.clanTag === round.opponent.tag) { oppHits += p.threeStars; oppTotalAtks += p.attacks; oppTotalDest += p.totalDest; } });
-    let oppLeagueHitRate = oppTotalAtks > 0 ? Math.round((oppHits / oppTotalAtks)*100) : 0;
-    let oppLeagueAvgDest = oppTotalAtks > 0 ? (oppTotalDest / oppTotalAtks).toFixed(1) : 0;
+let usHits = 0, usTotalAtks = 0, usTotalDest = 0;
+warInfo.starMap.forEach(p => { if (p.clanTag === decodeURIComponent("#YQP0GJ9")) { usHits += p.threeStars; usTotalAtks += p.attacks; usTotalDest += p.totalDest; } });
+let usTotalHitRate = usTotalAtks > 0 ? Math.round((usHits / usTotalAtks)*100) : 0;
+let usTotalAvgDest = usTotalAtks > 0 ? (usTotalDest / usTotalAtks).toFixed(1) : 0;
 
-    patHtml = `
-    <div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
-        <p style="font-size: 10px; color: var(--accent-main); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">[LEAGUE-WIDE SCOUTING REPORT]</p>
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalHitRate}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">3★ Hit Rate</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueHitRate}%</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalAvgDest}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Avg Destruction</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueAvgDest}%</span>
-        </div>
-    </div>`;
+let oppHits = 0, oppTotalAtks = 0, oppTotalDest = 0;
+warInfo.starMap.forEach(p => { if (p.clanTag === round.opponent.tag) { oppHits += p.threeStars; oppTotalAtks += p.attacks; oppTotalDest += p.totalDest; } });
+let oppLeagueHitRate = oppTotalAtks > 0 ? Math.round((oppHits / oppTotalAtks)*100) : 0;
+let oppLeagueAvgDest = oppTotalAtks > 0 ? (oppTotalDest / oppTotalAtks).toFixed(1) : 0;
+
+patHtml = `
+<div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
+<p style="font-size: 10px; color: var(--accent-main); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">[LEAGUE-WIDE SCOUTING REPORT]</p>
+<div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
+<span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
+<span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
+</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+<span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalHitRate}%</span>
+<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">3★ Hit Rate</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueHitRate}%</span>
+</div>
+<div style="display:flex; justify-content:space-between; font-size:12px;">
+<span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalAvgDest}%</span>
+<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Avg Destruction</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueAvgDest}%</span>
+</div>
+</div>`;
 } else {
-    patHtml = `
-    <div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
-        <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Attack Profile Comparison</p>
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.mirrors}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Mirrors</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.mirrors}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.dips}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Dips</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.dips}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.reaches}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Reaches</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.reaches}</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myHitRate}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Hit Rate</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppHitRate}%</span>
-        </div>
-    </div>`;
+patHtml = `
+<div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
+<p style="font-size: 10px; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Attack Profile Comparison</p>
+<div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
+<span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
+<span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
+</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+<span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.mirrors}</span>
+<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Mirrors</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.mirrors}</span>
+</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+<span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.dips}</span>
+<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Dips</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.dips}</span>
+</div>
+<div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+<span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.reaches}</span>
+<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Reaches</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.reaches}</span>
+</div>
+<div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
+<span style="color:var(--accent-main); width:30%; text-align:center;">${myHitRate}%</span>
+<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Hit Rate</span>
+<span style="color:var(--dot-red); width:30%; text-align:center;">${oppHitRate}%</span>
+</div>
+</div>`;
 }
 
 let oppLineupMap = [...(round.enemyLineup || [])].sort((a,b)=>a.mapPosition - b.mapPosition).map((e,i)=>({...e, relativePos: i+1}));
@@ -1112,7 +1099,7 @@ oppLineupMap.forEach(e => {
 let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px;">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
 rosterHtml += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0, 229, 255, 0.1); font-size:12px; align-items:center;">
 <div>
-<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.relativePos}</span>
+<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.mapPosition}</span>
 <span style="font-weight:500;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:4px; font-weight:500;">TH${e.th}</span>
 </div>
 <div>${atkStatus}</div>
@@ -1124,47 +1111,60 @@ if (isCurrent) rosterHtml += buildTargetAssignments(round);
 
 let prevSeasonHtml = "";
 if (round.opponent.prevLeague) {
-    prevSeasonHtml = `<div style="font-size:8px; color:var(--text-muted); margin-top:4px;">Prev Season: ${round.opponent.prevLeague} (Pos: ${round.opponent.prevPos})</div>`;
+prevSeasonHtml = `<div style="font-size:8px; color:var(--text-muted); margin-top:4px;">Prev Season: ${round.opponent.prevLeague} (Pos: ${round.opponent.prevPos})</div>`;
 }
 
 html += `
 <div class="carousel-slide ${isCurrent ? 'active' : ''}">
-  <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
-    <div>
-        <div style="font-size:15px; font-weight:600; font-family:var(--font-sans);">Round ${index + 1}: ${round.opponent.name}</div>
-        ${prevSeasonHtml}
-    </div>
-    <div style="font-size:9px; color:var(--accent-main); text-transform:uppercase; letter-spacing:1px; font-weight:600;">${round.state}</div>
-  </div>
-  ${patHtml}
-  ${rosterHtml}
+<div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+<div>
+<div style="font-size:15px; font-weight:600; font-family:var(--font-sans);">Round ${index + 1}: ${round.opponent.name}</div>
+${prevSeasonHtml}
+</div>
+<div style="font-size:9px; color:var(--accent-main); text-transform:uppercase; letter-spacing:1px; font-weight:600;">${round.state}</div>
+</div>
+${patHtml}
+${rosterHtml}
 </div>`;
 });
 html += `</div>`; 
 
+html += `
+<h4 class="section-title" style="margin-top:48px;">League Top Operators</h4>
+<div class="control-row" style="margin-bottom: 16px;">
+<select id="leagueRankFilter" onchange="renderLeagueRankings()">
+<option value="attackers">Best Attackers</option>
+<option value="defenders">Best Defenders</option>
+</select>
+</div>
+<div id="leagueRankingsContainer"></div>
+`;
+
 container.innerHTML = html;
 init3DCarousel();
 if(warInfo.starMap && warInfo.starMap.length > 0) {
-    drawStarMap();
-    drawSpiderWeb();
+drawStarMap();
+drawOperatorQuadrant();
 }
+
+renderLeagueRankings();
 }
 
 function toggleCompareMode() {
-    let compSec = document.getElementById('roster-compare-section');
-    let rosterCont = document.getElementById('roster-container');
-    let mapCont = document.getElementById('roster-map');
-    
-    if (compSec.style.display === 'none') {
-        compSec.style.display = 'block';
-        rosterCont.style.display = 'none';
-        mapCont.style.display = 'none';
-        populateVersusDropdowns();
-    } else {
-        compSec.style.display = 'none';
-        if (isMapView) mapCont.style.display = 'block';
-        else rosterCont.style.display = 'grid';
-    }
+let compSec = document.getElementById('roster-compare-section');
+let rosterCont = document.getElementById('roster-container');
+let mapCont = document.getElementById('roster-map');
+
+if (compSec.style.display === 'none') {
+compSec.style.display = 'block';
+rosterCont.style.display = 'none';
+mapCont.style.display = 'none';
+populateVersusDropdowns();
+} else {
+compSec.style.display = 'none';
+if (isMapView) mapCont.style.display = 'block';
+else rosterCont.style.display = 'grid';
+}
 }
 
 function populateVersusDropdowns() {
@@ -1182,7 +1182,6 @@ if (validPlayers.length === 0) validPlayers = globalPlayerData;
 let p1 = validPlayers[document.getElementById('player1Select').value], p2 = validPlayers[document.getElementById('player2Select').value];
 if(!p1 || !p2) return;
 document.getElementById('radarSection').style.display = "block";
-if (chartsRegistry.radarHero) chartsRegistry.radarHero.destroy(); if (chartsRegistry.radarPet) chartsRegistry.radarPet.destroy();
 
 let p1H = parseInt((p1.heroStats||"0").split('/')[0]), p2H = parseInt((p2.heroStats||"0").split('/')[0]);
 let p1P = parseInt((p1.petStats||"0").split('/')[0]), p2P = parseInt((p2.petStats||"0").split('/')[0]);
@@ -1193,26 +1192,13 @@ let [d1, d2] = getWin(p1.donations||0, p2.donations||0); let [s1, s2] = getWin(p
 
 document.getElementById('compareDetailsGrid').innerHTML = `
 <div class="player-card-inner" style="display:block;">
-    <div class="compare-row"><div class="compare-val ${c1}">${parseFloat(p1.percentage)}%</div><div class="compare-label">Overall Completion</div><div class="compare-val ${c2}" style="color:var(--accent-secondary);">${parseFloat(p2.percentage)}%</div></div>
-    <div class="compare-row"><div class="compare-val ${h1}">${p1.heroStats}</div><div class="compare-label">Total Hero Levels</div><div class="compare-val ${h2}" style="color:var(--accent-secondary);">${p2.heroStats}</div></div>
-    <div class="compare-row"><div class="compare-val ${pt1}">${p1.petStats}</div><div class="compare-label">Total Pet Levels</div><div class="compare-val ${pt2}" style="color:var(--accent-secondary);">${p2.petStats}</div></div>
-    <div class="compare-row"><div class="compare-val ${d1}">${(p1.donations||0).toLocaleString()}</div><div class="compare-label">Donations</div><div class="compare-val ${d2}" style="color:var(--accent-secondary);">${(p2.donations||0).toLocaleString()}</div></div>
-    <div class="compare-row" style="border:none;"><div class="compare-val ${s1}">${(p1.warStars||0).toLocaleString()}</div><div class="compare-label">War Stars</div><div class="compare-val ${s2}" style="color:var(--accent-secondary);">${(p2.warStars||0).toLocaleString()}</div></div>
+<div class="compare-row"><div class="compare-val ${c1}">${parseFloat(p1.percentage)}%</div><div class="compare-label">Overall Completion</div><div class="compare-val ${c2}" style="color:var(--accent-secondary);">${parseFloat(p2.percentage)}%</div></div>
+<div class="compare-row"><div class="compare-val ${h1}">${p1.heroStats}</div><div class="compare-label">Total Hero Levels</div><div class="compare-val ${h2}" style="color:var(--accent-secondary);">${p2.heroStats}</div></div>
+<div class="compare-row"><div class="compare-val ${pt1}">${p1.petStats}</div><div class="compare-label">Total Pet Levels</div><div class="compare-val ${pt2}" style="color:var(--accent-secondary);">${p2.petStats}</div></div>
+<div class="compare-row"><div class="compare-val ${d1}">${(p1.donations||0).toLocaleString()}</div><div class="compare-label">Donations</div><div class="compare-val ${d2}" style="color:var(--accent-secondary);">${(p2.donations||0).toLocaleString()}</div></div>
+<div class="compare-row" style="border:none;"><div class="compare-val ${s1}">${(p1.warStars||0).toLocaleString()}</div><div class="compare-label">War Stars</div><div class="compare-val ${s2}" style="color:var(--accent-secondary);">${(p2.warStars||0).toLocaleString()}</div></div>
 </div>`;
-
-if (!p1.heroes || !p2.heroes) return;
-let style = getComputedStyle(document.body); 
-let c1Border = style.getPropertyValue('--accent-main').trim();
-let c2Border = style.getPropertyValue('--accent-secondary').trim();
-
-let rOpts = { animation: false, events: [], responsive: true, maintainAspectRatio: false, scales: { r: { max: 100, ticks: { display: false }, grid: { color: 'rgba(0, 229, 255, 0.1)' }, angleLines: { color: 'rgba(0, 229, 255, 0.1)' }, pointLabels: { color: style.getPropertyValue('--text-main').trim(), font: { size: 10, family: 'Montserrat' } } } }, plugins: { legend: { labels: { color: style.getPropertyValue('--text-main').trim(), font: { family: 'Montserrat', size: 12 } } } } };
-
-chartsRegistry.radarHero = new Chart(document.getElementById('heroRadar').getContext('2d'), { type: 'radar', data: { labels: heroNames, datasets: [{ label: p1.name, data: heroNames.map(h => ((p1.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(0, 229, 255, 0.4)', 'rgba(0, 229, 255, 0.0)'), borderColor: c1Border, borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: heroNames.map(h => ((p2.heroes[h]||0)/maxLevelsMap[h])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(179, 0, 255, 0.4)', 'rgba(179, 0, 255, 0.0)'), borderColor: c2Border, borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
-chartsRegistry.radarPet = new Chart(document.getElementById('petRadar').getContext('2d'), { type: 'radar', data: { labels: petNames, datasets: [{ label: p1.name, data: petNames.map(p => ((p1.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(0, 229, 255, 0.4)', 'rgba(0, 229, 255, 0.0)'), borderColor: c1Border, borderWidth: 1.5, tension: 0.4 }, { label: p2.name, data: petNames.map(p => ((p2.pets[p]||0)/maxLevelsMap[p])*100), backgroundColor: (ctx) => getRadarGradient(ctx, 'rgba(179, 0, 255, 0.4)', 'rgba(179, 0, 255, 0.0)'), borderColor: c2Border, borderWidth: 1.5, tension: 0.4 }]}, options: rOpts });
 }
-
-// Global rotation state
-let webRotation = 0;
 </script>
 </body>
 </html>
