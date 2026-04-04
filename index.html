@@ -90,11 +90,11 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .compare-btn:active { transform: scale(0.95); }
 .view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center; align-items:center; gap:8px;}
 
-/* GLASS SLATE GRID */
-.glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px 0; width: 100%;}
-.glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow); text-align:center;}
-.glass-card:hover { transform: translateY(-4px); border-color: var(--accent-main); box-shadow: 0 10px 20px rgba(0,229,255,0.15); z-index: 10; }
-.glass-card:active { transform: scale(0.95); }
+/* V5.4 3D HOLOGRAPHIC GLASS SLATE GRID */
+.glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px 0; width: 100%; perspective: 1000px;}
+.glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s ease-out, box-shadow 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow); text-align:center; transform-style: preserve-3d;}
+.glass-card:hover { border-color: var(--accent-main); box-shadow: 0 15px 30px rgba(0,229,255,0.2); z-index: 10; }
+.glass-card-inner { pointer-events: none; transform: translateZ(30px); display: flex; flex-direction: column; align-items: center;}
 .glass-ring { width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); flex-shrink:0;}
 .glass-ring::before { content: ""; position: absolute; inset: 2.5px; background: var(--bg-dark); border-radius: 50%; }
 .glass-ring span { position: relative; font-size: 10px; font-weight: 600; color: var(--text-main); font-family: var(--font-sans);}
@@ -125,12 +125,16 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--accent-main); border-radius: 50%; box-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); z-index: 10;}
 .radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.4) 100%); animation: radarSweep 10s linear infinite; pointer-events: none; z-index: 1;}
 @keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-.map-node { position: absolute; width: 8px; height: 8px; background: var(--text-muted); border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer; z-index: 5; transition: transform 0.2s; box-shadow: 0 0 5px rgba(255,255,255,0.2);}
-.map-node:active { transform: translate(-50%, -50%) scale(1.5); }
-.map-node.growing { background: var(--accent-main); box-shadow: 0 0 10px var(--accent-main); animation: nodePulse 2s infinite alternate;}
-.map-node.maxed { background: var(--dot-green); box-shadow: 0 0 15px var(--dot-green); }
-@keyframes nodePulse { 0% { box-shadow: 0 0 5px var(--accent-main); } 100% { box-shadow: 0 0 15px var(--accent-main), 0 0 30px rgba(0, 229, 255, 0.4); } }
-.node-label { position: absolute; left: 12px; top: -6px; font-size: 8px; color: var(--text-main); font-family: var(--font-sans); white-space: nowrap; pointer-events: none; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
+
+/* V5.4 3D ISOMETRIC DEFENSIVE MATRIX */
+.defensive-matrix-wrapper { overflow: hidden; padding: 20px 0 60px 0; display: flex; justify-content: center; perspective: 1200px; margin-bottom: 24px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05);}
+.iso-grid { display: grid; grid-template-columns: repeat(5, 40px); grid-template-rows: repeat(3, 40px); gap: 20px; transform: rotateX(60deg) rotateZ(-45deg); transform-style: preserve-3d; }
+.iso-cube { width: 40px; height: 40px; border: 1px solid var(--accent-main); position: relative; transform-style: preserve-3d; transition: transform 0.3s ease; cursor: pointer; box-shadow: inset 0 0 15px rgba(0,229,255,0.1);}
+.iso-cube:hover { transform: translateZ(10px); }
+.iso-cube .pillar { position: absolute; bottom: 0; left: 0; width: 100%; transform-origin: bottom; transform: rotateX(-90deg) translateY(100%); border-left: 1px solid; border-right: 1px solid; border-top: 1px solid; transition: height 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.iso-cube .iso-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg); color: var(--text-main); font-size: 11px; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); pointer-events: none; }
+.iso-tooltip { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg) translateZ(30px); background: rgba(9,10,15,0.95); border: 1px solid var(--border-color); padding: 6px 10px; font-size: 10px; color: #fff; opacity: 0; transition: 0.3s; pointer-events: none; white-space: nowrap; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,229,255,0.3); text-align: center; line-height: 1.4;}
+.iso-cube:hover .iso-tooltip { opacity: 1; }
 
 /* Bottom Sheet Modal */
 .sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
@@ -184,13 +188,6 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 .energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 1px; transition: background 0.3s ease; }
 .energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 5px var(--accent-main); }
 
-/* League Rankings */
-.rank-card { background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; }
-.rank-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; }
-.rank-details { max-height: 0; padding: 0 16px; opacity: 0; transition: all 0.3s ease; font-size: 11px; color: var(--text-muted); }
-.rank-details.open { max-height: 200px; padding: 0 16px 16px 16px; opacity: 1; border-top: 1px solid rgba(0,229,255,0.1); margin-top: 8px; padding-top: 12px; }
-.rank-val { color: var(--text-main); font-weight: 500; }
-
 /* V5.3 Graphs */
 .distribution-bg { padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 24px; box-shadow: inset 0 0 20px rgba(0,229,255,0.05);}
 </style>
@@ -202,7 +199,7 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-ring"></div>
     <div class="loader-terminal">
-        <div class="term-line">> INITIALIZING MOLLY_OS V5.3...</div>
+        <div class="term-line">> INITIALIZING MOLLY_OS V5.4...</div>
         <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
         <div class="term-line">> DECRYPTING PACKETS...</div>
         <div class="term-line blink">> AWAITING HANDSHAKE...</div>
@@ -300,7 +297,7 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
 let warInfo = null;
-let chartsRegistry = { radarHero: null, radarPet: null, probChart: null, tacticChart: null };
+let chartsRegistry = { radarHero: null, radarPet: null, probChart: null };
 let sheetCharts = { history: null, hero: null, pet: null }; 
 let currentRosterFilter = 'all';
 let isMapView = false;
@@ -525,14 +522,38 @@ let growthIndicator = growth > 0 ? `<span class="growth-indicator">▲</span>` :
 
 htmlString += `
 <div class="glass-card" onclick="openBottomSheet(${realIndex})">
-    <div class="glass-ring" style="--pct: ${player.percentage}%;">
-        <span>${Math.floor(player.percentage)}%</span>
+    <div class="glass-card-inner">
+        <div class="glass-ring" style="--pct: ${player.percentage}%;">
+            <span>${Math.floor(player.percentage)}%</span>
+        </div>
+        <div class="glass-name">${player.name}</div>
+        <div class="glass-th">TH${player.thLevel || player.th || '?'} ${growthIndicator}</div>
     </div>
-    <div class="glass-name">${player.name}</div>
-    <div class="glass-th">TH${player.thLevel || player.th || '?'} ${growthIndicator}</div>
 </div>`;
 });
 container.innerHTML = htmlString;
+
+// V5.4 Add 3D Mouse Parallax Effect to Glass Cards
+setTimeout(() => {
+    document.querySelectorAll('.glass-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            let rect = card.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            let y = e.clientY - rect.top;
+            let centerX = rect.width / 2;
+            let centerY = rect.height / 2;
+            let rotateX = ((y - centerY) / centerY) * -15;
+            let rotateY = ((x - centerX) / centerX) * 15;
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+            card.style.zIndex = 10;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+            card.style.zIndex = 1;
+        });
+    });
+}, 100);
+
 }
 
 function scrambleText(elementId, finalValue) {
@@ -650,7 +671,7 @@ options: { animation: false, events: [], layout: { padding: { top: 25, right: 35
 plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body); let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '500 10px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2)); if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '500 11px "Montserrat"'; let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 15; ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
-// V5.3: Enhanced Tactical Assignments & Confidence Matrix
+// V5.4: Bayesian Tactical Assignments (Advanced Smoothing)
 function buildTargetAssignments(round) {
     if (!round.myLineup || !round.enemyLineup) return '';
 
@@ -660,20 +681,32 @@ function buildTargetAssignments(round) {
     let assignments = [];
     myPool.forEach(us => {
         let pData = globalPlayerData.find(p => p.tag === us.tag);
-        let hr = (pData && pData.hitRate !== undefined && pData.hitRate !== null) ? pData.hitRate : 75; // Default assumption high
-        assignments.push({ us, hr, target: null, confidence: 0 });
+        
+        let rawHR = (pData && pData.hitRate !== undefined && pData.hitRate !== null) ? pData.hitRate : 75;
+        let rawDest = (pData && pData.cwlStats && pData.cwlStats.avgDestruction) ? parseFloat(pData.cwlStats.avgDestruction) : 85;
+        let attacks = (pData && pData.cwlStats) ? pData.cwlStats.attacks : 0;
+        
+        // V5.4 Bayesian Smoothing (Prevents 100% -> 50% wild swings early on)
+        let smoothedHR = ((rawHR * attacks) + (50 * 2)) / (attacks + 2);
+        let smoothedDest = ((rawDest * attacks) + (75 * 2)) / (attacks + 2);
+        
+        let attackerClass = "Standard";
+        if (attacks > 0 && smoothedHR >= 60) attackerClass = "Elite";
+        else if (attacks > 0 && smoothedHR < 40) attackerClass = "Struggling";
+        
+        assignments.push({ us, attackerClass, smoothedHR, smoothedDest, target: null, confidence: 0 });
     });
 
-    // Assign targets based on TH logic
+    assignments.sort((a,b) => { if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1; if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1; return b.us.th - a.us.th; });
+
     assignments.forEach(a => {
         let candidates = enemyPool.filter(e => !e.assigned); if (candidates.length === 0) return;
         let best = null;
         
-        // V5.3 Confidence Engine matches bases
-        if (a.hr < 50) { 
+        if (a.attackerClass === "Struggling") { 
             let weakBases = candidates.filter(e => e.th <= a.us.th); 
             if (weakBases.length > 0) best = weakBases.sort((x,y) => y.th - x.th)[0]; 
-        } else if (a.hr >= 75) { 
+        } else if (a.attackerClass === "Elite") { 
             let strongBases = candidates.filter(e => e.th >= a.us.th); 
             if (strongBases.length > 0) best = strongBases.sort((x,y) => x.th - y.th)[0]; 
         }
@@ -681,27 +714,20 @@ function buildTargetAssignments(round) {
         if (!best) { candidates.sort((x,y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th)); best = candidates[0]; }
         best.assigned = true; a.target = best;
         
-        // V5.3 Confidence Math
+        // V5.4 Multi-Factor Confidence Math
         let thDiff = a.us.th - best.th;
-        let conf = a.hr + (thDiff * 15);
-        a.confidence = Math.max(10, Math.min(99, conf));
+        let conf = (a.smoothedHR * 0.45) + (a.smoothedDest * 0.45) + (thDiff * 15);
+        a.confidence = Math.max(10, Math.min(99, Math.round(conf)));
     });
 
     assignments.sort((a,b) => a.us.relativePos - b.us.relativePos);
     
-    // Store assignment data globally for the chart renderer
-    window.tacticalChartData = {
-        labels: assignments.map(a => `${a.us.name}`),
-        data: assignments.map(a => a.confidence),
-        colors: assignments.map(a => a.confidence >= 80 ? '#00e5ff' : (a.confidence >= 50 ? '#b300ff' : '#ff3366'))
-    };
-
     let listHtml = '';
     assignments.forEach(a => {
         if (!a.target) return;
-        let confColor = a.confidence >= 80 ? "var(--accent-main)" : (a.confidence >= 50 ? "var(--accent-secondary)" : "var(--dot-red)");
-        let reasoning = a.confidence >= 80 ? "Overpower mismatch detected" : (a.confidence >= 50 ? "Balanced mirror protocol" : "High-risk reach required");
-        if(a.us.relativePos !== a.target.relativePos) reasoning = "Positional tactical swap";
+        let confColor = a.confidence >= 80 ? "var(--accent-main)" : (a.confidence >= 60 ? "var(--accent-secondary)" : "var(--dot-red)");
+        let reasoning = a.confidence >= 80 ? "High probability of complete destruction." : (a.confidence >= 60 ? "Balanced engagement. Execution critical." : "High-risk reach. 2-star safety protocol recommended.");
+        if(a.us.relativePos !== a.target.relativePos) reasoning += " (Tactical Position Swap)";
         
         listHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
             <div style="color:${confColor}; flex:1; font-weight:600;">${a.us.relativePos}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
@@ -713,42 +739,10 @@ function buildTargetAssignments(round) {
 
     let html = `<div style="margin-top:32px;">
         <p style="font-size: 11px; color: var(--accent-main); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px; text-align:center; border-top: 1px solid var(--border-color); padding-top: 24px;">Tactical AI Assignments</p>
-        <div class="distribution-bg" style="padding:16px 12px; height: 180px; position:relative;">
-            <span style="position:absolute; top:8px; left:12px; font-size:8px; color:var(--text-muted); text-transform:uppercase;">Predicted Star Yield (3★ Confidence %)</span>
-            <canvas id="tacticalGraph"></canvas>
-        </div>
         <div style="font-size: 11px; display:flex; flex-direction:column; gap:6px;">${listHtml}</div>
     </div>`;
     
     return html;
-}
-
-// Draw the Tactical Chart after HTML is injected
-function renderTacticalGraph() {
-    let ctx = document.getElementById('tacticalGraph');
-    if (!ctx || !window.tacticalChartData) return;
-    
-    if (chartsRegistry.tacticChart) chartsRegistry.tacticChart.destroy();
-    
-    chartsRegistry.tacticChart = new Chart(ctx.getContext('2d'), {
-        type: 'bar',
-        data: {
-            labels: window.tacticalChartData.labels,
-            datasets: [{
-                data: window.tacticalChartData.data,
-                backgroundColor: window.tacticalChartData.colors,
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { display: false },
-                y: { max: 100, min: 0, ticks: { color: '#8b949e', font: {size: 9, family: 'Montserrat'}, stepSize: 50 }, grid: { color: 'rgba(255,255,255,0.05)' } }
-            }
-        }
-    });
 }
 
 function setStarMapFilter(f) {
@@ -896,7 +890,7 @@ let rosterSize = activeRound.teamSize || 15;
 let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png"; 
 let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 
-// V5.3 Enhanced Win Probability (Floor Math & Distribution)
+// V5.4 Enhanced Win Probability (Floor Math & Distribution)
 let winProbHtml = "";
 let distDataUs = null, distDataThem = null, distLabels = null;
 
@@ -904,7 +898,7 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     let oppAtksLeft = rosterSize - oppAtks;
     let myAtksLeft = rosterSize - myAtks;
     
-    // Mathematical Floor: Your clan doesn't drop below 2 stars
+    // V5.4 Mathematical Floor: Your clan doesn't drop below 2 stars
     let rawMyPace = myAtks > 0 ? myStars / myAtks : 2.5;
     let myPace = Math.max(2.1, rawMyPace); // Guaranteed minimum high-floor 
     let oppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
@@ -917,7 +911,7 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
     winProb = Math.max(1, Math.min(99, Math.round(winProb)));
 
-    // V5.3 Clinch Math (Assumes we get at least 2 per hit moving forward)
+    // V5.4 Clinch Math (Assumes we get at least 2 per hit moving forward)
     let myFloorStars = myStars + (myAtksLeft * 2);
     let oppMaxStars = oppStars + (oppAtksLeft * 3);
     let starsToClinch = oppMaxStars + 1 - myFloorStars;
@@ -985,6 +979,48 @@ if (activeRound.state === "inWar" && hitList.length > 0) {
     hitList.forEach(p => { html += `<div class="strike-pill">${p.name}</div>`; });
     html += `</div>`;
 }
+
+// V5.4 3D Defensive Integrity Matrix
+let isoHtml = `
+<h4 class="section-title" style="margin-top:40px;">Defensive Integrity Matrix</h4>
+<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">3D Topographic view of base resilience. Pillar height represents average stars yielded across the league.</p>
+<div class="defensive-matrix-wrapper">
+    <div class="iso-grid">
+`;
+
+activeRound.myLineup.sort((a,b)=>a.relativePos - b.relativePos).forEach(p => {
+    let sData = warInfo.starMap.find(s => s.tag === p.tag);
+    let defStars = sData ? sData.defStars : 0;
+    let defenses = sData ? sData.defenses : 0;
+    let defTotalDest = sData ? sData.defTotalDest : 0;
+    
+    let avgDefStars = defenses > 0 ? (defStars / defenses) : 0;
+    let avgDefDest = defenses > 0 ? (defTotalDest / defenses) : 0;
+    
+    let pillarHeight = Math.max(2, avgDefStars * 25);
+    
+    let colorHex = "#00e5ff";
+    let colorVar = "var(--accent-main)";
+    let bgGrad = `linear-gradient(to top, rgba(0, 229, 255, 0.8), rgba(0, 229, 255, 0.1))`;
+    
+    if (avgDefStars >= 2.5) {
+        colorHex = "#ff3366"; colorVar = "var(--dot-red)";
+        bgGrad = `linear-gradient(to top, rgba(255, 51, 102, 0.8), rgba(255, 51, 102, 0.1))`;
+    } else if (avgDefStars > 1.5) {
+        colorHex = "#b300ff"; colorVar = "var(--accent-secondary)";
+        bgGrad = `linear-gradient(to top, rgba(179, 0, 255, 0.8), rgba(179, 0, 255, 0.1))`;
+    }
+
+    isoHtml += `
+    <div class="iso-cube" style="border-color:${colorVar}; background: ${colorHex}22;">
+        <div class="pillar" style="height: ${pillarHeight}px; background: ${bgGrad}; border-color: ${colorVar}; box-shadow: 0 0 10px ${colorHex}66;"></div>
+        <div class="iso-label">${p.relativePos}</div>
+        <div class="iso-tooltip"><span style="color:${colorHex}; font-weight:bold; font-size:12px;">${p.name}</span><br>Avg Def: ${avgDefStars.toFixed(1)}★<br>Avg Dest: ${avgDefDest.toFixed(1)}%</div>
+    </div>`;
+});
+isoHtml += `</div></div>`;
+html += isoHtml;
+
 
 html += `
 <h4 class="section-title" style="margin-top:40px;">CWL Constellation</h4>
@@ -1131,7 +1167,7 @@ if(warInfo.starMap && warInfo.starMap.length > 0) {
     drawStarMap();
 }
 
-// V5.3 Draw Distribution Graph and Tactical Bar Chart
+// V5.4 Draw Monte Carlo Distribution Line Chart
 if(distDataUs && distDataThem && distLabels) {
     let ctxP = document.getElementById('winProbChart');
     if (ctxP) {
@@ -1156,7 +1192,6 @@ if(distDataUs && distDataThem && distLabels) {
         });
     }
 }
-renderTacticalGraph();
 renderLeagueRankings();
 }
 
