@@ -62,7 +62,7 @@ background-color: var(--bg-dark); font-family: var(--font-sans); color: var(--te
 
 /* V5.6 War Room Headers & Pendulum */
 .war-room-header { background: linear-gradient(135deg, rgba(13,15,23,0.95), rgba(5,6,8,0.98)); border: 1px solid var(--border-color); border-radius: 20px; padding: 24px; text-align: center; margin-bottom: 32px; box-shadow: 0 15px 50px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,229,255,0.05); position: relative;}
-.pendulum-container { width: 100%; height: 60px; position: relative; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px;}
+.pendulum-container { width: 100%; height: 70px; position: relative; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px;}
 .pendulum-canvas { width: 100%; height: 100%; }
 
 .circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.03) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 30px rgba(0,229,255,0.2); flex-shrink: 0; }
@@ -73,19 +73,34 @@ background-color: var(--bg-dark); font-family: var(--font-sans); color: var(--te
 .energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 2px; transition: 0.3s; }
 .energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 8px var(--accent-main); }
 
-.strike-pill { flex-shrink:0; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 100px; font-size: 11px; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px;}
-.strike-pill::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-main); box-shadow: 0 0 8px var(--accent-main); animation: pulse 2s infinite;}
-
 /* Distribution BG */
 .distribution-bg { padding: 16px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; margin-bottom: 24px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8); position: relative; height: 140px;}
 
 /* V5.6 Chronos Strike Wave */
-.chronos-wrapper { width: 100%; height: 120px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 32px;}
+.chronos-wrapper { width: 100%; height: 140px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; position: relative; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); margin-bottom: 32px;}
 .chronos-canvas { width: 100%; height: 100%; position: absolute; inset:0; }
 
-/* V5.6 Orbital League Projection */
+/* V5.6 Orbital League Projection & Constellation */
 .orbital-wrapper { width: 100%; padding-bottom: 100%; position: relative; background: radial-gradient(circle at center, rgba(179, 0, 255, 0.05) 0%, transparent 70%), #050608; border-radius: 50%; border: 1px solid rgba(255, 255, 255, 0.1); overflow: hidden; box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.9); margin-top: 16px;}
 .orbital-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;}
+
+.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle at center, rgba(179, 0, 255, 0.08) 0%, transparent 60%), #050608; border-radius: 50%; border: 1px solid rgba(179, 0, 255, 0.25); overflow: hidden; box-shadow: inset 0 0 60px rgba(179, 0, 255, 0.05), 0 0 40px rgba(0, 0, 0, 0.8); margin-top: 16px; display: block;}
+.star-map-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2;}
+.star-map-nodes { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
+.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px currentColor; transition: transform 0.2s;}
+.star-label { position: absolute; left: 12px; top: -6px; font-size: 8px; font-weight: 600; font-family: var(--font-sans); white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,1); letter-spacing: 0.5px;}
+.map-legend { display:flex; justify-content:center; gap:20px; font-size:9px; font-weight: 600; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin-top:16px; margin-bottom:16px;}
+
+.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.1); border-radius: 50%; pointer-events: none; z-index: 1;}
+.radar-ring.r1 { width: 33%; height: 33%; }
+.radar-ring.r2 { width: 66%; height: 66%; }
+.radar-ring.r3 { width: 100%; height: 100%; border: 1px solid rgba(0, 229, 255, 0.2);}
+.radar-crosshair { position: absolute; background: rgba(0, 229, 255, 0.1); pointer-events: none; z-index: 1;}
+.radar-crosshair.v { top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); }
+.radar-crosshair.h { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
+.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: var(--accent-secondary); border-radius: 50%; box-shadow: 0 0 25px var(--accent-secondary), 0 0 50px var(--accent-secondary); z-index: 3; animation: corePulse 2s infinite alternate;}
+@keyframes corePulse { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; } to { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } }
+
 .cyber-slider-container { width: 100%; margin-top: 24px; padding: 0 20px; box-sizing: border-box; text-align: center;}
 .cyber-slider { -webkit-appearance: none; width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; outline: none; margin: 16px 0;}
 .cyber-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--accent-main); cursor: pointer; box-shadow: 0 0 15px var(--accent-main); transition: 0.2s;}
@@ -126,6 +141,12 @@ background-color: var(--bg-dark); font-family: var(--font-sans); color: var(--te
 
 <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-ring"></div>
+    <div class="loader-terminal">
+        <div class="term-line">> INITIALIZING MOLLY_OS V5.6...</div>
+        <div class="term-line">> ESTABLISHING SECURE UPLINK...</div>
+        <div class="term-line">> DECRYPTING TACTICAL TELEMETRY...</div>
+        <div class="term-line blink">> AWAITING HANDSHAKE...</div>
+    </div>
 </div>
 
 <div class="main-scroll-area" id="mainScroll">
@@ -189,9 +210,9 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let warInfo = null;
 let chartsRegistry = { probChart: null };
-let globalPipelineRound = 0; // State for V5.6 Pipeline
-let orbitalDay = 1; // State for Orbital Slider
+let globalPipelineRound = 0; 
 let animationReqs = { chronos: null, orbital: null, pendulum: null };
+let currentStarMapFilter = 'us';
 
 window.addEventListener('DOMContentLoaded', () => {
     Chart.defaults.color = '#748293'; Chart.defaults.font.family = "'Montserrat', sans-serif";
@@ -208,7 +229,9 @@ function switchTab(tab) {
     document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
     document.getElementById('mainScroll').scrollTop = 0;
     if ((tab === 'roster' || tab === 'war') && globalPlayerData.length === 0) fetchDashboardData();
-    if(tab === 'war' && warInfo) { renderWar(); }
+    if(tab === 'war' && warInfo && warInfo.cwlDetails) { 
+        renderWar(); 
+    }
 }
 
 async function fetchDashboardData() {
@@ -220,7 +243,7 @@ async function fetchDashboardData() {
 
         if(data && data.players) {
             globalPlayerData = data.players;
-            warInfo = data.warInfo || { type: "NONE", data: null, starMap: [] };
+            warInfo = data.warInfo || { type: "NONE", data: null, starMap: [], cwlDetails: [] };
             
             if (warInfo.cwlDetails && warInfo.cwlDetails.length > 0) {
                 let aIdx = warInfo.cwlDetails.findIndex(r => r.state === "inWar" || r.state === "preparation");
@@ -241,23 +264,35 @@ async function fetchDashboardData() {
             let change = currentGlobal - oldGlobal;
 
             document.getElementById('global-circle').style.setProperty('--progress', `${currentGlobal}%`);
-            countUp('global-pct-val', currentGlobal, true);
+            
+            // Safe countup execution
+            const el = document.getElementById('global-pct-val'); 
+            if(el) el.innerText = currentGlobal.toFixed(1) + '%';
+            
             let changeEl = document.getElementById('global-change-val');
-            changeEl.innerText = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
-            changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
-            document.getElementById('global-progress-count').innerText = `${progressingPlayers} Operators Advancing`;
+            if (changeEl) {
+                changeEl.innerText = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
+                changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
+            }
+            let progEl = document.getElementById('global-progress-count');
+            if (progEl) progEl.innerText = `${progressingPlayers} Operators Advancing`;
 
-            document.getElementById('roster-controls').style.display = globalPlayerData.length > 0 ? "flex" : "none";
+            let ctrls = document.getElementById('roster-controls');
+            if (ctrls) ctrls.style.display = globalPlayerData.length > 0 ? "flex" : "none";
 
-            filterRoster(); renderWar();
+            filterRoster(); 
+            if (document.getElementById('war-tab').classList.contains('active')) renderWar();
         }
         hideLoader();
-    } catch (err) { hideLoader(); alert("Backend Crash: " + err.message); }
+    } catch (err) { hideLoader(); alert("Backend Error: Please run syncClanData in Apps Script."); }
 }
 
 function filterRoster() {
-    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const sortBy = document.getElementById('sortSelect').value;
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    if (!searchInput || !sortSelect) return;
+    const searchTerm = searchInput.value.toLowerCase();
+    const sortBy = sortSelect.value;
 
     displayedPlayerData = globalPlayerData.filter(p => p.name.toLowerCase().includes(searchTerm));
     displayedPlayerData.sort((a, b) => {
@@ -271,6 +306,7 @@ function filterRoster() {
 
 function renderPlayerCards() {
     var container = document.getElementById('roster-container');
+    if (!container) return;
     if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); width:100%; grid-column: span 3; padding-top:40px;'>No operators found.</p>"; return; }
 
     let htmlString = "";
@@ -292,7 +328,6 @@ function renderPlayerCards() {
     });
     container.innerHTML = htmlString;
 
-    // V5.5 3D Mouse Parallax
     setTimeout(() => {
         document.querySelectorAll('.glass-card').forEach(card => {
             card.addEventListener('mousemove', e => {
@@ -307,22 +342,7 @@ function renderPlayerCards() {
     }, 100);
 }
 
-function scrambleText(elementId, finalValue) {
-    const el = document.getElementById(elementId);
-    if (!el) return;
-    const chars = "0123456789!@#$%^&*()_+{}|[]<>?";
-    let iterations = 0;
-    const interval = setInterval(() => {
-        let text = "";
-        for(let i = 0; i < finalValue.toString().length; i++) text += chars[Math.floor(Math.random() * chars.length)];
-        el.innerText = text; iterations++;
-        if (iterations >= 8) { clearInterval(interval); el.innerText = finalValue; }
-    }, 40);
-}
-
 function openBottomSheet(index) {
-  // Modal logic omitted for brevity as it remains unchanged from V5.5 
-  // (Assuming standard setup here - simply ensuring overlay triggers)
   document.getElementById('playerBottomSheet').classList.add('open');
   document.getElementById('sheetBackdrop').classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -333,7 +353,6 @@ function closeBottomSheet() {
   document.body.style.overflow = 'auto';
 }
 
-// V5.6 Target Assignments (TH Indicator Logic Updated)
 function buildTargetAssignments(round) {
     if (!round.myLineup || !round.enemyLineup) return '';
     let enemyPool = [...round.enemyLineup].sort((a,b) => a.mapPosition - b.mapPosition).map((e, index) => ({...e, relativePos: index + 1, assigned: false}));
@@ -385,7 +404,6 @@ function buildTargetAssignments(round) {
         let reasoning = isElite ? "OVERPOWER MISMATCH" : (isStruggle ? "HIGH-RISK REACH" : "BALANCED MIRROR");
         if(a.us.relativePos !== a.target.relativePos) reasoning = "TACTICAL SWAP";
         
-        // V5.6: TH indicator ONLY if < 18
         let usTH = a.us.th < 18 ? `<span style="font-size:9px; color:var(--accent-main); font-weight:700; margin-left:4px;">TH${a.us.th}</span>` : '';
         let tgtTH = a.target.th < 18 ? `<span style="font-size:9px; color:var(--dot-red); font-weight:700; margin-left:4px;">TH${a.target.th}</span>` : '';
 
@@ -408,7 +426,6 @@ function buildTargetAssignments(round) {
     return `<div style="margin-top:40px;"><h4 class="section-title">Tactical AI Directives</h4><p class="section-subtitle">Bayesian predictive targeting matrix</p><div style="display:flex; flex-direction:column; gap:8px;">${listHtml}</div></div>`;
 }
 
-// V5.6: Pipeline Control Math
 function changePipelineRound(dir) {
     if (!warInfo || !warInfo.cwlDetails) return;
     let maxIdx = warInfo.cwlDetails.length - 1;
@@ -427,7 +444,6 @@ function renderPipelineCard() {
     if(!round) return;
     label.innerText = `ROUND ${globalPipelineRound + 1}`;
     
-    // Process Stats
     let oppPat = round.attackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0, threeStars: 0 };
     let oppHitRate = oppPat.total > 0 ? Math.round((oppPat.threeStars/oppPat.total)*100) : 0;
     let myPat = round.myAttackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0, threeStars: 0 };
@@ -465,7 +481,6 @@ function renderPipelineCard() {
     let rosterHtml = `<div style="margin-top:32px;"><p style="font-size: 10px; font-weight:700; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px; text-align:center;">Enemy Roster</p>`;
     oppLineupMap.forEach(e => {
         let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px; font-weight:600;">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
-        // V5.6 TH Indicator Fix
         let thTag = e.th < 18 ? `<span style="color:var(--dot-red); font-size:9px; margin-left:6px; font-weight:700;">TH${e.th}</span>` : '';
         rosterHtml += `<div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px; align-items:center;"><div><span style="color:var(--text-muted); width:28px; display:inline-block; font-size:10px; font-weight:600;">#${e.relativePos}</span><span style="font-weight:600; color:#fff;">${e.name}</span> ${thTag}</div><div>${atkStatus}</div></div>`;
     });
@@ -488,73 +503,76 @@ function renderPipelineCard() {
     }, 200);
 }
 
-// V5.6 Mathematical Components (Pendulum, Wave, Orbit)
 function drawMomentumPendulum(myStars, oppStars, myAtksLeft, oppAtksLeft) {
     const canvas = document.getElementById('pendulumCanvas');
     if(!canvas) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0) {
+        animationReqs.pendulum = requestAnimationFrame(() => drawMomentumPendulum(myStars, oppStars, myAtksLeft, oppAtksLeft));
+        return;
+    }
     const ctx = canvas.getContext('2d');
-    const w = canvas.parentElement.clientWidth * 2; 
-    const h = canvas.parentElement.clientHeight * 2;
+    const w = rect.width * 2; 
+    const h = rect.height * 2;
     canvas.width = w; canvas.height = h; ctx.scale(2,2);
-    const sw = w/2, sh = h/2;
-    const cx = sw/2, cy = sh - 10;
-    const r = sh - 20;
+    const sw = rect.width, sh = rect.height;
+    const cx = sw/2, cy = sh - 5;
+    const r = sh - 15;
 
-    // Calc momentum
     let totalAvail = (myAtksLeft + oppAtksLeft) * 3 || 1;
     let netScore = myStars - oppStars; 
-    // Shift -1 (Them) to 1 (Us)
-    let swing = Math.max(-1, Math.min(1, netScore / (totalAvail * 0.5 + 5))); 
+    let swing = Math.max(-1, Math.min(1, netScore / Math.max(10, totalAvail * 0.5))); 
     let angle = Math.PI/2 + (swing * Math.PI/2.5); 
     
-    // Break Point (Likelihood enemy gives up)
     let breakPoint = 0;
     if (netScore > 0) breakPoint = Math.min(99, (netScore / Math.max(1, oppAtksLeft*3)) * 100 + 10);
     
-    document.getElementById('breakPointText').innerText = `Enemy Break Point: ${Math.round(breakPoint)}%`;
+    let bpEl = document.getElementById('breakPointText');
+    if(bpEl) bpEl.innerText = `Enemy Break Point: ${Math.round(breakPoint)}%`;
 
     ctx.clearRect(0,0,sw,sh);
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 6;
     let grad = ctx.createLinearGradient(cx-r, cy, cx+r, cy);
     grad.addColorStop(0, '#ff3366'); grad.addColorStop(0.5, '#748293'); grad.addColorStop(1, '#00e5ff');
     ctx.strokeStyle = grad;
     ctx.beginPath(); ctx.arc(cx, cy, r, Math.PI, 0); ctx.stroke();
 
-    ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2); ctx.fillStyle = '#fff'; ctx.fill();
 
-    // Draw Needle
     ctx.beginPath(); ctx.moveTo(cx, cy); 
     ctx.lineTo(cx + Math.cos(angle)*r*0.9, cy - Math.sin(angle)*r*0.9);
-    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.shadowBlur = 10; ctx.shadowColor = '#fff'; ctx.stroke();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.shadowBlur = 10; ctx.shadowColor = '#fff'; ctx.stroke();
     ctx.shadowBlur = 0;
 }
 
 function drawChronosWave() {
     const canvas = document.getElementById('chronosCanvas');
     if(!canvas) return;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    if (rect.width === 0) {
+        animationReqs.chronos = requestAnimationFrame(drawChronosWave);
+        return;
+    }
     const ctx = canvas.getContext('2d');
-    const w = canvas.parentElement.clientWidth * 2; const h = canvas.parentElement.clientHeight * 2;
+    const w = rect.width * 2; const h = rect.height * 2;
     canvas.width = w; canvas.height = h; ctx.scale(2,2);
-    const sw = w/2, sh = h/2;
+    const sw = rect.width, sh = rect.height;
 
     let timeOffset = Date.now() / 2000;
-    
     if(animationReqs.chronos) cancelAnimationFrame(animationReqs.chronos);
     
     function render() {
         ctx.clearRect(0,0,sw,sh);
         timeOffset += 0.02;
 
-        // Grid
         ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(0, sh-20); ctx.lineTo(sw, sh-20); ctx.stroke();
 
         let drawWave = (color, phase, ampMult, isEnemy) => {
             ctx.beginPath(); ctx.moveTo(0, sh-20);
             for(let x=0; x<=sw; x+=5) {
-                // Mock data wave emphasizing end of war (right side)
                 let normalizedX = x/sw;
-                let baseAmp = Math.pow(normalizedX, 2) * 40 * ampMult; // Spikes towards end
+                let baseAmp = Math.pow(normalizedX, 2) * 40 * ampMult; 
                 let noise = Math.sin(x*0.05 + timeOffset + phase) * 10;
                 let y = (sh-20) - baseAmp + noise;
                 ctx.lineTo(x, y);
@@ -564,274 +582,3 @@ function drawChronosWave() {
             if(isEnemy) { grad.addColorStop(0, 'rgba(255,51,102,0.6)'); grad.addColorStop(1, 'rgba(255,51,102,0)'); }
             else { grad.addColorStop(0, 'rgba(0,229,255,0.6)'); grad.addColorStop(1, 'rgba(0,229,255,0)'); }
             ctx.fillStyle = grad; ctx.fill();
-            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.stroke();
-        };
-
-        drawWave('#00e5ff', 0, 0.8, false); // Us
-        ctx.globalCompositeOperation = 'screen';
-        drawWave('#ff3366', Math.PI, 1.2, true); // Enemy (spikes higher)
-        ctx.globalCompositeOperation = 'source-over';
-
-        animationReqs.chronos = requestAnimationFrame(render);
-    }
-    render();
-}
-
-function drawOrbitalProjection() {
-    const canvas = document.getElementById('orbitalCanvas');
-    const slider = document.getElementById('timelineSlider');
-    if(!canvas || !warInfo || !warInfo.starMap) return;
-    
-    let simDay = parseInt(slider.value);
-    document.getElementById('orbitalLabel').innerText = `PROJECTION: DAY ${simDay}`;
-
-    const ctx = canvas.getContext('2d');
-    const w = canvas.parentElement.clientWidth * 2; const h = canvas.parentElement.clientHeight * 2;
-    canvas.width = w; canvas.height = h; ctx.scale(2,2);
-    const cx = w/4, cy = h/4;
-
-    // Simulate 8 Clans (Mock the missing ones from warInfo if API didn't pull all 8)
-    let clanTags = [...new Set(warInfo.starMap.map(p=>p.clanTag))];
-    let clanData = clanTags.map(tag => {
-        let stars = 0, atks = 0;
-        warInfo.starMap.forEach(p => { if(p.clanTag === tag) { stars += p.stars; atks += p.attacks; } });
-        return { tag, stars, atks, name: warInfo.starMap.find(p=>p.clanTag===tag).clanName };
-    });
-    // Add mocks if < 8 to complete the solar system visually
-    while(clanData.length < 8) { clanData.push({tag: 'mock'+clanData.length, stars: Math.random()*20, atks: 15, name: 'Unknown Clan'}); }
-
-    // Math Projection for Day X
-    clanData.forEach(c => {
-        let dailyPace = c.atks > 0 ? (c.stars / c.atks) * 15 : 30;
-        let projectedWins = Math.round(Math.random() * simDay); // Rough mock for bonus
-        c.simStars = (dailyPace * simDay) + (projectedWins * 10);
-    });
-    clanData.sort((a,b) => b.simStars - a.simStars); // 1st to 8th
-
-    let timeOffset = Date.now() / 4000;
-    if(animationReqs.orbital) cancelAnimationFrame(animationReqs.orbital);
-
-    function render() {
-        ctx.clearRect(0,0,w/2,h/2);
-        timeOffset += 0.01;
-
-        // Draw Orbits (Isometric pseudo-3D)
-        for(let i=0; i<8; i++) {
-            let rX = 20 + (i * 22); let rY = rX * 0.4;
-            ctx.beginPath(); ctx.ellipse(cx, cy, rX, rY, 0, 0, Math.PI*2);
-            ctx.strokeStyle = i >= 6 ? 'rgba(255,51,102,0.3)' : 'rgba(0,229,255,0.15)'; // Outer 2 are red
-            ctx.lineWidth = i >= 6 ? 2 : 1;
-            ctx.stroke();
-        }
-
-        // Sun (1st Place Promotion)
-        ctx.beginPath(); ctx.arc(cx, cy, 12, 0, Math.PI*2);
-        ctx.fillStyle = '#00e5ff'; ctx.shadowBlur = 20; ctx.shadowColor = '#00e5ff'; ctx.fill(); ctx.shadowBlur=0;
-
-        // Planets
-        clanData.forEach((c, i) => {
-            if(i === 0) return; // Sun is clan 0
-            let rX = 20 + (i * 22); let rY = rX * 0.4;
-            let angle = timeOffset * (1 + (8-i)*0.2) + (i*Math.PI/4); // Inner planets move faster
-            let px = cx + Math.cos(angle)*rX;
-            let py = cy + Math.sin(angle)*rY;
-            
-            let isUs = c.tag === decodeURIComponent("#YQP0GJ9");
-            ctx.beginPath(); ctx.arc(px, py, isUs ? 6 : 4, 0, Math.PI*2);
-            ctx.fillStyle = isUs ? '#b300ff' : (i >= 6 ? '#ff3366' : '#748293');
-            if(isUs) { ctx.shadowBlur=10; ctx.shadowColor='#b300ff'; }
-            ctx.fill(); ctx.shadowBlur=0;
-        });
-
-        animationReqs.orbital = requestAnimationFrame(render);
-    }
-    render();
-}
-
-function generateNormalDistribution(mean, stdDev, start, end, steps) {
-    let data = []; let labels = []; let stepSize = (end - start) / steps;
-    for (let x = start; x <= end; x += stepSize) {
-        let exponent = Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
-        let y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * exponent;
-        labels.push(Math.round(x)); data.push(y);
-    }
-    return { labels, data };
-}
-
-function renderWar() {
-let container = document.getElementById('war-container');
-if (!warInfo || warInfo.type !== "CWL" || !warInfo.cwlDetails || warInfo.cwlDetails.length === 0) {
-    container.innerHTML = `<div style="padding: 32px 20px; text-align: center; margin-top:40px;"><h4 style="color: var(--accent-main); letter-spacing: 4px; text-transform: uppercase;">Awaiting Database Sync</h4><p style="font-size: 12px; color: var(--text-muted); margin-top: 16px;">The CWL Analytics engine is standing by.</p></div>`;
-    return;
-}
-
-let html = "";
-let activeRound = warInfo.cwlDetails[globalPipelineRound];
-let myStars = activeRound.myStars !== undefined ? activeRound.myStars : "...";
-let oppStars = activeRound.enemyStars !== undefined ? activeRound.enemyStars : "...";
-let myAtks = activeRound.myAttacks !== undefined ? activeRound.myAttacks : "...";
-let oppAtks = activeRound.oppAttacks !== undefined ? activeRound.oppAttacks : "...";
-let rosterSize = activeRound.teamSize || 15;
-
-let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png"; 
-let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
-
-let winProbHtml = "";
-let distDataUs = null, distDataThem = null, distLabels = null;
-
-if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
-    let oppAtksLeft = rosterSize - oppAtks;
-    let myAtksLeft = rosterSize - myAtks;
-    
-    let rawMyPace = myAtks > 0 ? myStars / myAtks : 2.5;
-    let myPace = Math.max(2.1, rawMyPace); 
-    let oppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
-
-    let oppProjected = oppStars + (oppAtksLeft * oppPace);
-    let myProjected = myStars + (myAtksLeft * myPace);
-
-    let winProb = 50;
-    if (myProjected > oppProjected) winProb = 50 + ((myProjected - oppProjected) / rosterSize) * 50;
-    else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
-    winProb = Math.max(1, Math.min(99, Math.round(winProb)));
-
-    let myFloorStars = myStars + (myAtksLeft * 2);
-    let oppMaxStars = oppStars + (oppAtksLeft * 3);
-    let starsToClinch = oppMaxStars + 1 - myFloorStars;
-    
-    let clinchTxt = "";
-    if (myStars + (myAtksLeft * 3) <= oppStars) clinchTxt = `<span style="color:var(--dot-red);">[IMPOSSIBLE]</span>`;
-    else if (myFloorStars > oppMaxStars) clinchTxt = `<span style="color:var(--dot-green);">0 (SECURED)</span>`;
-    else clinchTxt = `${Math.max(0, starsToClinch)} additional 3★ hits`;
-
-    winProbHtml = `
-    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(0,229,255,0.15); border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing: 1.5px;">AI Win Probability</div>
-            <div style="font-size:18px; font-weight:700; color:var(--accent-main); text-shadow: 0 0 10px rgba(0,229,255,0.4);">${winProb}%</div>
-        </div>
-        <div style="font-size:10px; color:var(--text-muted); text-align:left; margin-top:12px; padding-top:12px; border-top: 1px solid rgba(255,255,255,0.05);">Min 3★ Needed to Clinch: <span style="color:#fff; font-weight:700; margin-left:4px; letter-spacing:0.5px;">${clinchTxt}</span></div>
-    </div>
-    
-    <div class="distribution-bg">
-        <span style="position:absolute; top:12px; left:16px; font-size:9px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Monte Carlo Distribution</span>
-        <canvas id="winProbChart"></canvas>
-    </div>`;
-
-    let myStdDev = Math.max(0.5, myAtksLeft * 0.3); 
-    let oppStdDev = Math.max(1.0, oppAtksLeft * 0.6); 
-    let minRange = Math.floor(Math.min(myProjected, oppProjected) - 8);
-    let maxRange = Math.ceil(Math.max(myProjected, oppProjected) + 8);
-    
-    let usDist = generateNormalDistribution(myProjected, myStdDev, minRange, maxRange, 40);
-    let themDist = generateNormalDistribution(oppProjected, oppStdDev, minRange, maxRange, 40);
-    distLabels = usDist.labels;
-    distDataUs = usDist.data;
-    distDataThem = themDist.data;
-}
-
-let attackSegments = "";
-if(myAtks !== "...") {
-    let filledSegments = Math.floor((myAtks / rosterSize) * rosterSize);
-    for(let i=0; i<rosterSize; i++) attackSegments += `<div class="energy-segment ${i < filledSegments ? 'filled' : ''}"></div>`;
-}
-
-// Full War Room Assembly
-html += `
-<h4 class="section-title" style="margin-top:20px;">Live War Room</h4>
-<p class="section-subtitle">Real-time tactical oversight</p>
-<div class="war-room-header">
-    
-    <div class="pendulum-container">
-        <div style="position:absolute; top:0; left:0; width:100%; text-align:center; font-size:9px; font-weight:700; color:var(--accent-secondary); letter-spacing:1px; z-index:2;" id="breakPointText">Enemy Break Point: --%</div>
-        <canvas id="pendulumCanvas" class="pendulum-canvas"></canvas>
-    </div>
-
-    <div style="display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 32px;">
-        <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-            <img src="${myBadgeUrl}" style="width: 64px; height: 64px; filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.4)); margin-bottom: 12px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-            <span style="font-size: 36px; font-weight: 700; color: var(--accent-main); line-height:1; text-shadow: 0 0 20px rgba(0,229,255,0.4);">${myStars}</span>
-        </div>
-        <div style="font-size: 20px; color: var(--text-muted); font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.8);">VS</div>
-        <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-            <img src="${oppBadgeUrl}" style="width: 64px; height: 64px; filter: drop-shadow(0 0 15px rgba(255, 51, 102, 0.4)); margin-bottom: 12px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-            <span style="font-size: 36px; font-weight: 700; color: var(--dot-red); line-height:1; text-shadow: 0 0 20px rgba(255,51,102,0.4);">${oppStars}</span>
-        </div>
-    </div>
-    ${winProbHtml}
-    <div style="font-size: 10px; font-weight:600; color: var(--text-muted); margin-bottom: 12px; letter-spacing:1px; text-transform:uppercase;">Attacks Remaining: <span style="color:#fff;">${myAtks !== "..." ? rosterSize - myAtks : "..."}</span></div>
-    <div class="energy-bar-container">${attackSegments}</div>
-</div>`;
-
-// V5.6 Chronos Strike Wave
-html += `
-<h4 class="section-title">Chronos Strike Wave</h4>
-<p class="section-subtitle">Predicted 24H timezone activity clustering</p>
-<div class="chronos-wrapper">
-    <span style="position:absolute; top:8px; left:12px; font-size:8px; color:var(--text-muted); text-transform:uppercase; z-index:2;">0H</span>
-    <span style="position:absolute; top:8px; right:12px; font-size:8px; color:var(--text-muted); text-transform:uppercase; z-index:2;">24H</span>
-    <canvas id="chronosCanvas" class="chronos-canvas"></canvas>
-</div>`;
-
-// V5.6 Orbital League Projection
-html += `
-<h4 class="section-title">Orbital League Projection</h4>
-<p class="section-subtitle" id="orbitalLabel">PROJECTION: DAY 1</p>
-<div class="orbital-wrapper">
-    <canvas id="orbitalCanvas" class="orbital-canvas"></canvas>
-</div>
-<div class="cyber-slider-container">
-    <input type="range" class="cyber-slider" id="timelineSlider" min="1" max="7" step="1" value="${activeIdx+1}" oninput="drawOrbitalProjection()">
-    <div style="display:flex; justify-content:space-between; font-size:9px; color:var(--text-muted); font-weight:700;">
-        <span>DAY 1</span><span>DAY 7</span>
-    </div>
-</div>
-`;
-
-// V5.6 Single Card Pipeline
-html += `<h4 class="section-title" style="margin-top:48px;">CWL Matrix Pipeline</h4>`;
-html += `<p class="section-subtitle">Round-by-round tactical analysis</p>`;
-html += `
-<div class="pipeline-controls">
-    <button class="pipeline-btn" onclick="changePipelineRound(-1)">◀</button>
-    <span class="pipeline-label" id="pipeline-label">ROUND 1</span>
-    <button class="pipeline-btn" onclick="changePipelineRound(1)">▶</button>
-</div>
-<div id="pipeline-content" class="pipeline-card"></div>
-`;
-
-container.innerHTML = html;
-
-// Draw all dynamic canvases
-setTimeout(() => {
-    drawMomentumPendulum(myStars === "..." ? 0 : myStars, oppStars === "..." ? 0 : oppStars, rosterSize - (myAtks==="..."?0:myAtks), rosterSize - (oppAtks==="..."?0:oppAtks));
-    drawChronosWave();
-    drawOrbitalProjection();
-    renderPipelineCard();
-
-    if(distDataUs && distDataThem && distLabels) {
-        let ctxP = document.getElementById('winProbChart');
-        if (ctxP) {
-            if(chartsRegistry.probChart) chartsRegistry.probChart.destroy();
-            let gradUs = ctxP.getContext('2d').createLinearGradient(0, 0, 0, 140);
-            gradUs.addColorStop(0, 'rgba(0, 229, 255, 0.4)'); gradUs.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
-            let gradThem = ctxP.getContext('2d').createLinearGradient(0, 0, 0, 140);
-            gradThem.addColorStop(0, 'rgba(255, 51, 102, 0.4)'); gradThem.addColorStop(1, 'rgba(255, 51, 102, 0.0)');
-
-            chartsRegistry.probChart = new Chart(ctxP.getContext('2d'), {
-                type: 'line', data: { labels: distLabels, datasets: [
-                        { label: 'Us', data: distDataUs, borderColor: '#00e5ff', backgroundColor: gradUs, fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2.5 },
-                        { label: 'Them', data: distDataThem, borderColor: '#ff3366', backgroundColor: gradThem, fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2.5 }
-                    ]},
-                options: { animation: { duration: 2000, easing: 'easeOutQuart' }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: true, grid: { display: false }, ticks: { color: '#8b949e', font: {size: 10, family: 'Montserrat', weight:600} } }, y: { display: false, min: 0 } } }
-            });
-        }
-    }
-}, 100);
-
-}
-
-}
-</script>
-</body>
-</html>
