@@ -1329,7 +1329,7 @@ let d = new Date(s.season);
 if (!isNaN(d.getTime())) {
 let month = d.toLocaleString('default', { month: 'long' });
 let year = d.getFullYear().toString().slice(-2);
-displaySeason = `${month}, ${year}'`;
+displaySeason = `${month}, '${year}`;
 }
 }
 
