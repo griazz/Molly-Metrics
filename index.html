@@ -20,33 +20,20 @@
 
 <style>
 :root {
---bg-dark: #090a0f; 
---bg-card: rgba(18, 20, 28, 0.75); 
+--bg-dark: #050608; 
+--bg-card: rgba(13, 15, 23, 0.85); 
 --accent-main: #00e5ff; 
 --accent-secondary: #b300ff;
 --text-main: #ffffff; 
---text-muted: #8b949e; 
---border-color: rgba(0, 229, 255, 0.2); 
---card-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
---header-bg: rgba(9, 10, 15, 0.85);
+--text-muted: #748293; 
+--border-color: rgba(0, 229, 255, 0.25); 
+--card-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+--header-bg: rgba(5, 6, 8, 0.9);
 --transition-speed: 0.4s; 
---glow-accent: 0 0 20px rgba(0, 229, 255, 0.35); 
+--glow-accent: 0 0 25px rgba(0, 229, 255, 0.4); 
 --font-sans: 'Montserrat', sans-serif;
 --dot-green: #00ff88; 
 --dot-red: #ff3366;
-}
-
-body.light-mode {
---bg-dark: #f0f2f5; 
---bg-card: rgba(255, 255, 255, 0.8); 
---accent-main: #00b8cc;
---accent-secondary: #8a00c2;
---text-main: #1a1c23; 
---text-muted: #6b7280; 
---border-color: rgba(0, 184, 204, 0.3);
---card-shadow: 0 12px 30px rgba(0, 0, 0, 0.05); 
---header-bg: rgba(240, 242, 245, 0.85);
---glow-accent: 0 0 20px rgba(0, 184, 204, 0.15); 
 }
 
 html, body {
@@ -58,138 +45,135 @@ font-family: var(--font-sans); font-weight: 300; color: var(--text-main); -webki
 }
 
 h1, h2, h3, h4, .section-title, .player-info { margin: 0; }
-::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg-dark); } ::-webkit-scrollbar-thumb { background: var(--accent-secondary); border-radius: 3px; }
+::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
-#app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center; filter: grayscale(75%) sepia(25%) hue-rotate(190deg) brightness(0.2) contrast(1.3); transition: background-image 0.4s ease-in-out; }
-#app-background::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.4) 2px, rgba(0,0,0,0.4) 4px), linear-gradient(rgba(0, 229, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.05) 1px, transparent 1px); background-size: 100% 100%, 30px 30px, 30px 30px; pointer-events: none; z-index: 1; }
+#app-background { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100; background-image: url('https://i.imgur.com/lK3ctDR.jpeg'); background-size: cover; background-position: center; filter: grayscale(85%) sepia(15%) hue-rotate(200deg) brightness(0.15) contrast(1.4); }
+#app-background::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.5) 2px, rgba(0,0,0,0.5) 4px), linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px); background-size: 100% 100%, 40px 40px, 40px 40px; pointer-events: none; z-index: 1; }
 
-.main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+.main-scroll-area { position: absolute; top: 0; left: 0; right: 0; bottom: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; scroll-behavior: smooth;}
 
-.loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 10, 15, 0.95); backdrop-filter: blur(16px); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+/* Loader */
+.loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 6, 8, 0.98); backdrop-filter: blur(20px); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
 .loader-overlay.active { opacity: 1; pointer-events: all; }
-.loader-ring { width: 80px; height: 80px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--accent-main); border-bottom-color: var(--accent-secondary); animation: spin 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; position: relative; margin-bottom: 24px; }
-.loader-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; border: 3px solid transparent; border-left-color: var(--accent-main); border-right-color: var(--accent-secondary); animation: spin-reverse 2s linear infinite; }
-.loader-ring::after { content: ''; position: absolute; inset: 20px; border-radius: 50%; border: 3px solid transparent; border-top-color: var(--text-main); animation: spin 1s ease-in-out infinite; }
+.loader-ring { width: 90px; height: 90px; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--accent-main); border-bottom-color: var(--accent-secondary); animation: spin 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; position: relative; margin-bottom: 30px; box-shadow: 0 0 30px rgba(0,229,255,0.2); }
+.loader-ring::before { content: ''; position: absolute; inset: 10px; border-radius: 50%; border: 2px solid transparent; border-left-color: var(--accent-main); border-right-color: var(--accent-secondary); animation: spin-reverse 1.8s linear infinite; }
+.loader-ring::after { content: ''; position: absolute; inset: 24px; border-radius: 50%; border: 2px solid var(--text-main); animation: pulse 1.5s ease-in-out infinite; }
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 260px; background: rgba(0, 229, 255, 0.05); border: 1px solid rgba(0, 229, 255, 0.2); padding: 12px; border-radius: 8px; box-shadow: inset 0 0 10px rgba(0,229,255,0.05); }
-.term-line { margin-bottom: 6px; opacity: 0; animation: typeLine 0.1s forwards; letter-spacing: 1px;}
+@keyframes pulse { 0%, 100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
+
+.loader-terminal { font-family: monospace; font-size: 10px; color: var(--accent-main); text-align: left; width: 280px; background: rgba(0, 229, 255, 0.02); border: 1px solid rgba(0, 229, 255, 0.15); padding: 16px; border-radius: 12px; box-shadow: inset 0 0 15px rgba(0,229,255,0.05); text-transform: uppercase;}
+.term-line { margin-bottom: 8px; opacity: 0; animation: typeLine 0.1s forwards; letter-spacing: 1.5px;}
 .term-line:nth-child(1) { animation-delay: 0.2s; }
 .term-line:nth-child(2) { animation-delay: 1.2s; }
 .term-line:nth-child(3) { animation-delay: 2.0s; }
-.term-line.blink { animation: typeLine 0.1s forwards 2.8s, blink 1s infinite 2.8s; }
+.term-line.blink { animation: typeLine 0.1s forwards 2.8s, blink 1s infinite 2.8s; color: var(--dot-green);}
 @keyframes typeLine { to { opacity: 1; } }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .container { padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px)); max-width: 600px; margin: auto; }
-input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: var(--bg-card); color: var(--text-main); box-sizing: border-box; font-size: 14px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); }
-.control-row { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; }
-.control-row input { flex: 1; margin-bottom: 0; }
-.control-row select { flex-shrink: 0; width: auto; font-size: 11px; letter-spacing: 1px; margin-bottom: 0;}
-.compare-btn { flex-shrink:0; padding:16px 20px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; color:var(--accent-main); font-family:var(--font-sans); font-size:11px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; backdrop-filter: blur(16px); transition: all 0.3s ease; }
-.compare-btn:active { transform: scale(0.95); }
-.view-toggle-btn { width: 100%; padding: 12px; background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 12px; color: var(--text-main); font-family: var(--font-sans); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; backdrop-filter: blur(8px); margin-bottom: 24px; transition: all 0.3s ease; display:flex; justify-content:center; align-items:center; gap:8px;}
+input, select { width: 100%; padding: 16px 20px; margin-bottom: 0; border: 1px solid var(--border-color); border-radius: 12px; background-color: rgba(0,0,0,0.5); color: var(--text-main); box-sizing: border-box; font-size: 13px; outline: none; transition: all 0.4s ease; backdrop-filter: blur(16px); letter-spacing: 1px;}
+input:focus, select:focus { border-color: var(--accent-main); box-shadow: inset 0 0 10px rgba(0,229,255,0.1); }
+.control-row { display: flex; gap: 12px; margin-bottom: 32px; align-items: center; }
+.control-row input { flex: 1; }
+.control-row select { flex-shrink: 0; width: auto; font-size: 11px; font-weight: 500;}
 
-/* V5.4 3D HOLOGRAPHIC GLASS SLATE GRID */
-.glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 12px 0; width: 100%; perspective: 1000px;}
-.glass-card { width: 100%; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-left: 3px solid var(--accent-main); border-radius: 12px; padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s ease-out, box-shadow 0.3s ease; backdrop-filter: blur(12px); box-shadow: var(--card-shadow); text-align:center; transform-style: preserve-3d;}
-.glass-card:hover { border-color: var(--accent-main); box-shadow: 0 15px 30px rgba(0,229,255,0.2); z-index: 10; }
-.glass-card-inner { pointer-events: none; transform: translateZ(30px); display: flex; flex-direction: column; align-items: center;}
-.glass-ring { width: 40px; height: 40px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 12px; box-shadow: 0 0 10px rgba(0, 229, 255, 0.1); flex-shrink:0;}
-.glass-ring::before { content: ""; position: absolute; inset: 2.5px; background: var(--bg-dark); border-radius: 50%; }
-.glass-ring span { position: relative; font-size: 10px; font-weight: 600; color: var(--text-main); font-family: var(--font-sans);}
-.glass-name { font-size: 11px; font-weight: 600; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); letter-spacing: 0.5px;}
-.glass-th { font-size: 9px; color: var(--text-muted); margin-top: 4px; font-weight:500; display:flex; align-items:center; justify-content:center;}
-.growth-indicator { color: var(--dot-green); font-size: 10px; margin-left: 4px; text-shadow: 0 0 5px var(--dot-green); animation: pulseGrow 2s infinite alternate;}
-@keyframes pulseGrow { 0% { opacity: 0.6; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
-
-/* ORBITAL RADAR MAP (Roster Tab) */
-.radar-map-container { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(0, 229, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(0, 229, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-bottom: 24px; display: none; backdrop-filter: blur(8px);}
+/* V5.5 ENHANCED GLASS SLATE GRID */
+.glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 12px 0; width: 100%; perspective: 1200px;}
+.glass-card { width: 100%; box-sizing: border-box; background: linear-gradient(145deg, rgba(18,20,28,0.9), rgba(9,10,15,0.95)); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 20px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s ease-out, box-shadow 0.3s ease, border-color 0.3s ease; backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.5); text-align:center; transform-style: preserve-3d; position: relative; overflow: hidden;}
+.glass-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--accent-main), transparent); opacity: 0; transition: opacity 0.3s; }
+.glass-card:hover { border-color: rgba(0,229,255,0.3); box-shadow: 0 15px 35px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05); z-index: 10; }
+.glass-card:hover::before { opacity: 1; }
+.glass-card-inner { pointer-events: none; transform: translateZ(30px); display: flex; flex-direction: column; align-items: center; width: 100%;}
+.glass-ring { width: 44px; height: 44px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.03) 0deg); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 14px; box-shadow: 0 0 15px rgba(0, 229, 255, 0.15); flex-shrink:0;}
+.glass-ring::before { content: ""; position: absolute; inset: 2px; background: #0b0c10; border-radius: 50%; }
+.glass-ring span { position: relative; font-size: 11px; font-weight: 700; color: var(--text-main); font-family: var(--font-sans); letter-spacing: 0.5px;}
+.glass-name { font-size: 11px; font-weight: 600; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; letter-spacing: 0.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8);}
+.glass-th { font-size: 9px; color: var(--text-muted); margin-top: 6px; font-weight:600; display:flex; align-items:center; justify-content:center; letter-spacing: 1px;}
+.growth-indicator { color: var(--dot-green); font-size: 10px; margin-left: 6px; filter: drop-shadow(0 0 4px var(--dot-green)); animation: pulseGrow 2s infinite alternate;}
+@keyframes pulseGrow { 0% { opacity: 0.5; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.2); } }
 
 /* CWL CONSTELLATION MAP */
-.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle, rgba(179, 0, 255, 0.05) 0%, transparent 70%); border-radius: 50%; border: 1px solid rgba(179, 0, 255, 0.2); overflow: hidden; box-shadow: inset 0 0 40px rgba(179, 0, 255, 0.05), 0 0 30px rgba(0, 0, 0, 0.5); margin-top: 32px; display: block; backdrop-filter: blur(8px);}
-.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1;}
+.star-map-wrapper { position: relative; width: 100%; padding-bottom: 100%; background: radial-gradient(circle at center, rgba(179, 0, 255, 0.08) 0%, transparent 60%), #050608; border-radius: 50%; border: 1px solid rgba(179, 0, 255, 0.25); overflow: hidden; box-shadow: inset 0 0 60px rgba(179, 0, 255, 0.05), 0 0 40px rgba(0, 0, 0, 0.8); margin-top: 32px; display: block;}
+.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2;}
 .star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none;}
-.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px currentColor; transition: transform 0.2s;}
-.star-node:active { transform: translate(-50%, -50%) scale(1.5); }
-.star-label { position: absolute; left: 10px; top: -5px; font-size: 8px; font-family: var(--font-sans); white-space: nowrap; text-shadow: 1px 1px 2px #000; letter-spacing: 0.5px;}
-.map-legend { display:flex; justify-content:center; gap:16px; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:var(--text-muted); margin-top:16px; margin-bottom:16px;}
+.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 10px currentColor; transition: transform 0.2s;}
+.star-label { position: absolute; left: 12px; top: -6px; font-size: 8px; font-weight: 600; font-family: var(--font-sans); white-space: nowrap; text-shadow: 0 1px 4px rgba(0,0,0,1); letter-spacing: 0.5px;}
+.map-legend { display:flex; justify-content:center; gap:20px; font-size:9px; font-weight: 600; text-transform:uppercase; letter-spacing:2px; color:var(--text-muted); margin-top:16px; margin-bottom:16px;}
 
-.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.15); border-radius: 50%; pointer-events: none;}
+.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px dashed rgba(0, 229, 255, 0.1); border-radius: 50%; pointer-events: none; z-index: 1;}
 .radar-ring.r1 { width: 33%; height: 33%; }
 .radar-ring.r2 { width: 66%; height: 66%; }
-.radar-ring.r3 { width: 100%; height: 100%; border-style: solid; border-color: rgba(0, 229, 255, 0.3);}
-.radar-crosshair { position: absolute; background: rgba(0, 229, 255, 0.1); pointer-events: none;}
+.radar-ring.r3 { width: 100%; height: 100%; border: 1px solid rgba(0, 229, 255, 0.2);}
+.radar-crosshair { position: absolute; background: rgba(0, 229, 255, 0.1); pointer-events: none; z-index: 1;}
 .radar-crosshair.v { top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); }
 .radar-crosshair.h { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
-.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; background: var(--accent-main); border-radius: 50%; box-shadow: 0 0 20px var(--accent-main), 0 0 40px var(--accent-main); z-index: 10;}
-.radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.4) 100%); animation: radarSweep 10s linear infinite; pointer-events: none; z-index: 1;}
+.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px; background: var(--accent-secondary); border-radius: 50%; box-shadow: 0 0 25px var(--accent-secondary), 0 0 50px var(--accent-secondary); z-index: 3; animation: corePulse 2s infinite alternate;}
+@keyframes corePulse { from { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; } to { transform: translate(-50%, -50%) scale(1.1); opacity: 1; } }
+
+/* V5.5 Deep Space Scanner Overlay */
+.radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0, 229, 255, 0.05) 90%, rgba(0, 229, 255, 0.3) 100%); animation: radarSweep 6s linear infinite; pointer-events: none; z-index: 4; mix-blend-mode: screen;}
 @keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* V5.4 3D ISOMETRIC DEFENSIVE MATRIX */
-.defensive-matrix-wrapper { overflow: hidden; padding: 20px 0 60px 0; display: flex; justify-content: center; perspective: 1200px; margin-bottom: 24px; background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05);}
-.iso-grid { display: grid; grid-template-columns: repeat(5, 40px); grid-template-rows: repeat(3, 40px); gap: 20px; transform: rotateX(60deg) rotateZ(-45deg); transform-style: preserve-3d; }
-.iso-cube { width: 40px; height: 40px; border: 1px solid var(--accent-main); position: relative; transform-style: preserve-3d; transition: transform 0.3s ease; cursor: pointer; box-shadow: inset 0 0 15px rgba(0,229,255,0.1);}
-.iso-cube:hover { transform: translateZ(10px); }
-.iso-cube .pillar { position: absolute; bottom: 0; left: 0; width: 100%; transform-origin: bottom; transform: rotateX(-90deg) translateY(100%); border-left: 1px solid; border-right: 1px solid; border-top: 1px solid; transition: height 1s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.iso-cube .iso-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg); color: var(--text-main); font-size: 11px; font-weight: 700; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); pointer-events: none; }
-.iso-tooltip { position: absolute; top: -50px; left: 50%; transform: translateX(-50%) rotateZ(45deg) rotateX(-60deg) translateZ(30px); background: rgba(9,10,15,0.95); border: 1px solid var(--border-color); padding: 6px 10px; font-size: 10px; color: #fff; opacity: 0; transition: 0.3s; pointer-events: none; white-space: nowrap; border-radius: 6px; box-shadow: 0 4px 15px rgba(0,229,255,0.3); text-align: center; line-height: 1.4;}
-.iso-cube:hover .iso-tooltip { opacity: 1; }
-
-/* Bottom Sheet Modal */
-.sheet-backdrop { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(4px); }
+/* ENHANCED BOTTOM SHEET MODAL */
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(8px); }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
-.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: var(--header-bg); backdrop-filter: blur(24px); border-top-left-radius: 24px; border-top-right-radius: 24px; z-index: 2000; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 85vh; overflow-y: auto; padding: 40px 20px 20px 20px; box-sizing: border-box; border-top: 1px solid var(--border-color); box-shadow: 0 -10px 40px rgba(0,0,0,0.8); }
+.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, rgba(18,20,28,0.98), rgba(9,10,15,1)); backdrop-filter: blur(30px); border-top-left-radius: 32px; border-top-right-radius: 32px; z-index: 2000; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); max-height: 88vh; overflow-y: auto; padding: 40px 24px 24px 24px; box-sizing: border-box; border-top: 1px solid rgba(255,255,255,0.1); box-shadow: 0 -20px 60px rgba(0,0,0,0.9); }
 .bottom-sheet.open { transform: translateY(0); }
-.close-btn { position: absolute; top: 16px; right: 20px; width: 32px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid var(--border-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-main); font-size: 14px; cursor: pointer; backdrop-filter: blur(8px); transition: background 0.3s; z-index: 10; font-weight: 600;}
+.close-btn { position: absolute; top: 20px; right: 24px; width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 16px; cursor: pointer; transition: all 0.3s; z-index: 10;}
+.close-btn:hover { background: rgba(255,51,102,0.2); color: var(--dot-red); border-color: var(--dot-red);}
 
-.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 16px; margin-bottom: 24px;}
-.stat-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; position: relative; overflow: hidden;}
-.stat-label { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; position: relative; z-index: 2;}
-.stat-val { font-size: 13px; color: var(--accent-main); font-family: var(--font-sans); font-weight:600; position: relative; z-index: 2;}
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 24px; margin-bottom: 32px;}
+.stat-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,229,255,0.15); border-radius: 12px; padding: 16px 8px; text-align: center; position: relative; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);}
+.stat-box::before { content:''; position:absolute; inset:0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.03) 2px, rgba(0,229,255,0.03) 4px); pointer-events:none;}
+.stat-label { font-size: 9px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; position: relative; z-index: 2;}
+.stat-val { font-size: 16px; color: var(--accent-main); font-family: var(--font-sans); font-weight:700; position: relative; z-index: 2; text-shadow: 0 0 10px rgba(0,229,255,0.4);}
 
-.chart-container { margin-top: 24px; position: relative; width: 100%; }
-.compare-row { display: flex; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid var(--border-color); align-items: center; }
-.compare-label { font-size: 10px; text-transform: uppercase; color: var(--text-muted); flex: 1; text-align: center; letter-spacing: 1px;}
-.compare-val { font-size: 16px; width: 30%; text-align: center; transition: color 0.4s ease; font-family: var(--font-sans); letter-spacing: 1px;}
-.radar-container { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); padding: 24px 0; margin-top: 24px; height: 340px; position: relative; width: 100%; box-sizing: border-box; }
+.chart-container { margin-top: 24px; position: relative; width: 100%; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.05);}
 
-.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: var(--header-bg); backdrop-filter: blur(24px); border-top: 1px solid var(--border-color); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 8px; justify-content: space-around; }
-.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-muted); font-size: 9px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 16px; border-radius: 12px;}
-.nav-btn span { font-size: 20px; transition: transform 0.3s ease; }
-.nav-btn.active { color: var(--accent-main); }
-.nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 8px var(--accent-main)); }
+/* Bottom Nav */
+.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: rgba(5,6,8,0.9); backdrop-filter: blur(24px); border-top: 1px solid rgba(255,255,255,0.05); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 16px; justify-content: space-around; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-muted); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 24px; border-radius: 16px;}
+.nav-btn span { font-size: 22px; transition: transform 0.3s ease, filter 0.3s ease; }
+.nav-btn.active { color: var(--accent-main); background: rgba(0,229,255,0.05);}
+.nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 10px var(--accent-main)); }
 
 .tab-content { display: none; min-height: calc(100% + 1px); }
-.tab-content.active { display: block; animation: tabFade 0.4s ease-out; }
-@keyframes tabFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.tab-content.active { display: block; animation: tabFade 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes tabFade { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-.section-title { text-align: center; color: var(--text-muted); margin-top: 32px; margin-bottom: 24px; text-transform:uppercase; font-size: 16px; letter-spacing: 4px; }
-.status-badge { display: inline-flex; align-items: center; gap: 3px; padding: 3px 8px; border-radius: 100px; font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; margin-bottom:4px; }
-.badge-hit-rate { background: rgba(0, 255, 136, 0.15); border: 1px solid rgba(0, 255, 136, 0.35); color: var(--dot-green); }
+.section-title { text-align: center; color: var(--text-main); margin-top: 40px; margin-bottom: 8px; text-transform:uppercase; font-size: 14px; font-weight: 700; letter-spacing: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);}
+.section-subtitle { font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 24px; padding:0 20px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4;}
 
-/* CWL Carousel & War Room */
+/* WAR ROOM COMPONENTS */
 .cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none; margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
-.carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; box-shadow: var(--card-shadow); backdrop-filter: blur(16px); transform: rotateY(-15deg) scale(0.9); transition: transform 0.5s ease, opacity 0.5s ease; opacity: 0.6; }
-.carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: var(--accent-main); box-shadow: 0 0 30px rgba(0, 229, 255, 0.15); }
+.carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: linear-gradient(180deg, rgba(18,20,28,0.9), rgba(9,10,15,0.95)); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(20px); transform: rotateY(-10deg) scale(0.92); transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease; opacity: 0.5; }
+.carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: rgba(0,229,255,0.3); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(0, 229, 255, 0.05); }
 
-.war-room-header { background: linear-gradient(135deg, rgba(9,10,15,0.9), rgba(18,20,28,0.95)); border: 1px solid var(--accent-secondary); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(179, 0, 255, 0.15); }
-.strike-pill { flex-shrink:0; background:rgba(0,0,0,0.6); border:1px solid var(--border-color); padding:8px 16px; border-radius:100px; font-size:11px; color:var(--text-main); font-family:var(--font-sans); }
+.war-room-header { background: linear-gradient(135deg, rgba(13,15,23,0.95), rgba(5,6,8,0.98)); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px 24px; text-align: center; margin-bottom: 32px; box-shadow: 0 15px 50px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,229,255,0.05); position: relative; overflow: hidden;}
+.war-room-header::before { content:''; position:absolute; top:0; left:0; width:100%; height:2px; background: linear-gradient(90deg, transparent, var(--accent-main), transparent); opacity: 0.5;}
 
-.circular-progress { width: 100px; height: 100px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.05) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: var(--glow-accent); flex-shrink: 0; }
-.circular-progress::before { content: ""; position: absolute; inset: 6px; background: #12141c; border-radius: 50%; backdrop-filter: blur(16px); }
-.circular-value { position: relative; font-size: 20px; font-weight: 500; color: var(--text-main); font-family: var(--font-sans); }
-.time-to-max-banner { background: rgba(0, 229, 255, 0.08); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; text-align: center; margin-bottom: 24px; margin-top: 8px;}
+.strike-pill { flex-shrink:0; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 100px; font-size: 11px; font-weight: 600; color: var(--text-main); font-family: var(--font-sans); letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px;}
+.strike-pill::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-main); box-shadow: 0 0 8px var(--accent-main); animation: pulse 2s infinite;}
+
+.circular-progress { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.03) 0deg); display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 30px rgba(0,229,255,0.2); flex-shrink: 0; }
+.circular-progress::before { content: ""; position: absolute; inset: 4px; background: #090a0f; border-radius: 50%; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);}
+.circular-value { position: relative; font-size: 24px; font-weight: 700; color: #fff; font-family: var(--font-sans); text-shadow: 0 0 15px rgba(0,229,255,0.5);}
+.time-to-max-banner { background: linear-gradient(90deg, rgba(0, 229, 255, 0.05), rgba(0, 229, 255, 0.15), rgba(0, 229, 255, 0.05)); border: 1px solid rgba(0,229,255,0.2); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 24px; margin-top: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.5);}
 
 /* Segmented Energy Bar */
-.energy-bar-container { display: flex; gap: 2px; height: 8px; width: 85%; margin: 0 auto; }
-.energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 1px; transition: background 0.3s ease; }
-.energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 5px var(--accent-main); }
+.energy-bar-container { display: flex; gap: 4px; height: 10px; width: 90%; margin: 0 auto; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);}
+.energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 2px; transition: background 0.3s ease, box-shadow 0.3s ease; }
+.energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 8px var(--accent-main); }
 
-/* V5.3 Graphs */
-.distribution-bg { padding: 16px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; margin-bottom: 24px; box-shadow: inset 0 0 20px rgba(0,229,255,0.05);}
+/* V5.5 Graphs & HUD Elements */
+.distribution-bg { padding: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; margin-bottom: 24px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);}
+.tactical-hud-item { display:flex; justify-content:space-between; align-items:center; padding:12px 16px; background:linear-gradient(90deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3)); border:1px solid rgba(255,255,255,0.05); border-left: 3px solid; border-radius:8px; margin-bottom: 8px; position: relative;}
+.tactical-hud-item::before { content: '⌜'; position: absolute; top: 4px; left: 4px; font-size: 10px; color: inherit; opacity: 0.5; font-family: monospace;}
+.tactical-hud-item::after { content: '⌟'; position: absolute; bottom: 4px; right: 4px; font-size: 10px; color: inherit; opacity: 0.5; font-family: monospace;}
+
 </style>
 </head>
 <body>
@@ -199,9 +183,9 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 <div class="loader-overlay" id="loaderOverlay">
     <div class="loader-ring"></div>
     <div class="loader-terminal">
-        <div class="term-line">> INITIALIZING MOLLY_OS V5.4...</div>
-        <div class="term-line">> ESTABLISHING UPLINK TO SUPERCELL MAINFRAME...</div>
-        <div class="term-line">> DECRYPTING PACKETS...</div>
+        <div class="term-line">> INITIALIZING MOLLY_OS V5.5...</div>
+        <div class="term-line">> ESTABLISHING SECURE UPLINK...</div>
+        <div class="term-line">> DECRYPTING TACTICAL TELEMETRY...</div>
         <div class="term-line blink">> AWAITING HANDSHAKE...</div>
     </div>
 </div>
@@ -211,61 +195,35 @@ input, select { width: 100%; padding: 16px; margin-bottom: 0; border: 1px solid 
 
 <div id="roster-tab" class="tab-content">
   
-<div style="text-align: center; cursor: default; margin-bottom: 24px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; padding: 24px; backdrop-filter: blur(12px); box-shadow:var(--card-shadow);">
-    <h4 style="color: var(--text-muted); font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 20px;">Active Roster Progression</h4>
-    <div style="display: flex; justify-content: center; align-items: center; gap: 24px;">
+<div style="text-align: center; cursor: default; margin-bottom: 32px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; padding: 32px 20px; backdrop-filter: blur(20px); box-shadow: 0 15px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,229,255,0.05);">
+    <h4 style="color: var(--text-main); font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 24px; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">Active Roster Progression</h4>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 32px;">
         <div class="circular-progress" id="global-circle" style="--progress: 0%;">
             <div class="circular-value" id="global-pct-val">0%</div>
         </div>
-        <div style="text-align: left;">
-            <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">30-Day Growth</div>
-            <div id="global-change-val" style="font-size: 18px; font-weight: 500; color: var(--dot-green);">+0.00%</div>
-            <div style="font-size: 9px; color: var(--text-muted); margin-top: 6px;" id="global-progress-count">0 Operators Advancing</div>
+        <div style="text-align: left; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 24px;">
+            <div style="font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">30-Day Trajectory</div>
+            <div id="global-change-val" style="font-size: 24px; font-weight: 700; color: var(--dot-green); text-shadow: 0 0 15px rgba(0,255,136,0.3);">+0.00%</div>
+            <div style="font-size: 10px; color: var(--text-muted); margin-top: 8px; font-weight: 500;" id="global-progress-count">0 Operators Advancing</div>
         </div>
     </div>
 </div>
 
-<button class="view-toggle-btn" onclick="toggleMapView()" id="mapToggleBtn">
-    <span>◎</span> Switch to Sector Map
-</button>
-
-<div class="control-row" id="roster-controls" style="display:none;">
-<input type="text" id="searchInput" placeholder="Search Operators..." oninput="debouncedFilterRoster()">
-<select id="sortSelect" onchange="filterRoster()">
-<option value="comp">Overall %</option>
-<option value="hero">Hero %</option>
-<option value="pet">Pet %</option>
-</select>
-<button class="compare-btn" onclick="toggleCompareMode()">Compare</button>
+<div class="control-row" id="roster-controls" style="display:none; justify-content: center; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05);">
+    <input type="text" id="searchInput" placeholder="Scan Operators..." oninput="debouncedFilterRoster()" style="background: transparent; border: none; padding: 8px 12px; font-size: 14px; width: 60%;">
+    <div style="width: 1px; height: 24px; background: rgba(255,255,255,0.1);"></div>
+    <select id="sortSelect" onchange="filterRoster()" style="background: transparent; border: none; padding: 8px 12px; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--accent-main);">
+        <option value="comp">Overall Base</option>
+        <option value="hero">Hero Levels</option>
+        <option value="pet">Pet Levels</option>
+    </select>
 </div>
 
-<div id="roster-compare-section" style="display:none;">
-  <div style="display:flex; gap: 16px; margin-bottom: 24px;">
-  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 1</label><select id="player1Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
-  <div style="flex:1;"><label style="font-size: 10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:8px;">Operator 2</label><select id="player2Select" onchange="comparePlayers()"><option>Loading...</option></select></div>
-  </div>
-  <div id="radarSection" style="display:none;">
-  <h4 class="section-title" style="margin-top:0;">Head-to-Head Stats</h4>
-  <div style="background:var(--bg-card); border:1px solid var(--border-color); border-radius:16px; margin-bottom:24px;">
-      <div style="padding: 0 20px;" id="compareDetailsGrid"></div>
-  </div>
-  <h4 class="section-title">Hero Distribution (%)</h4>
-  <div class="radar-container"><canvas id="heroRadar"></canvas></div>
-  <h4 class="section-title">Pet Distribution (%)</h4>
-  <div class="radar-container"><canvas id="petRadar"></canvas></div>
-  </div>
-</div>
-
-<div id="roster-map" class="radar-map-container">
-    <canvas id="rosterMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
-    <div id="radar-nodes" class="star-map-nodes"></div>
-</div>
-
-<div id="roster-container" class="glass-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; grid-column: span 3;">Preparing roster...</p></div>
+<div id="roster-container" class="glass-grid"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; grid-column: span 3; padding-top: 40px;">Initializing roster matrix...</p></div>
 </div>
 
 <div id="war-tab" class="tab-content active">
-<div id="war-container"><p style="text-align:center; color: var(--text-muted); font-size: 12px; letter-spacing: 2px; margin-top:40px;">Fetching CWL Database...</p></div>
+<div id="war-container"><p style="text-align:center; color: var(--accent-main); font-size: 12px; letter-spacing: 3px; font-weight: 600; margin-top:60px; animation: pulse 2s infinite;">FETCHING CWL TELEMETRY...</p></div>
 </div>
 
 </div>
@@ -297,13 +255,9 @@ let globalPlayerData = [];
 let displayedPlayerData = [];
 let clanData = {};
 let warInfo = null;
-let chartsRegistry = { radarHero: null, radarPet: null, probChart: null };
+let chartsRegistry = { probChart: null };
 let sheetCharts = { history: null, hero: null, pet: null }; 
-let currentRosterFilter = 'all';
-let isMapView = false;
 let currentStarMapFilter = 'us';
-
-const CWL_TAGS = ["#PG0R8GQPQ", "#YCRV8GP0U", "#RYPU89Y8", "#99JQPVU9Q", "#GRJRUYP0", "#8QGVV099U", "#2RL2JGJPJ", "#Y8LY2VUJ9", "#GYJ00RJ2Q", "#G9YR000R8", "#20YLLYC9P", "#QVCLVUQVY", "#9LGG22Q28", "#GGULC2CR", "#9R0C82GU"];
 
 const maxLevelsMap = {
 "Barbarian King": 105, "Archer Queen": 105, "Grand Warden": 80, "Royal Champion": 55, "Minion Prince": 95, "Dragon Duke": 25,
@@ -323,20 +277,11 @@ if(p < 1) requestAnimationFrame(step); else el.innerText = prefix + (isPct ? end
 }; requestAnimationFrame(step);
 }
 
-function formatMonth(m) {
-    if(!m) return "N/A";
-    let d = new Date(m);
-    if (!isNaN(d.getTime())) return d.toLocaleString('default', { month: 'short', year: 'numeric' });
-    let parts = m.toString().split('-');
-    if(parts.length >= 2) return new Date(parts[0], parseInt(parts[1]) - 1).toLocaleString('default', { month: 'short', year: 'numeric' });
-    return m;
-}
-
-Chart.defaults.color = '#8b949e'; Chart.defaults.font.family = "'Montserrat', sans-serif";
+Chart.defaults.color = '#748293'; Chart.defaults.font.family = "'Montserrat', sans-serif";
 
 window.addEventListener('DOMContentLoaded', () => {
 if(localStorage.getItem('molly-theme') === 'light') document.body.classList.add('light-mode');
-Chart.defaults.borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim();
+Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
 fetchDashboardData(); 
 });
 
@@ -434,81 +379,12 @@ if (sortBy === 'hero') { let aH = parseInt((a.heroStats||"0").split('/')[0]); le
 if (sortBy === 'pet') { let aP = parseInt((a.petStats||"0").split('/')[0]); let bP = parseInt((b.petStats||"0").split('/')[0]); return bP - aP; }
 return 0;
 });
-if (isMapView) renderRosterMap(); else renderPlayerCards();
-}
-
-function toggleMapView() {
-    isMapView = !isMapView;
-    let btn = document.getElementById('mapToggleBtn');
-    let map = document.getElementById('roster-map');
-    let list = document.getElementById('roster-container');
-    let controls = document.getElementById('roster-controls');
-
-    if (isMapView) {
-        btn.innerHTML = "<span>☰</span> Switch to Slate Grid";
-        map.style.display = "block";
-        list.style.display = "none";
-        controls.style.display = "none";
-        renderRosterMap();
-    } else {
-        btn.innerHTML = "<span>◎</span> Switch to Sector Map";
-        map.style.display = "none";
-        list.style.display = "grid"; 
-        controls.style.display = "flex";
-        renderPlayerCards();
-    }
-}
-
-function renderRosterMap() {
-    let container = document.getElementById('radar-nodes');
-    let canvas = document.getElementById('rosterMapCanvas');
-    let html = '';
-    
-    if(canvas) {
-        let ctx = canvas.getContext('2d');
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        let cx = canvas.width/2; let cy = canvas.height/2; let maxR = canvas.width/2 * 0.85;
-        
-        ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; ctx.lineWidth = 1;
-        [0.33, 0.66, 1.0].forEach(scale => {
-            ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI*2); ctx.stroke();
-        });
-        ctx.beginPath(); ctx.moveTo(cx, cy - maxR); ctx.lineTo(cx, cy + maxR); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(cx - maxR, cy); ctx.lineTo(cx + maxR, cy); ctx.stroke();
-        
-        ctx.beginPath(); ctx.arc(cx, cy, 8, 0, Math.PI*2);
-        ctx.fillStyle = 'var(--accent-main)'; ctx.shadowColor = 'var(--accent-main)'; ctx.shadowBlur = 10; ctx.fill();
-        ctx.shadowBlur = 0;
-    }
-
-    displayedPlayerData.forEach((player) => {
-        let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
-        let pct = parseFloat(player.percentage);
-        let rPct = 100 - pct; 
-        let r = (rPct / 100) * 45; 
-
-        let hash = 0;
-        for(let i=0; i<player.tag.length; i++) hash += player.tag.charCodeAt(i);
-        let theta = (hash % 360) * (Math.PI / 180);
-
-        let left = 50 + (r * Math.cos(theta));
-        let top = 50 + (r * Math.sin(theta));
-
-        let growth = 0;
-        if (player.historyPcts && player.historyPcts.length > 1) growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
-
-        let nodeClass = "map-node";
-        if (pct >= 100) nodeClass += " maxed";
-        else if (growth > 0) nodeClass += " growing";
-
-        html += `<div class="${nodeClass}" style="left: ${left}%; top: ${top}%;" onclick="openBottomSheet(${realIndex})"><span class="node-label">${player.name}</span></div>`;
-    });
-    container.innerHTML = html;
+renderPlayerCards();
 }
 
 function renderPlayerCards() {
 var container = document.getElementById('roster-container');
-if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); width:100%; grid-column: span 3;'>No players found.</p>"; return; }
+if(displayedPlayerData.length === 0) { container.innerHTML = "<p style='text-align:center; color:var(--text-muted); width:100%; grid-column: span 3; padding-top:40px;'>No operators found.</p>"; return; }
 
 let htmlString = "";
 displayedPlayerData.forEach((player) => {
@@ -533,7 +409,7 @@ htmlString += `
 });
 container.innerHTML = htmlString;
 
-// V5.4 Add 3D Mouse Parallax Effect to Glass Cards
+// V5.5 Advanced 3D Mouse Parallax
 setTimeout(() => {
     document.querySelectorAll('.glass-card').forEach(card => {
         card.addEventListener('mousemove', e => {
@@ -542,14 +418,12 @@ setTimeout(() => {
             let y = e.clientY - rect.top;
             let centerX = rect.width / 2;
             let centerY = rect.height / 2;
-            let rotateX = ((y - centerY) / centerY) * -15;
-            let rotateY = ((x - centerX) / centerX) * 15;
-            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
-            card.style.zIndex = 10;
+            let rotateX = ((y - centerY) / centerY) * -18;
+            let rotateY = ((x - centerX) / centerX) * 18;
+            card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.08, 1.08, 1.08)`;
         });
         card.addEventListener('mouseleave', () => {
             card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            card.style.zIndex = 1;
         });
     });
 }, 100);
@@ -590,10 +464,10 @@ function openBottomSheet(index) {
   } else if (player.percentage >= 100) { estMaxText = "MAXED"; }
 
   let html = `
-    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:20px;">
         <div>
-            <h2 style="color:var(--text-main); margin:0; font-size:24px; font-family:var(--font-sans); font-weight:600;">${player.name}</h2>
-            <div style="color:var(--accent-main); font-size:12px; margin-top:4px; font-weight:500;">
+            <h2 style="color:var(--text-main); margin:0; font-size:26px; font-family:var(--font-sans); font-weight:700; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">${player.name}</h2>
+            <div style="color:var(--accent-main); font-size:12px; margin-top:6px; font-weight:600; letter-spacing: 1px;">
                 <span style="color:var(--accent-secondary); margin-right:8px;">[${roleText}]</span>
                 TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
             </div>
@@ -601,8 +475,8 @@ function openBottomSheet(index) {
     </div>
     
     <div class="time-to-max-banner">
-        <div style="font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Projected 100% Max</div>
-        <div style="font-size: 14px; color: var(--accent-main); font-weight: 600;">${estMaxText} <span style="font-size:10px; color:var(--text-muted); font-weight:400;">(${growth > 0 ? '+'+growth.toFixed(2)+'% / mo' : ''})</span></div>
+        <div style="font-size: 10px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">Projected 100% Max</div>
+        <div style="font-size: 16px; color: var(--accent-main); font-weight: 700; text-shadow: 0 0 10px rgba(0,229,255,0.4);">${estMaxText} <span style="font-size:10px; color:var(--text-muted); font-weight:500;">(${growth > 0 ? '+'+growth.toFixed(2)+'% / mo' : ''})</span></div>
     </div>
 
     <div class="stat-grid">
@@ -615,12 +489,12 @@ function openBottomSheet(index) {
     </div>
     
     ${player.heroes ? `
-    <h4 class="section-title" style="margin-top:32px;">Hero Levels (%)</h4>
-    <div class="chart-container" style="height: 180px;"><canvas id="bsHeroChart"></canvas></div>
+    <h4 class="section-title">Hero Levels (%)</h4>
+    <div class="chart-container" style="height: 200px;"><canvas id="bsHeroChart"></canvas></div>
     <h4 class="section-title">Pet Levels (%)</h4>
-    <div class="chart-container" style="height: 180px;"><canvas id="bsPetChart"></canvas></div>
+    <div class="chart-container" style="height: 200px;"><canvas id="bsPetChart"></canvas></div>
     <h4 class="section-title">30-Day History</h4>
-    <div class="chart-container" style="height: 180px; margin-bottom:32px;"><canvas id="bsHistoryChart"></canvas></div>
+    <div class="chart-container" style="height: 200px; margin-bottom:32px;"><canvas id="bsHistoryChart"></canvas></div>
     ` : `<p style='text-align:center; font-size:10px; color:var(--text-muted); padding:32px 0;'>Charts await backend sync.</p>`}
   `;
 
@@ -656,22 +530,22 @@ let bgColors = dataPct.map(pct => parseFloat(pct) >= 100 ? style.getPropertyValu
 
 return new Chart(ctx, { 
 type: 'bar', data: { labels: labels, datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4 }] }, 
-options: { indexAxis: 'y', animation: false, events: [], responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { max: 100, display:false }, y: { border: { display: false }, grid: { display: false }, ticks: { font: { family: 'Montserrat', size: 10 } } } } }, 
-plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); ctx.font = '500 10px "Montserrat"'; ctx.textBaseline = 'middle'; chart.getDatasetMeta(0).data.forEach((bar, index) => { const val = data.datasets[0].data[index]; const isMaxed = parseFloat(val) >= 100; let displayStr = isMaxed ? "MAX" : parseFloat(val).toString(); const fullTextWidth = ctx.measureText(displayStr).width; const isInside = bar.width > fullTextWidth + 12; let textX; if (isInside) { ctx.textAlign = 'right'; textX = bar.x - 8; ctx.fillStyle = isMaxed ? '#090a0f' : '#090a0f'; } else { ctx.textAlign = 'left'; textX = bar.x + 8; ctx.fillStyle = style.getPropertyValue('--text-muted').trim(); } ctx.fillText(displayStr, textX, bar.y + 1); }); ctx.restore(); } }] });
+options: { indexAxis: 'y', animation: false, events: [], responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { max: 100, display:false }, y: { border: { display: false }, grid: { display: false }, ticks: { color: '#fff', font: { family: 'Montserrat', size: 10, weight: 600 } } } } }, 
+plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; ctx.save(); ctx.font = '700 10px "Montserrat"'; ctx.textBaseline = 'middle'; chart.getDatasetMeta(0).data.forEach((bar, index) => { const val = data.datasets[0].data[index]; const isMaxed = parseFloat(val) >= 100; let displayStr = isMaxed ? "MAX" : parseFloat(val).toString(); const fullTextWidth = ctx.measureText(displayStr).width; const isInside = bar.width > fullTextWidth + 12; let textX; if (isInside) { ctx.textAlign = 'right'; textX = bar.x - 8; ctx.fillStyle = '#050608'; } else { ctx.textAlign = 'left'; textX = bar.x + 8; ctx.fillStyle = style.getPropertyValue('--text-muted').trim(); } ctx.fillText(displayStr, textX, bar.y + 1); }); ctx.restore(); } }] });
 }
 
 function renderLineChart(ctx, labels, dataPoints, labelName) {
 let style = getComputedStyle(document.body); let lineColor = style.getPropertyValue('--accent-main').trim(); let accentColor = style.getPropertyValue('--accent-main').trim(); let textColor = style.getPropertyValue('--text-muted').trim();
-let grad = ctx.createLinearGradient(0, 0, 0, 200); grad.addColorStop(0, style.getPropertyValue('--border-color').trim()); grad.addColorStop(1, 'rgba(0,0,0,0)');
+let grad = ctx.createLinearGradient(0, 0, 0, 200); grad.addColorStop(0, 'rgba(0, 229, 255, 0.4)'); grad.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
 let pointColors = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? accentColor : lineColor);
-let pointRadii = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? 3.5 : 0);
+let pointRadii = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? 4 : 0);
 return new Chart(ctx, { 
-type: 'line', data: { labels: labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: pointColors, pointRadius: pointRadii, pointHoverRadius: 5 }] }, 
-options: { animation: false, events: [], layout: { padding: { top: 25, right: 35, left: 35, bottom: 5 } }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: true, grid: { display: false, drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 9, family: 'Montserrat' } } }, y: { display: false } } }, 
-plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let currentStyle = getComputedStyle(document.body); let textFill = currentStyle.getPropertyValue('--text-main').trim(); let accColor = currentStyle.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '500 10px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2)); if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '500 11px "Montserrat"'; let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 15; ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
+type: 'line', data: { labels: labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2.5, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: '#fff', pointRadius: pointRadii, pointHoverRadius: 6 }] }, 
+options: { animation: false, events: [], layout: { padding: { top: 25, right: 35, left: 35, bottom: 5 } }, responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { display: true, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 9, family: 'Montserrat', weight: 500 } } }, y: { display: false } } }, 
+plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) { const { ctx, data } = chart; const meta = chart.getDatasetMeta(0); if(!meta.data || meta.data.length === 0) return; ctx.save(); let textFill = '#fff'; let accColor = style.getPropertyValue('--accent-main').trim(); ctx.textBaseline = 'middle'; const firstIdx = 0; const lastIdx = meta.data.length - 1; const ptFirst = meta.data[firstIdx]; const ptLast = meta.data[lastIdx]; const valFirst = parseFloat(data.datasets[0].data[firstIdx]); const valLast = parseFloat(data.datasets[0].data[lastIdx]); ctx.font = '700 11px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = textFill; ctx.fillText(valLast, ptLast.x + 8, ptLast.y); if (lastIdx > 0) { ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y); let diff = parseFloat((valLast - valFirst).toFixed(2)); if (diff !== 0) { let diffText = diff > 0 ? `+${diff}` : `${diff}`; ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accColor : 'var(--dot-red)'; ctx.font = '700 12px "Montserrat"'; let midX = (ptFirst.x + ptLast.x) / 2; let midY = (ptFirst.y + ptLast.y) / 2 - 18; ctx.fillText(diffText, midX, midY); } } ctx.restore(); } }] });
 }
 
-// V5.4: Bayesian Tactical Assignments (Advanced Smoothing)
+// V5.5: Bayesian Tactical Assignments (HUD Style)
 function buildTargetAssignments(round) {
     if (!round.myLineup || !round.enemyLineup) return '';
 
@@ -686,7 +560,6 @@ function buildTargetAssignments(round) {
         let rawDest = (pData && pData.cwlStats && pData.cwlStats.avgDestruction) ? parseFloat(pData.cwlStats.avgDestruction) : 85;
         let attacks = (pData && pData.cwlStats) ? pData.cwlStats.attacks : 0;
         
-        // V5.4 Bayesian Smoothing (Prevents 100% -> 50% wild swings early on)
         let smoothedHR = ((rawHR * attacks) + (50 * 2)) / (attacks + 2);
         let smoothedDest = ((rawDest * attacks) + (75 * 2)) / (attacks + 2);
         
@@ -714,7 +587,6 @@ function buildTargetAssignments(round) {
         if (!best) { candidates.sort((x,y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th)); best = candidates[0]; }
         best.assigned = true; a.target = best;
         
-        // V5.4 Multi-Factor Confidence Math
         let thDiff = a.us.th - best.th;
         let conf = (a.smoothedHR * 0.45) + (a.smoothedDest * 0.45) + (thDiff * 15);
         a.confidence = Math.max(10, Math.min(99, Math.round(conf)));
@@ -725,21 +597,37 @@ function buildTargetAssignments(round) {
     let listHtml = '';
     assignments.forEach(a => {
         if (!a.target) return;
-        let confColor = a.confidence >= 80 ? "var(--accent-main)" : (a.confidence >= 60 ? "var(--accent-secondary)" : "var(--dot-red)");
-        let reasoning = a.confidence >= 80 ? "High probability of complete destruction." : (a.confidence >= 60 ? "Balanced engagement. Execution critical." : "High-risk reach. 2-star safety protocol recommended.");
-        if(a.us.relativePos !== a.target.relativePos) reasoning += " (Tactical Position Swap)";
+        let isElite = a.confidence >= 80;
+        let isStruggle = a.confidence < 60;
         
-        listHtml += `<div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:rgba(0,0,0,0.4); border:1px solid var(--border-color); border-radius:8px;">
-            <div style="color:${confColor}; flex:1; font-weight:600;">${a.us.relativePos}. ${a.us.name} <span style="font-size:8px; opacity:0.7;">(TH${a.us.th})</span></div>
-            <div style="color:var(--text-muted); font-size:12px; padding:0 8px;">➔</div>
-            <div style="color:var(--text-main); flex:1; text-align:right; font-weight:500;">${a.target.relativePos}. ${a.target.name} <span style="font-size:8px; opacity:0.7;">(TH${a.target.th})</span></div>
-        </div>
-        <div style="font-size:8px; color:var(--text-muted); text-align:right; margin-top:-4px; margin-bottom:4px; padding-right:12px;"><span style="color:${confColor}; font-weight:bold;">[${a.confidence}% CONFIDENCE]</span> └ ${reasoning}</div>`;
+        let confColor = isElite ? "var(--accent-main)" : (isStruggle ? "var(--dot-red)" : "var(--accent-secondary)");
+        let borderColor = isElite ? "rgba(0,229,255,0.4)" : (isStruggle ? "rgba(255,51,102,0.4)" : "rgba(179,0,255,0.4)");
+        
+        let reasoning = isElite ? "OVERPOWER MISMATCH" : (isStruggle ? "HIGH-RISK REACH" : "BALANCED MIRROR");
+        if(a.us.relativePos !== a.target.relativePos) reasoning = "TACTICAL SWAP";
+        
+        listHtml += `
+        <div class="tactical-hud-item" style="border-color:${borderColor}; color:${confColor}; box-shadow: ${isElite ? 'inset 0 0 15px rgba(0,229,255,0.1)' : 'none'};">
+            <div style="flex:1;">
+                <div style="font-weight:700; font-size:12px; color:#fff;">${a.us.relativePos}. ${a.us.name} <span style="font-size:9px; color:var(--text-muted); font-weight:500;">TH${a.us.th}</span></div>
+                <div style="font-size:8px; margin-top:4px; opacity:0.8; letter-spacing:1px;">${reasoning}</div>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; align-items:center; padding:0 12px; opacity: 0.6;">
+                <span style="font-size:14px;">⟴</span>
+            </div>
+            
+            <div style="flex:1; text-align:right;">
+                <div style="font-weight:700; font-size:12px; color:#fff;">${a.target.relativePos}. ${a.target.name} <span style="font-size:9px; color:var(--text-muted); font-weight:500;">TH${a.target.th}</span></div>
+                <div style="font-size:9px; margin-top:4px; font-weight:700; letter-spacing:1px;">CONF: ${a.confidence}%</div>
+            </div>
+        </div>`;
     });
 
-    let html = `<div style="margin-top:32px;">
-        <p style="font-size: 11px; color: var(--accent-main); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px; text-align:center; border-top: 1px solid var(--border-color); padding-top: 24px;">Tactical AI Assignments</p>
-        <div style="font-size: 11px; display:flex; flex-direction:column; gap:6px;">${listHtml}</div>
+    let html = `<div style="margin-top:40px;">
+        <h4 class="section-title">Tactical AI Directives</h4>
+        <p class="section-subtitle">Bayesian predictive targeting matrix</p>
+        <div style="display:flex; flex-direction:column; gap:8px;">${listHtml}</div>
     </div>`;
     
     return html;
@@ -750,7 +638,7 @@ function setStarMapFilter(f) {
     document.querySelectorAll('.map-legend span').forEach(el => el.style.color = 'var(--text-muted)');
     if(f==='us') document.getElementById('leg-us').style.color = 'var(--accent-main)';
     if(f==='them') document.getElementById('leg-them').style.color = 'var(--dot-red)';
-    if(f==='all') document.getElementById('leg-all').style.color = 'var(--text-main)';
+    if(f==='all') document.getElementById('leg-all').style.color = '#fff';
     drawStarMap();
 }
 
@@ -765,7 +653,7 @@ function drawStarMap() {
 
     let cx = canvas.width / 2; let cy = canvas.height / 2; let maxR = canvas.width / 2 * 0.85;
 
-    ctx.strokeStyle = 'rgba(0, 229, 255, 0.15)'; ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.1)'; ctx.lineWidth = 1;
     [0.33, 0.66, 1.0].forEach(scale => {
         ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI*2); ctx.stroke();
     });
@@ -794,65 +682,7 @@ function drawStarMap() {
     nodesToDraw.forEach(n => {
         let color = n.isUs ? 'var(--accent-main)' : 'var(--dot-red)';
         let left = (n.x / canvas.width) * 100; let top = (n.y / canvas.height) * 100;
-        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color};"><span class="star-label" style="color:${color};">${n.name}</span></div>`;
-    });
-    container.innerHTML = html;
-}
-
-function renderLeagueRankings() {
-    let filter = document.getElementById('leagueRankFilter').value;
-    let container = document.getElementById('leagueRankingsContainer');
-    if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) {
-        container.innerHTML = `<p style="font-size:10px; color:var(--text-muted); text-align:center;">Awaiting League Database Sync...</p>`;
-        return;
-    }
-
-    let pool = [...warInfo.starMap];
-
-    if (filter === 'attackers') {
-        pool.sort((a, b) => b.stars - a.stars || b.avgDest - a.avgDest);
-    } else {
-        pool = pool.filter(p => p.defenses > 0);
-        pool.sort((a, b) => a.defStars - b.defStars || a.defAvgDest - b.defAvgDest);
-    }
-
-    let html = ``;
-    pool.slice(0, 15).forEach((p, i) => {
-        let primaryStat = filter === 'attackers' ? `${p.stars}★` : `${p.defStars}★`;
-        let subStat = filter === 'attackers' ? `${p.avgDest || 0}% Dest` : `${p.defAvgDest || 0}% Dest`;
-        let isUs = p.clanTag === decodeURIComponent("#YQP0GJ9");
-        let nameColor = isUs ? "var(--accent-main)" : "var(--text-main)";
-
-        html += `
-        <div class="rank-card">
-            <div class="rank-header" onclick="this.nextElementSibling.classList.toggle('open')">
-                <div style="display:flex; align-items:center; gap:12px;">
-                    <div style="font-size:14px; font-weight:600; color:var(--text-muted); width:20px;">#${i+1}</div>
-                    <div style="display:flex; flex-direction:column;">
-                        <span style="font-weight:600; font-size:13px; color:${nameColor};">${p.name}</span>
-                        <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${p.clanName} (TH${p.th})</span>
-                    </div>
-                </div>
-                <div style="display:flex; flex-direction:column; align-items:flex-end;">
-                    <span style="font-weight:600; font-size:14px; color:var(--text-main);">${primaryStat}</span>
-                    <span style="font-size:9px; color:var(--text-muted); margin-top:2px;">${subStat}</span>
-                </div>
-            </div>
-            <div class="rank-details">
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span>Total Attacks/Defs:</span> <span class="rank-val">${filter === 'attackers' ? p.attacks : p.defenses}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span>3★ Count:</span> <span class="rank-val">${p.threeStars || 0}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-                    <span>2★ Count:</span> <span class="rank-val">${p.twoStars || 0}</span>
-                </div>
-                <div style="display:flex; justify-content:space-between;">
-                    <span>1★ Count:</span> <span class="rank-val">${p.oneStar || 0}</span>
-                </div>
-            </div>
-        </div>`;
+        html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color}; box-shadow: 0 0 12px ${color};"><span class="star-label" style="color:${color};">${n.name}</span></div>`;
     });
     container.innerHTML = html;
 }
@@ -890,7 +720,6 @@ let rosterSize = activeRound.teamSize || 15;
 let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png"; 
 let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 
-// V5.4 Enhanced Win Probability (Floor Math & Distribution)
 let winProbHtml = "";
 let distDataUs = null, distDataThem = null, distLabels = null;
 
@@ -898,9 +727,9 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     let oppAtksLeft = rosterSize - oppAtks;
     let myAtksLeft = rosterSize - myAtks;
     
-    // V5.4 Mathematical Floor: Your clan doesn't drop below 2 stars
+    // Mathematical Floor: Your clan doesn't drop below 2 stars
     let rawMyPace = myAtks > 0 ? myStars / myAtks : 2.5;
-    let myPace = Math.max(2.1, rawMyPace); // Guaranteed minimum high-floor 
+    let myPace = Math.max(2.1, rawMyPace); 
     let oppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
 
     let oppProjected = oppStars + (oppAtksLeft * oppPace);
@@ -911,7 +740,6 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
     winProb = Math.max(1, Math.min(99, Math.round(winProb)));
 
-    // V5.4 Clinch Math (Assumes we get at least 2 per hit moving forward)
     let myFloorStars = myStars + (myAtksLeft * 2);
     let oppMaxStars = oppStars + (oppAtksLeft * 3);
     let starsToClinch = oppMaxStars + 1 - myFloorStars;
@@ -922,22 +750,21 @@ if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
     else clinchTxt = `${Math.max(0, starsToClinch)} additional 3★ hits`;
 
     winProbHtml = `
-    <div style="background: rgba(0, 229, 255, 0.05); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+    <div style="background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(0,229,255,0.15); border-radius: 12px; padding: 16px; margin-bottom: 24px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase;">AI Win Probability</div>
-            <div style="font-size:14px; font-weight:600; color:var(--accent-main);">${winProb}%</div>
+            <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing: 1.5px;">AI Win Probability</div>
+            <div style="font-size:18px; font-weight:700; color:var(--accent-main); text-shadow: 0 0 10px rgba(0,229,255,0.4);">${winProb}%</div>
         </div>
-        <div style="font-size:10px; color:var(--text-muted); text-align:left; margin-top:8px;">Min 3★ Needed to Win: <span style="color:var(--text-main); font-weight:600; margin-left:4px;">${clinchTxt}</span></div>
+        <div style="font-size:10px; color:var(--text-muted); text-align:left; margin-top:12px; padding-top:12px; border-top: 1px solid rgba(255,255,255,0.05);">Min 3★ Needed to Clinch: <span style="color:#fff; font-weight:700; margin-left:4px; letter-spacing:0.5px;">${clinchTxt}</span></div>
     </div>
     
-    <div class="distribution-bg" style="height: 120px; position:relative; margin-bottom: 24px;">
-        <span style="position:absolute; top:8px; left:12px; font-size:8px; color:var(--text-muted); text-transform:uppercase;">Monte Carlo Probability Distribution</span>
+    <div class="distribution-bg" style="height: 140px; position:relative;">
+        <span style="position:absolute; top:12px; left:16px; font-size:9px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Monte Carlo Distribution</span>
         <canvas id="winProbChart"></canvas>
     </div>`;
 
-    // Generate bell curves
-    let myStdDev = Math.max(0.5, myAtksLeft * 0.3); // Tight cluster (high consistency)
-    let oppStdDev = Math.max(1.0, oppAtksLeft * 0.6); // Wider cluster (more variance)
+    let myStdDev = Math.max(0.5, myAtksLeft * 0.3); 
+    let oppStdDev = Math.max(1.0, oppAtksLeft * 0.6); 
     let minRange = Math.floor(Math.min(myProjected, oppProjected) - 8);
     let maxRange = Math.ceil(Math.max(myProjected, oppProjected) + 8);
     
@@ -955,78 +782,37 @@ if(myAtks !== "...") {
 }
 
 html += `<div class="war-room-header">
-    <h4 style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 2px; margin:0;">Live War Room</h4>
-    <div style="display: flex; justify-content: center; align-items: center; gap: 24px; margin: 24px 0;">
+    <h4 style="color: var(--text-main); font-size: 13px; font-weight:700; text-transform: uppercase; letter-spacing: 3px; margin:0 0 32px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.8);">Live War Room</h4>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 24px; margin-bottom: 32px;">
         <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-            <img src="${myBadgeUrl}" style="width: 56px; height: 56px; filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.4)); margin-bottom: 8px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-            <span style="font-size: 32px; font-weight: 600; color: var(--accent-main); line-height:1;">${myStars}</span>
+            <img src="${myBadgeUrl}" style="width: 64px; height: 64px; filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.4)); margin-bottom: 12px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
+            <span style="font-size: 36px; font-weight: 700; color: var(--accent-main); line-height:1; text-shadow: 0 0 20px rgba(0,229,255,0.4);">${myStars}</span>
         </div>
-        <div style="font-size: 18px; color: var(--text-muted); font-weight: 600;">VS</div>
+        <div style="font-size: 20px; color: var(--text-muted); font-weight: 700; text-shadow: 0 2px 5px rgba(0,0,0,0.8);">VS</div>
         <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
-            <img src="${oppBadgeUrl}" style="width: 56px; height: 56px; filter: drop-shadow(0 0 10px rgba(255, 51, 102, 0.4)); margin-bottom: 8px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-            <span style="font-size: 32px; font-weight: 600; color: var(--dot-red); line-height:1;">${oppStars}</span>
+            <img src="${oppBadgeUrl}" style="width: 64px; height: 64px; filter: drop-shadow(0 0 15px rgba(255, 51, 102, 0.4)); margin-bottom: 12px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
+            <span style="font-size: 36px; font-weight: 700; color: var(--dot-red); line-height:1; text-shadow: 0 0 20px rgba(255,51,102,0.4);">${oppStars}</span>
         </div>
     </div>
     ${winProbHtml}
-    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px; font-weight:500;">Attacks Remaining: ${myAtks !== "..." ? rosterSize - myAtks : "..."}</div>
+    <div style="font-size: 10px; font-weight:600; color: var(--text-muted); margin-bottom: 12px; letter-spacing:1px; text-transform:uppercase;">Attacks Remaining: <span style="color:#fff;">${myAtks !== "..." ? rosterSize - myAtks : "..."}</span></div>
     <div class="energy-bar-container">${attackSegments}</div>
 </div>`;
 
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
 if (activeRound.state === "inWar" && hitList.length > 0) {
-    html += `<h4 style="margin-top:0; font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">Pending Strikes (${hitList.length})</h4>
-    <div style="display:flex; gap:8px; overflow-x:auto; padding-bottom:16px; margin-bottom:16px; scrollbar-width:none;">`;
+    html += `<h4 class="section-title">Pending Strikes</h4>
+    <p class="section-subtitle">Operators awaiting deployment (${hitList.length})</p>
+    <div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:16px; margin-bottom:24px; scrollbar-width:none;">`;
     hitList.forEach(p => { html += `<div class="strike-pill">${p.name}</div>`; });
     html += `</div>`;
 }
 
-// V5.4 3D Defensive Integrity Matrix
-let isoHtml = `
-<h4 class="section-title" style="margin-top:40px;">Defensive Integrity Matrix</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 16px; padding:0 20px;">3D Topographic view of base resilience. Pillar height represents average stars yielded across the league.</p>
-<div class="defensive-matrix-wrapper">
-    <div class="iso-grid">
-`;
-
-activeRound.myLineup.sort((a,b)=>a.relativePos - b.relativePos).forEach(p => {
-    let sData = warInfo.starMap.find(s => s.tag === p.tag);
-    let defStars = sData ? sData.defStars : 0;
-    let defenses = sData ? sData.defenses : 0;
-    let defTotalDest = sData ? sData.defTotalDest : 0;
-    
-    let avgDefStars = defenses > 0 ? (defStars / defenses) : 0;
-    let avgDefDest = defenses > 0 ? (defTotalDest / defenses) : 0;
-    
-    let pillarHeight = Math.max(2, avgDefStars * 25);
-    
-    let colorHex = "#00e5ff";
-    let colorVar = "var(--accent-main)";
-    let bgGrad = `linear-gradient(to top, rgba(0, 229, 255, 0.8), rgba(0, 229, 255, 0.1))`;
-    
-    if (avgDefStars >= 2.5) {
-        colorHex = "#ff3366"; colorVar = "var(--dot-red)";
-        bgGrad = `linear-gradient(to top, rgba(255, 51, 102, 0.8), rgba(255, 51, 102, 0.1))`;
-    } else if (avgDefStars > 1.5) {
-        colorHex = "#b300ff"; colorVar = "var(--accent-secondary)";
-        bgGrad = `linear-gradient(to top, rgba(179, 0, 255, 0.8), rgba(179, 0, 255, 0.1))`;
-    }
-
-    isoHtml += `
-    <div class="iso-cube" style="border-color:${colorVar}; background: ${colorHex}22;">
-        <div class="pillar" style="height: ${pillarHeight}px; background: ${bgGrad}; border-color: ${colorVar}; box-shadow: 0 0 10px ${colorHex}66;"></div>
-        <div class="iso-label">${p.relativePos}</div>
-        <div class="iso-tooltip"><span style="color:${colorHex}; font-weight:bold; font-size:12px;">${p.name}</span><br>Avg Def: ${avgDefStars.toFixed(1)}★<br>Avg Dest: ${avgDefDest.toFixed(1)}%</div>
-    </div>`;
-});
-isoHtml += `</div></div>`;
-html += isoHtml;
-
-
 html += `
-<h4 class="section-title" style="margin-top:40px;">CWL Constellation</h4>
-<p style="font-size: 9px; color: var(--text-muted); text-align:center; margin-bottom: 0px; padding:0 20px;">Mapping complete league trajectories. Center = 21 Stars. Rotational shifts indicate avg target reach/dip.</p>
+<h4 class="section-title">CWL Constellation</h4>
+<p class="section-subtitle">Macro-league trajectory map. Core = 21 Stars.</p>
 <div class="map-legend">
-    <span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:600;" onclick="setStarMapFilter('us')">Our Clan</span>
+    <span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:700; text-shadow:0 0 8px var(--accent-main);" onclick="setStarMapFilter('us')">Our Clan</span>
     <span id="leg-them" style="cursor:pointer;" onclick="setStarMapFilter('them')">Opponent</span>
     <span id="leg-all" style="cursor:pointer;" onclick="setStarMapFilter('all')">League</span>
 </div>
@@ -1034,11 +820,13 @@ html += `
     <canvas id="starMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
     <div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
     <div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
-    <div class="radar-core" style="background:var(--accent-secondary); box-shadow: 0 0 20px var(--accent-secondary);"></div>
+    <div class="radar-core"></div>
+    <div class="radar-sweep"></div>
     <div id="starMapNodes" class="star-map-nodes"></div>
 </div>`;
 
-html += `<h4 class="section-title" style="margin-top:40px;">CWL Matrix Pipeline</h4>`;
+html += `<h4 class="section-title">CWL Matrix Pipeline</h4>`;
+html += `<p class="section-subtitle">Round-by-round tactical analysis</p>`;
 html += `<div class="cwl-carousel" id="cwlCarousel">`;
 
 warInfo.cwlDetails.forEach((round, index) => {
@@ -1062,52 +850,52 @@ if (round.state === "preparation") {
     let oppLeagueAvgDest = oppTotalAtks > 0 ? (oppTotalDest / oppTotalAtks).toFixed(1) : 0;
 
     patHtml = `
-    <div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
-        <p style="font-size: 10px; color: var(--accent-main); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">[LEAGUE-WIDE SCOUTING REPORT]</p>
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
+    <div style="margin-top:24px; padding:20px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.05); border-radius:12px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+        <p style="font-size: 10px; font-weight:700; color: var(--accent-main); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; text-align:center;">[LEAGUE-WIDE SCOUTING REPORT]</p>
+        <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:9px; font-weight:700; letter-spacing:1px;">
             <span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
             <span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
             <span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalHitRate}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">3★ Hit Rate</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueHitRate}%</span>
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:14px; font-weight:600;">
+            <span style="color:var(--accent-main); width:30%; text-align:center; text-shadow:0 0 10px rgba(0,229,255,0.4);">${usTotalHitRate}%</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">3★ Hit Rate</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center; text-shadow:0 0 10px rgba(255,51,102,0.4);">${oppLeagueHitRate}%</span>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px;">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${usTotalAvgDest}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Avg Destruction</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppLeagueAvgDest}%</span>
+        <div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
+            <span style="color:var(--accent-main); width:30%; text-align:center; text-shadow:0 0 10px rgba(0,229,255,0.4);">${usTotalAvgDest}%</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">Avg Destruction</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center; text-shadow:0 0 10px rgba(255,51,102,0.4);">${oppLeagueAvgDest}%</span>
         </div>
     </div>`;
 } else {
     patHtml = `
-    <div style="margin-top:24px; padding:16px; background:rgba(0,0,0,0.3); border:1px solid var(--border-color); border-radius:12px;">
-        <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Attack Profile Comparison</p>
-        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:10px; font-weight:600;">
+    <div style="margin-top:24px; padding:20px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.05); border-radius:12px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+        <p style="font-size: 10px; font-weight:700; color: var(--text-muted); margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; text-align:center;">Attack Profile Comparison</p>
+        <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:9px; font-weight:700; letter-spacing:1px;">
             <span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
             <span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
             <span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:13px; font-weight:500;">
             <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.mirrors}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Mirrors</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">Mirrors</span>
             <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.mirrors}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:13px; font-weight:500;">
             <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.dips}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Dips</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">Dips</span>
             <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.dips}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:12px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:13px; font-weight:500;">
             <span style="color:var(--accent-main); width:30%; text-align:center;">${myPat.reaches}</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Reaches</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">Reaches</span>
             <span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat.reaches}</span>
         </div>
-        <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:600; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
-            <span style="color:var(--accent-main); width:30%; text-align:center;">${myHitRate}%</span>
-            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px;">Hit Rate</span>
-            <span style="color:var(--dot-red); width:30%; text-align:center;">${oppHitRate}%</span>
+        <div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; padding-top:16px; border-top:1px solid rgba(255,255,255,0.05);">
+            <span style="color:var(--accent-main); width:30%; text-align:center; text-shadow:0 0 10px rgba(0,229,255,0.4);">${myHitRate}%</span>
+            <span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">Hit Rate</span>
+            <span style="color:var(--dot-red); width:30%; text-align:center; text-shadow:0 0 10px rgba(255,51,102,0.4);">${oppHitRate}%</span>
         </div>
     </div>`;
 }
@@ -1115,13 +903,13 @@ if (round.state === "preparation") {
 let oppLineupMap = [...(round.enemyLineup || [])].sort((a,b)=>a.mapPosition - b.mapPosition).map((e,i)=>({...e, relativePos: i+1}));
 
 let rosterHtml = `<div style="margin-top:32px;">
-<p style="font-size: 10px; color: var(--text-muted); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; text-align:center;">Enemy Roster</p>`;
+<p style="font-size: 10px; font-weight:700; color: var(--text-muted); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 2px; text-align:center;">Enemy Roster</p>`;
 oppLineupMap.forEach(e => {
-let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px;">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
-rosterHtml += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(0, 229, 255, 0.1); font-size:12px; align-items:center;">
+let atkStatus = e.attacks > 0 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px; font-weight:600; text-shadow:0 0 5px var(--dot-red);">[⟁ ENGAGED]</span>` : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
+rosterHtml += `<div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px; align-items:center;">
 <div>
-<span style="color:var(--text-muted); width:24px; display:inline-block; font-size:10px;">#${e.relativePos}</span>
-<span style="font-weight:500;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:4px; font-weight:500;">TH${e.th}</span>
+<span style="color:var(--text-muted); width:28px; display:inline-block; font-size:10px; font-weight:600;">#${e.relativePos}</span>
+<span style="font-weight:600; color:#fff;">${e.name}</span> <span style="color:var(--accent-main); font-size:9px; margin-left:6px; font-weight:700;">TH${e.th}</span>
 </div>
 <div>${atkStatus}</div>
 </div>`;
@@ -1132,17 +920,17 @@ if (isCurrent) rosterHtml += buildTargetAssignments(round);
 
 let prevSeasonHtml = "";
 if (round.opponent.prevLeague) {
-    prevSeasonHtml = `<div style="font-size:8px; color:var(--text-muted); margin-top:4px;">Prev Season: ${round.opponent.prevLeague} (Pos: ${round.opponent.prevPos})</div>`;
+    prevSeasonHtml = `<div style="font-size:9px; font-weight:500; color:var(--text-muted); margin-top:6px; text-transform:uppercase; letter-spacing:1px;">Prev Season: ${round.opponent.prevLeague}</div>`;
 }
 
 html += `
 <div class="carousel-slide ${isCurrent ? 'active' : ''}">
-  <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px; margin-bottom:20px;">
     <div>
-        <div style="font-size:15px; font-weight:600; font-family:var(--font-sans);">Round ${index + 1}: ${round.opponent.name}</div>
+        <div style="font-size:16px; font-weight:700; font-family:var(--font-sans); color:#fff;">Round ${index + 1}: ${round.opponent.name}</div>
         ${prevSeasonHtml}
     </div>
-    <div style="font-size:9px; color:var(--accent-main); text-transform:uppercase; letter-spacing:1px; font-weight:600;">${round.state}</div>
+    <div style="font-size:10px; color:var(--accent-main); text-transform:uppercase; letter-spacing:2px; font-weight:700; text-shadow:0 0 10px rgba(0,229,255,0.4);">${round.state}</div>
   </div>
   ${patHtml}
   ${rosterHtml}
@@ -1150,99 +938,45 @@ html += `
 });
 html += `</div>`; 
 
-html += `
-<h4 class="section-title" style="margin-top:48px;">League Top Operators</h4>
-<div class="control-row" style="margin-bottom: 16px;">
-    <select id="leagueRankFilter" onchange="renderLeagueRankings()">
-        <option value="attackers">Best Attackers</option>
-        <option value="defenders">Best Defenders</option>
-    </select>
-</div>
-<div id="leagueRankingsContainer"></div>
-`;
-
 container.innerHTML = html;
 init3DCarousel();
 if(warInfo.starMap && warInfo.starMap.length > 0) {
     drawStarMap();
 }
 
-// V5.4 Draw Monte Carlo Distribution Line Chart
+// V5.5 Draw Beautiful Gradient Monte Carlo Distribution
 if(distDataUs && distDataThem && distLabels) {
     let ctxP = document.getElementById('winProbChart');
     if (ctxP) {
         if(chartsRegistry.probChart) chartsRegistry.probChart.destroy();
+        
+        let gradUs = ctxP.getContext('2d').createLinearGradient(0, 0, 0, 140);
+        gradUs.addColorStop(0, 'rgba(0, 229, 255, 0.4)'); gradUs.addColorStop(1, 'rgba(0, 229, 255, 0.0)');
+        
+        let gradThem = ctxP.getContext('2d').createLinearGradient(0, 0, 0, 140);
+        gradThem.addColorStop(0, 'rgba(255, 51, 102, 0.4)'); gradThem.addColorStop(1, 'rgba(255, 51, 102, 0.0)');
+
         chartsRegistry.probChart = new Chart(ctxP.getContext('2d'), {
             type: 'line',
             data: {
                 labels: distLabels,
                 datasets: [
-                    { label: 'Us', data: distDataUs, borderColor: '#00e5ff', backgroundColor: 'rgba(0, 229, 255, 0.2)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 },
-                    { label: 'Them', data: distDataThem, borderColor: '#ff3366', backgroundColor: 'rgba(255, 51, 102, 0.2)', fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 }
+                    { label: 'Us', data: distDataUs, borderColor: '#00e5ff', backgroundColor: gradUs, fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2.5 },
+                    { label: 'Them', data: distDataThem, borderColor: '#ff3366', backgroundColor: gradThem, fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2.5 }
                 ]
             },
             options: {
+                animation: { duration: 2000, easing: 'easeOutQuart' },
                 responsive: true, maintainAspectRatio: false,
                 plugins: { legend: { display: false }, tooltip: { enabled: false } },
                 scales: { 
-                    x: { display: true, grid: { display: false }, ticks: { color: '#8b949e', font: {size: 9, family: 'Montserrat'} } }, 
+                    x: { display: true, grid: { display: false }, ticks: { color: '#8b949e', font: {size: 10, family: 'Montserrat', weight:600} } }, 
                     y: { display: false, min: 0 } 
                 }
             }
         });
     }
 }
-renderLeagueRankings();
-}
-
-function toggleCompareMode() {
-    let compSec = document.getElementById('roster-compare-section');
-    let rosterCont = document.getElementById('roster-container');
-    let mapCont = document.getElementById('roster-map');
-    
-    if (compSec.style.display === 'none') {
-        compSec.style.display = 'block';
-        rosterCont.style.display = 'none';
-        mapCont.style.display = 'none';
-        populateVersusDropdowns();
-    } else {
-        compSec.style.display = 'none';
-        if (isMapView) mapCont.style.display = 'block';
-        else rosterCont.style.display = 'grid';
-    }
-}
-
-function populateVersusDropdowns() {
-var sel1 = document.getElementById('player1Select'), sel2 = document.getElementById('player2Select');
-sel1.innerHTML = ""; sel2.innerHTML = "";
-let validPlayers = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
-if (validPlayers.length === 0) validPlayers = globalPlayerData;
-validPlayers.forEach((p, i) => { sel1.add(new Option(p.name, i)); sel2.add(new Option(p.name, i)); });
-if(validPlayers.length > 1) sel2.selectedIndex = 1; comparePlayers();
-}
-
-function comparePlayers() {
-let validPlayers = globalPlayerData.filter(p => CWL_TAGS.includes(p.tag));
-if (validPlayers.length === 0) validPlayers = globalPlayerData;
-let p1 = validPlayers[document.getElementById('player1Select').value], p2 = validPlayers[document.getElementById('player2Select').value];
-if(!p1 || !p2) return;
-document.getElementById('radarSection').style.display = "block";
-
-let p1H = parseInt((p1.heroStats||"0").split('/')[0]), p2H = parseInt((p2.heroStats||"0").split('/')[0]);
-let p1P = parseInt((p1.petStats||"0").split('/')[0]), p2P = parseInt((p2.petStats||"0").split('/')[0]);
-
-const getWin = (v1, v2) => v1 > v2 ? ['winner', ''] : (v2 > v1 ? ['', 'winner'] : ['', '']);
-let [c1, c2] = getWin(p1.percentage, p2.percentage); let [h1, h2] = getWin(p1H, p2H); let [pt1, pt2] = getWin(p1P, p2P);
-let [d1, d2] = getWin(p1.donations||0, p2.donations||0); let [s1, s2] = getWin(p1.warStars||0, p2.warStars||0);
-
-document.getElementById('compareDetailsGrid').innerHTML = `
-<div class="player-card-inner" style="display:block;">
-    <div class="compare-row"><div class="compare-val ${c1}">${parseFloat(p1.percentage)}%</div><div class="compare-label">Overall Completion</div><div class="compare-val ${c2}" style="color:var(--accent-secondary);">${parseFloat(p2.percentage)}%</div></div>
-    <div class="compare-row"><div class="compare-val ${h1}">${p1.heroStats}</div><div class="compare-label">Total Hero Levels</div><div class="compare-val ${h2}" style="color:var(--accent-secondary);">${p2.heroStats}</div></div>
-    <div class="compare-row"><div class="compare-val ${pt1}">${p1.petStats}</div><div class="compare-label">Total Pet Levels</div><div class="compare-val ${pt2}" style="color:var(--accent-secondary);">${p2.petStats}</div></div>
-    <div class="compare-row"><div class="compare-val ${d1}">${(p1.donations||0).toLocaleString()}</div><div class="compare-label">Donations</div><div class="compare-val ${d2}" style="color:var(--accent-secondary);">${(p2.donations||0).toLocaleString()}</div></div>
-    <div class="compare-row" style="border:none;"><div class="compare-val ${s1}">${(p1.warStars||0).toLocaleString()}</div><div class="compare-label">War Stars</div><div class="compare-val ${s2}" style="color:var(--accent-secondary);">${(p2.warStars||0).toLocaleString()}</div></div>
-</div>`;
 }
 </script>
 </body>
