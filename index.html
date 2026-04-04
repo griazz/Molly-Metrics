@@ -1322,6 +1322,7 @@ html += `<div class="intel-card" style="overflow-x:auto;">
 <th>Season</th><th>League</th><th>⭐ Stars</th><th>💥 Dest</th><th>W/L</th><th>3★</th>
 </tr></thead>
 <tbody>`;
+
 cwlHistory.forEach(s => {
 let displaySeason = s.season || '—';
 if (s.season) {
@@ -1342,6 +1343,7 @@ html += `<tr>
 <td style="color:var(--accent-secondary);">${s.threeStars || 0}</td>
 </tr>`;
 });
+
 html += `</tbody></table></div>`;
 } else {
 html += `<div class="intel-card" style="text-align:center; padding:32px;">
@@ -1358,10 +1360,8 @@ if (globalPlayerData.length > 0) {
 let sorted = [...globalPlayerData].sort((a, b) => (b.donations || 0) - (a.donations || 0));
 html += `<div class="intel-card" style="padding:0; overflow:hidden;">`;
 sorted.forEach((p, i) => {
-let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ?
-'bronze' : '';
-let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ?
-'🥉' : (i + 1);
+let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
 html += `<div class="donation-row">
 <div class="donation-rank ${rankCls}">${rankIcon}</div>
 <div class="donation-name">${p.name} <span style="font-size:9px; color:var(--text-muted);">TH${p.thLevel||'?'}</span></div>
@@ -1379,10 +1379,8 @@ html += `<h4 class="section-title">War Stars Leaderboard</h4>
 let sortedByWar = [...globalPlayerData].sort((a, b) => (parseInt(b.warStars) || 0) - (parseInt(a.warStars) || 0));
 html += `<div class="intel-card" style="padding:0; overflow:hidden;">`;
 sortedByWar.forEach((p, i) => {
-let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ?
-'🥉' : (i + 1);
-let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ?
-'bronze' : '';
+let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
 html += `<div class="donation-row">
 <div class="donation-rank ${rankCls}">${rankIcon}</div>
 <div class="donation-name">${p.name}</div>
