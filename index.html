@@ -13,7 +13,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ── CSS VARIABLES ── */
 :root {
@@ -38,7 +38,6 @@
 --grade-c: #ffcc00;
 --grade-d: #ff3366;
 }
-
 html, body {
 height: 100%; width: 100%; margin: 0; padding: 0;
 overflow: hidden; position: fixed;
@@ -49,12 +48,10 @@ font-family: var(--font-sans); font-weight: 300;
 color: var(--text-main); -webkit-font-smoothing: antialiased;
 -webkit-tap-highlight-color: transparent;
 }
-
 h1,h2,h3,h4,.section-title,.player-info { margin: 0; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-
 /* ── BACKGROUND ── */
 #app-background {
 position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100;
@@ -71,7 +68,6 @@ linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
 background-size: 100% 100%, 40px 40px, 40px 40px;
 pointer-events: none; z-index: 1;
 }
-
 /* ── SCROLL AREA ── */
 .main-scroll-area {
 position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -80,7 +76,6 @@ overscroll-behavior-y: none;
 padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
 box-sizing: border-box; scroll-behavior: smooth;
 }
-
 /* ── LOADER ── */
 .loader-overlay {
 position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -90,7 +85,6 @@ align-items: center; justify-content: center;
 opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
 }
 .loader-overlay.active { opacity: 1; pointer-events: all; }
-
 .loader-ring {
 width: 90px; height: 90px; border-radius: 50%;
 border: 2px solid transparent;
@@ -111,7 +105,6 @@ border: 2px solid var(--text-main); animation: pulse 1.5s ease-in-out infinite;
 @keyframes spin { 100% { transform: rotate(360deg); } }
 @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
 @keyframes pulse { 0%,100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
-
 .loader-terminal {
 font-family: monospace; font-size: 10px; color: var(--accent-main);
 text-align: left; width: 280px;
@@ -127,7 +120,6 @@ text-transform: uppercase;
 .term-line.blink { animation: typeLine 0.1s forwards 3.2s, blink 1s infinite 3.2s; color: var(--dot-green); }
 @keyframes typeLine { to { opacity: 1; } }
 @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
-
 /* ── CONTAINER ── */
 .container {
 padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px));
@@ -141,11 +133,9 @@ box-sizing: border-box; font-size: 13px; outline: none;
 transition: all 0.4s ease; backdrop-filter: blur(16px); letter-spacing: 1px;
 }
 input:focus, select:focus { border-color: var(--accent-main); box-shadow: inset 0 0 10px rgba(0,229,255,0.1); }
-
 .control-row { display: flex; gap: 12px; margin-bottom: 32px; align-items: center; }
 .control-row input { flex: 1; }
 .control-row select { flex-shrink: 0; width: auto; font-size: 11px; font-weight: 500; }
-
 /* ── GLASS GRID ── */
 .glass-grid {
 display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -169,8 +159,6 @@ opacity: 0; transition: opacity 0.3s;
 .glass-card:hover { border-color: rgba(0,229,255,0.3); box-shadow: 0 15px 35px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05); z-index: 10; }
 .glass-card:hover::before { opacity: 1; }
 .glass-card-inner { pointer-events: none; transform: translateZ(30px); display: flex; flex-direction: column; align-items: center; width: 100%; }
-
-/* V6: Grade Badge */
 .grade-badge {
 position: absolute; top: 8px; right: 8px;
 font-size: 9px; font-weight: 800; letter-spacing: 1px;
@@ -182,7 +170,6 @@ font-family: var(--font-sans);
 .grade-B { background: rgba(0,255,136,0.10); color: var(--grade-b); border: 1px solid rgba(0,255,136,0.25); }
 .grade-C { background: rgba(255,204,0,0.10); color: var(--grade-c); border: 1px solid rgba(255,204,0,0.25); }
 .grade-D { background: rgba(255,51,102,0.10); color: var(--grade-d); border: 1px solid rgba(255,51,102,0.25); }
-
 .glass-ring {
 width: 44px; height: 44px; border-radius: 50%;
 background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.03) 0deg);
@@ -196,7 +183,6 @@ text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
 .glass-th { font-size: 9px; color: var(--text-muted); margin-top: 6px; font-weight: 600; display: flex; align-items: center; justify-content: center; letter-spacing: 1px; }
 .growth-indicator { color: var(--dot-green); font-size: 10px; margin-left: 6px; filter: drop-shadow(0 0 4px var(--dot-green)); animation: pulseGrow 2s infinite alternate; }
 @keyframes pulseGrow { 0% { opacity: 0.5; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.2); } }
-
 /* ── CWL CONSTELLATION MAP ── */
 .star-map-wrapper {
 position: relative; width: 100%; padding-bottom: 100%;
@@ -227,7 +213,6 @@ box-shadow: 0 0 25px var(--accent-secondary), 0 0 50px var(--accent-secondary); 
 .radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0,229,255,0.05) 90%, rgba(0,229,255,0.3) 100%);
 animation: radarSweep 6s linear infinite; pointer-events: none; z-index: 4; mix-blend-mode: screen; }
 @keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
 /* ── BOTTOM SHEET MODAL ── */
 .sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(8px);
 }
@@ -239,7 +224,6 @@ border-top: 1px solid rgba(255,255,255,0.1); box-shadow: 0 -20px 60px rgba(0,0,0
 .close-btn { position: absolute; top: 20px; right: 24px; width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;
 display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 16px; cursor: pointer; transition: all 0.3s; z-index: 10; }
 .close-btn:hover { background: rgba(255,51,102,0.2); color: var(--dot-red); border-color: var(--dot-red); }
-
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 24px; margin-bottom: 32px; }
 .stat-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,229,255,0.15); border-radius: 12px; padding: 16px 8px; text-align: center; position: relative; overflow: hidden;
 box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
@@ -248,7 +232,6 @@ box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
 .stat-val { font-size: 16px; color: var(--accent-main); font-family: var(--font-sans); font-weight: 700; position: relative; z-index: 2; text-shadow: 0 0 10px rgba(0,229,255,0.4); }
 .chart-container { margin-top: 24px; position: relative; width: 100%; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.05);
 }
-
 /* ── BOTTOM NAV ── */
 .bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: rgba(5,6,8,0.9); backdrop-filter: blur(24px);
 border-top: 1px solid rgba(255,255,255,0.05); padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -258,18 +241,29 @@ transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); cursor: pointer; posi
 .nav-btn span { font-size: 22px; transition: transform 0.3s ease, filter 0.3s ease; }
 .nav-btn.active { color: var(--accent-main); background: rgba(0,229,255,0.05); }
 .nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 10px var(--accent-main)); }
-
 .tab-content { display: none; min-height: calc(100% + 1px); }
 .tab-content.active { display: block; animation: tabFade 0.4s cubic-bezier(0.16,1,0.3,1); }
 @keyframes tabFade { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
 .section-title { text-align: center; color: var(--text-main); margin-top: 40px; margin-bottom: 8px; text-transform: uppercase; font-size: 14px; font-weight: 700; letter-spacing: 4px;
 text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
 .section-subtitle { font-size: 9px; color: var(--text-muted); text-align: center; margin-bottom: 24px; padding: 0 20px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
-
 /* ── WAR ROOM ── */
+.carousel-wrapper { position: relative; width: 100%; margin-top: 16px; }
+.carousel-nav {
+position: absolute; top: 50%; transform: translateY(-50%);
+background: rgba(0,0,0,0.6); border: 1px solid rgba(0,229,255,0.3);
+color: var(--accent-main); width: 36px; height: 36px; border-radius: 50%;
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; z-index: 100; backdrop-filter: blur(8px);
+transition: all 0.3s ease; font-size: 16px;
+}
+.carousel-nav:hover { background: rgba(0,229,255,0.1); border-color: var(--accent-main); box-shadow: 0 0 15px rgba(0,229,255,0.3); }
+.carousel-nav:active { transform: translateY(-50%) scale(0.9); }
+.carousel-nav.left { left: -10px; }
+.carousel-nav.right { right: -10px; }
+
 .cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none;
-margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
+perspective: 1200px; transform-style: preserve-3d; }
 .cwl-carousel::-webkit-scrollbar { display: none; }
 .carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: linear-gradient(180deg, rgba(18,20,28,0.9), rgba(9,10,15,0.95)); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 24px;
 box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(20px); transform: rotateY(-10deg) scale(0.92); transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease; opacity: 0.5; }
@@ -297,23 +291,16 @@ border: 1px solid rgba(255,255,255,0.05); }
 border-left: 3px solid; border-radius: 8px; margin-bottom: 8px; position: relative; }
 .tactical-hud-item::before { content: '⌜'; position: absolute; top: 4px; left: 4px; font-size: 10px; color: inherit; opacity: 0.5; font-family: monospace; }
 .tactical-hud-item::after { content: '⌟'; position: absolute; bottom: 4px; right: 4px; font-size: 10px; color: inherit; opacity: 0.5; font-family: monospace; }
-
-/* V6: Confidence bar inside target assignments */
 .conf-bar-track { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 6px; width: 100%; overflow: hidden; }
 .conf-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
-
-/* V6: Round result pip */
 .round-result-pip { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 100px; letter-spacing: 1px; }
 .result-win { background: rgba(0,255,136,0.1); color: var(--dot-green); border: 1px solid rgba(0,255,136,0.3); }
 .result-loss { background: rgba(255,51,102,0.1); color: var(--dot-red); border: 1px solid rgba(255,51,102,0.3); }
 .result-draw { background: rgba(255,204,0,0.1); color: var(--dot-yellow); border: 1px solid rgba(255,204,0,0.3); }
 .result-inProgress { background: rgba(0,229,255,0.1); color: var(--accent-main); border: 1px solid rgba(0,229,255,0.3); }
-
-/* V6: TH warning badge */
 .th-warning { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 4px; background: rgba(255,204,0,0.15);
 color: var(--dot-yellow); border: 1px solid rgba(255,204,0,0.3); animation: warningPulse 2s infinite; }
 @keyframes warningPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-
 /* ── INTEL TAB ── */
 .intel-table { width: 100%; border-collapse: collapse; font-size: 11px; }
 .intel-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-size: 9px; padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.08);
@@ -322,8 +309,6 @@ text-align: left; }
 .intel-table tr:hover td { background: rgba(0,229,255,0.04); }
 .intel-card { background: linear-gradient(135deg, rgba(13,15,23,0.9), rgba(9,10,15,0.95)); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 16px;
 box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-
-/* V6: Donation leaderboard */
 .donation-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); }
 .donation-rank { font-size: 11px; font-weight: 800; color: var(--text-muted); width: 24px; flex-shrink: 0; }
 .donation-rank.gold { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
@@ -333,7 +318,6 @@ box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
 .donation-val { font-size: 13px; font-weight: 700; color: var(--accent-main); text-shadow: 0 0 8px rgba(0,229,255,0.3); }
 .donation-ratio-pill { font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 100px; background: rgba(0,229,255,0.08); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);
 margin-left: 6px; }
-
 /* ── TOAST ── */
 .toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
 .toast { background: rgba(15,17,25,0.95); border: 1px solid rgba(0,229,255,0.3); border-radius: 12px; padding: 12px 18px; font-size: 11px; font-weight: 600; color: var(--text-main);
@@ -342,28 +326,20 @@ letter-spacing: 0.5px; box-shadow: 0 8px 32px rgba(0,0,0,0.8); backdrop-filter: 
 .toast.success { border-color: rgba(0,255,136,0.4); }
 @keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
-
-/* V6: Refresh button */
 .refresh-btn { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: 16px; z-index: 900; background: rgba(0,0,0,0.6); border: 1px solid rgba(0,229,255,0.2);
 border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--text-muted);
 transition: all 0.3s; backdrop-filter: blur(16px); }
 .refresh-btn:active { transform: rotate(360deg); color: var(--accent-main); border-color: var(--accent-main); }
 .refresh-btn.spinning { animation: refreshSpin 0.8s linear infinite; }
 @keyframes refreshSpin { 100% { transform: rotate(360deg); } }
-
-/* V6: Pull-to-refresh indicator */
 .ptr-indicator { text-align: center; padding: 20px; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 0.3s; }
 .ptr-indicator.visible { opacity: 1; }
 </style>
 </head>
 <body>
-
 <div id="app-background"></div>
-
 <div class="toast-container" id="toastContainer"></div>
-
 <div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()" title="Refresh Data">↺</div>
-
 <div class="loader-overlay" id="loaderOverlay">
 <div class="loader-ring"></div>
 <div class="loader-terminal">
@@ -374,10 +350,8 @@ transition: all 0.3s; backdrop-filter: blur(16px); }
 <div class="term-line blink">> AWAITING HANDSHAKE...</div>
 </div>
 </div>
-
 <div class="main-scroll-area" id="mainScroll">
 <div class="container">
-
 <div id="roster-tab" class="tab-content">
 <div style="text-align:center; cursor:default; margin-bottom:32px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; padding:32px 20px; backdrop-filter:blur(20px); box-shadow:0 15px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,229,255,0.05);">
 <h4 style="color:var(--text-main); font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:24px; text-shadow:0 2px 10px rgba(0,0,0,0.8);">Active Roster Progression</h4>
@@ -392,7 +366,6 @@ transition: all 0.3s; backdrop-filter: blur(16px); }
 </div>
 </div>
 </div>
-
 <div class="control-row" id="roster-controls" style="display:none; justify-content:center; background:rgba(0,0,0,0.4); padding:12px; border-radius:16px; border:1px solid rgba(255,255,255,0.05);">
 <input type="text" id="searchInput" placeholder="Scan Operators..." oninput="debouncedFilterRoster()" style="background:transparent; border:none; padding:8px 12px; font-size:14px; width:60%;">
 <div style="width:1px; height:24px; background:rgba(255,255,255,0.1);"></div>
@@ -405,21 +378,16 @@ transition: all 0.3s; backdrop-filter: blur(16px); }
 <option value="warStars">War Stars</option>
 </select>
 </div>
-
 <div id="roster-container" class="glass-grid"><p style="text-align:center; color:var(--text-muted); font-size:12px; letter-spacing:2px; grid-column:span 3; padding-top:40px;">Initializing roster matrix...</p></div>
 </div>
-
 <div id="war-tab" class="tab-content">
 <div id="war-container"><p style="text-align:center; color:var(--accent-main); font-size:12px; letter-spacing:3px; font-weight:600; margin-top:60px; animation:pulse 2s infinite;">FETCHING CWL TELEMETRY...</p></div>
 </div>
-
 <div id="intel-tab" class="tab-content">
 <div id="intel-container"><p style="text-align:center; color:var(--text-muted); font-size:12px; letter-spacing:2px; padding-top:60px;">Loading Intel...</p></div>
 </div>
-
 </div>
 </div>
-
 <div class="bottom-nav-wrapper">
 <div class="bottom-nav">
 <div class="nav-btn" onclick="switchTab('roster')"><span>🛡</span> Roster</div>
@@ -427,16 +395,13 @@ transition: all 0.3s; backdrop-filter: blur(16px); }
 <div class="nav-btn" onclick="switchTab('intel')"><span>📡</span> Intel</div>
 </div>
 </div>
-
 <div id="sheetBackdrop" class="sheet-backdrop" onclick="closeBottomSheet()"></div>
 <div id="playerBottomSheet" class="bottom-sheet">
 <div class="close-btn" onclick="closeBottomSheet()">✕</div>
 <div id="bottomSheetContent"></div>
 </div>
-
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
-
 // ── STATE ──
 let globalPlayerData = [];
 let displayedPlayerData = [];
@@ -445,7 +410,6 @@ let warInfo = null;
 let chartsRegistry = { probChart: null };
 let sheetCharts = { history: null, hero: null, pet: null };
 let currentStarMapFilter = 'us';
-
 const maxLevelsMap = {
 "Barbarian King": 105, "Archer Queen": 105, "Grand Warden": 80,
 "Royal Champion": 55, "Minion Prince": 95, "Dragon Duke": 25,
@@ -455,14 +419,12 @@ const maxLevelsMap = {
 const heroNames = ["Barbarian King", "Archer Queen", "Grand Warden", "Royal Champion", "Minion Prince", "Dragon Duke"];
 const petNames = ["Electro Owl", "Unicorn", "Frosty", "Diggy", "Phoenix", "Spirit Fox", "Angry Jelly", "Sneezy", "Greedy Raven"];
 const gradeOrder = { S: 5, A: 4, B: 3, C: 2, D: 1, "N/A": 0 };
-
 // ── UTILITIES ──
 function debounce(fn, delay) {
 let timer;
 return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
 }
 const debouncedFilterRoster = debounce(() => filterRoster(), 250);
-
 function showToast(msg, type = 'info', duration = 3000) {
 const c = document.getElementById('toastContainer');
 const t = document.createElement('div');
@@ -474,7 +436,6 @@ t.style.animation = 'toastOut 0.4s ease forwards';
 setTimeout(() => t.remove(), 400);
 }, duration);
 }
-
 function countUp(elId, endVal, isPct, prefix = "") {
 const el = document.getElementById(elId); if (!el) return;
 let duration = 2500, start = 0, startTime = null, end = parseFloat(endVal) || 0;
@@ -488,7 +449,6 @@ else el.innerText = prefix + (isPct ? end.toFixed(1) + '%' : end);
 };
 requestAnimationFrame(step);
 }
-
 function scrambleText(elementId, finalValue) {
 const el = document.getElementById(elementId); if (!el) return;
 const chars = "0123456789!@#$%^&*()_+{}|[]<>?";
@@ -500,25 +460,20 @@ el.innerText = text; iterations++;
 if (iterations >= 8) { clearInterval(interval); el.innerText = finalValue; }
 }, 40);
 }
-
 function gradeColor(grade) {
 return { S: 'var(--grade-s)', A: 'var(--grade-a)', B: 'var(--grade-b)', C: 'var(--grade-c)', D: 'var(--grade-d)' }[grade] || 'var(--text-muted)';
 }
-
 Chart.defaults.color = '#748293';
 Chart.defaults.font.family = "'Montserrat', sans-serif";
-
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
 Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
 fetchDashboardData();
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBottomSheet(); });
 });
-
 // ── LOADER ──
 function showLoader() { document.getElementById('loaderOverlay').classList.add('active'); }
 function hideLoader() { document.getElementById('loaderOverlay').classList.remove('active'); }
-
 // ── TAB SWITCHING ──
 function switchTab(tab) {
 document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -526,13 +481,17 @@ document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'
 document.getElementById(`${tab}-tab`).classList.add('active');
 document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
 document.getElementById('mainScroll').scrollTop = 0;
-
 if ((tab === 'roster' || tab === 'war' || tab === 'intel') && globalPlayerData.length === 0) fetchDashboardData();
 if (tab === 'war') { init3DCarousel(); if (warInfo && warInfo.starMap) drawStarMap(); }
 if (tab === 'intel') renderIntel();
 }
-
-// ── CAROUSEL ──
+// ── CAROUSEL NAV ──
+function scrollCarousel(dir) {
+const track = document.getElementById('cwlCarousel');
+if(!track) return;
+const slideWidth = track.querySelector('.carousel-slide').offsetWidth + 24;
+track.scrollBy({ left: dir * slideWidth, behavior: 'smooth' });
+}
 function init3DCarousel() {
 setTimeout(() => {
 const carousel = document.getElementById('cwlCarousel');
@@ -551,7 +510,6 @@ let activeSlide = carousel.querySelector('.carousel-slide.active');
 if (activeSlide) carousel.scrollTo({ left: activeSlide.offsetLeft - 16, behavior: 'smooth' });
 }, 150);
 }
-
 // ── DATA FETCH ──
 async function fetchDashboardData(callback) {
 showLoader();
@@ -561,12 +519,10 @@ try {
 let res = await fetch(WEB_APP_URL + "?action=getDashboardData");
 let data = await res.json();
 if (data.error) throw new Error(data.error);
-
 if (data && data.players) {
 globalPlayerData = data.players;
 clanData = data;
 warInfo = data.warInfo || { type: "NONE", data: null, starMap: [] };
-
 let progressingPlayers = 0, currentTotal = 0, oldTotal = 0;
 globalPlayerData.forEach(p => {
 let pcts = p.historyPcts || [];
@@ -575,11 +531,9 @@ let curr = parseFloat(pcts[pcts.length - 1]), old = parseFloat(pcts[0]);
 if (curr > old) { progressingPlayers++; currentTotal += curr; oldTotal += old; }
 }
 });
-
 let currentGlobal = progressingPlayers > 0 ? (currentTotal / progressingPlayers) : 0;
 let oldGlobal = progressingPlayers > 0 ? (oldTotal / progressingPlayers) : 0;
 let change = currentGlobal - oldGlobal;
-
 document.getElementById('global-circle').style.setProperty('--progress', `${currentGlobal}%`);
 countUp('global-pct-val', currentGlobal, true);
 let changeEl = document.getElementById('global-change-val');
@@ -587,7 +541,6 @@ changeEl.innerText = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
 changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
 document.getElementById('global-progress-count').innerText = `${progressingPlayers} Operators Advancing`;
 document.getElementById('roster-controls').style.display = globalPlayerData.length > 0 ? "flex" : "none";
-
 filterRoster();
 renderWar();
 showToast('✓ Data synchronized', 'success');
@@ -601,7 +554,6 @@ btn.classList.remove('spinning');
 showToast('Backend error: ' + err.message, 'error', 5000);
 }
 }
-
 async function hardRefresh() {
 const btn = document.getElementById('refreshBtn');
 btn.classList.add('spinning');
@@ -613,13 +565,11 @@ showToast('Refresh failed', 'error');
 btn.classList.remove('spinning');
 }
 }
-
 // ── ROSTER FILTER + RENDER ──
 function filterRoster() {
 const searchTerm = document.getElementById('searchInput').value.toLowerCase();
 const sortBy = document.getElementById('sortSelect').value;
 displayedPlayerData = globalPlayerData.filter(p => p.name.toLowerCase().includes(searchTerm));
-
 displayedPlayerData.sort((a, b) => {
 if (sortBy === 'comp') return b.percentage - a.percentage;
 if (sortBy === 'hero') return parseInt((b.heroStats || "0").split('/')[0]) - parseInt((a.heroStats || "0").split('/')[0]);
@@ -629,17 +579,14 @@ if (sortBy === 'donations') return (b.donations || 0) - (a.donations || 0);
 if (sortBy === 'warStars') return (parseInt(b.warStars) || 0) - (parseInt(a.warStars) || 0);
 return 0;
 });
-
 renderPlayerCards();
 }
-
 function renderPlayerCards() {
 const container = document.getElementById('roster-container');
 if (displayedPlayerData.length === 0) {
 container.innerHTML = `<p style='text-align:center; color:var(--text-muted); width:100%; grid-column:span 3; padding-top:40px;'>No operators found.</p>`;
 return;
 }
-
 let htmlString = "";
 displayedPlayerData.forEach(player => {
 let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
@@ -650,7 +597,6 @@ growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFl
 const grade = player.grade || "N/A";
 const growthIndicator = growth > 0 ? `<span class="growth-indicator">▲</span>` : '';
 const gradeCls = grade !== "N/A" ? `grade-${grade}` : '';
-
 htmlString += `
 <div class="glass-card" onclick="openBottomSheet(${realIndex})">
 ${grade !== "N/A" ? `<div class="grade-badge ${gradeCls}">${grade}</div>` : ''}
@@ -663,9 +609,7 @@ ${grade !== "N/A" ? `<div class="grade-badge ${gradeCls}">${grade}</div>` : ''}
 </div>
 </div>`;
 });
-
 container.innerHTML = htmlString;
-
 // 3D Mouse Parallax
 setTimeout(() => {
 document.querySelectorAll('.glass-card').forEach(card => {
@@ -682,7 +626,6 @@ card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
 });
 }, 100);
 }
-
 // ── BOTTOM SHEET ──
 function openBottomSheet(index) {
 let player = globalPlayerData[index];
@@ -692,22 +635,17 @@ let speed = (player.cwlStats && player.cwlStats.avgDuration) ? player.cwlStats.a
 let efficiency = (player.cwlStats && player.cwlStats.efficiencyScore) ? player.cwlStats.efficiencyScore : 0;
 let grade = player.grade || "N/A";
 const gradeCls = grade !== "N/A" ? `grade-${grade}` : '';
-
 let roleText = { leader: "CMD", coLeader: "EXEC", admin: "OFFICER" }[player.role] || "OP";
-
 let growth = 0;
 if (player.historyPcts && player.historyPcts.length > 1) {
 growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
 }
-
 let estMaxText = "Awaiting Data";
 if (growth > 0 && player.percentage < 100) {
 let monthsLeft = (100 - player.percentage) / growth;
 let d = new Date(); d.setMonth(d.getMonth() + monthsLeft);
 estMaxText = d.toLocaleString('default', { month: 'short', year: 'numeric' });
 } else if (player.percentage >= 100) { estMaxText = "MAXED"; }
-
-// V6: Recently completed upgrades
 let recentHtml = '';
 if (player.recentlyCompleted && player.recentlyCompleted.length > 0) {
 recentHtml = `<div style="margin-top:16px; margin-bottom:8px;">
@@ -717,7 +655,6 @@ ${player.recentlyCompleted.map(u => `<span style="font-size:10px; padding:4px 10
 </div>
 </div>`;
 }
-
 let html = `
 <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
 <div>
@@ -735,12 +672,10 @@ TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
 <div style="font-size:9px; color:var(--text-muted); margin-top:4px; text-transform:uppercase; letter-spacing:1px;">Combat Grade</div>
 </div>
 </div>
-
 <div class="time-to-max-banner">
 <div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Projected 100% Max</div>
 <div style="font-size:16px; color:var(--accent-main); font-weight:700; text-shadow:0 0 10px rgba(0,229,255,0.4);">${estMaxText} <span style="font-size:10px; color:var(--text-muted); font-weight:500;">(${growth > 0 ? '+' + growth.toFixed(2) + '% / mo' : 'No recent gains'})</span></div>
 </div>
-
 <div class="stat-grid">
 <div class="stat-box"><div class="stat-label">Hit Rate</div><div class="stat-val" id="bs_hr">...</div></div>
 <div class="stat-box"><div class="stat-label">Avg Dest</div><div class="stat-val" id="bs_dest">...</div></div>
@@ -749,7 +684,6 @@ TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
 <div class="stat-box"><div class="stat-label">Heroes</div><div class="stat-val" id="bs_hero">...</div></div>
 <div class="stat-box"><div class="stat-label">Pets</div><div class="stat-val" id="bs_pet">...</div></div>
 </div>
-
 <div style="display:flex; gap:12px; margin-bottom:24px;">
 <div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.1); border-radius:12px; padding:14px; text-align:center;">
 <div style="font-size:9px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Efficiency Score</div>
@@ -761,9 +695,7 @@ TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
 <div style="font-size:9px; color:var(--text-muted); margin-top:4px;">Ratio: ${player.donationRatio || '0'}</div>
 </div>
 </div>
-
 ${recentHtml}
-
 ${player.heroes ? `
 <h4 class="section-title">Hero Levels (%)</h4>
 <div class="chart-container" style="height:200px;"><canvas id="bsHeroChart"></canvas></div>
@@ -773,12 +705,10 @@ ${player.heroes ? `
 <div class="chart-container" style="height:200px; margin-bottom:32px;"><canvas id="bsHistoryChart"></canvas></div>
 ` : `<p style='text-align:center; font-size:10px; color:var(--text-muted); padding:32px 0;'>Charts await backend sync.</p>`}
 `;
-
 document.getElementById('bottomSheetContent').innerHTML = html;
 document.getElementById('playerBottomSheet').classList.add('open');
 document.getElementById('sheetBackdrop').classList.add('active');
 document.body.style.overflow = 'hidden';
-
 setTimeout(() => {
 scrambleText('bs_hr', hr + '%');
 scrambleText('bs_dest', avgDest);
@@ -787,7 +717,6 @@ scrambleText('bs_ws', (player.warStars || 0).toLocaleString());
 scrambleText('bs_hero', player.heroStats);
 scrambleText('bs_pet', player.petStats);
 }, 50);
-
 if (player.heroes) {
 if (sheetCharts.hero) sheetCharts.hero.destroy();
 if (sheetCharts.pet) sheetCharts.pet.destroy();
@@ -797,13 +726,11 @@ sheetCharts.pet = renderEntityBarChart(document.getElementById('bsPetChart').get
 sheetCharts.history = renderLineChart(document.getElementById('bsHistoryChart').getContext('2d'), player.historyDates || [], player.historyPcts || [], 'Completion %');
 }
 }
-
 function closeBottomSheet() {
 document.getElementById('playerBottomSheet').classList.remove('open');
 document.getElementById('sheetBackdrop').classList.remove('active');
 document.body.style.overflow = 'auto';
 }
-
 // ── CHARTS ──
 function renderEntityBarChart(ctx, entityObj) {
 let style = getComputedStyle(document.body);
@@ -813,12 +740,11 @@ name, pct: ((entityObj[name] / (maxLevelsMap[name] || 100)) * 100)
 let labels = sortedEntities.map(e => e.name);
 let dataPct = sortedEntities.map(e => e.pct.toFixed(1));
 let bgColors = dataPct.map(pct => parseFloat(pct) >= 100 ? style.getPropertyValue('--dot-green').trim() : style.getPropertyValue('--accent-main').trim());
-
 return new Chart(ctx, {
 type: 'bar', data: { labels, datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4 }] },
 options: { indexAxis: 'y', animation: false, events: [], responsive: true, maintainAspectRatio: false,
 plugins: { legend: { display: false }, tooltip: { enabled: false } },
-scales: { x: { max: 100, display: false }, y: { border: { display: false }, grid: { display: false }, ticks: { color: '#fff', font: { family: 'Montserrat', size: 10, weight: 600 } } } }
+scales: { x: { max: 100, display: false }, y: { border: { display: false }, grid: { display: false }, ticks: { color: '#fff', font: { family: 'Montserrat', size: 10, weight: 600 } } } } }
 },
 plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) {
 const { ctx, data } = chart; ctx.save(); ctx.font = '700 10px "Montserrat"'; ctx.textBaseline = 'middle';
@@ -832,7 +758,6 @@ else { ctx.textAlign = 'left'; ctx.fillStyle = style.getPropertyValue('--text-mu
 }}]
 });
 }
-
 function renderLineChart(ctx, labels, dataPoints, labelName) {
 let style = getComputedStyle(document.body);
 let lineColor = style.getPropertyValue('--accent-main').trim();
@@ -843,12 +768,11 @@ grad.addColorStop(0, 'rgba(0,229,255,0.4)');
 grad.addColorStop(1, 'rgba(0,229,255,0.0)');
 let pointColors = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? accentColor : lineColor);
 let pointRadii = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? 4 : 0);
-
 return new Chart(ctx, {
 type: 'line', data: { labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2.5, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: '#fff', pointRadius: pointRadii, pointHoverRadius: 6 }] },
 options: { animation: false, events: [], layout: { padding: { top: 25, right: 35, left: 35, bottom: 5 } }, responsive: true, maintainAspectRatio: false,
 plugins: { legend: { display: false }, tooltip: { enabled: false } },
-scales: { x: { display: true, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 9, family: 'Montserrat', weight: 500 } } }, y: { display: false } }
+scales: { x: { display: true, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 9, family: 'Montserrat', weight: 500 } } }, y: { display: false } } }
 },
 plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) {
 const { ctx, data } = chart; const meta = chart.getDatasetMeta(0);
@@ -873,14 +797,12 @@ ctx.restore();
 }}]
 });
 }
-
 // ── BAYESIAN TARGET ASSIGNMENTS (V6 enhanced) ──
 function buildTargetAssignments(round) {
 if (!round.myLineup || !round.enemyLineup) return '';
 let enemyPool = [...round.enemyLineup].sort((a, b) => a.mapPosition - b.mapPosition).map((e, index) => ({ ...e, relativePos: index + 1, assigned: false }));
 let myPool = [...round.myLineup].sort((a, b) => a.mapPosition - b.mapPosition).map((u, index) => ({ ...u, relativePos: index + 1 }));
 let assignments = [];
-
 myPool.forEach(us => {
 let pData = globalPlayerData.find(p => p.tag === us.tag);
 let rawHR = (pData && pData.hitRate !== null && pData.hitRate !== undefined) ? pData.hitRate : 75;
@@ -888,25 +810,28 @@ let rawDest = (pData && pData.cwlStats && pData.cwlStats.avgDestruction) ? parse
 let attacks = (pData && pData.cwlStats) ? pData.cwlStats.attacks : 0;
 let smoothedHR = ((rawHR * attacks) + (50 * 2)) / (attacks + 2);
 let smoothedDest = ((rawDest * attacks) + (75 * 2)) / (attacks + 2);
-let attackerClass = attacks > 0 && smoothedHR >= 60 ?
-"Elite" : attacks > 0 && smoothedHR < 40 ? "Struggling" : "Standard";
+let attackerClass = "Standard";
+if (attacks > 0) {
+    if (smoothedHR >= 65 && smoothedDest >= 90) attackerClass = "Assassin";
+    else if (smoothedHR < 40 && smoothedDest >= 85) attackerClass = "Heavy Hitter";
+    else if (smoothedHR < 30) attackerClass = "Struggling";
+    else if (smoothedHR >= 50) attackerClass = "Elite";
+}
 assignments.push({ us, attackerClass, smoothedHR, smoothedDest, target: null, confidence: 0 });
 });
-
 assignments.sort((a, b) => {
 if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1;
 if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1;
 return b.us.th - a.us.th;
 });
-
 assignments.forEach(a => {
 let candidates = enemyPool.filter(e => !e.assigned);
 if (candidates.length === 0) return;
 let best = null;
-if (a.attackerClass === "Struggling") {
+if (a.attackerClass === "Struggling" || a.attackerClass === "Cleanup") {
 let weakBases = candidates.filter(e => e.th <= a.us.th);
 if (weakBases.length > 0) best = weakBases.sort((x, y) => y.th - x.th)[0];
-} else if (a.attackerClass === "Elite") {
+} else if (a.attackerClass === "Elite" || a.attackerClass === "Assassin") {
 let strongBases = candidates.filter(e => e.th >= a.us.th);
 if (strongBases.length > 0) best = strongBases.sort((x, y) => x.th - y.th)[0];
 }
@@ -916,17 +841,19 @@ let thDiff = a.us.th - best.th;
 let conf = (a.smoothedHR * 0.45) + (a.smoothedDest * 0.45) + (thDiff * 15);
 a.confidence = Math.max(10, Math.min(99, Math.round(conf)));
 });
-
 assignments.sort((a, b) => a.us.relativePos - b.us.relativePos);
-
 let listHtml = '';
 assignments.forEach(a => {
 if (!a.target) return;
 let isElite = a.confidence >= 80, isStruggle = a.confidence < 60;
 let confColor = isElite ? "var(--accent-main)" : (isStruggle ? "var(--dot-red)" : "var(--accent-secondary)");
 let borderColor = isElite ? "rgba(0,229,255,0.4)" : (isStruggle ? "rgba(255,51,102,0.4)" : "rgba(179,0,255,0.4)");
-let reasoning = isElite ? "OVERPOWER MISMATCH" : (isStruggle ? "HIGH-RISK REACH" : "BALANCED MIRROR");
-if (a.us.relativePos !== a.target.relativePos) reasoning = "TACTICAL SWAP";
+let reasoning = "BALANCED MIRROR";
+if (a.attackerClass === "Assassin") reasoning = "PRECISION STRIKE";
+else if (a.attackerClass === "Heavy Hitter") reasoning = "BRUTE FORCE CLEAR";
+else if (isElite) reasoning = "OVERPOWER MISMATCH";
+else if (isStruggle) reasoning = "HIGH-RISK REACH";
+else if (a.us.relativePos !== a.target.relativePos) reasoning = "TACTICAL SWAP";
 
 listHtml += `
 <div class="tactical-hud-item" style="border-color:${borderColor}; color:${confColor}; box-shadow:${isElite ? 'inset 0 0 15px rgba(0,229,255,0.1)' : 'none'};">
@@ -942,14 +869,12 @@ listHtml += `
 </div>
 </div>`;
 });
-
 return `<div style="margin-top:40px;">
 <h4 class="section-title">Tactical AI Directives</h4>
 <p class="section-subtitle">Bayesian predictive targeting matrix</p>
 <div style="display:flex; flex-direction:column; gap:8px;">${listHtml}</div>
 </div>`;
 }
-
 // ── STAR MAP ──
 function setStarMapFilter(f) {
 currentStarMapFilter = f;
@@ -959,7 +884,6 @@ if (f === 'them') document.getElementById('leg-them').style.color = 'var(--dot-r
 if (f === 'all') document.getElementById('leg-all').style.color = '#fff';
 drawStarMap();
 }
-
 function drawStarMap() {
 if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
 let container = document.getElementById('starMapNodes');
@@ -970,12 +894,10 @@ let ctx = canvas.getContext('2d');
 ctx.clearRect(0, 0, canvas.width, canvas.height);
 let myClanTag = decodeURIComponent("#YQP0GJ9");
 let cx = canvas.width / 2, cy = canvas.height / 2, maxR = canvas.width / 2 * 0.85;
-
 ctx.strokeStyle = 'rgba(0,229,255,0.1)'; ctx.lineWidth = 1;
 [0.33, 0.66, 1.0].forEach(scale => {
 ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI * 2); ctx.stroke();
 });
-
 let nodesToDraw = [];
 warInfo.starMap.forEach(p => {
 let isUs = (p.clanTag === myClanTag);
@@ -991,17 +913,14 @@ let angle = baseAngle + (deltaAngle * 0.4);
 let x = cx + r * Math.cos(angle), y = cy + r * Math.sin(angle);
 nodesToDraw.push({ ...p, isUs, x, y });
 });
-
 let html = '';
 nodesToDraw.forEach(n => {
 let color = n.isUs ? 'var(--accent-main)' : 'var(--dot-red)';
 let left = (n.x / canvas.width) * 100, top = (n.y / canvas.height) * 100;
-// V6: Show avg destruction in tooltip-like label
 html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color}; box-shadow:0 0 12px ${color};"><span class="star-label" style="color:${color};" title="${n.avgDest}% avg dest">${n.name}</span></div>`;
 });
 container.innerHTML = html;
 }
-
 // ── MONTE CARLO DISTRIBUTION ──
 function generateNormalDistribution(mean, stdDev, start, end, steps) {
 let data = [], labels = [];
@@ -1013,7 +932,6 @@ labels.push(Math.round(x)); data.push(y);
 }
 return { labels, data };
 }
-
 // ── WAR ROOM RENDER ──
 function renderWar() {
 let container = document.getElementById('war-container');
@@ -1021,12 +939,10 @@ if (!warInfo || warInfo.type !== "CWL" || !warInfo.cwlDetails || warInfo.cwlDeta
 container.innerHTML = `<div style="padding:32px 20px; text-align:center; margin-top:40px;"><h4 style="color:var(--accent-main); letter-spacing:4px; text-transform:uppercase;">Awaiting Database Sync</h4><p style="font-size:12px; color:var(--text-muted); margin-top:16px;">The CWL Analytics engine is standing by.</p></div>`;
 return;
 }
-
 let html = "";
 let activeIdx = warInfo.cwlDetails.findIndex(r => r.state === "inWar" || r.state === "preparation");
 if (activeIdx === -1) activeIdx = warInfo.cwlDetails.length - 1;
 let activeRound = warInfo.cwlDetails[activeIdx];
-
 let myStars = activeRound.myStars !== undefined ? activeRound.myStars : "...";
 let oppStars = activeRound.enemyStars !== undefined ? activeRound.enemyStars : "...";
 let myAtks = activeRound.myAttacks !== undefined ? activeRound.myAttacks : "...";
@@ -1034,8 +950,7 @@ let oppAtks = activeRound.oppAttacks !== undefined ? activeRound.oppAttacks : ".
 let rosterSize = activeRound.teamSize || 15;
 let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
 let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
-
-// V6: Round series record
+// Win/Loss record
 let wins = 0, losses = 0, draws = 0;
 warInfo.cwlDetails.forEach(r => {
 if (r.result === 'win') wins++;
@@ -1048,20 +963,29 @@ let recordHtml = `<div style="display:flex; justify-content:center; gap:16px; ma
 <span style="font-size:11px; color:var(--dot-red); font-weight:700;">${losses}L</span>
 ${draws > 0 ? `<span style="font-size:11px; color:var(--text-muted);">•</span><span style="font-size:11px; color:var(--dot-yellow); font-weight:700;">${draws}D</span>` : ''}
 </div>`;
-
-// Win probability math
+// Dynamic Win probability math
 let winProbHtml = "", distDataUs = null, distDataThem = null, distLabels = null;
 if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
 let oppAtksLeft = rosterSize - oppAtks, myAtksLeft = rosterSize - myAtks;
+// Smarter dynamic pace based on remaining attacks logic
 let rawMyPace = myAtks > 0 ? myStars / myAtks : 2.5;
-let myPace = Math.max(2.1, rawMyPace);
-let oppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
+let myPace = Math.max(1.8, Math.min(3.0, rawMyPace));
+let rawOppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
+let oppPace = Math.max(1.8, Math.min(3.0, rawOppPace));
+
 let oppProjected = oppStars + (oppAtksLeft * oppPace);
 let myProjected = myStars + (myAtksLeft * myPace);
-let winProb = 50;
-if (myProjected > oppProjected) winProb = 50 + ((myProjected - oppProjected) / rosterSize) * 50;
-else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
-winProb = Math.max(1, Math.min(99, Math.round(winProb)));
+
+// Standard Deviation shrinks dynamically as attacks are spent
+let myStdDev = Math.max(0.2, (myAtksLeft / rosterSize) * 3.5);
+let oppStdDev = Math.max(0.2, (oppAtksLeft / rosterSize) * 3.5);
+
+// Volatility factor pushes win probability dynamically tighter to 0/100 towards the end
+let combinedVolatility = Math.max(0.5, (myAtksLeft + oppAtksLeft) / (rosterSize * 2));
+let diff = myProjected - oppProjected;
+let winProbRaw = 50 + (diff / (rosterSize * combinedVolatility)) * 50;
+
+let winProb = Math.max(1, Math.min(99, Math.round(winProbRaw)));
 
 let myFloorStars = myStars + (myAtksLeft * 2);
 let oppMaxStars = oppStars + (oppAtksLeft * 3);
@@ -1071,45 +995,36 @@ if (myStars + (myAtksLeft * 3) <= oppStars) clinchTxt = `<span style="color:var(
 else if (myFloorStars > oppMaxStars) clinchTxt = `<span style="color:var(--dot-green);">0 (SECURED)</span>`;
 else clinchTxt = `${Math.max(0, starsToClinch)} additional 3★ hits`;
 
-// V6: Win probability gradient bar
-let probBarWidth = winProb;
 let probBarColor = winProb >= 60 ? 'var(--accent-main)' : winProb <= 40 ? 'var(--dot-red)' : 'var(--dot-yellow)';
-
 winProbHtml = `
 <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.15); border-radius:12px; padding:16px; margin-bottom:24px; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-<div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1.5px;">AI Win Probability</div>
+<div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1.5px;">Live AI Win Probability</div>
 <div style="font-size:18px; font-weight:700; color:${probBarColor}; text-shadow:0 0 10px rgba(0,229,255,0.4);">${winProb}%</div>
 </div>
 <div style="height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-bottom:12px;">
-<div style="height:100%; width:${probBarWidth}%; background:${probBarColor}; border-radius:3px; transition:width 1.5s ease; box-shadow:0 0 8px ${probBarColor};"></div>
+<div style="height:100%; width:${winProb}%; background:${probBarColor}; border-radius:3px; transition:width 1.5s ease; box-shadow:0 0 8px ${probBarColor};"></div>
 </div>
 <div style="font-size:10px; color:var(--text-muted); text-align:left; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05);">Min 3★ Needed to Clinch: <span style="color:#fff; font-weight:700; margin-left:4px; letter-spacing:0.5px;">${clinchTxt}</span></div>
 </div>
-
 <div class="distribution-bg" style="height:140px; position:relative;">
-<span style="position:absolute; top:12px; left:16px; font-size:9px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Monte Carlo Distribution</span>
+<span style="position:absolute; top:12px; left:16px; font-size:9px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Dynamic Monte Carlo Projection</span>
 <span style="position:absolute; top:12px; right:16px; font-size:9px; font-weight:600; color:var(--text-muted);">
 <span style="color:var(--accent-main);">■</span> Us &nbsp;
 <span style="color:var(--dot-red);">■</span> Them
 </span>
 <canvas id="winProbChart"></canvas>
 </div>`;
-
-let myStdDev = Math.max(0.5, myAtksLeft * 0.3);
-let oppStdDev = Math.max(1.0, oppAtksLeft * 0.6);
 let minRange = Math.floor(Math.min(myProjected, oppProjected) - 8);
 let maxRange = Math.ceil(Math.max(myProjected, oppProjected) + 8);
 let usDist = generateNormalDistribution(myProjected, myStdDev, minRange, maxRange, 40);
 let themDist = generateNormalDistribution(oppProjected, oppStdDev, minRange, maxRange, 40);
 distLabels = usDist.labels; distDataUs = usDist.data; distDataThem = themDist.data;
 }
-
 let attackSegments = "";
 if (myAtks !== "...") {
 for (let i = 0; i < rosterSize; i++) attackSegments += `<div class="energy-segment ${i < myAtks ? 'filled' : ''}"></div>`;
 }
-
 html += `<div class="war-room-header">
 <h4 style="color:var(--text-main); font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:3px; margin:0 0 8px 0; text-shadow:0 2px 10px rgba(0,0,0,0.8);">Live War Room</h4>
 ${recordHtml}
@@ -1128,7 +1043,6 @@ ${winProbHtml}
 <div style="font-size:10px; font-weight:600; color:var(--text-muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Attacks Remaining: <span style="color:#fff;">${myAtks !== "..." ? rosterSize - myAtks : "..."}</span></div>
 <div class="energy-bar-container">${attackSegments}</div>
 </div>`;
-
 // Pending strikes
 if (activeRound.myLineup) {
 let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
@@ -1140,10 +1054,9 @@ hitList.forEach(p => { html += `<div class="strike-pill">${p.name}</div>`; });
 html += `</div>`;
 }
 }
-
 // Constellation
 html += `<h4 class="section-title">CWL Constellation</h4>
-<p class="section-subtitle">Macro-league trajectory map. Core = 21 Stars. Node label on hover shows avg destruction.</p>
+<p class="section-subtitle">Macro-league trajectory map. Core = 21 Stars.</p>
 <div class="map-legend">
 <span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:700; text-shadow:0 0 8px var(--accent-main);" onclick="setStarMapFilter('us')">Our Clan</span>
 <span id="leg-them" style="cursor:pointer;" onclick="setStarMapFilter('them')">Opponent</span>
@@ -1157,22 +1070,19 @@ html += `<h4 class="section-title">CWL Constellation</h4>
 <div class="radar-sweep"></div>
 <div id="starMapNodes" class="star-map-nodes"></div>
 </div>`;
-
 // Matrix pipeline
 html += `<h4 class="section-title">CWL Matrix Pipeline</h4><p class="section-subtitle">Round-by-round tactical analysis</p>`;
-html += `<div class="cwl-carousel" id="cwlCarousel">`;
-
+html += `<div class="carousel-wrapper">
+         <button class="carousel-nav left" onclick="scrollCarousel(-1)">&#10094;</button>
+         <div class="cwl-carousel" id="cwlCarousel">`;
 warInfo.cwlDetails.forEach((round, index) => {
 let isCurrent = (index === activeIdx);
 let oppPat = round.attackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0, threeStars: 0 };
 let oppHitRate = oppPat.total > 0 ? Math.round((oppPat.threeStars / oppPat.total) * 100) : 0;
 let myPat = round.myAttackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0, threeStars: 0 };
 let myHitRate = myPat.total > 0 ? Math.round((myPat.threeStars / myPat.total) * 100) : 0;
-
-// V6: Result pip
 const resultLabels = { win: '✓ WIN', loss: '✗ LOSS', draw: '= DRAW', inProgress: '⟳ LIVE' };
 const resultPip = round.result ? `<div class="round-result-pip result-${round.result}">${resultLabels[round.result] || round.state}</div>` : '';
-
 let patHtml = "";
 if (round.state === "preparation") {
 let usHits = 0, usTotalAtks = 0, usTotalDest = 0;
@@ -1185,7 +1095,6 @@ let oppHits = 0, oppTotalAtks = 0, oppTotalDest = 0;
 warInfo.starMap.forEach(p => { if (p.clanTag === round.opponent.tag) { oppHits += p.threeStars; oppTotalAtks += p.attacks; oppTotalDest += p.totalDest; } });
 let oppLeagueHitRate = oppTotalAtks > 0 ? Math.round((oppHits / oppTotalAtks) * 100) : 0;
 let oppLeagueAvgDest = oppTotalAtks > 0 ? (oppTotalDest / oppTotalAtks).toFixed(1) : 0;
-
 patHtml = `<div style="margin-top:24px; padding:20px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.05); border-radius:12px; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
 <p style="font-size:10px; font-weight:700; color:var(--accent-main); margin-bottom:20px; text-transform:uppercase; letter-spacing:2px; text-align:center;">[LEAGUE-WIDE SCOUTING REPORT]</p>
 <div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:9px; font-weight:700; letter-spacing:1px;">
@@ -1225,15 +1134,12 @@ ${[['mirrors', 'Mirrors'], ['dips', 'Dips'], ['reaches', 'Reaches']].map(([k, la
 </div>
 </div>`;
 }
-
-// Enemy roster with V6 TH warning badges
 let oppLineupMap = [...(round.enemyLineup || [])].sort((a, b) => a.mapPosition - b.mapPosition).map((e, i) => ({ ...e, relativePos: i + 1 }));
 let rosterHtml = `<div style="margin-top:32px;"><p style="font-size:10px; font-weight:700; color:var(--text-muted); margin-bottom:16px; text-transform:uppercase; letter-spacing:2px; text-align:center;">Enemy Roster</p>`;
 oppLineupMap.forEach(e => {
 let atkStatus = e.attacks > 0
 ? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px; font-weight:600; text-shadow:0 0 5px var(--dot-red);">[⟁ ENGAGED]</span>`
 : `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
-// V6: TH warning if TH17 or below
 let thWarning = e.th <= 17 ? `<span class="th-warning">⚠ TH${e.th}</span>` : '';
 rosterHtml += `<div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px; align-items:center;">
 <div>
@@ -1245,13 +1151,10 @@ ${e.th > 17 ? `<span style="color:var(--accent-main); font-size:9px; margin-left
 </div>`;
 });
 rosterHtml += `</div>`;
-
 if (isCurrent) rosterHtml += buildTargetAssignments(round);
-
 let prevSeasonHtml = round.opponent.prevLeague
 ? `<div style="font-size:9px; font-weight:500; color:var(--text-muted); margin-top:6px; text-transform:uppercase; letter-spacing:1px;">Prev Season: ${round.opponent.prevLeague}</div>`
 : "";
-
 html += `
 <div class="carousel-slide ${isCurrent ? 'active' : ''}">
 <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px; margin-bottom:20px;">
@@ -1268,13 +1171,12 @@ ${patHtml}
 ${rosterHtml}
 </div>`;
 });
-
-html += `</div>`;
+html += `</div>
+         <button class="carousel-nav right" onclick="scrollCarousel(1)">&#10095;</button>
+         </div>`;
 container.innerHTML = html;
-
 init3DCarousel();
 if (warInfo.starMap && warInfo.starMap.length > 0) drawStarMap();
-
 if (distDataUs && distDataThem && distLabels) {
 let ctxP = document.getElementById('winProbChart');
 if (ctxP) {
@@ -1302,48 +1204,46 @@ y: { display: false, min: 0 }
 }
 }
 }
-
 // ── INTEL TAB (V6 NEW) ──
 function renderIntel() {
 const container = document.getElementById('intel-container');
 if (!container) return;
-
 let html = '';
 
-// Historical CWL table
+// Historical CWL table Grouped By Year
 let cwlHistory = clanData.cwlHistoricalStats || [];
 html += `<h4 class="section-title">CWL Season Archive</h4>
 <p class="section-subtitle">Historical league performance log</p>`;
-
 if (cwlHistory.length > 0) {
+let historyByYear = {};
+cwlHistory.forEach(s => {
+    let d = new Date(s.season);
+    let year = isNaN(d.getTime()) ? "Archive" : d.getFullYear();
+    let month = isNaN(d.getTime()) ? s.season : d.toLocaleString('default', { month: 'long' });
+    if(!historyByYear[year]) historyByYear[year] = [];
+    historyByYear[year].push({...s, month});
+});
+let years = Object.keys(historyByYear).sort((a,b) => b - a);
+
 html += `<div class="intel-card" style="overflow-x:auto;">
 <table class="intel-table">
 <thead><tr>
 <th>Season</th><th>League</th><th>⭐ Stars</th><th>💥 Dest</th><th>W/L</th><th>3★</th>
 </tr></thead>
 <tbody>`;
-
-cwlHistory.forEach(s => {
-let displaySeason = s.season || '—';
-if (s.season) {
-let d = new Date(s.season);
-if (!isNaN(d.getTime())) {
-let month = d.toLocaleString('default', { month: 'long' });
-let year = d.getFullYear().toString().slice(-2);
-displaySeason = `${month}, '${year}`;
-}
-}
-
-html += `<tr>
-<td style="color:var(--accent-main); font-weight:700; white-space:nowrap;">${displaySeason}</td>
-<td style="font-size:10px; color:var(--text-muted);">${s.league || '—'}</td>
-<td style="color:#fff; font-weight:600;">${s.stars || 0}</td>
-<td style="color:var(--dot-yellow);">${s.destruction || '—'}%</td>
-<td><span style="color:var(--dot-green);">${s.wins || 0}W</span> <span style="color:var(--text-muted);">/</span> <span style="color:var(--dot-red);">${s.losses || 0}L</span></td>
-<td style="color:var(--accent-secondary);">${s.threeStars || 0}</td>
-</tr>`;
+years.forEach(yr => {
+    html += `<tr><td colspan="6" style="background:rgba(0,229,255,0.05); color:var(--accent-main); font-weight:800; text-align:center; font-size:10px; letter-spacing:4px; padding:6px 0; border-bottom:1px solid rgba(0,229,255,0.2);">${yr}</td></tr>`;
+    historyByYear[yr].forEach(s => {
+        html += `<tr>
+        <td style="color:var(--text-main); font-weight:700; white-space:nowrap;">${s.month}</td>
+        <td style="font-size:10px; color:var(--text-muted);">${s.league || '—'}</td>
+        <td style="color:#fff; font-weight:600;">${s.stars || 0}</td>
+        <td style="color:var(--dot-yellow);">${s.destruction || '—'}%</td>
+        <td><span style="color:var(--dot-green);">${s.wins || 0}W</span> <span style="color:var(--text-muted);">/</span> <span style="color:var(--dot-red);">${s.losses || 0}L</span></td>
+        <td style="color:var(--accent-secondary);">${s.threeStars || 0}</td>
+        </tr>`;
+    });
 });
-
 html += `</tbody></table></div>`;
 } else {
 html += `<div class="intel-card" style="text-align:center; padding:32px;">
@@ -1351,17 +1251,18 @@ html += `<div class="intel-card" style="text-align:center; padding:32px;">
 <div style="font-size:10px; color:var(--text-muted); margin-top:8px;">CWL seasons auto-log when they end.</div>
 </div>`;
 }
-
-// Donation leaderboard
+// Donation leaderboard (Filtered for > 0)
 html += `<h4 class="section-title">Donation Leaderboard</h4>
 <p class="section-subtitle">Troop supply rankings this season</p>`;
-
-if (globalPlayerData.length > 0) {
-let sorted = [...globalPlayerData].sort((a, b) => (b.donations || 0) - (a.donations || 0));
+let donorData = globalPlayerData.filter(p => (p.donations || 0) > 0);
+if (donorData.length > 0) {
+let sorted = [...donorData].sort((a, b) => (b.donations || 0) - (a.donations || 0));
 html += `<div class="intel-card" style="padding:0; overflow:hidden;">`;
 sorted.forEach((p, i) => {
-let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ?
+'bronze' : '';
+let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ?
+'🥉' : (i + 1);
 html += `<div class="donation-row">
 <div class="donation-rank ${rankCls}">${rankIcon}</div>
 <div class="donation-name">${p.name} <span style="font-size:9px; color:var(--text-muted);">TH${p.thLevel||'?'}</span></div>
@@ -1372,15 +1273,19 @@ html += `<div class="donation-row">
 </div>`;
 });
 html += `</div>`;
-
+} else {
+html += `<p style='text-align:center; font-size:11px; color:var(--text-muted); margin-bottom:32px;'>No operator has donated yet.</p>`;
+}
 // War Stars leaderboard
 html += `<h4 class="section-title">War Stars Leaderboard</h4>
 <p class="section-subtitle">All-time war star rankings</p>`;
 let sortedByWar = [...globalPlayerData].sort((a, b) => (parseInt(b.warStars) || 0) - (parseInt(a.warStars) || 0));
 html += `<div class="intel-card" style="padding:0; overflow:hidden;">`;
 sortedByWar.forEach((p, i) => {
-let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
-let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ?
+'🥉' : (i + 1);
+let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ?
+'bronze' : '';
 html += `<div class="donation-row">
 <div class="donation-rank ${rankCls}">${rankIcon}</div>
 <div class="donation-name">${p.name}</div>
@@ -1388,7 +1293,6 @@ html += `<div class="donation-row">
 </div>`;
 });
 html += `</div>`;
-
 // Grade distribution
 html += `<h4 class="section-title">Grade Distribution</h4>
 <p class="section-subtitle">Combat performance breakdown</p>`;
@@ -1403,7 +1307,6 @@ ${Object.entries(gradeCounts).filter(([g]) => g !== 'N/A').map(([g, count]) => `
 </div>`).join('')}
 </div>
 </div>`;
-}
 
 container.innerHTML = html;
 }
