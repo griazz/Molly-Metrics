@@ -883,75 +883,39 @@ h1,h2,h3,h4,p { margin: 0; }
 /* ─────────────────────────────── CONFIG ─────────────────────────────── */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
-/* ─────────────────────────────── DYNAMIC ID ENGINE (STATSCELL) ─────────
-   Automatically fetches the latest building and trap IDs directly from 
-   Statscell's raw github repository, making the app 100% future-proof.
+/* ─────────────────────────────── COC ID DICTIONARY ─────────────────────
+   Local, bulletproof dictionary. Update this manually 1-2 times a year 
+   when a major Town Hall update drops.
 ────────────────────────────────────────────────────────────────────────── */
-let DYNAMIC_ID_MAP = {};
-let DYNAMIC_MAX_LEVELS = {};
+const DYNAMIC_ID_MAP = {
+  1000097:"Crafted Defense", 1000008:"Cannon", 1000009:"Archer Tower",
+  1000013:"Mortar", 1000012:"Air Defense", 1000011:"Wizard Tower",
+  1000028:"Air Sweeper", 1000019:"Hidden Tesla", 1000032:"Bomb Tower",
+  1000021:"X-Bow", 1000027:"Inferno Tower", 1000031:"Eagle Artillery",
+  1000067:"Scattershot", 1000015:"Builder's Hut", 1000072:"Spell Tower",
+  1000077:"Monolith", 1000089:"Firespitter", 1000010:"Wall",
+  1000084:"Multi-Archer Tower", 1000085:"Ricochet Cannon", 1000079:"Multi-Gear Tower",
+  12000000:"Bomb", 12000001:"Spring Trap", 12000002:"Giant Bomb",
+  12000005:"Air Bomb", 12000006:"Seeking Air Mine", 12000008:"Skeleton Trap",
+  12000016:"Tornado Trap", 12000020:"Giga Bomb",
+  1000004:"Gold Mine", 1000002:"Elixir Collector", 1000005:"Gold Storage",
+  1000003:"Elixir Storage", 1000023:"Dark Elixir Drill", 1000024:"Dark Elixir Storage",
+  1000014:"Clan Castle", 1000000:"Army Camp", 1000006:"Barracks",
+  1000026:"Dark Barracks", 1000007:"Laboratory", 1000020:"Spell Factory",
+  1000071:"Hero Hall", 1000029:"Dark Spell Factory", 1000070:"Blacksmith",
+  1000059:"Workshop", 1000068:"Pet House", 1000001:"Town Hall"
+};
 
-async function fetchStatscellDictionary() {
-  // 1. Check if we already downloaded the latest dictionary this week (7 day cache)
-  const cachedData = localStorage.getItem('molly_dict_v1');
-  const cacheTime = localStorage.getItem('molly_dict_time');
-  
-  if (cachedData && cacheTime && (Date.now() - cacheTime < 7 * 24 * 60 * 60 * 1000)) {
-    const parsed = JSON.parse(cachedData);
-    DYNAMIC_ID_MAP = parsed.idMap;
-    DYNAMIC_MAX_LEVELS = parsed.maxLevels;
-    return;
-  }
-
-  // 2. Fetch fresh data from Statscell's Output folder
-  const baseUrl = "https://raw.githubusercontent.com/Statscell/clash-of-clans-data/main/output";
-  
-  try {
-    const [buildingsRes, trapsRes] = await Promise.all([
-      fetch(`${baseUrl}/buildings.json`).then(r => r.json()),
-      fetch(`${baseUrl}/traps.json`).then(r => r.json())
-    ]);
-
-    let newIdMap = {};
-    let newMaxLevels = {};
-
-    // 3. Robust parser to extract IDs and Max Levels regardless of slight formatting changes
-    const processData = (dataArray) => {
-      const items = Array.isArray(dataArray) ? dataArray : Object.values(dataArray);
-      
-      items.forEach(item => {
-        // Statscell usually provides 'id', 'dataId', or 'data'
-        const id = item.id || item.dataId || item.data; 
-        if (!id) return;
-
-        // Extract the clean name
-        const name = item.name || item.Name || `Unknown Asset ${id}`;
-        newIdMap[id] = name;
-        
-        // Extract the maximum level for this building/trap
-        if (item.levels && Array.isArray(item.levels)) {
-          newMaxLevels[id] = item.levels.length;
-        } else if (item.maxLevel) {
-          newMaxLevels[id] = item.maxLevel;
-        } else {
-          newMaxLevels[id] = 20; // Safe fallback
-        }
-      });
-    };
-
-    processData(buildingsRes);
-    processData(trapsRes);
-
-    // 4. Save to memory and cache in browser
-    DYNAMIC_ID_MAP = newIdMap;
-    DYNAMIC_MAX_LEVELS = newMaxLevels;
-    localStorage.setItem('molly_dict_v1', JSON.stringify({ idMap: newIdMap, maxLevels: newMaxLevels }));
-    localStorage.setItem('molly_dict_time', Date.now().toString());
-
-  } catch (err) {
-    console.error("Failed to fetch Statscell dictionary:", err);
-    throw new Error("Could not reach Statscell database to sync latest game IDs.");
-  }
-}
+/* Max levels by dataId (TH16 benchmarks) */
+const DYNAMIC_MAX_LEVELS = {
+  1000008:21, 1000009:22, 1000013:14, 1000012:14, 1000011:16,
+  1000019:14, 1000032:12, 1000021:11, 1000027:10, 1000031:6,
+  1000067:6,  1000077:3,  1000084:3,  1000085:3,  1000089:3,
+  1000079:3,  1000005:16, 1000003:16, 1000024:14, 1000004:18,
+  1000002:18, 1000023:9,  1000014:12, 1000001:16,
+  12000000:9, 12000001:6, 12000002:7, 12000005:8, 12000006:6,
+  12000008:4, 12000016:5
+};
 
 /* Upgrade time estimates in hours [indexed by level].
    Inspired by SamBro's optimizer scheduling logic for SPT/LPT queues.
@@ -1691,10 +1655,8 @@ async function clipboardSync(playerTag) {
 
 
     // 4. Client-side parse using dynamic Statscell data
-    if (btn) btn.innerHTML = `<span class="sync-icon">📡</span> FETCHING LATEST GAME IDs...`;
     
     // --> THIS IS THE NEW LINE: Wait for the dictionary to update/load
-    await fetchStatscellDictionary(); 
 
     if (btn) btn.innerHTML = `<span class="sync-icon">⚙️</span> PARSING VILLAGE...`;
     const processed = parseVillageJson(playerTag, village);
