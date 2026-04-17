@@ -564,23 +564,8 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
 
 <!-- ░░ REFRESH ░░ -->
 <div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()">↺</div>
-<div class="refresh-btn" id="deepSyncBtn" onclick="openDeepSync()" style="right: 60px;">🚀</div>
+<div class="refresh-btn" id="deepSyncBtn" onclick="autoDeepSync()" style="right: 60px;" title="Auto-Sync Clipboard">🚀</div>
 
-<div id="deepSyncModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; padding:20px; align-items:center; justify-content:center;">
-  <div style="background:#080a14; padding:20px; border-radius:12px; border:1px solid #00f0ff; width:100%; max-width:400px;">
-    <h3 style="color:#00f0ff; margin-bottom:10px; font-family: 'Orbitron', sans-serif;">DEEP SYNC UPLINK</h3>
-    <p style="font-size:10px; color:#64748b; margin-bottom:10px;">Paste your raw Village Data JSON below to merge your defense matrix.</p>
-    
-    <input type="text" id="playerTagInput" placeholder="Your Player Tag (e.g. #YQP0GJ9)" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #3d4a5c; background: transparent; color: white;">
-    
-    <textarea id="jsonInput" placeholder='Paste JSON here... starts with {"tag":...' style="width:100%; height:150px; background:#040508; color:#00ff9d; border:1px solid #3d4a5c; padding:10px; margin-bottom:15px; font-family: monospace; font-size: 10px;"></textarea>
-    
-    <div style="display:flex; gap:10px;">
-      <button onclick="submitDeepSync()" style="flex:1; padding:10px; background:#00f0ff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius: 6px;">UPLOAD</button>
-      <button onclick="closeDeepSync()" style="flex:1; padding:10px; background:#ff2d55; color:#fff; border:none; font-weight:bold; cursor:pointer; border-radius: 6px;">CANCEL</button>
-    </div>
-  </div>
-</div>
 
 <!-- ░░ LOADER ░░ -->
 <div class="loader-overlay" id="loaderOverlay">
@@ -1126,24 +1111,58 @@ function escHtml(str) {
   return d.innerHTML;
 }
 /* ───────────────────────────── DEEP SYNC LOGIC ───────────────────────────── */
-function openDeepSync() {
-  document.getElementById('deepSyncModal').style.display = 'flex';
-}
 
-function closeDeepSync() {
-  document.getElementById('deepSyncModal').style.display = 'none';
-  // Clear the boxes if they cancel
-  document.getElementById('jsonInput').value = '';
-}
+/* ───────────────────────────── 1-CLICK DEEP SYNC ───────────────────────────── */
+async function autoDeepSync() {
+  try {
+    // 1. Request access to read the user's clipboard
+    const clipboardText = await navigator.clipboard.readText();
+    
+    if (!clipboardText) {
+      alert("System Error: Your clipboard is empty. Please copy your Village JSON first.");
+      return;
+    }
 
-async function submitDeepSync() {
-  const rawData = document.getElementById('jsonInput').value;
-  let tag = document.getElementById('playerTagInput').value.trim();
-  
-  if (!rawData || !tag) {
-    alert("System Error: Both the Player Tag and JSON are required.");
-    return;
+    // 2. Try to parse the clipboard text into a JSON object
+    let parsedData;
+    try {
+      parsedData = JSON.parse(clipboardText);
+    } catch (err) {
+      alert("System Error: The copied text is not valid JSON.");
+      return;
+    }
+
+    // 3. Verify the JSON actually belongs to Clash of Clans by checking for the tag
+    if (!parsedData.tag) {
+      alert("System Error: Could not find a player tag in the copied data. Are you sure this is your Village Data?");
+      return;
+    }
+
+    // 4. Fire up the loader and send the payload
+    document.getElementById('loaderText').innerText = `SYNCING ${parsedData.tag}...`;
+    setLoading(true);
+
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify(parsedData)
+    });
+    
+    const result = await response.json();
+    setLoading(false);
+    
+    if (result.status) {
+      alert(`Deep Sync Successful! Operator ${parsedData.tag} matrix updated.`);
+    } else {
+      alert("Backend Error: " + result.error);
+    }
+
+  } catch (e) {
+    setLoading(false);
+    // If the user denies clipboard permissions, the browser throws an error here
+    alert("Permission Denied: Molly Metrics needs clipboard access to read your Village Data. Please allow clipboard permissions in your browser.");
+    console.error("Clipboard read failed:", e);
   }
+}
 
   // Ensure they included the hashtag
   if (!tag.startsWith("#")) {
