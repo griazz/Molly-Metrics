@@ -1707,37 +1707,52 @@ async function clipboardSync(playerTag) {
 
 /* Parse the raw village JSON into the processed payload the backend expects */
 function parseVillageJson(playerTag, village) {
-  const buildings = village.buildings || village.village_buildings || [];
-  const nowSec    = Math.floor(Date.now() / 1000);
+  // 1. MERGE ARRAYS: The older JSON splits data. We merge them so heroes, 
+  // pets, and lab upgrades appear in the Gantt chart.
+  const allEntities = [
+    ...(village.buildings || village.village_buildings || []),
+    ...(village.heroes || []),
+    ...(village.pets || []),
+    ...(village.troops || []),
+    ...(village.spells || [])
+  ];
+
+  const nowSec = Math.floor(Date.now() / 1000);
 
   let activeUpgrades   = [];
   let unmaxedBuildings = [];
   let totalBuildings   = 0;
   let maxedBuildings   = 0;
 
-  buildings.forEach(b => {
+  allEntities.forEach(b => {
     const dataId  = b.data || b.data_id || b.dataId;
-    const level   = b.l || b.level || b.Level || 0;
-    const endTime = b.upgrade_end_time || b.upgradeEndTime || null;
-    const name    = COC_ID_MAP[dataId] || null;
+    // 2. FIX LEVEL PARSING: Added `b.lvl` support
+    const level   = b.l || b.level || b.Level || b.lvl || 0;
+    
+    // 3. FIX TIMER PARSING: Added `b.timer` support (converts seconds remaining to a timestamp)
+    let endTime   = b.upgrade_end_time || b.upgradeEndTime || null;
+    if (!endTime && b.timer) {
+      endTime = nowSec + b.timer;
+    }
+
+    const name = COC_ID_MAP[dataId] || null;
 
     if (!name) return;                          // Unknown ID — skip
-    if (name === 'Wall') return;                // Skip walls (they're not upgradings)
+    if (name === 'Wall') return;                // Skip walls (they don't use builder time)
     if (dataId >= 12000000 && dataId < 13000000) return; // Skip traps (no builder needed)
-
-    totalBuildings++;
 
     const maxLvl = COC_MAX_LEVELS[dataId];
     const isUpgrading = !!(endTime && endTime > nowSec);
 
-    // Active builder detection
+    // Active builder/lab detection for the Gantt Chart
     if (isUpgrading) {
       const remainingHours = Math.max(0, Math.round((endTime - nowSec) / 3600));
       activeUpgrades.push({ name, level, endTime, remainingHours });
     }
 
-    // Un-maxed building detection
+    // 4. INTEGRITY SKEW PREVENTION: Only calculate integrity % for known buildings with a max level.
     if (maxLvl !== undefined) {
+      totalBuildings++;
       if (level >= maxLvl) {
         maxedBuildings++;
       } else {
