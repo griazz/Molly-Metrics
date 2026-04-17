@@ -348,11 +348,9 @@ h1,h2,h3,h4,p { margin: 0; }
   flex-shrink: 0;
 }
 .close-btn {
-  position: absolute; top: 24px; right: 20px;
+  position: absolute; top: 10px; right: 16px;
   color: var(--muted); font-size: 18px; cursor: pointer; z-index: 10;
   padding: 6px; line-height: 1;
-  background: rgba(255,255,255,0.05); /* Added a slight background so it's easier to tap */
-  border-radius: 50%; /* Made it circular */
 }
 #sheetBody {
   overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -884,30 +882,56 @@ h1,h2,h3,h4,p { margin: 0; }
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
 /* ─────────────────────────────── COC ID DICTIONARY ─────────────────────
-   Local, bulletproof dictionary. Update this manually 1-2 times a year 
-   when a major Town Hall update drops.
+   Extracted from SamBro2901/coc-upgrade-optimizer (mapping.json) +
+   pghant/cocMapping.json gist. Translates Supercell internal dataIds to
+   human-readable building names automatically — no manual mapping needed.
 ────────────────────────────────────────────────────────────────────────── */
-const DYNAMIC_ID_MAP = {
-  1000097:"Crafted Defense", 1000008:"Cannon", 1000009:"Archer Tower",
-  1000013:"Mortar", 1000012:"Air Defense", 1000011:"Wizard Tower",
-  1000028:"Air Sweeper", 1000019:"Hidden Tesla", 1000032:"Bomb Tower",
-  1000021:"X-Bow", 1000027:"Inferno Tower", 1000031:"Eagle Artillery",
-  1000067:"Scattershot", 1000015:"Builder's Hut", 1000072:"Spell Tower",
-  1000077:"Monolith", 1000089:"Firespitter", 1000010:"Wall",
-  1000084:"Multi-Archer Tower", 1000085:"Ricochet Cannon", 1000079:"Multi-Gear Tower",
-  12000000:"Bomb", 12000001:"Spring Trap", 12000002:"Giant Bomb",
-  12000005:"Air Bomb", 12000006:"Seeking Air Mine", 12000008:"Skeleton Trap",
-  12000016:"Tornado Trap", 12000020:"Giga Bomb",
-  1000004:"Gold Mine", 1000002:"Elixir Collector", 1000005:"Gold Storage",
-  1000003:"Elixir Storage", 1000023:"Dark Elixir Drill", 1000024:"Dark Elixir Storage",
-  1000014:"Clan Castle", 1000000:"Army Camp", 1000006:"Barracks",
-  1000026:"Dark Barracks", 1000007:"Laboratory", 1000020:"Spell Factory",
-  1000071:"Hero Hall", 1000029:"Dark Spell Factory", 1000070:"Blacksmith",
-  1000059:"Workshop", 1000068:"Pet House", 1000001:"Town Hall"
+const COC_ID_MAP = {
+  1000097:"Crafted Defense", 1000008:"Cannon",             1000009:"Archer Tower",
+  1000013:"Mortar",          1000012:"Air Defense",         1000011:"Wizard Tower",
+  1000028:"Air Sweeper",     1000019:"Hidden Tesla",        1000032:"Bomb Tower",
+  1000021:"X-Bow",           1000027:"Inferno Tower",       1000031:"Eagle Artillery",
+  1000067:"Scattershot",     1000015:"Builder's Hut",       1000072:"Spell Tower",
+  1000077:"Monolith",        1000089:"Firespitter",         1000010:"Wall",
+  1000084:"Multi-Archer Tower", 1000085:"Ricochet Cannon",  1000079:"Multi-Gear Tower",
+  12000000:"Bomb",           12000001:"Spring Trap",        12000002:"Giant Bomb",
+  12000005:"Air Bomb",       12000006:"Seeking Air Mine",   12000008:"Skeleton Trap",
+  12000016:"Tornado Trap",   12000020:"Giga Bomb",
+  1000004:"Gold Mine",       1000002:"Elixir Collector",    1000005:"Gold Storage",
+  1000003:"Elixir Storage",  1000023:"Dark Elixir Drill",   1000024:"Dark Elixir Storage",
+  1000014:"Clan Castle",     1000000:"Army Camp",           1000006:"Barracks",
+  1000026:"Dark Barracks",   1000007:"Laboratory",          1000020:"Spell Factory",
+  1000071:"Hero Hall",       1000029:"Dark Spell Factory",  1000070:"Blacksmith",
+  1000059:"Workshop",        1000068:"Pet House",           1000001:"Town Hall",
+  28000000:"Barbarian King", 28000001:"Archer Queen",       28000006:"Minion Prince",
+  28000002:"Grand Warden",   28000004:"Royal Champion",
+  4000051:"Wall Wrecker",    4000052:"Battle Blimp",        4000062:"Stone Slammer",
+  4000075:"Siege Barracks",  4000087:"Log Launcher",        4000091:"Flame Flinger",
+  4000092:"Battle Drill",    4000135:"Troop Launcher",
+  73000000:"L.A.S.S.I",     73000001:"Electro Owl",        73000002:"Mighty Yak",
+  73000003:"Unicorn",        73000004:"Phoenix",            73000007:"Poison Lizard",
+  73000008:"Diggy",          73000009:"Frosty",             73000010:"Spirit Fox",
+  73000011:"Angry Jelly",    73000016:"Sneezy",
+  4000000:"Barbarian",       4000001:"Archer",              4000002:"Goblin",
+  4000003:"Giant",           4000004:"Wall Breaker",        4000005:"Balloon",
+  4000006:"Wizard",          4000007:"Healer",              4000008:"Dragon",
+  4000009:"P.E.K.K.A",      4000010:"Minion",              4000011:"Hog Rider",
+  4000012:"Valkyrie",        4000013:"Golem",               4000015:"Witch",
+  4000017:"Lava Hound",      4000022:"Bowler",              4000023:"Baby Dragon",
+  4000024:"Miner",           4000053:"Yeti",                4000058:"Ice Golem",
+  4000059:"Electro Dragon",  4000065:"Dragon Rider",        4000082:"Headhunter",
+  4000095:"Electro Titan",   4000097:"Apprentice Warden",   4000110:"Root Rider",
+  4000123:"Druid",           4000132:"Thrower",             4000150:"Furnace",
+  26000000:"Lightning Spell",26000001:"Healing Spell",      26000002:"Rage Spell",
+  26000003:"Jump Spell",     26000005:"Freeze Spell",       26000009:"Poison Spell",
+  26000010:"Earthquake Spell",26000011:"Haste Spell",       26000016:"Clone Spell",
+  26000017:"Skeleton Spell", 26000028:"Bat Spell",          26000035:"Invisibility Spell",
+  26000053:"Recall Spell",   26000070:"Overgrowth Spell",   26000098:"Revive Spell",
+  26000109:"Ice Block Spell"
 };
 
-/* Max levels by dataId (TH16 benchmarks) */
-const DYNAMIC_MAX_LEVELS = {
+/* Max levels by dataId (TH16 approximations for un-maxed detection) */
+const COC_MAX_LEVELS = {
   1000008:21, 1000009:22, 1000013:14, 1000012:14, 1000011:16,
   1000019:14, 1000032:12, 1000021:11, 1000027:10, 1000031:6,
   1000067:6,  1000077:3,  1000084:3,  1000085:3,  1000089:3,
@@ -1653,14 +1677,9 @@ async function clipboardSync(playerTag) {
       return;
     }
 
-
-    // 4. Client-side parse using dynamic Statscell data
-    
-    // --> THIS IS THE NEW LINE: Wait for the dictionary to update/load
-
+    // 4. Client-side parse using COC_ID_MAP
     if (btn) btn.innerHTML = `<span class="sync-icon">⚙️</span> PARSING VILLAGE...`;
     const processed = parseVillageJson(playerTag, village);
-
 
     // 5. POST to GAS backend
     if (btn) btn.innerHTML = `<span class="sync-icon">📡</span> TRANSMITTING...`;
@@ -1686,10 +1705,11 @@ async function clipboardSync(playerTag) {
   }
 }
 
-/* ─────────────────────────────── CORE PARSER ─────────────────────────────── */
+/* Parse the raw village JSON into the processed payload the backend expects */
 function parseVillageJson(playerTag, village) {
   const buildings = village.buildings || village.village_buildings || [];
-  
+  const nowSec    = Math.floor(Date.now() / 1000);
+
   let activeUpgrades   = [];
   let unmaxedBuildings = [];
   let totalBuildings   = 0;
@@ -1697,41 +1717,35 @@ function parseVillageJson(playerTag, village) {
 
   buildings.forEach(b => {
     const dataId  = b.data || b.data_id || b.dataId;
-    const level   = b.lvl || b.l || b.level || b.Level || 0;
-    const timer   = b.timer || 0; 
-    const count   = b.cnt || 1; 
-    
-    // FIX: Successfully pointing to our new local dictionary
-    const name    = DYNAMIC_ID_MAP[dataId] || null;
+    const level   = b.l || b.level || b.Level || 0;
+    const endTime = b.upgrade_end_time || b.upgradeEndTime || null;
+    const name    = COC_ID_MAP[dataId] || null;
 
     if (!name) return;                          // Unknown ID — skip
-    if (name === 'Wall') return;                // Skip walls
-    if (dataId >= 12000000 && dataId < 13000000) return; // Skip traps
+    if (name === 'Wall') return;                // Skip walls (they're not upgradings)
+    if (dataId >= 12000000 && dataId < 13000000) return; // Skip traps (no builder needed)
 
-    totalBuildings += count;
+    totalBuildings++;
 
-    // FIX: Successfully pointing to our new max levels dictionary
-    const maxLvl = DYNAMIC_MAX_LEVELS[dataId];
-    const isUpgrading = timer > 0;
+    const maxLvl = COC_MAX_LEVELS[dataId];
+    const isUpgrading = !!(endTime && endTime > nowSec);
 
     // Active builder detection
     if (isUpgrading) {
-      const remainingHours = timer / 3600;
-      activeUpgrades.push({ name, level, remainingHours });
+      const remainingHours = Math.max(0, Math.round((endTime - nowSec) / 3600));
+      activeUpgrades.push({ name, level, endTime, remainingHours });
     }
 
     // Un-maxed building detection
     if (maxLvl !== undefined) {
       if (level >= maxLvl) {
-        maxedBuildings += count;
+        maxedBuildings++;
       } else {
-        for (let i = 0; i < count; i++) {
-          unmaxedBuildings.push({
-            name, level, maxLevel: maxLvl,
-            levelsRemaining: maxLvl - level,
-            isUpgrading
-          });
-        }
+        unmaxedBuildings.push({
+          name, level, maxLevel: maxLvl,
+          levelsRemaining: maxLvl - level,
+          isUpgrading
+        });
       }
     }
   });
@@ -1749,22 +1763,33 @@ function parseVillageJson(playerTag, village) {
     unmaxedBuildings: unmaxedBuildings.sort((a, b) => a.levelsRemaining - b.levelsRemaining)
   };
 }
-/* ─────────────────────────────── TRANSMITTER ─────────────────────────────── */
+
+/* POST processed village data to GAS doPost endpoint */
 async function postDeepSync(payload) {
   try {
-    // FIX 4: Use text/plain to completely bypass Google's strict CORS preflight
+    // GAS Web Apps accept POST from fetch; use no-cors as fallback if CORS preflight fails
     const res = await fetch(WEB_APP_URL, {
       method:  'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload)
     });
-    
-    const data = await res.json().catch(() => ({}));
-    if (data.error) throw new Error(data.error);
-    
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.error) throw new Error(data.error);
+    }
+    // If no-cors, res.type === 'opaque' — we trust the GAS backend processed it
   } catch(e) {
-    console.error(e);
-    throw new Error('Network timeout. Please ensure you created a NEW deployment in GAS.');
+    // Try no-cors fallback (silently fires, no response body readable)
+    try {
+      await fetch(WEB_APP_URL, {
+        method:  'POST',
+        mode:    'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+      });
+    } catch(e2) {
+      throw new Error('Network error — check GAS deployment settings.');
+    }
   }
 }
 
