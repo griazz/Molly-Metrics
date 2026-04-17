@@ -4,1270 +4,443 @@
 <base target="_top">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
 <meta name="theme-color" content="#090a0f">
-<link rel="icon" href="https://i.imgur.com/iqJbl2r.png">
-<link rel="apple-touch-icon" href="https://i.imgur.com/iqJbl2r.png">
-<link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Molly Metrics","short_name":"Molly","display":"standalone","background_color":"#090a0f","theme_color":"#090a0f","icons":[{"src":"https://i.imgur.com/iqJbl2r.png","sizes":"512x512","type":"image/png"}]}'>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Molly Metrics">
+<title>Molly Metrics V7</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* ── CSS VARIABLES ── */
 :root {
---bg-dark: #050608;
---bg-card: rgba(13,15,23,0.85);
---accent-main: #00e5ff;
---accent-secondary: #b300ff;
---text-main: #ffffff;
---text-muted: #748293;
---border-color: rgba(0,229,255,0.25);
---card-shadow: 0 16px 40px rgba(0,0,0,0.9);
---header-bg: rgba(5,6,8,0.9);
---transition-speed: 0.4s;
---glow-accent: 0 0 25px rgba(0,229,255,0.4);
---font-sans: 'Montserrat', sans-serif;
---dot-green: #00ff88;
---dot-red: #ff3366;
---dot-yellow: #ffcc00;
---grade-s: #ffd700;
---grade-a: #00e5ff;
---grade-b: #00ff88;
---grade-c: #ffcc00;
---grade-d: #ff3366;
+  --bg-dark: #050608;
+  --bg-card: rgba(13,15,23,0.85);
+  --accent-main: #00e5ff;
+  --accent-secondary: #b300ff;
+  --text-main: #ffffff;
+  --text-muted: #748293;
+  --border-color: rgba(0,229,255,0.25);
+  --card-shadow: 0 16px 40px rgba(0,0,0,0.9);
+  --font-sans: 'Montserrat', sans-serif;
+  --dot-green: #00ff88;
+  --dot-red: #ff3366;
+  --grade-s: #ffd700;
+  --grade-a: #00e5ff;
+  --grade-b: #00ff88;
+  --grade-c: #ffcc00;
+  --grade-d: #ff3366;
 }
 html, body {
-height: 100%; width: 100%; margin: 0; padding: 0;
-overflow: hidden; position: fixed;
-top: 0; left: 0; right: 0; bottom: 0;
-background-color: var(--bg-dark);
-transition: background-color var(--transition-speed) ease;
-font-family: var(--font-sans); font-weight: 300;
-color: var(--text-main); -webkit-font-smoothing: antialiased;
--webkit-tap-highlight-color: transparent;
+  height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--bg-dark); font-family: var(--font-sans); color: var(--text-main);
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
 }
-h1,h2,h3,h4,.section-title,.player-info { margin: 0; }
+h1, h2, h3, h4, p { margin: 0; }
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
 /* ── BACKGROUND ── */
 #app-background {
-position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -100;
-background-image: url('https://i.imgur.com/lK3ctDR.jpeg');
-background-size: cover; background-position: center;
-filter: grayscale(85%) sepia(15%) hue-rotate(200deg) brightness(0.15) contrast(1.4);
+  position: fixed; inset: 0; z-index: -100;
+  background-image: url('https://i.imgur.com/lK3ctDR.jpeg');
+  background-size: cover; background-position: center;
+  filter: grayscale(85%) sepia(15%) hue-rotate(200deg) brightness(0.15) contrast(1.4);
 }
 #app-background::after {
-content: ''; position: absolute; inset: 0;
-background-image:
-repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.5) 2px, rgba(0,0,0,0.5) 4px),
-linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
-linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
-background-size: 100% 100%, 40px 40px, 40px 40px;
-pointer-events: none; z-index: 1;
+  content: ''; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.5) 2px, rgba(0,0,0,0.5) 4px),
+                    linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px; pointer-events: none; z-index: 1;
 }
-/* ── SCROLL AREA ── */
+
+/* ── LAYOUT ── */
 .main-scroll-area {
-position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-overflow-y: auto; -webkit-overflow-scrolling: touch;
-overscroll-behavior-y: none;
-padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
-box-sizing: border-box; scroll-behavior: smooth;
+  position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px));
 }
-/* ── LOADER ── */
-.loader-overlay {
-position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-background: rgba(5,6,8,0.98); backdrop-filter: blur(20px);
-z-index: 1000; display: flex; flex-direction: column;
-align-items: center; justify-content: center;
-opacity: 0; pointer-events: none; transition: opacity 0.5s ease;
-}
-.loader-overlay.active { opacity: 1; pointer-events: all; }
-.loader-ring {
-width: 90px; height: 90px; border-radius: 50%;
-border: 2px solid transparent;
-border-top-color: var(--accent-main); border-bottom-color: var(--accent-secondary);
-animation: spin 1.2s cubic-bezier(0.68,-0.55,0.265,1.55) infinite;
-position: relative; margin-bottom: 30px; box-shadow: 0 0 30px rgba(0,229,255,0.2);
-}
-.loader-ring::before {
-content: ''; position: absolute; inset: 10px; border-radius: 50%;
-border: 2px solid transparent;
-border-left-color: var(--accent-main); border-right-color: var(--accent-secondary);
-animation: spin-reverse 1.8s linear infinite;
-}
-.loader-ring::after {
-content: ''; position: absolute; inset: 24px; border-radius: 50%;
-border: 2px solid var(--text-main); animation: pulse 1.5s ease-in-out infinite;
-}
-@keyframes spin { 100% { transform: rotate(360deg); } }
-@keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
-@keyframes pulse { 0%,100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.1); opacity: 1; } }
-.loader-terminal {
-font-family: monospace; font-size: 10px; color: var(--accent-main);
-text-align: left; width: 280px;
-background: rgba(0,229,255,0.02); border: 1px solid rgba(0,229,255,0.15);
-padding: 16px; border-radius: 12px; box-shadow: inset 0 0 15px rgba(0,229,255,0.05);
-text-transform: uppercase;
-}
-.term-line { margin-bottom: 8px; opacity: 0; animation: typeLine 0.1s forwards; letter-spacing: 1.5px; }
-.term-line:nth-child(1) { animation-delay: 0.2s; }
-.term-line:nth-child(2) { animation-delay: 1.0s; }
-.term-line:nth-child(3) { animation-delay: 1.8s; }
-.term-line:nth-child(4) { animation-delay: 2.6s; }
-.term-line.blink { animation: typeLine 0.1s forwards 3.2s, blink 1s infinite 3.2s; color: var(--dot-green); }
-@keyframes typeLine { to { opacity: 1; } }
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
-/* ── CONTAINER ── */
 .container {
-padding: calc(32px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) 32px max(20px, env(safe-area-inset-left, 0px));
-max-width: 600px; margin: auto;
+  padding: calc(32px + env(safe-area-inset-top, 0px)) 20px 32px 20px;
+  max-width: 600px; margin: auto;
 }
+.section-title {
+  text-align: center; color: var(--text-main); margin-top: 40px; margin-bottom: 8px;
+  text-transform: uppercase; font-size: 14px; font-weight: 700; letter-spacing: 4px;
+}
+.section-subtitle {
+  font-size: 9px; color: var(--text-muted); text-align: center; margin-bottom: 24px;
+  text-transform: uppercase; letter-spacing: 1px;
+}
+
+/* ── CONTROLS ── */
+.control-row { display: flex; gap: 12px; margin-bottom: 32px; align-items: center; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
 input, select {
-width: 100%; padding: 16px 20px; margin-bottom: 0;
-border: 1px solid var(--border-color); border-radius: 12px;
-background-color: rgba(0,0,0,0.5); color: var(--text-main);
-box-sizing: border-box; font-size: 13px; outline: none;
-transition: all 0.4s ease; backdrop-filter: blur(16px); letter-spacing: 1px;
+  width: 100%; padding: 8px 12px; border: none; background: transparent;
+  color: var(--text-main); font-size: 13px; outline: none; font-family: var(--font-sans);
 }
-input:focus, select:focus { border-color: var(--accent-main); box-shadow: inset 0 0 10px rgba(0,229,255,0.1); }
-.control-row { display: flex; gap: 12px; margin-bottom: 32px; align-items: center; }
-.control-row input { flex: 1; }
-.control-row select { flex-shrink: 0; width: auto; font-size: 11px; font-weight: 500; }
-/* ── GLASS GRID ── */
-.glass-grid {
-display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-gap: 14px; padding: 12px 0; width: 100%; perspective: 1200px;
-}
+select { font-size: 11px; font-weight: 600; text-transform: uppercase; color: var(--accent-main); }
+
+/* ── GLASS GRID (ROSTER) ── */
+.glass-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; width: 100%; perspective: 1200px; }
 .glass-card {
-width: 100%; box-sizing: border-box;
-background: linear-gradient(145deg, rgba(18,20,28,0.9), rgba(9,10,15,0.95));
-border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;
-padding: 20px 8px; display: flex; flex-direction: column;
-align-items: center; justify-content: center; cursor: pointer;
-transition: transform 0.15s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
-backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-text-align: center; transform-style: preserve-3d; position: relative; overflow: hidden;
+  background: linear-gradient(145deg, rgba(18,20,28,0.9), rgba(9,10,15,0.95));
+  border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 20px 8px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; transition: transform 0.2s, box-shadow 0.3s, border-color 0.3s;
+  backdrop-filter: blur(16px); box-shadow: 0 8px 32px rgba(0,0,0,0.5); position: relative;
 }
-.glass-card::before {
-content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-background: linear-gradient(90deg, transparent, var(--accent-main), transparent);
-opacity: 0; transition: opacity 0.3s;
+.glass-card:hover { border-color: rgba(0,229,255,0.3); box-shadow: 0 15px 35px rgba(0,229,255,0.15); transform: translateY(-4px); }
+.glass-ring {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.05) 0deg);
+  display: flex; align-items: center; justify-content: center; margin-bottom: 14px; position: relative;
 }
-.glass-card:hover { border-color: rgba(0,229,255,0.3); box-shadow: 0 15px 35px rgba(0,229,255,0.15), inset 0 0 20px rgba(0,229,255,0.05); z-index: 10; }
-.glass-card:hover::before { opacity: 1; }
-.glass-card-inner { pointer-events: none; transform: translateZ(30px); display: flex; flex-direction: column; align-items: center; width: 100%; }
-/* V6: Grade Badge */
-.grade-badge {
-position: absolute; top: 8px; right: 8px;
-font-size: 9px; font-weight: 800; letter-spacing: 1px;
-padding: 2px 5px; border-radius: 4px; line-height: 1.4;
-font-family: var(--font-sans);
-}
+.glass-ring::before { content: ""; position: absolute; inset: 2px; background: #0b0c10; border-radius: 50%; }
+.glass-ring span { position: relative; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+.glass-name { font-size: 11px; font-weight: 600; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
+.glass-th { font-size: 9px; color: var(--text-muted); margin-top: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.growth-indicator { color: var(--dot-green); font-size: 10px; }
+
+/* ── GRADE BADGES ── */
+.grade-badge { position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 800; padding: 2px 5px; border-radius: 4px; }
 .grade-S { background: rgba(255,215,0,0.15); color: var(--grade-s); border: 1px solid rgba(255,215,0,0.3); text-shadow: 0 0 8px var(--grade-s); }
 .grade-A { background: rgba(0,229,255,0.12); color: var(--grade-a); border: 1px solid rgba(0,229,255,0.3); }
 .grade-B { background: rgba(0,255,136,0.10); color: var(--grade-b); border: 1px solid rgba(0,255,136,0.25); }
 .grade-C { background: rgba(255,204,0,0.10); color: var(--grade-c); border: 1px solid rgba(255,204,0,0.25); }
 .grade-D { background: rgba(255,51,102,0.10); color: var(--grade-d); border: 1px solid rgba(255,51,102,0.25); }
-.glass-ring {
-width: 44px; height: 44px; border-radius: 50%;
-background: conic-gradient(var(--accent-main) var(--pct), rgba(255,255,255,0.03) 0deg);
-display: flex; align-items: center; justify-content: center;
-position: relative; margin-bottom: 14px; box-shadow: 0 0 15px rgba(0,229,255,0.15); flex-shrink: 0;
-}
-.glass-ring::before { content: ""; position: absolute; inset: 2px; background: #0b0c10; border-radius: 50%; }
-.glass-ring span { position: relative; font-size: 11px; font-weight: 700; color: var(--text-main); font-family: var(--font-sans); letter-spacing: 0.5px; }
-.glass-name { font-size: 11px; font-weight: 600; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; letter-spacing: 0.5px;
-text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-.glass-th { font-size: 9px; color: var(--text-muted); margin-top: 6px; font-weight: 600; display: flex; align-items: center; justify-content: center; letter-spacing: 1px; }
-.growth-indicator { color: var(--dot-green); font-size: 10px; margin-left: 6px; filter: drop-shadow(0 0 4px var(--dot-green)); animation: pulseGrow 2s infinite alternate; }
-@keyframes pulseGrow { 0% { opacity: 0.5; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.2); } }
-/* ── CWL CONSTELLATION MAP ── */
-.star-map-wrapper {
-position: relative; width: 100%; padding-bottom: 100%;
-background: radial-gradient(circle at center, rgba(179,0,255,0.08) 0%, transparent 60%), #050608;
-border-radius: 50%; border: 1px solid rgba(179,0,255,0.25); overflow: hidden;
-box-shadow: inset 0 0 60px rgba(179,0,255,0.05), 0 0 40px rgba(0,0,0,0.8);
-margin-top: 32px; display: block;
-}
-.star-map-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
-.star-map-nodes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
-.star-node { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%,-50%); box-shadow: 0 0 10px currentColor; transition: transform 0.2s;
-}
-.star-label { position: absolute; left: 12px; top: -6px; font-size: 8px; font-weight: 600; font-family: var(--font-sans); white-space: nowrap;
-text-shadow: 0 1px 4px rgba(0,0,0,1); letter-spacing: 0.5px; }
-.map-legend { display: flex; justify-content: center; gap: 20px; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-top: 16px;
-margin-bottom: 16px; }
-.radar-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); border: 1px dashed rgba(0,229,255,0.1); border-radius: 50%; pointer-events: none; z-index: 1;
-}
-.radar-ring.r1 { width: 33%; height: 33%; }
-.radar-ring.r2 { width: 66%; height: 66%; }
-.radar-ring.r3 { width: 100%; height: 100%; border: 1px solid rgba(0,229,255,0.2); }
-.radar-crosshair { position: absolute; background: rgba(0,229,255,0.1); pointer-events: none; z-index: 1; }
-.radar-crosshair.v { top: 0; bottom: 0; left: 50%; width: 1px; transform: translateX(-50%); }
-.radar-crosshair.h { left: 0; right: 0; top: 50%; height: 1px; transform: translateY(-50%); }
-.radar-core { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 14px; height: 14px; background: var(--accent-secondary); border-radius: 50%;
-box-shadow: 0 0 25px var(--accent-secondary), 0 0 50px var(--accent-secondary); z-index: 3; animation: corePulse 2s infinite alternate; }
-@keyframes corePulse { from { transform: translate(-50%,-50%) scale(0.9); opacity: 0.8; } to { transform: translate(-50%,-50%) scale(1.1); opacity: 1; } }
-.radar-sweep { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg at 50% 50%, transparent 75%, rgba(0,229,255,0.05) 90%, rgba(0,229,255,0.3) 100%);
-animation: radarSweep 6s linear infinite; pointer-events: none; z-index: 4; mix-blend-mode: screen; }
-@keyframes radarSweep { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
 /* ── BOTTOM SHEET MODAL ── */
-.sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(8px);
-}
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1500; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(8px); }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
-.bottom-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, rgba(18,20,28,0.98), rgba(9,10,15,1)); backdrop-filter: blur(30px); border-top-left-radius: 32px; border-top-right-radius: 32px;
-z-index: 2000; transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1); max-height: 88vh; overflow-y: auto; padding: 40px 24px 24px 24px; box-sizing: border-box;
-border-top: 1px solid rgba(255,255,255,0.1); box-shadow: 0 -20px 60px rgba(0,0,0,0.9); }
+.bottom-sheet {
+  position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(180deg, rgba(18,20,28,0.98), rgba(9,10,15,1));
+  backdrop-filter: blur(30px); border-top-left-radius: 32px; border-top-right-radius: 32px; z-index: 2000;
+  transform: translateY(100%); transition: transform 0.5s cubic-bezier(0.2,0.8,0.2,1); max-height: 88vh; overflow-y: auto;
+  padding: 40px 24px 24px 24px; border-top: 1px solid rgba(255,255,255,0.1); box-shadow: 0 -20px 60px rgba(0,0,0,0.9);
+}
 .bottom-sheet.open { transform: translateY(0); }
-.close-btn { position: absolute; top: 20px; right: 24px; width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;
-display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 16px; cursor: pointer; transition: all 0.3s; z-index: 10; }
-.close-btn:hover { background: rgba(255,51,102,0.2); color: var(--dot-red); border-color: var(--dot-red); }
+.close-btn { position: absolute; top: 20px; right: 24px; width: 36px; height: 36px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .stat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 24px; margin-bottom: 32px; }
-.stat-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,229,255,0.15); border-radius: 12px; padding: 16px 8px; text-align: center; position: relative; overflow: hidden;
-box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-.stat-box::before { content:''; position:absolute; inset:0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,229,255,0.03) 2px, rgba(0,229,255,0.03) 4px); pointer-events:none; }
-.stat-label { font-size: 9px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; position: relative; z-index: 2; }
-.stat-val { font-size: 16px; color: var(--accent-main); font-family: var(--font-sans); font-weight: 700; position: relative; z-index: 2; text-shadow: 0 0 10px rgba(0,229,255,0.4); }
-.chart-container { margin-top: 24px; position: relative; width: 100%; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 16px; box-sizing: border-box; border: 1px solid rgba(255,255,255,0.05);
+.stat-box { background: rgba(0,0,0,0.4); border: 1px solid rgba(0,229,255,0.15); border-radius: 12px; padding: 16px 8px; text-align: center; }
+.stat-label { font-size: 9px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.stat-val { font-size: 15px; color: var(--accent-main); font-weight: 700; text-shadow: 0 0 10px rgba(0,229,255,0.4); }
+
+/* ── TROPHY ROOM (HALL OF FAME) ── */
+.hof-card {
+  background: linear-gradient(135deg, rgba(13,15,23,0.9), rgba(9,10,15,0.95));
+  border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 20px; margin-bottom: 16px;
 }
+.hof-header { font-size: 13px; font-weight: 700; color: var(--accent-main); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; }
+.hof-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.hof-row:last-child { border-bottom: none; }
+.hof-rank { font-size: 14px; font-weight: 800; width: 24px; text-align: center; }
+.hof-name { flex: 1; font-size: 12px; font-weight: 600; }
+.hof-val { font-size: 14px; font-weight: 700; color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.3); }
+
 /* ── BOTTOM NAV ── */
-.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; display: flex; justify-content: center; z-index: 1000; background: rgba(5,6,8,0.9); backdrop-filter: blur(24px);
-border-top: 1px solid rgba(255,255,255,0.05); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 16px; justify-content: space-around; }
-.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-muted); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px;
-transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275); cursor: pointer; position: relative; background: transparent; padding: 8px 24px; border-radius: 16px; }
-.nav-btn span { font-size: 22px; transition: transform 0.3s ease, filter 0.3s ease; }
-.nav-btn.active { color: var(--accent-main); background: rgba(0,229,255,0.05); }
+.bottom-nav-wrapper { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; background: rgba(5,6,8,0.9); backdrop-filter: blur(24px); border-top: 1px solid rgba(255,255,255,0.05); padding-bottom: env(safe-area-inset-bottom, 0px); display: flex; justify-content: center;}
+.bottom-nav { display: flex; width: 100%; max-width: 600px; padding: 12px 16px; justify-content: space-evenly; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; gap: 6px; color: var(--text-muted); font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer; padding: 8px 24px; transition: 0.3s; }
+.nav-btn span { font-size: 22px; transition: transform 0.3s, filter 0.3s; }
+.nav-btn.active { color: var(--accent-main); }
 .nav-btn.active span { transform: translateY(-4px); filter: drop-shadow(0 0 10px var(--accent-main)); }
-.tab-content { display: none; min-height: calc(100% + 1px); }
-.tab-content.active { display: block; animation: tabFade 0.4s cubic-bezier(0.16,1,0.3,1); }
-@keyframes tabFade { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-.section-title { text-align: center; color: var(--text-main); margin-top: 40px; margin-bottom: 8px; text-transform: uppercase; font-size: 14px; font-weight: 700; letter-spacing: 4px;
-text-shadow: 0 2px 10px rgba(0,0,0,0.8); }
-.section-subtitle { font-size: 9px; color: var(--text-muted); text-align: center; margin-bottom: 24px; padding: 0 20px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
-/* ── WAR ROOM ── */
-.cwl-carousel { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 24px; padding: 20px 7.5% 40px 7.5%; scrollbar-width: none; -ms-overflow-style: none;
-margin-top: 16px; perspective: 1200px; transform-style: preserve-3d; }
-.cwl-carousel::-webkit-scrollbar { display: none; }
-.carousel-slide { min-width: 85%; scroll-snap-align: center; box-sizing: border-box; background: linear-gradient(180deg, rgba(18,20,28,0.9), rgba(9,10,15,0.95)); border: 1px solid rgba(255,255,255,0.05); border-radius: 20px; padding: 24px;
-box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(20px); transform: rotateY(-10deg) scale(0.92); transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease; opacity: 0.5; }
-.carousel-slide.active { transform: rotateY(0deg) scale(1); opacity: 1; border-color: rgba(0,229,255,0.3); box-shadow: 0 15px 50px rgba(0,0,0,0.9), inset 0 0 30px rgba(0,229,255,0.05); }
-.war-room-header { background: linear-gradient(135deg, rgba(13,15,23,0.95), rgba(5,6,8,0.98)); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px 24px; text-align: center; margin-bottom: 32px;
-box-shadow: 0 15px 50px rgba(0,0,0,0.8), inset 0 0 40px rgba(0,229,255,0.05); position: relative; overflow: hidden; }
-.war-room-header::before { content:''; position:absolute; top:0; left:0; width:100%; height:2px; background: linear-gradient(90deg, transparent, var(--accent-main), transparent); opacity: 0.5; }
-.strike-pill { flex-shrink: 0; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); padding: 10px 20px; border-radius: 100px; font-size: 11px; font-weight: 600;
-color: var(--text-main); font-family: var(--font-sans); letter-spacing: 0.5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 8px; }
-.strike-pill::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-main); box-shadow: 0 0 8px var(--accent-main);
-animation: pulse 2s infinite; }
-.circular-progress { width: 120px; height: 120px; border-radius: 50%; background: conic-gradient(var(--accent-main) var(--progress), rgba(255,255,255,0.03) 0deg); display: flex; align-items: center; justify-content: center;
-position: relative; box-shadow: 0 0 30px rgba(0,229,255,0.2); flex-shrink: 0; }
-.circular-progress::before { content: ""; position: absolute; inset: 4px; background: #090a0f; border-radius: 50%; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
-.circular-value { position: relative; font-size: 24px; font-weight: 700; color: #fff; font-family: var(--font-sans); text-shadow: 0 0 15px rgba(0,229,255,0.5); }
-.time-to-max-banner { background: linear-gradient(90deg, rgba(0,229,255,0.05), rgba(0,229,255,0.15), rgba(0,229,255,0.05)); border: 1px solid rgba(0,229,255,0.2); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 24px;
-margin-top: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); }
-.energy-bar-container { display: flex; gap: 4px; height: 10px; width: 90%; margin: 0 auto; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 6px;
-border: 1px solid rgba(255,255,255,0.05); }
-.energy-segment { flex: 1; background: rgba(255,255,255,0.05); border-radius: 2px; transition: background 0.3s ease, box-shadow 0.3s ease; }
-.energy-segment.filled { background: var(--accent-main); box-shadow: 0 0 8px var(--accent-main); }
-.distribution-bg { padding: 20px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; margin-bottom: 24px; box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
-}
-.tactical-hud-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: linear-gradient(90deg, rgba(0,0,0,0.6), rgba(0,0,0,0.3)); border: 1px solid rgba(255,255,255,0.05);
-border-left: 3px solid; border-radius: 8px; margin-bottom: 8px; position: relative; }
-.tactical-hud-item::before { content: '⌜'; position: absolute; top: 4px; left: 4px; font-size: 10px; color: inherit; opacity: 0.5; font-family: monospace; }
-.tactical-hud-item::after { content: '⌟'; position: absolute; bottom: 4px; right: 4px; font-size: 10px; color: inherit; opacity: 0.5; font-family: monospace; }
-/* V6: Confidence bar inside target assignments */
-.conf-bar-track { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 6px; width: 100%; overflow: hidden; }
-.conf-bar-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
-/* V6: Round result pip */
-.round-result-pip { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 100px; letter-spacing: 1px; }
-.result-win { background: rgba(0,255,136,0.1); color: var(--dot-green); border: 1px solid rgba(0,255,136,0.3); }
-.result-loss { background: rgba(255,51,102,0.1); color: var(--dot-red); border: 1px solid rgba(255,51,102,0.3); }
-.result-draw { background: rgba(255,204,0,0.1); color: var(--dot-yellow); border: 1px solid rgba(255,204,0,0.3); }
-.result-inProgress { background: rgba(0,229,255,0.1); color: var(--accent-main); border: 1px solid rgba(0,229,255,0.3); }
-/* V6: TH warning badge */
-.th-warning { display: inline-flex; align-items: center; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-left: 4px; background: rgba(255,204,0,0.15);
-color: var(--dot-yellow); border: 1px solid rgba(255,204,0,0.3); animation: warningPulse 2s infinite; }
-@keyframes warningPulse { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
-/* ── INTEL TAB ── */
-.intel-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-.intel-table th { color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-size: 9px; padding: 12px 8px; border-bottom: 1px solid rgba(255,255,255,0.08);
-text-align: left; }
-.intel-table td { padding: 14px 8px; border-bottom: 1px solid rgba(255,255,255,0.04); color: var(--text-main); font-weight: 500; vertical-align: middle; }
-.intel-table tr:hover td { background: rgba(0,229,255,0.04); }
-.intel-card { background: linear-gradient(135deg, rgba(13,15,23,0.9), rgba(9,10,15,0.95)); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 20px; margin-bottom: 16px;
-box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
-/* V6: Donation leaderboard */
-.donation-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); }
-.donation-rank { font-size: 11px; font-weight: 800; color: var(--text-muted); width: 24px; flex-shrink: 0; }
-.donation-rank.gold { color: #ffd700; text-shadow: 0 0 8px #ffd700; }
-.donation-rank.silver { color: #c0c0c0; }
-.donation-rank.bronze { color: #cd7f32; }
-.donation-name { flex: 1; font-size: 12px; font-weight: 600; color: #fff; }
-.donation-val { font-size: 13px; font-weight: 700; color: var(--accent-main); text-shadow: 0 0 8px rgba(0,229,255,0.3); }
-.donation-ratio-pill { font-size: 9px; font-weight: 600; padding: 2px 7px; border-radius: 100px; background: rgba(0,229,255,0.08); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.08);
-margin-left: 6px; }
-/* ── TOAST ── */
-.toast-container { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
-.toast { background: rgba(15,17,25,0.95); border: 1px solid rgba(0,229,255,0.3); border-radius: 12px; padding: 12px 18px; font-size: 11px; font-weight: 600; color: var(--text-main);
-letter-spacing: 0.5px; box-shadow: 0 8px 32px rgba(0,0,0,0.8); backdrop-filter: blur(16px); animation: toastIn 0.4s cubic-bezier(0.16,1,0.3,1); max-width: 280px; }
-.toast.error { border-color: rgba(255,51,102,0.4); }
-.toast.success { border-color: rgba(0,255,136,0.4); }
-@keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes toastOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(30px); } }
-/* V6: Refresh button */
-.refresh-btn { position: fixed; top: calc(16px + env(safe-area-inset-top, 0px)); left: 16px; z-index: 900; background: rgba(0,0,0,0.6); border: 1px solid rgba(0,229,255,0.2);
-border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--text-muted);
-transition: all 0.3s; backdrop-filter: blur(16px); }
-.refresh-btn:active { transform: rotate(360deg); color: var(--accent-main); border-color: var(--accent-main); }
-.refresh-btn.spinning { animation: refreshSpin 0.8s linear infinite; }
-@keyframes refreshSpin { 100% { transform: rotate(360deg); } }
-/* V6: Pull-to-refresh indicator */
-.ptr-indicator { text-align: center; padding: 20px; font-size: 10px; color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase; opacity: 0; transition: opacity 0.3s; }
-.ptr-indicator.visible { opacity: 1; }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fade 0.4s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── UTILS ── */
+.loader-overlay { position: fixed; inset: 0; background: rgba(5,6,8,0.95); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; }
+.loader-overlay.active { opacity: 1; pointer-events: all; }
+.spinner { width: 50px; height: 50px; border: 3px solid rgba(0,229,255,0.2); border-top-color: var(--accent-main); border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.refresh-btn { position: fixed; top: 16px; left: 16px; z-index: 900; background: rgba(0,0,0,0.6); border: 1px solid rgba(0,229,255,0.2); border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; }
+.refresh-btn.spinning { animation: spin 1s linear infinite; }
 </style>
 </head>
 <body>
+
 <div id="app-background"></div>
-<div class="toast-container" id="toastContainer"></div>
-<div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()" title="Refresh Data">↺</div>
+<div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()">↺</div>
+
 <div class="loader-overlay" id="loaderOverlay">
-<div class="loader-ring"></div>
-<div class="loader-terminal">
-<div class="term-line">> INITIALIZING MOLLY_OS V6.0...</div>
-<div class="term-line">> ESTABLISHING SECURE UPLINK...</div>
-<div class="term-line">> DECRYPTING TACTICAL TELEMETRY...</div>
-<div class="term-line">> CALIBRATING BAYESIAN MATRIX...</div>
-<div class="term-line blink">> AWAITING HANDSHAKE...</div>
+  <div class="spinner"></div>
+  <p style="margin-top: 16px; font-size: 10px; letter-spacing: 2px; color: var(--accent-main);">SYNCING DB...</p>
 </div>
-</div>
+
 <div class="main-scroll-area" id="mainScroll">
-<div class="container">
-<div id="roster-tab" class="tab-content">
-<div style="text-align:center; cursor:default; margin-bottom:32px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; padding:32px 20px; backdrop-filter:blur(20px); box-shadow:0 15px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,229,255,0.05);">
-<h4 style="color:var(--text-main); font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:24px; text-shadow:0 2px 10px rgba(0,0,0,0.8);">Active Roster Progression</h4>
-<div style="display:flex; justify-content:center; align-items:center; gap:32px;">
-<div class="circular-progress" id="global-circle" style="--progress:0%;">
-<div class="circular-value" id="global-pct-val">0%</div>
+  <div class="container">
+    
+    <div id="roster-tab" class="tab-content active">
+      <div style="text-align:center; margin-bottom:32px; background:var(--bg-card); border:1px solid var(--border-color); border-radius:20px; padding:32px 20px; box-shadow:0 15px 40px rgba(0,0,0,0.8);">
+        <h4 style="font-size:13px; font-weight:700; letter-spacing:3px; text-transform:uppercase; margin-bottom:24px;">Global Progression</h4>
+        <div style="font-size:36px; font-weight:800; color:var(--accent-main); text-shadow:0 0 15px rgba(0,229,255,0.4);" id="global-pct-val">0.0%</div>
+        <div id="global-change-val" style="font-size:12px; color:var(--dot-green); margin-top:8px; font-weight:600;">+0.00% (30d)</div>
+      </div>
+
+      <div class="control-row" id="roster-controls" style="display:none;">
+        <input type="text" id="searchInput" placeholder="Search Operators..." oninput="filterRoster()">
+        <div style="width:1px; height:24px; background:rgba(255,255,255,0.1);"></div>
+        <select id="sortSelect" onchange="filterRoster()">
+          <option value="comp">Overall %</option>
+          <option value="grade">Grade</option>
+          <option value="th">Town Hall</option>
+        </select>
+      </div>
+
+      <div id="roster-container" class="glass-grid">
+        <p style="text-align:center; color:var(--text-muted); font-size:12px; grid-column:span 3; padding-top:40px;">Initializing matrix...</p>
+      </div>
+    </div>
+
+    <div id="trophy-tab" class="tab-content">
+      <h4 class="section-title">Hall of Fame</h4>
+      <p class="section-subtitle">Top 3 Elite Operators per category</p>
+      <div id="hof-container">
+        <p style="text-align:center; color:var(--text-muted); font-size:12px; padding-top:40px;">Loading records...</p>
+      </div>
+    </div>
+
+  </div>
 </div>
-<div style="text-align:left; border-left:1px solid rgba(255,255,255,0.1); padding-left:24px;">
-<div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">30-Day Trajectory</div>
-<div id="global-change-val" style="font-size:24px; font-weight:700; color:var(--dot-green); text-shadow:0 0 15px rgba(0,255,136,0.3);">+0.00%</div>
-<div style="font-size:10px; color:var(--text-muted); margin-top:8px; font-weight:500;" id="global-progress-count">0 Operators Advancing</div>
-</div>
-</div>
-</div>
-<div class="control-row" id="roster-controls" style="display:none; justify-content:center; background:rgba(0,0,0,0.4); padding:12px; border-radius:16px; border:1px solid rgba(255,255,255,0.05);">
-<input type="text" id="searchInput" placeholder="Scan Operators..." oninput="debouncedFilterRoster()" style="background:transparent; border:none; padding:8px 12px; font-size:14px; width:60%;">
-<div style="width:1px; height:24px; background:rgba(255,255,255,0.1);"></div>
-<select id="sortSelect" onchange="filterRoster()" style="background:transparent; border:none; padding:8px 12px; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--accent-main);">
-<option value="comp">Overall Base</option>
-<option value="hero">Hero Levels</option>
-<option value="pet">Pet Levels</option>
-<option value="grade">Grade</option>
-<option value="donations">Donations</option>
-<option value="warStars">War Stars</option>
-</select>
-</div>
-<div id="roster-container" class="glass-grid"><p style="text-align:center; color:var(--text-muted); font-size:12px; letter-spacing:2px; grid-column:span 3; padding-top:40px;">Initializing roster matrix...</p></div>
-</div>
-<div id="war-tab" class="tab-content">
-<div id="war-container"><p style="text-align:center; color:var(--accent-main); font-size:12px; letter-spacing:3px; font-weight:600; margin-top:60px; animation:pulse 2s infinite;">FETCHING CWL TELEMETRY...</p></div>
-</div>
-<div id="intel-tab" class="tab-content">
-<div id="intel-container"><p style="text-align:center; color:var(--text-muted); font-size:12px; letter-spacing:2px; padding-top:60px;">Loading Intel...</p></div>
-</div>
-</div>
-</div>
+
 <div class="bottom-nav-wrapper">
-<div class="bottom-nav">
-<div class="nav-btn" onclick="switchTab('roster')"><span>🛡</span> Roster</div>
-<div class="nav-btn active" onclick="switchTab('war')"><span>⚔</span> War Room</div>
-<div class="nav-btn" onclick="switchTab('intel')"><span>📡</span> Intel</div>
+  <div class="bottom-nav">
+    <div class="nav-btn active" onclick="switchTab('roster')"><span>🛡️</span> Roster</div>
+    <div class="nav-btn" onclick="switchTab('trophy')"><span>🏆</span> Trophy Room</div>
+  </div>
 </div>
-</div>
+
 <div id="sheetBackdrop" class="sheet-backdrop" onclick="closeBottomSheet()"></div>
 <div id="playerBottomSheet" class="bottom-sheet">
-<div class="close-btn" onclick="closeBottomSheet()">✕</div>
-<div id="bottomSheetContent"></div>
+  <div class="close-btn" onclick="closeBottomSheet()">✕</div>
+  <div id="bottomSheetContent"></div>
 </div>
+
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
-// ── STATE ──
+const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE"; // Insert your deployed Google Apps Script URL
+
 let globalPlayerData = [];
+let hallOfFameData = {};
 let displayedPlayerData = [];
-let clanData = {};
-let warInfo = null;
-let chartsRegistry = { probChart: null };
-let sheetCharts = { history: null, hero: null, pet: null };
-let currentStarMapFilter = 'us';
-const maxLevelsMap = {
-"Barbarian King": 105, "Archer Queen": 105, "Grand Warden": 80,
-"Royal Champion": 55, "Minion Prince": 95, "Dragon Duke": 25,
-"Electro Owl": 15, "Unicorn": 15, "Frosty": 15, "Diggy": 10,
-"Phoenix": 10, "Spirit Fox": 10, "Angry Jelly": 10, "Sneezy": 10, "Greedy Raven": 10
-};
-const heroNames = ["Barbarian King", "Archer Queen", "Grand Warden", "Royal Champion", "Minion Prince", "Dragon Duke"];
-const petNames = ["Electro Owl", "Unicorn", "Frosty", "Diggy", "Phoenix", "Spirit Fox", "Angry Jelly", "Sneezy", "Greedy Raven"];
+let bsChart = null;
+
 const gradeOrder = { S: 5, A: 4, B: 3, C: 2, D: 1, "N/A": 0 };
-// ── UTILITIES ──
-function debounce(fn, delay) {
-let timer;
-return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
-}
-const debouncedFilterRoster = debounce(() => filterRoster(), 250);
-function showToast(msg, type = 'info', duration = 3000) {
-const c = document.getElementById('toastContainer');
-const t = document.createElement('div');
-t.className = `toast ${type}`;
-t.textContent = msg;
-c.appendChild(t);
-setTimeout(() => {
-t.style.animation = 'toastOut 0.4s ease forwards';
-setTimeout(() => t.remove(), 400);
-}, duration);
-}
-function countUp(elId, endVal, isPct, prefix = "") {
-const el = document.getElementById(elId); if (!el) return;
-let duration = 2500, start = 0, startTime = null, end = parseFloat(endVal) || 0;
-const step = (t) => {
-if (!startTime) startTime = t;
-let p = Math.min((t - startTime) / duration, 1), ease = 1 - Math.pow(1 - p, 3);
-let curr = start + ease * (end - start);
-el.innerText = prefix + (isPct ? curr.toFixed(1) + '%' : Math.floor(curr));
-if (p < 1) requestAnimationFrame(step);
-else el.innerText = prefix + (isPct ? end.toFixed(1) + '%' : end);
-};
-requestAnimationFrame(step);
-}
-function scrambleText(elementId, finalValue) {
-const el = document.getElementById(elementId); if (!el) return;
-const chars = "0123456789!@#$%^&*()_+{}|[]<>?";
-let iterations = 0;
-const interval = setInterval(() => {
-let text = "";
-for (let i = 0; i < finalValue.toString().length; i++) text += chars[Math.floor(Math.random() * chars.length)];
-el.innerText = text; iterations++;
-if (iterations >= 8) { clearInterval(interval); el.innerText = finalValue; }
-}, 40);
-}
-function gradeColor(grade) {
-return { S: 'var(--grade-s)', A: 'var(--grade-a)', B: 'var(--grade-b)', C: 'var(--grade-c)', D: 'var(--grade-d)' }[grade] || 'var(--text-muted)';
-}
-Chart.defaults.color = '#748293';
-Chart.defaults.font.family = "'Montserrat', sans-serif";
-// ── INIT ──
-window.addEventListener('DOMContentLoaded', () => {
-Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
-fetchDashboardData();
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBottomSheet(); });
-});
-// ── LOADER ──
-function showLoader() { document.getElementById('loaderOverlay').classList.add('active'); }
-function hideLoader() { document.getElementById('loaderOverlay').classList.remove('active'); }
-// ── TAB SWITCHING ──
+
+window.addEventListener('DOMContentLoaded', () => { fetchDashboardData(); });
+
 function switchTab(tab) {
-document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-document.getElementById(`${tab}-tab`).classList.add('active');
-document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
-document.getElementById('mainScroll').scrollTop = 0;
-if ((tab === 'roster' || tab === 'war' || tab === 'intel') && globalPlayerData.length === 0) fetchDashboardData();
-if (tab === 'war') { init3DCarousel(); if (warInfo && warInfo.starMap) drawStarMap(); }
-if (tab === 'intel') renderIntel();
+  document.querySelectorAll('.tab-content, .nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`${tab}-tab`).classList.add('active');
+  document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
+  document.getElementById('mainScroll').scrollTop = 0;
 }
-// ── CAROUSEL ──
-function init3DCarousel() {
-setTimeout(() => {
-const carousel = document.getElementById('cwlCarousel');
-if (!carousel) return;
-const slides = carousel.querySelectorAll('.carousel-slide');
-const observer = new IntersectionObserver((entries) => {
-entries.forEach(entry => {
-if (entry.isIntersecting) {
-slides.forEach(s => s.classList.remove('active'));
-entry.target.classList.add('active');
+
+async function fetchDashboardData() {
+  document.getElementById('loaderOverlay').classList.add('active');
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  
+  try {
+    let res = await fetch(WEB_APP_URL + "?action=getDashboardData");
+    let data = await res.json();
+    
+    if (data.players) {
+      globalPlayerData = data.players;
+      hallOfFameData = data.hallOfFame || {};
+      
+      let totalPct = 0, oldTotal = 0, progressing = 0;
+      globalPlayerData.forEach(p => {
+        totalPct += parseFloat(p.percentage);
+        if (p.historyPcts && p.historyPcts.length > 0) {
+          let old = parseFloat(p.historyPcts[0]);
+          let curr = parseFloat(p.historyPcts[p.historyPcts.length - 1]);
+          if (curr > old) { oldTotal += old; progressing++; }
+        }
+      });
+      
+      let avgPct = globalPlayerData.length > 0 ? (totalPct / globalPlayerData.length).toFixed(1) : 0;
+      document.getElementById('global-pct-val').innerText = `${avgPct}%`;
+      
+      let change = progressing > 0 ? ((totalPct / globalPlayerData.length) - (oldTotal / progressing)).toFixed(2) : "0.00";
+      let changeEl = document.getElementById('global-change-val');
+      changeEl.innerText = (change >= 0 ? "+" : "") + change + "% (30d velocity)";
+      changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
+
+      document.getElementById('roster-controls').style.display = "flex";
+      filterRoster();
+      renderHallOfFame();
+    }
+  } catch (err) {
+    console.error("Backend error:", err);
+  }
+  
+  document.getElementById('loaderOverlay').classList.remove('active');
+  btn.classList.remove('spinning');
 }
-});
-}, { root: carousel, threshold: 0.6 });
-slides.forEach(s => observer.observe(s));
-let activeSlide = carousel.querySelector('.carousel-slide.active');
-if (activeSlide) carousel.scrollTo({ left: activeSlide.offsetLeft - 16, behavior: 'smooth' });
-}, 150);
-}
-// ── DATA FETCH ──
-async function fetchDashboardData(callback) {
-showLoader();
-const btn = document.getElementById('refreshBtn');
-btn.classList.add('spinning');
-try {
-let res = await fetch(WEB_APP_URL + "?action=getDashboardData");
-let data = await res.json();
-if (data.error) throw new Error(data.error);
-if (data && data.players) {
-globalPlayerData = data.players;
-clanData = data;
-warInfo = data.warInfo || { type: "NONE", data: null, starMap: [] };
-let progressingPlayers = 0, currentTotal = 0, oldTotal = 0;
-globalPlayerData.forEach(p => {
-let pcts = p.historyPcts || [];
-if (pcts.length > 0) {
-let curr = parseFloat(pcts[pcts.length - 1]), old = parseFloat(pcts[0]);
-if (curr > old) { progressingPlayers++; currentTotal += curr; oldTotal += old; }
-}
-});
-let currentGlobal = progressingPlayers > 0 ? (currentTotal / progressingPlayers) : 0;
-let oldGlobal = progressingPlayers > 0 ? (oldTotal / progressingPlayers) : 0;
-let change = currentGlobal - oldGlobal;
-document.getElementById('global-circle').style.setProperty('--progress', `${currentGlobal}%`);
-countUp('global-pct-val', currentGlobal, true);
-let changeEl = document.getElementById('global-change-val');
-changeEl.innerText = (change >= 0 ? "+" : "") + change.toFixed(2) + "%";
-changeEl.style.color = change >= 0 ? "var(--dot-green)" : "var(--dot-red)";
-document.getElementById('global-progress-count').innerText = `${progressingPlayers} Operators Advancing`;
-document.getElementById('roster-controls').style.display = globalPlayerData.length > 0 ? "flex" : "none";
-filterRoster();
-renderWar();
-showToast('✓ Data synchronized', 'success');
-}
-hideLoader();
-btn.classList.remove('spinning');
-if (callback) callback();
-} catch (err) {
-hideLoader();
-btn.classList.remove('spinning');
-showToast('Backend error: ' + err.message, 'error', 5000);
-}
-}
+
 async function hardRefresh() {
-const btn = document.getElementById('refreshBtn');
-btn.classList.add('spinning');
-try {
-await fetch(WEB_APP_URL + "?action=clearCache");
-await fetchDashboardData();
-} catch (e) {
-showToast('Refresh failed', 'error');
-btn.classList.remove('spinning');
+  document.getElementById('refreshBtn').classList.add('spinning');
+  try {
+    await fetch(WEB_APP_URL + "?action=clearCache");
+    await fetchDashboardData();
+  } catch (e) {
+    document.getElementById('refreshBtn').classList.remove('spinning');
+  }
 }
-}
-// ── ROSTER FILTER + RENDER ──
+
 function filterRoster() {
-const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-const sortBy = document.getElementById('sortSelect').value;
-displayedPlayerData = globalPlayerData.filter(p => p.name.toLowerCase().includes(searchTerm));
-displayedPlayerData.sort((a, b) => {
-if (sortBy === 'comp') return b.percentage - a.percentage;
-if (sortBy === 'hero') return parseInt((b.heroStats || "0").split('/')[0]) - parseInt((a.heroStats || "0").split('/')[0]);
-if (sortBy === 'pet') return parseInt((b.petStats || "0").split('/')[0]) - parseInt((a.petStats || "0").split('/')[0]);
-if (sortBy === 'grade') return (gradeOrder[b.grade] || 0) - (gradeOrder[a.grade] || 0);
-if (sortBy === 'donations') return (b.donations || 0) - (a.donations || 0);
-if (sortBy === 'warStars') return (parseInt(b.warStars) || 0) - (parseInt(a.warStars) || 0);
-return 0;
-});
-renderPlayerCards();
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  const sortBy = document.getElementById('sortSelect').value;
+  
+  displayedPlayerData = globalPlayerData.filter(p => p.name.toLowerCase().includes(term));
+  
+  displayedPlayerData.sort((a, b) => {
+    if (sortBy === 'comp') return b.percentage - a.percentage;
+    if (sortBy === 'grade') return (gradeOrder[b.grade] || 0) - (gradeOrder[a.grade] || 0);
+    if (sortBy === 'th') return b.thLevel - a.thLevel;
+    return 0;
+  });
+  
+  renderPlayerCards();
 }
+
 function renderPlayerCards() {
-const container = document.getElementById('roster-container');
-if (displayedPlayerData.length === 0) {
-container.innerHTML = `<p style='text-align:center; color:var(--text-muted); width:100%; grid-column:span 3; padding-top:40px;'>No operators found.</p>`;
-return;
+  const container = document.getElementById('roster-container');
+  if (displayedPlayerData.length === 0) {
+    container.innerHTML = `<p style='text-align:center; color:var(--text-muted); width:100%; grid-column:span 3; padding-top:40px;'>No operators found.</p>`;
+    return;
+  }
+  
+  let html = "";
+  displayedPlayerData.forEach(p => {
+    let realIdx = globalPlayerData.findIndex(gp => gp.tag === p.tag);
+    let growthIndicator = p.progression30d > 0 ? `<span class="growth-indicator">▲</span>` : '';
+    let gradeCls = p.grade && p.grade !== "N/A" ? `grade-${p.grade}` : '';
+    
+    html += `
+    <div class="glass-card" onclick="openBottomSheet(${realIdx})">
+      ${p.grade && p.grade !== "N/A" ? `<div class="grade-badge ${gradeCls}">${p.grade}</div>` : ''}
+      <div class="glass-ring" style="--pct:${p.percentage}%;">
+        <span>${Math.floor(p.percentage)}%</span>
+      </div>
+      <div class="glass-name">${p.name}</div>
+      <div class="glass-th">TH${p.thLevel} ${growthIndicator}</div>
+    </div>`;
+  });
+  container.innerHTML = html;
 }
-let htmlString = "";
-displayedPlayerData.forEach(player => {
-let realIndex = globalPlayerData.findIndex(p => p.tag === player.tag);
-let growth = 0;
-if (player.historyPcts && player.historyPcts.length > 1) {
-growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
+
+function renderHallOfFame() {
+  const container = document.getElementById('hof-container');
+  if (Object.keys(hallOfFameData).length === 0) {
+    container.innerHTML = `<p style='text-align:center; color:var(--text-muted); padding-top:40px;'>Awaiting sync.</p>`;
+    return;
+  }
+
+  // Icons for achievements
+  const icons = {
+    "Sweet Victory!": "🏆 Trophies",
+    "War League Legend": "🌟 CWL Stars",
+    "Shattered and Scattered": "🎯 Scattershots Destroyed",
+    "Anti-Artillery": "🦅 Eagle Artilleries Destroyed",
+    "Sharing is caring": "🤝 Total Donations",
+    "Heroic Heist": "💧 Dark Elixir Looted"
+  };
+
+  let html = "";
+  for (let ach in hallOfFameData) {
+    if (hallOfFameData[ach].length === 0) continue;
+    
+    let title = icons[ach] || ach;
+    html += `<div class="hof-card">
+      <div class="hof-header">${title}</div>`;
+      
+    hallOfFameData[ach].forEach((p, idx) => {
+      let medal = idx === 0 ? "🥇" : idx === 1 ? "🥈" : "🥉";
+      let formatVal = parseInt(p.value).toLocaleString();
+      html += `
+      <div class="hof-row">
+        <div class="hof-rank">${medal}</div>
+        <div class="hof-name">${p.name} <span style="font-size:9px; color:var(--text-muted);">TH${p.th}</span></div>
+        <div class="hof-val">${formatVal}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+  container.innerHTML = html;
 }
-const grade = player.grade || "N/A";
-const growthIndicator = growth > 0 ? `<span class="growth-indicator">▲</span>` : '';
-const gradeCls = grade !== "N/A" ? `grade-${grade}` : '';
-htmlString += `
-<div class="glass-card" onclick="openBottomSheet(${realIndex})">
-${grade !== "N/A" ? `<div class="grade-badge ${gradeCls}">${grade}</div>` : ''}
-<div class="glass-card-inner">
-<div class="glass-ring" style="--pct:${player.percentage}%;">
-<span>${Math.floor(player.percentage)}%</span>
-</div>
-<div class="glass-name">${player.name}</div>
-<div class="glass-th">TH${player.thLevel || player.th || '?'} ${growthIndicator}</div>
-</div>
-</div>`;
-});
-container.innerHTML = htmlString;
-// 3D Mouse Parallax
-setTimeout(() => {
-document.querySelectorAll('.glass-card').forEach(card => {
-card.addEventListener('mousemove', e => {
-let rect = card.getBoundingClientRect();
-let x = e.clientX - rect.left, y = e.clientY - rect.top;
-let rotateX = ((y - rect.height / 2) / rect.height * 2) * -18;
-let rotateY = ((x - rect.width / 2) / rect.width * 2) * 18;
-card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.08,1.08,1.08)`;
-});
-card.addEventListener('mouseleave', () => {
-card.style.transform = `rotateX(0deg) rotateY(0deg) scale3d(1,1,1)`;
-});
-});
-}, 100);
-}
-// ── BOTTOM SHEET ──
+
 function openBottomSheet(index) {
-let player = globalPlayerData[index];
-let hr = player.hitRate !== null && player.hitRate !== undefined ? player.hitRate : 0;
-let avgDest = (player.cwlStats && player.cwlStats.avgDestruction) ? player.cwlStats.avgDestruction + "%" : "N/A";
-let speed = (player.cwlStats && player.cwlStats.avgDuration) ? player.cwlStats.avgDuration + "s" : "N/A";
-let efficiency = (player.cwlStats && player.cwlStats.efficiencyScore) ? player.cwlStats.efficiencyScore : 0;
-let grade = player.grade || "N/A";
-const gradeCls = grade !== "N/A" ? `grade-${grade}` : '';
-let roleText = { leader: "CMD", coLeader: "EXEC", admin: "OFFICER" }[player.role] || "OP";
-let growth = 0;
-if (player.historyPcts && player.historyPcts.length > 1) {
-growth = parseFloat(player.historyPcts[player.historyPcts.length - 1]) - parseFloat(player.historyPcts[0]);
+  let p = globalPlayerData[index];
+  let gradeCls = p.grade && p.grade !== "N/A" ? `grade-${p.grade}` : '';
+  
+  let html = `
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+      <div>
+        <h2 style="font-size:24px; font-weight:800;">${p.name}</h2>
+        <div style="color:var(--accent-main); font-size:12px; font-weight:600; margin-top:4px;">
+          <span style="color:var(--text-muted);">TH${p.thLevel}</span> • ${p.percentage}% OVERALL
+        </div>
+        <div style="font-size:10px; color:var(--dot-green); margin-top:8px; font-weight:600;">+${p.progression30d}% (30d Velocity)</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="grade-badge ${gradeCls}" style="font-size:22px; padding:6px 12px; border-radius:8px; position:static;">${p.grade || 'N/A'}</div>
+      </div>
+    </div>
+    
+    <h4 style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">Combat Diagnostics</h4>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-label">Heroes</div><div class="stat-val">${p.heroes}</div></div>
+      <div class="stat-box"><div class="stat-label">Equipment</div><div class="stat-val">${p.equipment}</div></div>
+      <div class="stat-box"><div class="stat-label">Pets</div><div class="stat-val">${p.pets}</div></div>
+      <div class="stat-box"><div class="stat-label">Troops</div><div class="stat-val">${p.troops}</div></div>
+      <div class="stat-box"><div class="stat-label">Spells</div><div class="stat-val">${p.spells}</div></div>
+      <div class="stat-box"><div class="stat-label">Donations</div><div class="stat-val">${(p.donations||0).toLocaleString()}</div></div>
+    </div>
+    
+    <h4 style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:2px; margin-bottom:16px;">30-Day Trajectory</h4>
+    <div style="height:200px; width:100%; position:relative; margin-bottom:32px;"><canvas id="bsHistoryChart"></canvas></div>
+  `;
+  
+  document.getElementById('bottomSheetContent').innerHTML = html;
+  document.getElementById('playerBottomSheet').classList.add('open');
+  document.getElementById('sheetBackdrop').classList.add('active');
+  
+  if (bsChart) bsChart.destroy();
+  if (p.historyDates && p.historyDates.length > 0) {
+    let ctx = document.getElementById('bsHistoryChart').getContext('2d');
+    
+    let grad = ctx.createLinearGradient(0, 0, 0, 200);
+    grad.addColorStop(0, 'rgba(0,229,255,0.4)');
+    grad.addColorStop(1, 'rgba(0,229,255,0.0)');
+    
+    Chart.defaults.color = '#748293';
+    Chart.defaults.font.family = "'Montserrat', sans-serif";
+    
+    bsChart = new Chart(ctx, {
+      type: 'line',
+      data: { 
+        labels: p.historyDates, 
+        datasets: [{ 
+          data: p.historyPcts, borderColor: '#00e5ff', backgroundColor: grad, 
+          borderWidth: 2, fill: true, tension: 0.3, pointBackgroundColor: '#00e5ff', pointRadius: 3 
+        }] 
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { 
+          x: { grid: { display: false }, ticks: { font: { size: 9 } } }, 
+          y: { grid: { color: 'rgba(255,255,255,0.05)' }, border: { display: false } } 
+        }
+      }
+    });
+  }
 }
-let estMaxText = "Awaiting Data";
-if (growth > 0 && player.percentage < 100) {
-let monthsLeft = (100 - player.percentage) / growth;
-let d = new Date(); d.setMonth(d.getMonth() + monthsLeft);
-estMaxText = d.toLocaleString('default', { month: 'short', year: 'numeric' });
-} else if (player.percentage >= 100) { estMaxText = "MAXED"; }
-// V6: Recently completed upgrades
-let recentHtml = '';
-if (player.recentlyCompleted && player.recentlyCompleted.length > 0) {
-recentHtml = `<div style="margin-top:16px; margin-bottom:8px;">
-<div style="font-size:10px; color:var(--dot-green); font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px;">⚡ Recent Upgrades</div>
-<div style="display:flex; flex-wrap:wrap; gap:8px;">
-${player.recentlyCompleted.map(u => `<span style="font-size:10px; padding:4px 10px; border-radius:100px; background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.25); color:var(--dot-green); font-weight:600;">${u}</span>`).join('')}
-</div>
-</div>`;
-}
-let html = `
-<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
-<div>
-<h2 style="color:var(--text-main); margin:0; font-size:26px; font-family:var(--font-sans); font-weight:700; text-shadow:0 2px 10px rgba(0,0,0,0.8);">${player.name}</h2>
-<div style="color:var(--accent-main); font-size:12px; margin-top:6px; font-weight:600; letter-spacing:1px;">
-<span style="color:var(--accent-secondary); margin-right:8px;">[${roleText}]</span>
-TH${player.thLevel || player.th || '?'} • ${parseFloat(player.percentage)}%
-</div>
-<div style="margin-top:8px;">
-<button onclick="navigator.clipboard && navigator.clipboard.writeText('${player.tag}').then(() => showToast('Tag copied!', 'success'))" style="font-size:9px; padding:3px 10px; border-radius:100px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); color:var(--text-muted); cursor:pointer; font-weight:600; letter-spacing:1px;">${player.tag} 📋</button>
-</div>
-</div>
-<div style="text-align:center;">
-<div class="grade-badge ${gradeCls}" style="font-size:22px; padding:6px 12px; border-radius:8px; position:static; display:inline-block;">${grade}</div>
-<div style="font-size:9px; color:var(--text-muted); margin-top:4px; text-transform:uppercase; letter-spacing:1px;">Combat Grade</div>
-</div>
-</div>
-<div class="time-to-max-banner">
-<div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Projected 100% Max</div>
-<div style="font-size:16px; color:var(--accent-main); font-weight:700; text-shadow:0 0 10px rgba(0,229,255,0.4);">${estMaxText} <span style="font-size:10px; color:var(--text-muted); font-weight:500;">(${growth > 0 ? '+' + growth.toFixed(2) + '% / mo' : 'No recent gains'})</span></div>
-</div>
-<div class="stat-grid">
-<div class="stat-box"><div class="stat-label">Hit Rate</div><div class="stat-val" id="bs_hr">...</div></div>
-<div class="stat-box"><div class="stat-label">Avg Dest</div><div class="stat-val" id="bs_dest">...</div></div>
-<div class="stat-box"><div class="stat-label">Speed</div><div class="stat-val" id="bs_spd">...</div></div>
-<div class="stat-box"><div class="stat-label">War Stars</div><div class="stat-val" id="bs_ws">...</div></div>
-<div class="stat-box"><div class="stat-label">Heroes</div><div class="stat-val" id="bs_hero">...</div></div>
-<div class="stat-box"><div class="stat-label">Pets</div><div class="stat-val" id="bs_pet">...</div></div>
-</div>
-<div style="display:flex; gap:12px; margin-bottom:24px;">
-<div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.1); border-radius:12px; padding:14px; text-align:center;">
-<div style="font-size:9px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Efficiency Score</div>
-<div style="font-size:22px; font-weight:800; color:${gradeColor(grade)}; text-shadow:0 0 12px ${gradeColor(grade)};">${efficiency}</div>
-</div>
-<div style="flex:1; background:rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.1); border-radius:12px; padding:14px; text-align:center;">
-<div style="font-size:9px; color:var(--text-muted); font-weight:700; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:6px;">Donations</div>
-<div style="font-size:16px; font-weight:800; color:var(--accent-main);">${(player.donations||0).toLocaleString()}</div>
-<div style="font-size:9px; color:var(--text-muted); margin-top:4px;">Ratio: ${player.donationRatio || '0'}</div>
-</div>
-</div>
-${recentHtml}
-${player.heroes ? `
-<h4 class="section-title">Hero Levels (%)</h4>
-<div class="chart-container" style="height:200px;"><canvas id="bsHeroChart"></canvas></div>
-<h4 class="section-title">Pet Levels (%)</h4>
-<div class="chart-container" style="height:200px;"><canvas id="bsPetChart"></canvas></div>
-<h4 class="section-title">30-Day History</h4>
-<div class="chart-container" style="height:200px; margin-bottom:32px;"><canvas id="bsHistoryChart"></canvas></div>
-` : `<p style='text-align:center; font-size:10px; color:var(--text-muted); padding:32px 0;'>Charts await backend sync.</p>`}
-`;
-document.getElementById('bottomSheetContent').innerHTML = html;
-document.getElementById('playerBottomSheet').classList.add('open');
-document.getElementById('sheetBackdrop').classList.add('active');
-document.body.style.overflow = 'hidden';
-setTimeout(() => {
-scrambleText('bs_hr', hr + '%');
-scrambleText('bs_dest', avgDest);
-scrambleText('bs_spd', speed);
-scrambleText('bs_ws', (player.warStars || 0).toLocaleString());
-scrambleText('bs_hero', player.heroStats);
-scrambleText('bs_pet', player.petStats);
-}, 50);
-if (player.heroes) {
-if (sheetCharts.hero) sheetCharts.hero.destroy();
-if (sheetCharts.pet) sheetCharts.pet.destroy();
-if (sheetCharts.history) sheetCharts.history.destroy();
-sheetCharts.hero = renderEntityBarChart(document.getElementById('bsHeroChart').getContext('2d'), player.heroes);
-sheetCharts.pet = renderEntityBarChart(document.getElementById('bsPetChart').getContext('2d'), player.pets);
-sheetCharts.history = renderLineChart(document.getElementById('bsHistoryChart').getContext('2d'), player.historyDates || [], player.historyPcts || [], 'Completion %');
-}
-}
+
 function closeBottomSheet() {
-document.getElementById('playerBottomSheet').classList.remove('open');
-document.getElementById('sheetBackdrop').classList.remove('active');
-document.body.style.overflow = 'auto';
-}
-// ── CHARTS ──
-function renderEntityBarChart(ctx, entityObj) {
-let style = getComputedStyle(document.body);
-let sortedEntities = Object.keys(entityObj).map(name => ({
-name, pct: ((entityObj[name] / (maxLevelsMap[name] || 100)) * 100)
-})).sort((a, b) => b.pct - a.pct);
-let labels = sortedEntities.map(e => e.name);
-let dataPct = sortedEntities.map(e => e.pct.toFixed(1));
-let bgColors = dataPct.map(pct => parseFloat(pct) >= 100 ? style.getPropertyValue('--dot-green').trim() : style.getPropertyValue('--accent-main').trim());
-return new Chart(ctx, {
-type: 'bar', data: { labels, datasets: [{ data: dataPct, backgroundColor: bgColors, borderRadius: 4 }] },
-options: { indexAxis: 'y', animation: false, events: [], responsive: true, maintainAspectRatio: false,
-plugins: { legend: { display: false }, tooltip: { enabled: false } },
-scales: { x: { max: 100, display: false }, y: { border: { display: false }, grid: { display: false }, ticks: { color: '#fff', font: { family: 'Montserrat', size: 10, weight: 600 } } } }
-},
-plugins: [{ id: 'barInsideLabels', afterDatasetsDraw(chart) {
-const { ctx, data } = chart; ctx.save(); ctx.font = '700 10px "Montserrat"'; ctx.textBaseline = 'middle';
-chart.getDatasetMeta(0).data.forEach((bar, index) => {
-const val = data.datasets[0].data[index]; const isMaxed = parseFloat(val) >= 100;
-let displayStr = isMaxed ? "MAX" : parseFloat(val).toString();
-const isInside = bar.width > ctx.measureText(displayStr).width + 12;
-if (isInside) { ctx.textAlign = 'right'; ctx.fillStyle = '#050608'; ctx.fillText(displayStr, bar.x - 8, bar.y + 1); }
-else { ctx.textAlign = 'left'; ctx.fillStyle = style.getPropertyValue('--text-muted').trim(); ctx.fillText(displayStr, bar.x + 8, bar.y + 1); }
-}); ctx.restore();
-}}]
-});
-}
-function renderLineChart(ctx, labels, dataPoints, labelName) {
-let style = getComputedStyle(document.body);
-let lineColor = style.getPropertyValue('--accent-main').trim();
-let accentColor = style.getPropertyValue('--accent-main').trim();
-let textColor = style.getPropertyValue('--text-muted').trim();
-let grad = ctx.createLinearGradient(0, 0, 0, 200);
-grad.addColorStop(0, 'rgba(0,229,255,0.4)');
-grad.addColorStop(1, 'rgba(0,229,255,0.0)');
-let pointColors = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? accentColor : lineColor);
-let pointRadii = dataPoints.map((_, i) => (i === 0 || i === dataPoints.length - 1) ? 4 : 0);
-return new Chart(ctx, {
-type: 'line', data: { labels, datasets: [{ label: labelName, data: dataPoints, borderColor: lineColor, backgroundColor: grad, borderWidth: 2.5, fill: true, tension: 0.4, pointBackgroundColor: pointColors, pointBorderColor: '#fff', pointRadius: pointRadii, pointHoverRadius: 6 }] },
-options: { animation: false, events: [], layout: { padding: { top: 25, right: 35, left: 35, bottom: 5 } }, responsive: true, maintainAspectRatio: false,
-plugins: { legend: { display: false }, tooltip: { enabled: false } },
-scales: { x: { display: true, grid: { color: 'rgba(255,255,255,0.05)', drawBorder: false }, ticks: { maxTicksLimit: 6, color: textColor, font: { size: 9, family: 'Montserrat', weight: 500 } } }, y: { display: false } }
-},
-plugins: [{ id: 'floatingLabels', afterDatasetsDraw(chart) {
-const { ctx, data } = chart; const meta = chart.getDatasetMeta(0);
-if (!meta.data || meta.data.length === 0) return;
-ctx.save(); ctx.textBaseline = 'middle';
-const ptFirst = meta.data[0]; const ptLast = meta.data[meta.data.length - 1];
-const valFirst = parseFloat(data.datasets[0].data[0]);
-const valLast = parseFloat(data.datasets[0].data[meta.data.length - 1]);
-ctx.font = '700 11px "Montserrat"'; ctx.textAlign = 'left'; ctx.fillStyle = '#fff';
-ctx.fillText(valLast, ptLast.x + 8, ptLast.y);
-if (meta.data.length > 1) {
-ctx.textAlign = 'right'; ctx.fillText(valFirst, ptFirst.x - 8, ptFirst.y);
-let diff = parseFloat((valLast - valFirst).toFixed(2));
-if (diff !== 0) {
-let diffText = diff > 0 ? `+${diff}` : `${diff}`;
-ctx.textAlign = 'center'; ctx.fillStyle = diff > 0 ? accentColor : 'var(--dot-red)';
-ctx.font = '700 12px "Montserrat"';
-ctx.fillText(diffText, (ptFirst.x + ptLast.x) / 2, (ptFirst.y + ptLast.y) / 2 - 18);
-}
-}
-ctx.restore();
-}}]
-});
-}
-// ── BAYESIAN TARGET ASSIGNMENTS (V6 enhanced) ──
-function buildTargetAssignments(round) {
-if (!round.myLineup || !round.enemyLineup) return '';
-let enemyPool = [...round.enemyLineup].sort((a, b) => a.mapPosition - b.mapPosition).map((e, index) => ({ ...e, relativePos: index + 1, assigned: false }));
-let myPool = [...round.myLineup].sort((a, b) => a.mapPosition - b.mapPosition).map((u, index) => ({ ...u, relativePos: index + 1 }));
-let assignments = [];
-myPool.forEach(us => {
-let pData = globalPlayerData.find(p => p.tag === us.tag);
-let rawHR = (pData && pData.hitRate !== null && pData.hitRate !== undefined) ? pData.hitRate : 75;
-let rawDest = (pData && pData.cwlStats && pData.cwlStats.avgDestruction) ? parseFloat(pData.cwlStats.avgDestruction) : 85;
-let attacks = (pData && pData.cwlStats) ? pData.cwlStats.attacks : 0;
-let smoothedHR = ((rawHR * attacks) + (50 * 2)) / (attacks + 2);
-let smoothedDest = ((rawDest * attacks) + (75 * 2)) / (attacks + 2);
-let attackerClass = attacks > 0 && smoothedHR >= 60 ?
-"Elite" : attacks > 0 && smoothedHR < 40 ? "Struggling" : "Standard";
-assignments.push({ us, attackerClass, smoothedHR, smoothedDest, target: null, confidence: 0 });
-});
-assignments.sort((a, b) => {
-if (a.attackerClass === "Struggling" && b.attackerClass !== "Struggling") return -1;
-if (a.attackerClass !== "Struggling" && b.attackerClass === "Struggling") return 1;
-return b.us.th - a.us.th;
-});
-assignments.forEach(a => {
-let candidates = enemyPool.filter(e => !e.assigned);
-if (candidates.length === 0) return;
-let best = null;
-if (a.attackerClass === "Struggling") {
-let weakBases = candidates.filter(e => e.th <= a.us.th);
-if (weakBases.length > 0) best = weakBases.sort((x, y) => y.th - x.th)[0];
-} else if (a.attackerClass === "Elite") {
-let strongBases = candidates.filter(e => e.th >= a.us.th);
-if (strongBases.length > 0) best = strongBases.sort((x, y) => x.th - y.th)[0];
-}
-if (!best) { candidates.sort((x, y) => Math.abs(x.th - a.us.th) - Math.abs(y.th - a.us.th)); best = candidates[0]; }
-best.assigned = true; a.target = best;
-let thDiff = a.us.th - best.th;
-let conf = (a.smoothedHR * 0.45) + (a.smoothedDest * 0.45) + (thDiff * 15);
-a.confidence = Math.max(10, Math.min(99, Math.round(conf)));
-});
-assignments.sort((a, b) => a.us.relativePos - b.us.relativePos);
-let listHtml = '';
-assignments.forEach(a => {
-if (!a.target) return;
-let isElite = a.confidence >= 80, isStruggle = a.confidence < 60;
-let confColor = isElite ? "var(--accent-main)" : (isStruggle ? "var(--dot-red)" : "var(--accent-secondary)");
-let borderColor = isElite ? "rgba(0,229,255,0.4)" : (isStruggle ? "rgba(255,51,102,0.4)" : "rgba(179,0,255,0.4)");
-let reasoning = isElite ? "OVERPOWER MISMATCH" : (isStruggle ? "HIGH-RISK REACH" : "BALANCED MIRROR");
-if (a.us.relativePos !== a.target.relativePos) reasoning = "TACTICAL SWAP";
-listHtml += `
-<div class="tactical-hud-item" style="border-color:${borderColor}; color:${confColor}; box-shadow:${isElite ? 'inset 0 0 15px rgba(0,229,255,0.1)' : 'none'};">
-<div style="flex:1;">
-<div style="font-weight:700; font-size:12px; color:#fff;">${a.us.relativePos}. ${a.us.name} <span style="font-size:9px; color:var(--text-muted); font-weight:500;">TH${a.us.th}</span></div>
-<div style="font-size:8px; margin-top:4px; opacity:0.8; letter-spacing:1px;">${reasoning}</div>
-</div>
-<div style="display:flex; flex-direction:column; align-items:center; padding:0 12px; opacity:0.6;"><span style="font-size:14px;">⟴</span></div>
-<div style="flex:1; text-align:right;">
-<div style="font-weight:700; font-size:12px; color:#fff;">${a.target.relativePos}. ${a.target.name} <span style="font-size:9px; color:var(--text-muted); font-weight:500;">TH${a.target.th}</span></div>
-<div style="font-size:9px; margin-top:4px; font-weight:700; letter-spacing:1px;">CONF: ${a.confidence}%</div>
-<div class="conf-bar-track"><div class="conf-bar-fill" style="width:${a.confidence}%; background:${confColor};"></div></div>
-</div>
-</div>`;
-});
-return `<div style="margin-top:40px;">
-<h4 class="section-title">Tactical AI Directives</h4>
-<p class="section-subtitle">Bayesian predictive targeting matrix</p>
-<div style="display:flex; flex-direction:column; gap:8px;">${listHtml}</div>
-</div>`;
-}
-// ── STAR MAP ──
-function setStarMapFilter(f) {
-currentStarMapFilter = f;
-document.querySelectorAll('.map-legend span').forEach(el => el.style.color = 'var(--text-muted)');
-if (f === 'us') document.getElementById('leg-us').style.color = 'var(--accent-main)';
-if (f === 'them') document.getElementById('leg-them').style.color = 'var(--dot-red)';
-if (f === 'all') document.getElementById('leg-all').style.color = '#fff';
-drawStarMap();
-}
-function drawStarMap() {
-if (!warInfo || !warInfo.starMap || warInfo.starMap.length === 0) return;
-let container = document.getElementById('starMapNodes');
-let canvas = document.getElementById('starMapCanvas');
-if (!container || !canvas) return;
-container.innerHTML = '';
-let ctx = canvas.getContext('2d');
-ctx.clearRect(0, 0, canvas.width, canvas.height);
-let myClanTag = decodeURIComponent("#YQP0GJ9");
-let cx = canvas.width / 2, cy = canvas.height / 2, maxR = canvas.width / 2 * 0.85;
-ctx.strokeStyle = 'rgba(0,229,255,0.1)'; ctx.lineWidth = 1;
-[0.33, 0.66, 1.0].forEach(scale => {
-ctx.beginPath(); ctx.arc(cx, cy, maxR * scale, 0, Math.PI * 2); ctx.stroke();
-});
-let nodesToDraw = [];
-warInfo.starMap.forEach(p => {
-let isUs = (p.clanTag === myClanTag);
-if (currentStarMapFilter === 'us' && !isUs) return;
-if (currentStarMapFilter === 'them' && isUs) return;
-let maxStars = 21;
-let rPct = Math.max(0, (maxStars - p.stars) / maxStars);
-let r = rPct * maxR;
-let rosterSize = (warInfo && warInfo.cwlDetails && warInfo.cwlDetails.length > 0) ? warInfo.cwlDetails[0].teamSize || 15 : 15;
-let baseAngle = (p.basePos / rosterSize) * Math.PI * 2 - (Math.PI / 2);
-let deltaAngle = (p.avgDelta / rosterSize) * Math.PI * 2;
-let angle = baseAngle + (deltaAngle * 0.4);
-let x = cx + r * Math.cos(angle), y = cy + r * Math.sin(angle);
-nodesToDraw.push({ ...p, isUs, x, y });
-});
-let html = '';
-nodesToDraw.forEach(n => {
-let color = n.isUs ? 'var(--accent-main)' : 'var(--dot-red)';
-let left = (n.x / canvas.width) * 100, top = (n.y / canvas.height) * 100;
-// V6: Show avg destruction in tooltip-like label
-html += `<div class="star-node" style="left:${left}%; top:${top}%; background:${color}; color:${color}; box-shadow:0 0 12px ${color};"><span class="star-label" style="color:${color};" title="${n.avgDest}% avg dest">${n.name}</span></div>`;
-});
-container.innerHTML = html;
-}
-// ── MONTE CARLO DISTRIBUTION ──
-function generateNormalDistribution(mean, stdDev, start, end, steps) {
-let data = [], labels = [];
-let stepSize = (end - start) / steps;
-for (let x = start; x <= end; x += stepSize) {
-let exponent = Math.exp(-0.5 * Math.pow((x - mean) / stdDev, 2));
-let y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * exponent;
-labels.push(Math.round(x)); data.push(y);
-}
-return { labels, data };
-}
-// ── WAR ROOM RENDER ──
-function renderWar() {
-let container = document.getElementById('war-container');
-if (!warInfo || warInfo.type !== "CWL" || !warInfo.cwlDetails || warInfo.cwlDetails.length === 0) {
-container.innerHTML = `<div style="padding:32px 20px; text-align:center; margin-top:40px;"><h4 style="color:var(--accent-main); letter-spacing:4px; text-transform:uppercase;">Awaiting Database Sync</h4><p style="font-size:12px; color:var(--text-muted); margin-top:16px;">The CWL Analytics engine is standing by.</p></div>`;
-return;
-}
-let html = "";
-let activeIdx = warInfo.cwlDetails.findIndex(r => r.state === "inWar" || r.state === "preparation");
-if (activeIdx === -1) activeIdx = warInfo.cwlDetails.length - 1;
-let activeRound = warInfo.cwlDetails[activeIdx];
-let myStars = activeRound.myStars !== undefined ? activeRound.myStars : "...";
-let oppStars = activeRound.enemyStars !== undefined ? activeRound.enemyStars : "...";
-let myAtks = activeRound.myAttacks !== undefined ? activeRound.myAttacks : "...";
-let oppAtks = activeRound.oppAttacks !== undefined ? activeRound.oppAttacks : "...";
-let rosterSize = activeRound.teamSize || 15;
-let myBadgeUrl = activeRound.myBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
-let oppBadgeUrl = activeRound.oppBadgeUrl || "https://i.imgur.com/iqJbl2r.png";
-// V6: Round series record
-let wins = 0, losses = 0, draws = 0;
-warInfo.cwlDetails.forEach(r => {
-if (r.result === 'win') wins++;
-else if (r.result === 'loss') losses++;
-else if (r.result === 'draw') draws++;
-});
-let recordHtml = `<div style="display:flex; justify-content:center; gap:16px; margin-top:12px; margin-bottom:4px;">
-<span style="font-size:11px; color:var(--dot-green); font-weight:700;">${wins}W</span>
-<span style="font-size:11px; color:var(--text-muted);">•</span>
-<span style="font-size:11px; color:var(--dot-red); font-weight:700;">${losses}L</span>
-${draws > 0 ? `<span style="font-size:11px; color:var(--text-muted);">•</span><span style="font-size:11px; color:var(--dot-yellow); font-weight:700;">${draws}D</span>` : ''}
-</div>`;
-// Win probability math
-let winProbHtml = "", distDataUs = null, distDataThem = null, distLabels = null;
-if (activeRound.state === "inWar" && myAtks !== "..." && oppAtks !== "...") {
-let oppAtksLeft = rosterSize - oppAtks, myAtksLeft = rosterSize - myAtks;
-let rawMyPace = myAtks > 0 ? myStars / myAtks : 2.5;
-let myPace = Math.max(2.1, rawMyPace);
-let oppPace = oppAtks > 0 ? oppStars / oppAtks : 2.0;
-let oppProjected = oppStars + (oppAtksLeft * oppPace);
-let myProjected = myStars + (myAtksLeft * myPace);
-let winProb = 50;
-if (myProjected > oppProjected) winProb = 50 + ((myProjected - oppProjected) / rosterSize) * 50;
-else winProb = 50 - ((oppProjected - myProjected) / rosterSize) * 50;
-winProb = Math.max(1, Math.min(99, Math.round(winProb)));
-let myFloorStars = myStars + (myAtksLeft * 2);
-let oppMaxStars = oppStars + (oppAtksLeft * 3);
-let starsToClinch = oppMaxStars + 1 - myFloorStars;
-let clinchTxt = "";
-if (myStars + (myAtksLeft * 3) <= oppStars) clinchTxt = `<span style="color:var(--dot-red);">[IMPOSSIBLE]</span>`;
-else if (myFloorStars > oppMaxStars) clinchTxt = `<span style="color:var(--dot-green);">0 (SECURED)</span>`;
-else clinchTxt = `${Math.max(0, starsToClinch)} additional 3★ hits`;
-// V6: Win probability gradient bar
-let probBarWidth = winProb;
-let probBarColor = winProb >= 60 ? 'var(--accent-main)' : winProb <= 40 ? 'var(--dot-red)' : 'var(--dot-yellow)';
-winProbHtml = `
-<div style="background:rgba(0,0,0,0.4); border:1px solid rgba(0,229,255,0.15); border-radius:12px; padding:16px; margin-bottom:24px; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
-<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-<div style="font-size:10px; color:var(--text-muted); font-weight:600; text-transform:uppercase; letter-spacing:1.5px;">AI Win Probability</div>
-<div style="font-size:18px; font-weight:700; color:${probBarColor}; text-shadow:0 0 10px rgba(0,229,255,0.4);">${winProb}%</div>
-</div>
-<div style="height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; margin-bottom:12px;">
-<div style="height:100%; width:${probBarWidth}%; background:${probBarColor}; border-radius:3px; transition:width 1.5s ease; box-shadow:0 0 8px ${probBarColor};"></div>
-</div>
-<div style="font-size:10px; color:var(--text-muted); text-align:left; padding-top:12px; border-top:1px solid rgba(255,255,255,0.05);">Min 3★ Needed to Clinch: <span style="color:#fff; font-weight:700; margin-left:4px; letter-spacing:0.5px;">${clinchTxt}</span></div>
-</div>
-<div class="distribution-bg" style="height:140px; position:relative;">
-<span style="position:absolute; top:12px; left:16px; font-size:9px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px;">Monte Carlo Distribution</span>
-<span style="position:absolute; top:12px; right:16px; font-size:9px; font-weight:600; color:var(--text-muted);">
-<span style="color:var(--accent-main);">■</span> Us &nbsp;
-<span style="color:var(--dot-red);">■</span> Them
-</span>
-<canvas id="winProbChart"></canvas>
-</div>`;
-let myStdDev = Math.max(0.5, myAtksLeft * 0.3);
-let oppStdDev = Math.max(1.0, oppAtksLeft * 0.6);
-let minRange = Math.floor(Math.min(myProjected, oppProjected) - 8);
-let maxRange = Math.ceil(Math.max(myProjected, oppProjected) + 8);
-let usDist = generateNormalDistribution(myProjected, myStdDev, minRange, maxRange, 40);
-let themDist = generateNormalDistribution(oppProjected, oppStdDev, minRange, maxRange, 40);
-distLabels = usDist.labels; distDataUs = usDist.data; distDataThem = themDist.data;
-}
-let attackSegments = "";
-if (myAtks !== "...") {
-for (let i = 0; i < rosterSize; i++) attackSegments += `<div class="energy-segment ${i < myAtks ? 'filled' : ''}"></div>`;
-}
-html += `<div class="war-room-header">
-<h4 style="color:var(--text-main); font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:3px; margin:0 0 8px 0; text-shadow:0 2px 10px rgba(0,0,0,0.8);">Live War Room</h4>
-${recordHtml}
-<div style="display:flex; justify-content:center; align-items:center; gap:24px; margin:24px 0 24px 0;">
-<div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-<img src="${myBadgeUrl}" style="width:64px; height:64px; filter:drop-shadow(0 0 15px rgba(0,229,255,0.4)); margin-bottom:12px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-<span style="font-size:36px; font-weight:700; color:var(--accent-main); line-height:1; text-shadow:0 0 20px rgba(0,229,255,0.4);">${myStars}</span>
-</div>
-<div style="font-size:20px; color:var(--text-muted); font-weight:700;">VS</div>
-<div style="display:flex; flex-direction:column; align-items:center; flex:1;">
-<img src="${oppBadgeUrl}" style="width:64px; height:64px; filter:drop-shadow(0 0 15px rgba(255,51,102,0.4)); margin-bottom:12px;" onerror="this.src='https://i.imgur.com/iqJbl2r.png'">
-<span style="font-size:36px; font-weight:700; color:var(--dot-red); line-height:1; text-shadow:0 0 20px rgba(255,51,102,0.4);">${oppStars}</span>
-</div>
-</div>
-${winProbHtml}
-<div style="font-size:10px; font-weight:600; color:var(--text-muted); margin-bottom:12px; letter-spacing:1px; text-transform:uppercase;">Attacks Remaining: <span style="color:#fff;">${myAtks !== "..." ? rosterSize - myAtks : "..."}</span></div>
-<div class="energy-bar-container">${attackSegments}</div>
-</div>`;
-// Pending strikes
-if (activeRound.myLineup) {
-let hitList = activeRound.myLineup.filter(p => p.attacks === 0);
-if (activeRound.state === "inWar" && hitList.length > 0) {
-html += `<h4 class="section-title">Pending Strikes</h4>
-<p class="section-subtitle">Operators awaiting deployment (${hitList.length})</p>
-<div style="display:flex; gap:12px; overflow-x:auto; padding-bottom:16px; margin-bottom:24px; scrollbar-width:none;">`;
-hitList.forEach(p => { html += `<div class="strike-pill">${p.name}</div>`; });
-html += `</div>`;
-}
-}
-// Constellation
-html += `<h4 class="section-title">CWL Constellation</h4>
-<p class="section-subtitle">Macro-league trajectory map. Core = 21 Stars. Node label on hover shows avg destruction.</p>
-<div class="map-legend">
-<span id="leg-us" style="color:var(--accent-main); cursor:pointer; font-weight:700; text-shadow:0 0 8px var(--accent-main);" onclick="setStarMapFilter('us')">Our Clan</span>
-<span id="leg-them" style="cursor:pointer;" onclick="setStarMapFilter('them')">Opponent</span>
-<span id="leg-all" style="cursor:pointer;" onclick="setStarMapFilter('all')">League</span>
-</div>
-<div class="star-map-wrapper">
-<canvas id="starMapCanvas" class="star-map-canvas" width="400" height="400"></canvas>
-<div class="radar-ring r1"></div><div class="radar-ring r2"></div><div class="radar-ring r3"></div>
-<div class="radar-crosshair v"></div><div class="radar-crosshair h"></div>
-<div class="radar-core"></div>
-<div class="radar-sweep"></div>
-<div id="starMapNodes" class="star-map-nodes"></div>
-</div>`;
-// Matrix pipeline
-html += `<h4 class="section-title">CWL Matrix Pipeline</h4><p class="section-subtitle">Round-by-round tactical analysis</p>`;
-html += `<div class="cwl-carousel" id="cwlCarousel">`;
-warInfo.cwlDetails.forEach((round, index) => {
-let isCurrent = (index === activeIdx);
-let oppPat = round.attackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0, threeStars: 0 };
-let oppHitRate = oppPat.total > 0 ? Math.round((oppPat.threeStars / oppPat.total) * 100) : 0;
-let myPat = round.myAttackPattern || { mirrors: 0, dips: 0, reaches: 0, total: 0, threeStars: 0 };
-let myHitRate = myPat.total > 0 ? Math.round((myPat.threeStars / myPat.total) * 100) : 0;
-// V6: Result pip
-const resultLabels = { win: '✓ WIN', loss: '✗ LOSS', draw: '= DRAW', inProgress: '⟳ LIVE' };
-const resultPip = round.result ? `<div class="round-result-pip result-${round.result}">${resultLabels[round.result] || round.state}</div>` : '';
-let patHtml = "";
-if (round.state === "preparation") {
-let usHits = 0, usTotalAtks = 0, usTotalDest = 0;
-warInfo.starMap.forEach(p => {
-if (p.clanTag === decodeURIComponent("#YQP0GJ9")) { usHits += p.threeStars; usTotalAtks += p.attacks; usTotalDest += p.totalDest; }
-});
-let usTotalHitRate = usTotalAtks > 0 ? Math.round((usHits / usTotalAtks) * 100) : 0;
-let usTotalAvgDest = usTotalAtks > 0 ? (usTotalDest / usTotalAtks).toFixed(1) : 0;
-let oppHits = 0, oppTotalAtks = 0, oppTotalDest = 0;
-warInfo.starMap.forEach(p => { if (p.clanTag === round.opponent.tag) { oppHits += p.threeStars; oppTotalAtks += p.attacks; oppTotalDest += p.totalDest; } });
-let oppLeagueHitRate = oppTotalAtks > 0 ? Math.round((oppHits / oppTotalAtks) * 100) : 0;
-let oppLeagueAvgDest = oppTotalAtks > 0 ? (oppTotalDest / oppTotalAtks).toFixed(1) : 0;
-patHtml = `<div style="margin-top:24px; padding:20px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.05); border-radius:12px; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
-<p style="font-size:10px; font-weight:700; color:var(--accent-main); margin-bottom:20px; text-transform:uppercase; letter-spacing:2px; text-align:center;">[LEAGUE-WIDE SCOUTING REPORT]</p>
-<div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:9px; font-weight:700; letter-spacing:1px;">
-<span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
-<span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
-<span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
-</div>
-<div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:14px; font-weight:600;">
-<span style="color:var(--accent-main); width:30%; text-align:center; text-shadow:0 0 10px rgba(0,229,255,0.4);">${usTotalHitRate}%</span>
-<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">3★ Hit Rate</span>
-<span style="color:var(--dot-red); width:30%; text-align:center; text-shadow:0 0 10px rgba(255,51,102,0.4);">${oppLeagueHitRate}%</span>
-</div>
-<div style="display:flex; justify-content:space-between; font-size:14px; font-weight:600;">
-<span style="color:var(--accent-main); width:30%; text-align:center; text-shadow:0 0 10px rgba(0,229,255,0.4);">${usTotalAvgDest}%</span>
-<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">Avg Destruction</span>
-<span style="color:var(--dot-red); width:30%; text-align:center; text-shadow:0 0 10px rgba(255,51,102,0.4);">${oppLeagueAvgDest}%</span>
-</div>
-</div>`;
-} else {
-patHtml = `<div style="margin-top:24px; padding:20px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.05); border-radius:12px; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);">
-<p style="font-size:10px; font-weight:700; color:var(--text-muted); margin-bottom:20px; text-transform:uppercase; letter-spacing:2px; text-align:center;">Attack Profile Comparison</p>
-<div style="display:flex; justify-content:space-between; margin-bottom:16px; font-size:9px; font-weight:700; letter-spacing:1px;">
-<span style="color:var(--accent-main); width:30%; text-align:center;">US</span>
-<span style="color:var(--text-muted); width:40%; text-align:center;">METRIC</span>
-<span style="color:var(--dot-red); width:30%; text-align:center;">THEM</span>
-</div>
-${[['mirrors', 'Mirrors'], ['dips', 'Dips'], ['reaches', 'Reaches']].map(([k, label]) => `
-<div style="display:flex; justify-content:space-between; margin-bottom:12px; font-size:13px; font-weight:500;">
-<span style="color:var(--accent-main); width:30%; text-align:center;">${myPat[k]}</span>
-<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">${label}</span>
-<span style="color:var(--dot-red); width:30%; text-align:center;">${oppPat[k]}</span>
-</div>`).join('')}
-<div style="display:flex; justify-content:space-between; font-size:15px; font-weight:700; padding-top:16px; border-top:1px solid rgba(255,255,255,0.05);">
-<span style="color:var(--accent-main); width:30%; text-align:center; text-shadow:0 0 10px rgba(0,229,255,0.4);">${myHitRate}%</span>
-<span style="color:var(--text-muted); width:40%; text-align:center; font-size:10px; text-transform:uppercase; letter-spacing:1px;">Hit Rate</span>
-<span style="color:var(--dot-red); width:30%; text-align:center; text-shadow:0 0 10px rgba(255,51,102,0.4);">${oppHitRate}%</span>
-</div>
-</div>`;
-}
-// Enemy roster with V6 TH warning badges
-let oppLineupMap = [...(round.enemyLineup || [])].sort((a, b) => a.mapPosition - b.mapPosition).map((e, i) => ({ ...e, relativePos: i + 1 }));
-let rosterHtml = `<div style="margin-top:32px;"><p style="font-size:10px; font-weight:700; color:var(--text-muted); margin-bottom:16px; text-transform:uppercase; letter-spacing:2px; text-align:center;">Enemy Roster</p>`;
-oppLineupMap.forEach(e => {
-let atkStatus = e.attacks > 0
-? `<span style="color:var(--dot-red); font-family:monospace; font-size:9px; font-weight:600; text-shadow:0 0 5px var(--dot-red);">[⟁ ENGAGED]</span>`
-: `<span style="color:var(--text-muted); font-family:monospace; font-size:9px;">[⧖ STANDBY]</span>`;
-// V6: TH warning if TH17 or below
-let thWarning = e.th <= 17 ? `<span class="th-warning">⚠ TH${e.th}</span>` : '';
-rosterHtml += `<div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:12px; align-items:center;">
-<div>
-<span style="color:var(--text-muted); width:28px; display:inline-block; font-size:10px; font-weight:600;">#${e.relativePos}</span>
-<span style="font-weight:600; color:#fff;">${e.name}</span>
-${e.th > 17 ? `<span style="color:var(--accent-main); font-size:9px; margin-left:6px; font-weight:700;">TH${e.th}</span>` : thWarning}
-</div>
-<div>${atkStatus}</div>
-</div>`;
-});
-rosterHtml += `</div>`;
-if (isCurrent) rosterHtml += buildTargetAssignments(round);
-let prevSeasonHtml = round.opponent.prevLeague
-? `<div style="font-size:9px; font-weight:500; color:var(--text-muted); margin-top:6px; text-transform:uppercase; letter-spacing:1px;">Prev Season: ${round.opponent.prevLeague}</div>`
-: "";
-html += `
-<div class="carousel-slide ${isCurrent ? 'active' : ''}">
-<div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:16px; margin-bottom:20px;">
-<div>
-<div style="font-size:16px; font-weight:700; font-family:var(--font-sans); color:#fff;">Round ${index + 1}: ${round.opponent.name}</div>
-${prevSeasonHtml}
-</div>
-<div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
-${resultPip}
-<div style="font-size:10px; color:var(--accent-main); text-transform:uppercase; letter-spacing:2px; font-weight:700; text-shadow:0 0 10px rgba(0,229,255,0.4);">${round.state}</div>
-</div>
-</div>
-${patHtml}
-${rosterHtml}
-</div>`;
-});
-html += `</div>`;
-container.innerHTML = html;
-init3DCarousel();
-if (warInfo.starMap && warInfo.starMap.length > 0) drawStarMap();
-if (distDataUs && distDataThem && distLabels) {
-let ctxP = document.getElementById('winProbChart');
-if (ctxP) {
-if (chartsRegistry.probChart) chartsRegistry.probChart.destroy();
-let gradUs = ctxP.getContext('2d').createLinearGradient(0, 0, 0, 140);
-gradUs.addColorStop(0, 'rgba(0,229,255,0.4)'); gradUs.addColorStop(1, 'rgba(0,229,255,0.0)');
-let gradThem = ctxP.getContext('2d').createLinearGradient(0, 0, 0, 140);
-gradThem.addColorStop(0, 'rgba(255,51,102,0.4)'); gradThem.addColorStop(1, 'rgba(255,51,102,0.0)');
-chartsRegistry.probChart = new Chart(ctxP.getContext('2d'), {
-type: 'line',
-data: { labels: distLabels, datasets: [
-{ label: 'Us', data: distDataUs, borderColor: '#00e5ff', backgroundColor: gradUs, fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2.5 },
-{ label: 'Them', data: distDataThem, borderColor: '#ff3366', backgroundColor: gradThem, fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2.5 }
-]},
-options: {
-animation: { duration: 2000, easing: 'easeOutQuart' },
-responsive: true, maintainAspectRatio: false,
-plugins: { legend: { display: false }, tooltip: { enabled: false } },
-scales: {
-x: { display: true, grid: { display: false }, ticks: { color: '#8b949e', font: { size: 10, family: 'Montserrat', weight: 600 } } },
-y: { display: false, min: 0 }
-}
-}
-});
-}
-}
-}
-// ── INTEL TAB (V6 NEW) ──
-function renderIntel() {
-const container = document.getElementById('intel-container');
-if (!container) return;
-let html = '';
-// Historical CWL table
-let cwlHistory = clanData.cwlHistoricalStats || [];
-html += `<h4 class="section-title">CWL Season Archive</h4>
-<p class="section-subtitle">Historical league performance log</p>`;
-if (cwlHistory.length > 0) {
-html += `<div class="intel-card" style="overflow-x:auto;">
-<table class="intel-table">
-<thead><tr>
-<th>Season</th><th>League</th><th>⭐ Stars</th><th>💥 Dest</th><th>W/L</th><th>3★</th>
-</tr></thead>
-<tbody>`;
-cwlHistory.forEach(s => {
-let displaySeason = s.season || '—';
-if (s.season) {
-let d = new Date(s.season);
-if (!isNaN(d.getTime())) {
-let month = d.toLocaleString('default', { month: 'long' });
-let year = d.getFullYear().toString().slice(-2);
-displaySeason = `${month}, '${year}`;
-}
-}
-html += `<tr>
-<td style="color:var(--accent-main); font-weight:700; white-space:nowrap;">${displaySeason}</td>
-<td style="font-size:10px; color:var(--text-muted);">${s.league || '—'}</td>
-<td style="color:#fff; font-weight:600;">${s.stars || 0}</td>
-<td style="color:var(--dot-yellow);">${s.destruction || '—'}%</td>
-<td><span style="color:var(--dot-green);">${s.wins || 0}W</span> <span style="color:var(--text-muted);">/</span> <span style="color:var(--dot-red);">${s.losses || 0}L</span></td>
-<td style="color:var(--accent-secondary);">${s.threeStars || 0}</td>
-</tr>`;
-});
-html += `</tbody></table></div>`;
-} else {
-html += `<div class="intel-card" style="text-align:center; padding:32px;">
-<div style="font-size:11px; color:var(--text-muted); letter-spacing:2px;">No historical CWL data logged yet.</div>
-<div style="font-size:10px; color:var(--text-muted); margin-top:8px;">CWL seasons auto-log when they end.</div>
-</div>`;
-}
-// Donation leaderboard
-html += `<h4 class="section-title">Donation Leaderboard</h4>
-<p class="section-subtitle">Troop supply rankings this season</p>`;
-if (globalPlayerData.length > 0) {
-let sorted = [...globalPlayerData].sort((a, b) => (b.donations || 0) - (a.donations || 0));
-html += `<div class="intel-card" style="padding:0; overflow:hidden;">`;
-sorted.forEach((p, i) => {
-let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
-html += `<div class="donation-row">
-<div class="donation-rank ${rankCls}">${rankIcon}</div>
-<div class="donation-name">${p.name} <span style="font-size:9px; color:var(--text-muted);">TH${p.thLevel||'?'}</span></div>
-<div style="text-align:right;">
-<div class="donation-val">${(p.donations || 0).toLocaleString()} <span style="font-size:10px; color:var(--text-muted); font-weight:500;">donated</span></div>
-<span class="donation-ratio-pill">Ratio: ${p.donationRatio || '0'}</span>
-</div>
-</div>`;
-});
-html += `</div>`;
-// War Stars leaderboard
-html += `<h4 class="section-title">War Stars Leaderboard</h4>
-<p class="section-subtitle">All-time war star rankings</p>`;
-let sortedByWar = [...globalPlayerData].sort((a, b) => (parseInt(b.warStars) || 0) - (parseInt(a.warStars) || 0));
-html += `<div class="intel-card" style="padding:0; overflow:hidden;">`;
-sortedByWar.forEach((p, i) => {
-let rankIcon = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
-let rankCls = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-html += `<div class="donation-row">
-<div class="donation-rank ${rankCls}">${rankIcon}</div>
-<div class="donation-name">${p.name}</div>
-<div class="donation-val">⭐ ${(parseInt(p.warStars)||0).toLocaleString()}</div>
-</div>`;
-});
-html += `</div>`;
-// Grade distribution
-html += `<h4 class="section-title">Grade Distribution</h4>
-<p class="section-subtitle">Combat performance breakdown</p>`;
-const gradeCounts = { S: 0, A: 0, B: 0, C: 0, D: 0, 'N/A': 0 };
-globalPlayerData.forEach(p => { gradeCounts[p.grade || 'N/A']++; });
-html += `<div class="intel-card">
-<div style="display:flex; justify-content:space-around; gap:8px;">
-${Object.entries(gradeCounts).filter(([g]) => g !== 'N/A').map(([g, count]) => `
-<div style="text-align:center; flex:1;">
-<div style="font-size:20px; font-weight:800; color:${gradeColor(g)}; text-shadow:0 0 10px ${gradeColor(g)};">${count}</div>
-<div class="grade-badge grade-${g}" style="position:static; display:inline-block; margin-top:6px;">${g}</div>
-</div>`).join('')}
-</div>
-</div>`;
-}
-container.innerHTML = html;
+  document.getElementById('playerBottomSheet').classList.remove('open');
+  document.getElementById('sheetBackdrop').classList.remove('active');
 }
 </script>
 </body>
 </html>
-
