@@ -3,716 +3,469 @@
 <head>
 <base target="_top">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
-<meta name="theme-color" content="#040508">
-<title>Molly Metrics V8</title>
+<meta name="theme-color" content="#12141a">
+<title>Molly Metrics V9 — Modern Chic</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=VT323&family=DotGothic16&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Josefin+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ─────────────────────────────────────────────
-   Y2K NEO-NOSTALGIA VARIABLES
+   MODERN CHIC DESIGN SYSTEM
 ───────────────────────────────────────────── */
 :root {
-  --bg:          #fff0f5; /* Lavender Blush */
-  --bg-card:     rgba(255, 255, 255, 0.65);
-  --cyan:        #ff69b4; /* Hot Pink */
-  --cyan-glow:   rgba(255, 105, 180, 0.4);
-  --purple:      #87cefa; /* Light Sky Blue */
-  --purple-glow: rgba(135, 206, 250, 0.4);
-  --green:       #ba55d3; /* Medium Orchid */
-  --green-glow:  rgba(186, 85, 211, 0.4);
-  --red:         #ff4500;
-  --gold:        #ffd700;
-  --text-main:   #555555; /* Dark gray for readability */
-  --muted:       #888888;
-  --muted-light: #aaaaaa;
-  --border:      rgba(255, 255, 255, 0.9);
-  --border-soft: rgba(255, 255, 255, 0.6);
-  --font-d:      'VT323', monospace; /* Retro pixel headers */
-  --font-b:      'Nunito', sans-serif; /* Bubbly rounded body */
-  --font-m:      'DotGothic16', sans-serif; /* Pixel numbers */
+  --bg-dark:       #0d1117;
+  --bg-card:       rgba(24, 28, 38, 0.7);
+  --accent-main:   #e74c3c; /* Red from beanie */
+  --accent-sec:    #3498db; /* Denim Blue from jeans */
+  --text-main:     #ecf0f1; /* Off-White from top */
+  --text-muted:    #a3afc1;
+  --border:        rgba(255, 255, 255, 0.08);
+  --font-h:        'Josefin Sans', sans-serif; /* Stylish, characteristic */
+  --font-b:        'Poppins', sans-serif; /* Clean, modern body */
   
-  --grade-s: #ff69b4;
-  --grade-a: #87cefa;
-  --grade-b: #ba55d3;
-  --grade-c: #ffa500;
-  --grade-d: #ff4500;
+  --grade-s:       #e74c3c;
+  --grade-a:       #3498db;
+  --grade-b:       #ecf0f1;
+  --grade-c:       #f1c40f;
+  --grade-d:       #e67e22;
+  --card-shadow:   0 16px 40px rgba(0,0,0,0.7);
+  --trans-base:    transform 0.2s, box-shadow 0.2s, background-color 0.2s;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; outline: none; }
 html, body {
   height: 100%; width: 100%; margin: 0; padding: 0;
   overflow: hidden; position: fixed; inset: 0;
-  background: var(--bg); font-family: var(--font-b);
+  background: var(--bg-dark); font-family: var(--font-b);
   color: var(--text-main); -webkit-font-smoothing: antialiased;
 }
 h1,h2,h3,h4,p { margin: 0; }
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-thumb { background: var(--cyan-glow); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
 /* ─────────────────────────────────────────────
-   DREAMY PASTEL BACKGROUND
+   CHIC SCENE (BLURRED IDOL BACKDROP)
 ───────────────────────────────────────────── */
-#bg-scene { position: fixed; inset: 0; z-index: -10; overflow: hidden; background: linear-gradient(135deg, #e6e6fa 0%, #ffb6c1 50%, #add8e6 100%); }
-#bg-grid {
-  position: absolute; inset: 0;
-  background-image: radial-gradient(rgba(255,255,255,0.8) 2px, transparent 2px);
-  background-size: 30px 30px;
+#app-backdrop {
+  position: fixed; inset: 0; z-index: -10;
+  background-image: url('https://i.imgur.com/bEpRYBE.jpeg');
+  background-size: cover; background-position: center;
+  filter: grayscale(80%) sepia(20%) brightness(0.1) blur(20px);
 }
-.bg-orb { position: absolute; border-radius: 50%; filter: blur(70px); animation: orbPulse 12s ease-in-out infinite; }
-.bg-orb-c { width: 400px; height: 400px; top: -100px; right: -100px; background: #fff; opacity: 0.6; }
-.bg-orb-p { width: 350px; height: 350px; bottom: -50px; left: -100px; background: rgba(255,255,255,0.8); opacity: 0.5; animation-delay: -6s; }
-@keyframes orbPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+#app-backdrop::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 70% 30%, rgba(52, 152, 219, 0.05), transparent),
+              radial-gradient(circle at 30% 70%, rgba(231, 76, 60, 0.05), transparent);
+}
 
-.main-scroll { position: absolute; inset: 0; overflow-y: auto; padding-bottom: 120px; }
-.container { padding: 40px 16px 16px; max-width: 600px; margin: auto; }
+.main-scroll { position: absolute; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 120px; }
+.container { padding: calc(32px + env(safe-area-inset-top, 0px)) 16px 16px; max-width: 600px; margin: auto; }
 
 /* ─────────────────────────────────────────────
-   HEADERS & TEXT
+   UI COMPONENT SHELLS
 ───────────────────────────────────────────── */
-.header { display: flex; justify-content: space-between; border-bottom: 3px dashed var(--border-soft); padding-bottom: 14px; margin-bottom: 22px; }
-.header-wordmark { font-family: var(--font-d); font-size: 28px; color: var(--cyan); text-shadow: 2px 2px 0px #fff; letter-spacing: 2px; }
-.header-build { font-family: var(--font-m); font-size: 10px; color: var(--green); }
-.header-live { font-family: var(--font-b); font-size: 12px; font-weight: 900; color: var(--cyan); background: #fff; padding: 4px 10px; border-radius: 20px; border: 2px solid var(--cyan); box-shadow: 2px 2px 0px var(--cyan-glow); }
-
-.sec-title { font-family: var(--font-d); font-size: 22px; color: var(--cyan); text-align: center; margin: 30px 0 20px; text-shadow: 1px 1px 0px #fff; }
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  padding: 24px;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 16px;
+  transition: var(--trans-base);
+}
 
 /* ─────────────────────────────────────────────
-   FROSTED ACRYLIC CARDS (Sticker Feel)
+   GLOBAL HEADER & STATS
 ───────────────────────────────────────────── */
-.global-card, .hof-card {
-  background: rgba(255, 255, 255, 0.6);
-  border: 3px solid #fff; border-radius: 24px; padding: 24px;
-  box-shadow: 6px 6px 0px rgba(255, 105, 180, 0.15); /* Chunky shadow */
-  backdrop-filter: blur(12px); margin-bottom: 20px;
+.header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 24px; }
+.header-brand { font-family: var(--font-h); font-size: 20px; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 1px; }
+.header-brand span { color: var(--accent-main); }
+.header-live { font-family: var(--font-b); font-size: 10px; font-weight: 700; color: var(--bg-dark); background: var(--text-main); padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+
+.global-card { text-align: center; }
+.global-num { font-family: var(--font-h); font-size: 48px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+.global-label { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+.global-meta { font-family: var(--font-b); font-size: 12px; font-weight: 600; margin-top: 10px; }
+.global-meta.g { color: var(--accent-sec); }
+.global-meta.c { color: var(--accent-main); }
+
+/* ─────────────────────────────────────────────
+   FILTERS & MATRIX
+───────────────────────────────────────────── */
+.control-panel { display: flex; gap: 8px; margin-bottom: 20px; }
+input, select {
+  width: 100%; padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(0,0,0,0.1);
+  color: var(--text-main); font-family: var(--font-b); font-size: 12px;
 }
-.global-tag { font-family: var(--font-b); font-weight: 800; color: var(--purple); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-.global-num { font-family: var(--font-d); font-size: 56px; color: var(--cyan); text-shadow: 3px 3px 0px #fff; }
-.meta-val { font-family: var(--font-m); font-size: 16px; font-weight: bold; }
-.meta-val.c { color: var(--purple); }
-.meta-val.g { color: var(--cyan); }
+input::placeholder { color: var(--text-muted); }
 
-.control-row { display: flex; gap: 10px; background: rgba(255,255,255,0.7); padding: 12px; border-radius: 16px; border: 2px solid #fff; box-shadow: 4px 4px 0px rgba(135, 206, 250, 0.2); margin-bottom: 24px; }
-input, select { border: none; background: transparent; color: var(--text-main); font-family: var(--font-b); font-weight: 700; width: 100%; outline: none; }
-
-.glass-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.glass-card {
-  background: rgba(255,255,255,0.8); border: 2px solid #fff; border-radius: 18px;
-  padding: 16px 8px; display: flex; flex-direction: column; align-items: center;
-  box-shadow: 4px 4px 0px rgba(0,0,0,0.05); cursor: pointer; transition: 0.2s;
+.grid-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.grid-card {
+  background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border);
+  padding: 16px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; transition: var(--trans-base); text-align: center;
 }
-.glass-card:hover { transform: translateY(-4px) rotate(-2deg); box-shadow: 6px 6px 0px var(--cyan-glow); }
-.glass-name { font-weight: 800; font-size: 12px; color: var(--text-main); margin-top: 8px; }
-.glass-th { font-family: var(--font-m); font-size: 10px; color: var(--purple); font-weight: bold; }
+.grid-card:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.grid-card:active { transform: translateY(0); background: rgba(255,255,255,0.03); }
+.grid-name { font-weight: 600; font-size: 11px; margin-top: 8px; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+.grid-th { font-family: var(--font-h); font-size: 10px; font-weight: 700; color: var(--accent-sec); }
 
-.g-badge { position: absolute; top: 6px; right: 6px; font-family: var(--font-b); font-weight: 900; font-size: 10px; padding: 3px 6px; border-radius: 8px; background: #fff; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
-.ring-wrap { width: 50px; height: 50px; position: relative; }
+/* ── PROGRESS RINGS (Minimal) ── */
+.ring-wrap { position: relative; width: 44px; height: 44px; }
 .ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-.ring-track { fill: none; stroke: rgba(0,0,0,0.05); stroke-width: 4; }
+.ring-track { fill: none; stroke: rgba(255,255,255,0.05); stroke-width: 4; }
 .ring-fill { fill: none; stroke-width: 4; stroke-linecap: round; }
-.ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-m); font-weight: bold; font-size: 12px; }
+.ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-h); font-size: 11px; font-weight: 700; }
 
 /* ─────────────────────────────────────────────
-   BOTTOM SHEET & NAV
+   HALL OF FAME (EDITORIAL STYLE)
 ───────────────────────────────────────────── */
-.sheet-backdrop { position: fixed; inset: 0; background: rgba(255,255,255,0.5); backdrop-filter: blur(5px); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
+.hof-card { padding: 0; }
+.hof-title { font-family: var(--font-h); font-size: 16px; font-weight: 600; color: var(--accent-main); text-align: center; border-bottom: 1px solid var(--border); padding: 16px 0; margin-bottom: 0; }
+.hof-entry { display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.hof-entry:last-child { border-bottom: none; }
+.hof-medal { font-family: var(--font-h); font-size: 16px; font-weight: 700; color: var(--text-muted); width: 24px; text-align: center; margin-right: 12px; }
+.hof-body { flex: 1; display: flex; align-items: baseline; }
+.hof-name { font-size: 12px; font-weight: 500; color: var(--text-main); margin-right: 6px; }
+.hof-th { font-family: var(--font-h); font-size: 9px; font-weight: 700; color: var(--accent-sec); }
+.hof-val { font-family: var(--font-h); font-size: 14px; font-weight: 600; color: var(--text-main); }
+
+/* ─────────────────────────────────────────────
+   OPERATOR SHEET (BOTTOM MODAL)
+───────────────────────────────────────────── */
+.sheet-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1500; opacity: 0; pointer-events: none; transition: 0.3s; }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
 .bottom-sheet {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 2000;
-  background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-  border-top-left-radius: 30px; border-top-right-radius: 30px;
-  border-top: 4px solid #fff; box-shadow: 0 -10px 40px rgba(255,105,180,0.15);
-  padding: 30px 20px 50px; transform: translateY(100%); transition: 0.4s cubic-bezier(0.2,1,0.3,1);
+  background: linear-gradient(180deg, #181c26 0%, #0d1117 100%);
+  border-top-left-radius: 28px; border-top-right-radius: 28px;
+  border-top: 1px solid var(--border); box-shadow: 0 -10px 40px rgba(0,0,0,0.7);
+  padding: calc(40px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px)) 20px;
+  transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2,1,0.3,1);
   max-height: 90vh; overflow-y: auto;
 }
 .bottom-sheet.open { transform: translateY(0); }
-.close-btn { position: absolute; top: calc(16px + env(safe-area-inset-top, 0px)); right: 16px; width: 32px; height: 32px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--cyan); box-shadow: 2px 2px 0px rgba(0,0,0,0.1); z-index: 100; cursor: pointer;}
+.close-btn { position: absolute; top: calc(24px + env(safe-area-inset-top, 0px)); right: 18px; width: 30px; height: 30px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: var(--text-muted); z-index: 100; transition: background 0.2s, color 0.2s, border-color 0.2s;}
 
-.nav-wrapper { position: fixed; bottom: 0; width: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(15px); border-top: 2px solid #fff; z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
-.bottom-nav { display: flex; justify-content: space-evenly; max-width: 600px; margin: auto; padding: 12px; }
-.nav-btn { display: flex; flex-direction: column; align-items: center; font-family: var(--font-b); font-weight: 800; font-size: 9px; color: var(--muted); cursor: pointer; transition: 0.2s; }
-.nav-icon { font-size: 22px; margin-bottom: 4px; transition: 0.2s; }
-.nav-btn.active { color: var(--cyan); }
-.nav-btn.active .nav-icon { transform: translateY(-4px); filter: drop-shadow(0 4px 4px var(--cyan-glow)); }
+.sheet-head { display: flex; justify-content: space-between; align-items: start; margin-bottom: 24px; }
+.sheet-label { font-size: 11px; font-weight: 600; color: var(--accent-sec); text-transform: uppercase; letter-spacing: 2px; }
+.sheet-pct { font-family: var(--font-h); font-size: 40px; font-weight: 700; line-height: 1; }
+.sheet-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.sheet-cat { text-transform: uppercase; letter-spacing: 2px; font-size: 10px; color: var(--text-muted); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin: 24px 0 16px; font-weight: 600;}
+
+/* ── Radar Chart custom styling ── */
+.radar-box { position: relative; padding: 0 10px 20px; }
+.bs-grade { font-family: var(--font-h); font-size: 32px; font-weight: 700; color: var(--text-main); line-height: 1; }
+.bs-grade-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
 
 /* ─────────────────────────────────────────────
-   IDOL STICKER INJECTIONS (Add your PNG URLs here)
+   BOTTOM NAVIGATION
 ───────────────────────────────────────────── */
-/* Example: This will stick an image to the top right of your Hall of Fame card */
-.hof-card { position: relative; }
-.hof-card::after {
-  content: '';
-  position: absolute;
-  top: -20px;
-  right: -10px;
-  width: 60px;
-  height: 60px;
-  background-image: url('https://i.imgur.com/KwafRMl.jpeg');
-  background-size: contain;
-  background-repeat: no-repeat;
-  transform: rotate(15deg);
-  pointer-events: none;
-  filter: drop-shadow(2px 2px 0px #fff);
-}
+.nav-wrapper { position: fixed; bottom: 0; width: 100%; background: rgba(13,17,23,0.9); backdrop-filter: blur(12px); border-top: 1px solid var(--border); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); }
+.bottom-nav { display: flex; justify-content: space-evenly; max-width: 600px; margin: auto; padding: 12px; }
+.nav-btn { display: flex; flex-direction: column; align-items: center; font-family: var(--font-b); font-size: 9px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+.nav-icon { font-size: 22px; margin-bottom: 4px; transition: 0.2s; }
+.nav-btn.active { color: var(--text-main); }
+.nav-btn.active .nav-icon { transform: translateY(-4px); filter: drop-shadow(0 4px 10px var(--accent-main)); }
+
+/* ─────────────────────────────────────────────
+   UTIL CLASSES
+───────────────────────────────────────────── */
+.loading { position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 1; transition: opacity 0.3s; }
+.spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--text-main); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.refresh { position: fixed; top: 16px; left: 16px; z-index: 900; background: var(--bg-card); border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.spinning { animation: spin 0.8s linear infinite; }
 </style>
 </head>
 <body>
 
-<!-- ░░ BACKGROUND ░░ -->
-<div id="bg-scene">
-  <div id="bg-img"></div>
-  <div id="bg-grid"></div>
-  <div id="bg-lines"></div>
-  <div class="bg-orb bg-orb-c"></div>
-  <div class="bg-orb bg-orb-p"></div>
-  <div id="bg-corner-tl"></div>
-  <div id="bg-corner-br"></div>
+<div id="app-backdrop"></div>
+<div class="refresh" onclick="hardRefresh()">↻</div>
+
+<div class="loading" id="loader">
+  <div class="spinner"></div>
 </div>
 
-<!-- ░░ REFRESH ░░ -->
-<div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()">↺</div>
-
-<!-- ░░ LOADER ░░ -->
-<div class="loader-overlay" id="loaderOverlay">
-  <div class="loader-logo">MOLLY METRICS</div>
-  <div class="loader-track"><div class="loader-fill"></div></div>
-  <div class="loader-lbl" id="loaderText">SYNCING MATRIX...</div>
-</div>
-
-<!-- ░░ MAIN ░░ -->
 <div class="main-scroll" id="mainScroll">
   <div class="container">
-
-    <!-- ── ROSTER TAB ── -->
+    
     <div id="roster-tab" class="tab-content active">
-
       <div class="header">
-        <div>
-          <div class="header-wordmark">MOLLY<em>_</em>METRICS</div>
-          <div class="header-build">V8.0 // PROGRESSION ENGINE</div>
-        </div>
-        <div class="header-live">
-          <div class="live-dot"></div>LIVE
-        </div>
+        <div class="header-brand">Molly <span>Metrics</span></div>
+        <div class="header-live">HOME // Village</div>
       </div>
-
-      <!-- Global Stat -->
-      <div class="global-card">
-        <div class="global-tag">Clan Progression Index</div>
-        <div class="global-num" id="gPct">–<span class="unit">%</span></div>
-        <div class="global-meta">
-          <div class="meta-item">
-            <div class="meta-label">30D VELOCITY</div>
-            <div class="meta-val g" id="gVelocity">+0.00%</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">OPERATORS</div>
-            <div class="meta-val c" id="gCount">–</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">CLIMBING</div>
-            <div class="meta-val g" id="gClimbing">–</div>
-          </div>
-        </div>
+      
+      <div class="global-card card">
+        <div class="global-num" id="global-pct-val">0.0%</div>
+        <div class="global-label">Avg. Completion // Roster</div>
+        <div id="global-change-val" class="global-meta g">Initializing...</div>
       </div>
-
-      <!-- Controls -->
-      <div class="control-row" id="rosterControls" style="display:none;">
-        <input type="text" id="searchInput" placeholder="Search operators..." oninput="filterRoster()">
-        <div class="v-divider"></div>
+      
+      <div class="control-panel">
+        <input type="text" id="searchInput" placeholder="Search Operators..." oninput="filterRoster()">
         <select id="sortSelect" onchange="filterRoster()">
-          <option value="comp">Overall %</option>
-          <option value="grade">Grade</option>
-          <option value="th">Town Hall</option>
-          <option value="vel">30D Velocity</option>
+          <option value="percentage">Overall %</option>
+          <option value="thLevel">Town Hall</option>
         </select>
       </div>
+      <div id="roster-container" class="grid-matrix"></div>
+    </div>
 
-      <div id="rosterContainer" class="glass-grid">
-        <div class="empty" style="grid-column:span 3;">INITIALIZING MATRIX...</div>
+    <div id="trophy-tab" class="tab-content" style="display:none;">
+      <div class="global-card card">
+        <div class="global-label">Roster Top styles</div>
+        <div class="global-meta">Top 3 Elite Operators // By Category</div>
       </div>
+      <div id="hof-container"></div>
     </div>
 
-    <!-- ── TROPHY TAB ── -->
-    <div id="trophy-tab" class="tab-content">
-      <div class="sec-title">Hall of Fame</div>
-      <div id="hofContainer">
-        <div class="empty">LOADING RECORDS...</div>
-      </div>
-    </div>
-
-    <!-- ── VELOCITY TAB ── -->
-    <div id="velocity-tab" class="tab-content">
-      <div class="sec-title">Velocity Board</div>
-      <div class="vel-intro">
-        <b>30-DAY PROGRESSION VELOCITY</b><br>
-        Ranks every operator by the raw percentage gained over the last 30 snapshot days.
-        The fastest climbers surface immediately — identify who's grinding vs. who has gone cold.
-      </div>
-      <div id="velocityContainer">
-        <div class="empty">COMPUTING TRAJECTORIES...</div>
-      </div>
-    </div>
-
-  </div><!-- /container -->
-</div><!-- /main-scroll -->
-
-<!-- ░░ BOTTOM NAV ░░ -->
-<div class="nav-wrapper">
-  <div class="bottom-nav">
-    <div class="nav-btn active" onclick="switchTab('roster')">
-      <span class="nav-icon">🛡️</span>Roster
-    </div>
-    <div class="nav-btn" onclick="switchTab('trophy')">
-      <span class="nav-icon">🏆</span>Trophy
-    </div>
-    <div class="nav-btn" onclick="switchTab('velocity')">
-      <span class="nav-icon">⚡</span>Velocity
-    </div>
   </div>
 </div>
 
-<!-- ░░ BOTTOM SHEET ░░ -->
-<div id="sheetBg" class="sheet-backdrop" onclick="closeSheet()"></div>
-<div id="playerSheet" class="bottom-sheet">
-  <div class="sheet-handle"></div>
-  <div class="close-btn" onclick="closeSheet()">✕</div>
-  <div id="sheetBody"></div>
+<div class="nav-wrapper">
+  <div class="bottom-nav">
+    <div class="nav-btn active" onclick="switchTab('roster')"><div class="nav-icon">🛡️</div>MATRIX</div>
+    <div class="nav-btn" onclick="switchTab('trophy')"><div class="nav-icon">🏆</div>FAME</div>
+  </div>
 </div>
 
-<!-- ░░ SCRIPT ░░ -->
+<div id="backdrop" class="sheet-backdrop" onclick="closeSheet()"></div>
+<div id="bottomSheet" class="bottom-sheet">
+  <div class="close-btn" onclick="closeSheet()">✕</div>
+  <div id="sheetContent"></div>
+</div>
+
 <script>
-/* ───────────────────────────── CONFIG ───────────────────────────── */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
+/* ─────────────────────────────────────────────
+   GLOBAL CONFIG (Replace these)
+───────────────────────────────────────────── */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec"; 
+const IDOL_IMG_URL = "https://i.imgur.com/bEpRYBE.jpeg"; 
 
-/* ───────────────────────────── STATE ───────────────────────────── */
-let globalPlayers  = [];
-let hallOfFame     = {};
-let displayList    = [];
-let bsLineChart    = null;
-let bsRadarChart   = null;
+let globalPlayerData = [];
+let displayedPlayerData = [];
+let bsRadarChart = null;
+let hallOfFameData = {};
 
-const GRADE_ORDER  = { S:5, A:4, B:3, C:2, D:1, "N/A":0 };
-const GRADE_COLOR  = { S:'#ff69b4', A:'#87cefa', B:'#ba55d3', C:'#ffa500', D:'#ff4500', 'N/A':'#aaaaaa' };
-
-/* Category display config */
+/* Grade & Category display config */
+const GRADE_COLOR  = { S:'#e74c3c', A:'#3498db', B:'#ecf0f1', C:'#f1c40f', D:'#e67e22', 'N/A':'#aaaaaa' };
 const CATS = [
-  { key:'heroes',    label:'Heroes',    color:'#ff69b4' }, // Hot pink
-  { key:'equipment', label:'Equip',     color:'#87cefa' }, // Sky blue
-  { key:'pets',      label:'Pets',      color:'#ba55d3' }, // Orchid purple
-  { key:'troops',    label:'Troops',    color:'#ffa500' }, // Orange
-  { key:'spells',    label:'Spells',    color:'#ff4500' }, // Red-orange
+  { key:'heroes',    label:'Heroes',    color:'#e74c3c' }, // Red from beanie
+  { key:'equipment', label:'Equip',     color:'#3498db' }, // Blue from jeans
+  { key:'pets',      label:'Pets',      color:'#ecf0f1' }, // White from top
+  { key:'troops',    label:'Troops',    color:'#95a5a6' }, // Grey from vest/shoes
+  { key:'spells',    label:'Spells',    color:'#e67e22' }, 
 ];
 
-/* ───────────────────────────── INIT ───────────────────────────── */
-window.addEventListener('DOMContentLoaded', () => fetchData());
+window.addEventListener('DOMContentLoaded', () => { 
+  // Set the backdrop image if provided
+  if (IDOL_IMG_URL && IDOL_IMG_URL !== "https://i.imgur.com/bEpRYBE.jpeg") {
+    document.getElementById('app-backdrop').style.backgroundImage = `url('${https://i.imgur.com/bEpRYBE.jpeg}')`;
+  }
+  fetchData(); 
+});
 
-/* ───────────────────────────── DATA ───────────────────────────── */
 async function fetchData() {
-  setLoading(true);
+  document.getElementById('loader').style.opacity = '1';
+  document.getElementById('loader').style.pointerEvents = 'all';
+  const refresh = document.querySelector('.refresh');
+  refresh.classList.add('spinning');
+  
   try {
-    const res  = await fetch(`${WEB_APP_URL}?action=getDashboardData`);
+    const res = await fetch(WEB_APP_URL + "?action=getDashboardData");
     const data = await res.json();
     if (data.players) {
-      globalPlayers = data.players;
-      hallOfFame    = data.hallOfFame || {};
-      updateGlobalStats();
-      document.getElementById('rosterControls').style.display = 'flex';
-      filterRoster();
+      globalPlayerData = data.players;
+      hallOfFameData = data.hallOfFame || {};
+      displayedPlayerData = globalPlayerData;
+      
+      const totalPct = globalPlayerData.reduce((sum, p) => sum + parseFloat(p.percentage), 0);
+      const avgPct   = globalPlayerData.length > 0 ? (totalPct / globalPlayerData.length).toFixed(1) : 0;
+      document.getElementById('global-pct-val').innerText = `${avgPct}%`;
+      
+      const change = globalPlayerData.reduce((sum, p) => sum + parseFloat(p.progression30d), 0) / globalPlayerData.length;
+      const changeEl = document.getElementById('global-change-val');
+      changeEl.innerText = `${change.toFixed(2)}% // Growth // 30d Velocity`;
+      changeEl.classList.remove('g', 'c');
+      changeEl.classList.add(change >= 0 ? 'g' : 'c');
+
       renderHoF();
-      renderVelocityBoard();
+      filterRoster();
     }
-  } catch(e) {
-    console.error('Fetch error:', e);
+  } catch (err) {
+    console.error("Backend error:", err);
   }
-  setLoading(false);
+  document.getElementById('loader').style.opacity = '0';
+  document.getElementById('loader').style.pointerEvents = 'none';
+  refresh.classList.remove('spinning');
 }
 
 async function hardRefresh() {
-  setLoading(true);
+  document.getElementById('loader').style.opacity = '1';
+  document.getElementById('loader').style.pointerEvents = 'all';
+  document.querySelector('.refresh').classList.add('spinning');
   try {
-    await fetch(`${WEB_APP_URL}?action=clearCache`);
+    await fetch(WEB_APP_URL + "?action=clearCache");
     await fetchData();
-  } catch(e) { setLoading(false); }
+  } catch (e) {}
 }
 
-function setLoading(on) {
-  document.getElementById('loaderOverlay').classList.toggle('active', on);
-  document.getElementById('refreshBtn').classList.toggle('spinning', on);
+function filterRoster() {
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  const sort = document.getElementById('sortSelect').value;
+  displayedPlayerData = globalPlayerData.filter(p => p.name.toLowerCase().includes(term));
+  displayedPlayerData.sort((a,b) => sort === 'thLevel' ? b.thLevel - a.thLevel : b.percentage - a.percentage);
+  renderGrid();
 }
 
-/* ───────────────────────────── GLOBAL STATS ───────────────────────────── */
-function updateGlobalStats() {
-  const n = globalPlayers.length || 1;
-  let totalPct   = 0;
-  let gainers    = 0;
-  let totalGain  = 0;
-  let gainSamples = 0;
-
-  globalPlayers.forEach(p => {
-    totalPct += parseFloat(p.percentage) || 0;
-    // Compute velocity from history array (most accurate) or fallback field
-    const gain = computeVelocity(p);
-    if (gain > 0) { gainers++; totalGain += gain; gainSamples++; }
-  });
-
-  const avg     = (totalPct / n).toFixed(1);
-  const avgGain = gainSamples > 0 ? (totalGain / gainSamples).toFixed(2) : '0.00';
-
-  animCounter('gPct', parseFloat(avg), '%');
-
-  const velEl = document.getElementById('gVelocity');
-  velEl.textContent = (avgGain >= 0 ? '+' : '') + avgGain + '%';
-  velEl.className   = 'meta-val ' + (avgGain >= 0 ? 'g' : 'r');
-
-  document.getElementById('gCount').textContent    = n;
-  document.getElementById('gClimbing').textContent = gainers;
-}
-
-function computeVelocity(p) {
-  if (p.historyPcts && p.historyPcts.length > 1) {
-    const first = parseFloat(p.historyPcts[0]) || 0;
-    const last  = parseFloat(p.historyPcts[p.historyPcts.length - 1]) || 0;
-    return parseFloat((last - first).toFixed(2));
-  }
-  return parseFloat(p.progression30d) || 0;
-}
-
-function animCounter(id, target, suffix) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  let start = null;
-  const duration = 1100;
-  const step = ts => {
-    if (!start) start = ts;
-    const p   = Math.min((ts - start) / duration, 1);
-    const e   = 1 - Math.pow(1 - p, 3);
-    const val = (target * e).toFixed(1);
-    el.innerHTML = `${val}<span class="unit">${suffix}</span>`;
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
-
-/* ───────────────────────────── TAB SWITCHING ───────────────────────────── */
 function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById(`${tab}-tab`).classList.add('active');
+  document.getElementById(`${tab}-tab`).style.display = 'block';
   document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
   document.getElementById('mainScroll').scrollTop = 0;
 }
 
-/* ───────────────────────────── ROSTER ───────────────────────────── */
-function filterRoster() {
-  const term = document.getElementById('searchInput').value.toLowerCase();
-  const sort = document.getElementById('sortSelect').value;
-
-  displayList = globalPlayers.filter(p => p.name.toLowerCase().includes(term));
-
-  displayList.sort((a, b) => {
-    if (sort === 'comp')  return (parseFloat(b.percentage) || 0) - (parseFloat(a.percentage) || 0);
-    if (sort === 'grade') return (GRADE_ORDER[b.grade] || 0) - (GRADE_ORDER[a.grade] || 0);
-    if (sort === 'th')    return (parseInt(b.thLevel) || 0) - (parseInt(a.thLevel) || 0);
-    if (sort === 'vel')   return computeVelocity(b) - computeVelocity(a);
-    return 0;
-  });
-
-  renderRoster();
-}
-
-function renderRoster() {
-  const container = document.getElementById('rosterContainer');
-  if (!displayList.length) {
-    container.innerHTML = `<div class="empty" style="grid-column:span 3;">No operators found.</div>`;
+function renderGrid() {
+  const container = document.getElementById('roster-container');
+  if (displayedPlayerData.length === 0) {
+    container.innerHTML = `<p style="grid-column:1/4; text-align:center; color:var(--text-muted); font-size:12px; padding-top:40px;">No operators match your filter.</p>`;
     return;
   }
-
-  const CIRC = 2 * Math.PI * 19; // r=19
-  let html = '';
-
-  displayList.forEach((p, i) => {
-    const realIdx   = globalPlayers.findIndex(gp => gp.tag === p.tag);
-    const pct       = Math.min(100, Math.max(0, parseFloat(p.percentage) || 0));
-    const offset    = CIRC - (pct / 100) * CIRC;
-    const gColor    = GRADE_COLOR[p.grade] || '#3d4a5c';
-    const gCls      = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
-    const vel       = computeVelocity(p);
-    const delayMs   = (i % 9) * 45;
-
-    html += `
-      <div class="glass-card" onclick="openSheet(${realIdx})" style="animation-delay:${delayMs}ms">
-        ${gCls ? `<div class="g-badge ${gCls}">${p.grade}</div>` : ''}
-        <div class="ring-wrap">
-          <svg class="ring-svg" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="19"/>
-            <circle class="ring-fill" cx="24" cy="24" r="19"
-              stroke="${gColor}"
-              stroke-dasharray="${CIRC.toFixed(2)}"
-              stroke-dashoffset="${offset.toFixed(2)}"
-              style="filter:drop-shadow(0 0 4px ${gColor}55)"/>
-          </svg>
-          <div class="ring-label" style="color:${gColor}">${Math.floor(pct)}%</div>
-        </div>
-        <div class="glass-name">${escHtml(p.name)}</div>
-        <div class="glass-th">TH${p.thLevel} ${vel > 0 ? '<span class="up-arr">▲</span>' : ''}</div>
-      </div>`;
-  });
-
-  container.innerHTML = html;
+  const color = displayedPlayerData.length > 0 ? displayedPlayerData[0].gradeColor : GRADE_COLOR['N/A'];
+  container.innerHTML = displayedPlayerData.map((p, i) => `
+    <div class="grid-card card" onclick="openSheet(${i})" style="border-color:${GRADE_COLOR[p.grade] || 'var(--border)'}">
+      <div class="ring-wrap">
+        <svg class="ring-svg" viewBox="0 0 36 36">
+          <path class="ring-track" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          <path class="ring-fill" stroke="${GRADE_COLOR[p.grade] || var(--accent-sec)}" stroke-dasharray="${p.percentage}, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+        </svg>
+        <div class="ring-label">${Math.floor(p.percentage)}%</div>
+      </div>
+      <div class="grid-name">${p.name}</div>
+      <div class="grid-th">TH${p.thLevel} // GRADE ${p.grade || 'NA'}</div>
+    </div>`).join('');
 }
-
-/* ───────────────────────────── HALL OF FAME ───────────────────────────── */
-const HOF_ICONS = {
-  "Friend in Need":          "🤝 Lifetime Donations",
-  "Conqueror":               "⚔️ Attacks Won",
-  "Unbreakable":             "🛡️ Defenses Won",
-  "Shattered and Scattered": "🎯 Scattershots Destroyed",
-  "Anti-Artillery":          "🦅 Eagles Destroyed",
-  "Heroic Heist":            "💧 Dark Elixir Looted"
-};
 
 function renderHoF() {
-  const container = document.getElementById('hofContainer');
-  if (!Object.keys(hallOfFame).length) {
-    container.innerHTML = `<div class="empty">Awaiting sync.</div>`;
+  const container = document.getElementById('hof-container');
+  if (Object.keys(hallOfFameData).length === 0) {
+    container.innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:12px; padding-top:40px;">No Hall of Fame data yet. <br>Sync data to generate.</p>`;
     return;
   }
-
-  const medals = ['🥇','🥈','🥉'];
-  let html = '';
-
-  for (const ach in hallOfFame) {
-    if (!hallOfFame[ach].length) continue;
-    const title = HOF_ICONS[ach] || ach;
-    html += `<div class="hof-card"><div class="hof-hdr">${title}</div>`;
-    hallOfFame[ach].forEach((p, idx) => {
-      html += `
-        <div class="hof-row">
-          <div class="hof-rank">${medals[idx] || `#${idx+1}`}</div>
-          <div class="hof-info">
-            <span class="hof-name">${escHtml(p.name)}</span>
-            <span class="hof-th">TH${p.th}</span>
-          </div>
-          <div class="hof-val">${parseInt(p.value).toLocaleString()}</div>
-        </div>`;
-    });
-    html += `</div>`;
-  }
-
-  container.innerHTML = html;
+  const HOF_ICONS = {
+    "Friend in Need":          "🤝 Lifetime Donations",
+    "Conqueror":               "⚔️ Attacks Won",
+    "Unbreakable":             "🛡️ Defenses Won",
+    "Shattered and Scattered": "🎯 Scattershots Destroyed",
+    "Anti-Artillery":          "🦅 Eagles Destroyed",
+    "Heroic Heist":            "💧 Dark Elixir Looted"
+  };
+  container.innerHTML = Object.entries(hallOfFameData).filter(([_, list]) => list.length > 0).map(([key, list]) => {
+    const title = HOF_ICONS[key] || key;
+    const entries = list.map((p,idx) => `
+      <div class="hof-entry">
+        <div class="hof-medal">${idx+1}</div>
+        <div class="hof-body">
+          <div class="hof-name">${p.name}</div>
+          <div class="hof-th">TH${p.th}</div>
+        </div>
+        <div class="hof-val">${parseInt(p.value).toLocaleString()}</div>
+      </div>`).join('');
+    return `<div class="hof-card card"><div class="hof-title">${title}</div>${entries}</div>`;
+  }).join('');
 }
 
-/* ───────────────────────────── VELOCITY BOARD ───────────────────────────── */
-function renderVelocityBoard() {
-  const container = document.getElementById('velocityContainer');
-
-  const ranked = globalPlayers
-    .map(p => ({ ...p, _gain: computeVelocity(p) }))
-    .sort((a, b) => b._gain - a._gain);
-
-  const maxGain  = Math.max(ranked[0]?._gain || 0, 0.01);
-  const active   = ranked.filter(p => p._gain > 0);
-  const stagnant = ranked.filter(p => p._gain <= 0);
-
-  let html = '';
-
-  active.forEach((p, i) => {
-    const barPct = (p._gain / maxGain) * 100;
-    const isTop  = i < 3;
-    html += `
-      <div class="vel-row">
-        <div class="vel-rank-num ${isTop ? 'top' : ''}">${i + 1}</div>
-        <div class="vel-info">
-          <div class="vel-name">${escHtml(p.name)}</div>
-          <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% overall &nbsp;·&nbsp; Grade ${p.grade || 'N/A'}</div>
-        </div>
-        <div class="vel-bar-col">
-          <div class="vel-bar-trk">
-            <div class="vel-bar-fill" style="width:${barPct.toFixed(1)}%"></div>
-          </div>
-        </div>
-        <div class="vel-gain">+${p._gain.toFixed(2)}%</div>
-      </div>`;
-  });
-
-  if (stagnant.length) {
-    html += `<div class="stag-divider">No movement detected</div>`;
-    stagnant.forEach(p => {
-      html += `
-        <div class="vel-row" style="opacity:0.38;">
-          <div class="vel-rank-num">–</div>
-          <div class="vel-info">
-            <div class="vel-name">${escHtml(p.name)}</div>
-            <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% overall</div>
-          </div>
-          <div class="vel-bar-col"></div>
-          <div class="vel-gain zero">${p._gain.toFixed(2)}%</div>
-        </div>`;
-    });
-  }
-
-  container.innerHTML = html || `<div class="empty">No velocity data available.</div>`;
-}
-
-/* ───────────────────────────── BOTTOM SHEET ───────────────────────────── */
 function openSheet(index) {
-  const p       = globalPlayers[index];
-  const gColor  = GRADE_COLOR[p.grade] || '#3d4a5c';
-  const gCls    = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
-  const vel     = computeVelocity(p);
-
+  const p = displayedPlayerData[index];
+  
   /* Build category values from the backend's "current/max" string format */
   const catVals = CATS.map(c => {
     const raw = p[c.key] || "0/1";
     const parts = raw.split('/');
-    
-    // If it's correctly formatted as "current/max"
     if (parts.length === 2) {
       const current = parseFloat(parts[0]) || 0;
       const max = parseFloat(parts[1]) || 1;
       const pct = max > 0 ? (current / max) * 100 : 0;
       return Math.min(100, Math.max(0, pct));
     }
-    
     return 0; // Fallback
   });
-
-  /* Category bars HTML */
-  const barsHtml = CATS.map((c, i) => `
-    <div class="cat-row">
-      <div class="cat-lbl">${c.label}</div>
-      <div class="cat-track">
-        <div class="cat-fill" style="width:${catVals[i].toFixed(1)}%; background:${c.color}; box-shadow:0 0 8px ${c.color}44;"></div>
-      </div>
-      <div class="cat-val" style="color:${c.color}">${p[c.key]} <span style="font-size:7px; color:var(--muted); margin-left:4px;">(${catVals[i].toFixed(0)}%)</span></div>
-    </div>`).join('');
-
-  document.getElementById('sheetBody').innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
+  
+  const sheetContent = `
+    <div class="sheet-head">
       <div>
-        <div class="sheet-name">${escHtml(p.name)}</div>
-        <div class="sheet-sub">
-          <span>TH${p.thLevel}</span>
-          <span class="sep">·</span>
-          <span class="accent">${parseFloat(p.percentage).toFixed(1)}% OVERALL</span>
-          <span class="sep">·</span>
-          <span class="gain">${vel >= 0 ? '+' : ''}${vel.toFixed(2)}% (30d)</span>
-        </div>
+        <div class="sheet-label">Operator // Village</div>
+        <div style="font-size:11px; margin-top:2px;">${p.name}</div>
+        <div class="sheet-meta">Home // Matrix TH${p.thLevel}</div>
+        <div style="font-size:10px; margin-top:6px; font-weight:600; color:${p.progression30d >= 0 ? '#ecf0f1' : '#e74c3c'}">${p.progression30d >= 0 ? '+' : ''}${p.progression30d}% Growth // 30d Velocity</div>
       </div>
-      ${gCls ? `<div class="g-badge g-badge-lg ${gCls}">${p.grade}</div>` : ''}
+      <div style="text-align:right;">
+        <div class="bs-grade" style="color:${GRADE_COLOR[p.grade] || '#aaaaaa'}">${p.grade || 'NA'}</div>
+        <div class="bs-grade-label">Operator // GRADE</div>
+      </div>
     </div>
-
-    <div class="sh-sec">Combat Radar</div>
-    <div class="radar-wrap"><canvas id="radarCanvas"></canvas></div>
-
-    <div class="sh-sec">Category Breakdown</div>
-    <div class="cat-bars">${barsHtml}</div>
-
-    <div class="sh-sec">Troop Donations</div>
-    <div class="donations-val">
-      ${(parseInt(p.donations) || 0).toLocaleString()}
-      <span>troops donated</span>
+    
+    <div class="radar-box"><canvas id="radarChart"></canvas></div>
+    
+    <div class="sheet-cat">Village Stats matrix</div>
+    <div class="stat-grid">
+      ${CATS.map((c, i) => `
+        <div class="hof-entry card" style="background:rgba(255,255,255,0.01); border-color:${c.color}">
+          <div class="hof-name">${c.label}</div>
+          <div class="hof-val" style="color:${c.color}">${p[c.key]}</div>
+        </div>`).join('')}
     </div>
-
-    <div class="sh-sec">30-Day Trajectory</div>
-    <div class="chart-wrap"><canvas id="lineCanvas"></canvas></div>
   `;
+  
+  document.getElementById('sheetContent').innerHTML = sheetContent;
+  document.getElementById('bottomSheet').classList.add('open');
+  document.getElementById('backdrop').classList.add('active');
+  
+  /* Shared Chart.js defaults */
+  Chart.defaults.color      = '#a3afc1';
+  Chart.defaults.font.family = "'Poppins', sans-serif";
+  Chart.defaults.font.size   = 9;
 
-  document.getElementById('playerSheet').classList.add('open');
-  document.getElementById('sheetBg').classList.add('active');
-
-  /* ── Destroy old charts ── */
-  if (bsLineChart)  { bsLineChart.destroy();  bsLineChart  = null; }
-  if (bsRadarChart) { bsRadarChart.destroy(); bsRadarChart = null; }
-
-  /* ── Shared Chart.js defaults ── */
-  Chart.defaults.color      = '#555555'; /* Changed to dark gray */
-  Chart.defaults.font.family = "'DotGothic16', sans-serif"; /* Swapped to the new pixel font */
-
-  /* ── Radar chart ── */
-  const rCtx = document.getElementById('radarCanvas').getContext('2d');
-  bsRadarChart = new Chart(rCtx, {
+  if (bsRadarChart) bsRadarChart.destroy();
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  bsRadarChart = new Chart(ctx, {
     type: 'radar',
     data: {
       labels: CATS.map(c => c.label),
       datasets: [{
         data: catVals,
-        backgroundColor: 'rgba(0,240,255,0.06)',
-        borderColor: '#00f0ff',
-        borderWidth: 1.5,
-        pointBackgroundColor: CATS.map(c => c.color),
+        backgroundColor: 'rgba(52, 152, 219, 0.2)', // Acc sec background
+        borderColor: '#3498db',
+        pointBackgroundColor: GRADE_COLOR[p.grade] || '#3498db',
+        pointBorderColor: '#12141a',
         pointRadius: 4,
         pointHoverRadius: 6,
+        borderWidth: 2
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: true,
-      plugins: { legend: { display: false } },
       scales: {
         r: {
-          min: 0, max: 100,
-          grid:        { color: 'rgba(255,255,255,0.05)' },
-          angleLines:  { color: 'rgba(255,255,255,0.05)' },
-          pointLabels: { color: '#64748b', font: { size: 9, family: "'Share Tech Mono', monospace" } },
-          ticks:       { display: false, stepSize: 25 },
+          min: 0, max: 100, ticks: { display: false, stepSize: 20 },
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          angleLines: { color: 'rgba(255,255,255,0.05)' },
+          pointLabels: { color: '#a3afc1', font: { weight: 500 } }
         }
       },
-      animation: { duration: 800 }
+      plugins: { legend: { display: false }, tooltip: { enabled: false } }
     }
   });
-
-  /* ── 30-day line chart ── */
-  if (p.historyDates && p.historyDates.length > 0) {
-    const lCtx = document.getElementById('lineCanvas').getContext('2d');
-    const grad = lCtx.createLinearGradient(0, 0, 0, 170);
-    grad.addColorStop(0, 'rgba(0,240,255,0.28)');
-    grad.addColorStop(1, 'rgba(0,240,255,0.00)');
-
-    bsLineChart = new Chart(lCtx, {
-      type: 'line',
-      data: {
-        labels: p.historyDates,
-        datasets: [{
-          data: p.historyPcts,
-          borderColor: '#00f0ff',
-          backgroundColor: grad,
-          borderWidth: 1.5, fill: true, tension: 0.4,
-          pointBackgroundColor: '#00f0ff',
-          pointRadius: 2.5, pointHoverRadius: 5,
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: {
-            grid: { display: false },
-            ticks: { font: { size: 8 }, maxRotation: 0, maxTicksLimit: 6 }
-          },
-          y: {
-            grid:   { color: 'rgba(255,255,255,0.04)' },
-            border: { display: false },
-            ticks:  { font: { size: 8 } }
-          }
-        },
-        animation: { duration: 700 }
-      }
-    });
-  }
 }
 
 function closeSheet() {
-  document.getElementById('playerSheet').classList.remove('open');
-  document.getElementById('sheetBg').classList.remove('active');
-  if (bsLineChart)  { bsLineChart.destroy();  bsLineChart  = null; }
-  if (bsRadarChart) { bsRadarChart.destroy(); bsRadarChart = null; }
-}
-
-/* ───────────────────────────── UTILS ───────────────────────────── */
-function escHtml(str) {
-  const d = document.createElement('div');
-  d.appendChild(document.createTextNode(str));
-  return d.innerHTML;
+  document.getElementById('bottomSheet').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('active');
 }
 </script>
 </body>
