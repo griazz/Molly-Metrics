@@ -34,6 +34,12 @@
   --grade-b: #00ff9d;
   --grade-c: #ff9f0a;
   --grade-d: #ff2d55;
+  /* Deep Matrix palette */
+  --ds-green:      #00ff9d;
+  --ds-green-glow: rgba(0,255,157,0.25);
+  --ds-amber:      #ff9f0a;
+  --ds-amber-glow: rgba(255,159,10,0.2);
+  --ds-border:     rgba(0,255,157,0.28);
 }
 
 /* ─────────────────────────────────────────────
@@ -56,7 +62,6 @@ h1,h2,h3,h4,p { margin: 0; }
    BACKGROUND SYSTEM
 ───────────────────────────────────────────── */
 #bg-scene { position: fixed; inset: 0; z-index: -10; overflow: hidden; }
-
 #bg-img {
   position: absolute; inset: 0;
   background-image: url('https://i.imgur.com/lK3ctDR.jpeg');
@@ -78,7 +83,6 @@ h1,h2,h3,h4,p { margin: 0; }
   );
   pointer-events: none;
 }
-/* Radial ambient glows */
 .bg-orb {
   position: absolute; border-radius: 50%;
   filter: blur(90px); pointer-events: none;
@@ -90,7 +94,6 @@ h1,h2,h3,h4,p { margin: 0; }
   0%,100% { transform: scale(1) translate(0,0); }
   50% { transform: scale(1.12) translate(18px,28px); }
 }
-/* Corner bracket decorations */
 #bg-corner-tl, #bg-corner-br {
   position: absolute; width: 80px; height: 80px; pointer-events: none;
 }
@@ -198,253 +201,464 @@ h1,h2,h3,h4,p { margin: 0; }
   background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 12px;
   border: 1px solid var(--border-soft);
 }
-input, select {
-  width: 100%; padding: 5px 2px; border: none; background: transparent;
-  color: #fff; font-size: 13px; outline: none; font-family: var(--font-b);
+.control-row input {
+  flex: 1; background: none; border: none; outline: none;
+  color: #fff; font-family: var(--font-m); font-size: 11px;
 }
-input::placeholder { color: var(--muted); font-family: var(--font-b); }
-select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-transform: uppercase; }
-.v-divider { width: 1px; height: 18px; background: var(--border-soft); flex-shrink: 0; }
+.control-row input::placeholder { color: var(--muted); }
+.control-row select {
+  background: rgba(0,0,0,0.5); border: 1px solid var(--border-soft);
+  border-radius: 6px; color: var(--muted-light); font-family: var(--font-m);
+  font-size: 9px; padding: 4px 6px; outline: none;
+}
+.v-divider { width: 1px; height: 14px; background: var(--border-soft); }
+
+/* ─────────────────────────────────────────────
+   ROSTER GRID
+───────────────────────────────────────────── */
+.glass-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 10px; margin-bottom: 16px;
+}
+.glass-card {
+  background: var(--bg-card); border: 1px solid var(--border-soft);
+  border-radius: 14px; padding: 16px 10px 14px;
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; position: relative; overflow: hidden;
+  animation: fadeUp 0.4s ease both; transition: border-color 0.25s, box-shadow 0.25s;
+}
+.glass-card:active { transform: scale(0.96); }
+.glass-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── VERIFIED (Deep Sync) card treatment ── */
+.glass-card.ds-verified {
+  border-color: var(--ds-border);
+  box-shadow: 0 0 18px rgba(0,255,157,0.06), inset 0 0 16px rgba(0,255,157,0.025);
+}
+.glass-card.ds-verified::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ds-green), transparent);
+  box-shadow: 0 0 8px var(--ds-green-glow);
+}
+
+/* ── Deep Sync badge on roster card ── */
+.ds-pip {
+  position: absolute; top: 7px; left: 7px;
+  display: flex; align-items: center; gap: 3px;
+  background: rgba(0,255,157,0.12);
+  border: 1px solid rgba(0,255,157,0.35);
+  border-radius: 4px; padding: 1px 4px;
+  font-family: var(--font-m); font-size: 6px; letter-spacing: 1px;
+  color: var(--ds-green); text-shadow: 0 0 8px var(--ds-green);
+  animation: pipPulse 3s ease-in-out infinite;
+}
+.ds-pip-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--ds-green); box-shadow: 0 0 6px var(--ds-green);
+}
+@keyframes pipPulse {
+  0%,100% { opacity: 1; } 60% { opacity: 0.55; }
+}
+
+/* ── Grade badge ── */
+.g-badge {
+  position: absolute; top: 7px; right: 7px;
+  font-family: var(--font-d); font-size: 9px; font-weight: 900;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid;
+}
+.g-badge-lg {
+  width: 34px; height: 34px; font-size: 14px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid; font-family: var(--font-d); font-weight: 900;
+}
+.g-S { color:var(--grade-s); border-color:rgba(255,214,10,0.4); background:rgba(255,214,10,0.08); box-shadow:0 0 10px rgba(255,214,10,0.3); }
+.g-A { color:var(--grade-a); border-color:rgba(0,240,255,0.4);  background:rgba(0,240,255,0.08);  box-shadow:0 0 10px rgba(0,240,255,0.3); }
+.g-B { color:var(--grade-b); border-color:rgba(0,255,157,0.4);  background:rgba(0,255,157,0.08);  box-shadow:0 0 10px rgba(0,255,157,0.3); }
+.g-C { color:var(--grade-c); border-color:rgba(255,159,10,0.4); background:rgba(255,159,10,0.08); box-shadow:0 0 10px rgba(255,159,10,0.2); }
+.g-D { color:var(--grade-d); border-color:rgba(255,45,85,0.4);  background:rgba(255,45,85,0.08);  box-shadow:0 0 10px rgba(255,45,85,0.2); }
+
+/* Progress ring */
+.ring-wrap { position: relative; width: 54px; height: 54px; margin-bottom: 10px; }
+.ring-svg { width: 54px; height: 54px; transform: rotate(-90deg); }
+.ring-track { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 3; }
+.ring-fill  { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+.ring-label {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-m); font-size: 11px; font-weight: 700;
+}
+.glass-name {
+  font-family: var(--font-b); font-size: 12px; font-weight: 600;
+  text-align: center; line-height: 1.2; word-break: break-word;
+  max-width: 100%;
+}
+.glass-th {
+  font-family: var(--font-m); font-size: 8px; color: var(--muted);
+  margin-top: 4px; letter-spacing: 1px;
+}
+.up-arr { color: var(--green); font-size: 7px; }
 
 /* ─────────────────────────────────────────────
    SECTION TITLE
 ───────────────────────────────────────────── */
 .sec-title {
-  display: flex; align-items: center; gap: 12px;
-  font-family: var(--font-d); font-size: 8px; letter-spacing: 4px;
-  color: var(--muted); text-transform: uppercase; margin: 28px 0 16px;
+  font-family: var(--font-d); font-size: 10px; letter-spacing: 4px;
+  color: var(--muted); text-transform: uppercase;
+  margin-bottom: 16px; padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-soft);
 }
-.sec-title::before, .sec-title::after {
-  content: ''; flex: 1; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.18), transparent);
-}
-
-/* ─────────────────────────────────────────────
-   ROSTER GRID & CARDS
-───────────────────────────────────────────── */
-.glass-grid {
-  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-.glass-card {
-  background: linear-gradient(160deg, rgba(12,14,26,0.97), rgba(4,5,12,0.99));
-  border: 1px solid var(--border-soft); border-radius: 14px;
-  padding: 18px 8px 14px; display: flex; flex-direction: column;
-  align-items: center; cursor: pointer; position: relative; overflow: hidden;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
-  backdrop-filter: blur(20px);
-  animation: cardIn 0.45s ease both;
-}
-.glass-card::after {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.5), transparent);
-  opacity: 0; transition: opacity 0.3s;
-}
-.glass-card:hover {
-  border-color: rgba(0,240,255,0.28);
-  box-shadow: 0 8px 28px rgba(0,240,255,0.1), 0 0 0 1px rgba(0,240,255,0.08);
-  transform: translateY(-3px);
-}
-.glass-card:hover::after { opacity: 1; }
-@keyframes cardIn {
-  from { opacity: 0; transform: scale(0.92) translateY(10px); }
-  to   { opacity: 1; transform: scale(1) translateY(0); }
-}
-
-/* SVG Progress Ring */
-.ring-wrap { width: 50px; height: 50px; position: relative; margin-bottom: 12px; flex-shrink: 0; }
-.ring-svg { width: 100%; height: 100%; transform: rotate(-90deg); overflow: visible; }
-.ring-track { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 3.5; }
-.ring-fill  { fill: none; stroke-width: 3.5; stroke-linecap: round; }
-.ring-label {
-  position: absolute; inset: 0; display: flex; align-items: center;
-  justify-content: center; font-family: var(--font-m); font-size: 10px; font-weight: 700;
-}
-.glass-name {
-  font-size: 11px; font-weight: 600; font-family: var(--font-b);
-  width: 92%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  text-align: center; letter-spacing: 0.3px;
-}
-.glass-th {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted); margin-top: 5px;
-  display: flex; align-items: center; gap: 3px;
-}
-.up-arr { color: var(--green); }
-
-/* Grade badges */
-.g-badge {
-  position: absolute; top: 7px; right: 7px;
-  font-family: var(--font-d); font-size: 7.5px; font-weight: 700;
-  padding: 2px 5px; border-radius: 3px; letter-spacing: 0.5px;
-}
-.g-S { background: rgba(255,214,10,0.08); color: var(--grade-s); border: 1px solid rgba(255,214,10,0.28); text-shadow: 0 0 8px var(--grade-s); }
-.g-A { background: rgba(0,240,255,0.07); color: var(--grade-a); border: 1px solid rgba(0,240,255,0.22); }
-.g-B { background: rgba(0,255,157,0.06); color: var(--grade-b); border: 1px solid rgba(0,255,157,0.18); }
-.g-C { background: rgba(255,159,10,0.07); color: var(--grade-c); border: 1px solid rgba(255,159,10,0.2); }
-.g-D { background: rgba(255,45,85,0.07); color: var(--grade-d); border: 1px solid rgba(255,45,85,0.2); }
 
 /* ─────────────────────────────────────────────
    BOTTOM SHEET
 ───────────────────────────────────────────── */
 .sheet-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.82); z-index: 1500;
-  opacity: 0; pointer-events: none; transition: opacity 0.35s; backdrop-filter: blur(8px);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px); z-index: 1100;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
 .sheet-backdrop.active { opacity: 1; pointer-events: all; }
-
 .bottom-sheet {
   position: fixed; bottom: 0; left: 0; right: 0;
-  background: linear-gradient(180deg, rgba(8,10,22,0.99) 0%, #040508 100%);
-  border-top-left-radius: 26px; border-top-right-radius: 26px; z-index: 2000;
-  transform: translateY(100%);
-  transition: transform 0.48s cubic-bezier(0.16,1,0.3,1);
-  max-height: 91vh; overflow-y: auto; overflow-x: hidden;
-  padding: 28px 20px 48px;
-  border-top: 1px solid rgba(0,240,255,0.18);
-  box-shadow: 0 -28px 80px rgba(0,0,0,0.95);
+  max-width: 600px; margin: 0 auto;
+  background: linear-gradient(180deg, rgba(8,10,22,0.99) 0%, rgba(4,5,10,0.99) 100%);
+  border: 1px solid var(--border-soft);
+  border-top: 1px solid rgba(0,240,255,0.12);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  z-index: 1200; padding: 0 0 calc(env(safe-area-inset-bottom,0px) + 20px);
+  transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
+  max-height: 91vh; display: flex; flex-direction: column;
 }
 .bottom-sheet.open { transform: translateY(0); }
-
 .sheet-handle {
-  width: 36px; height: 3px; background: rgba(255,255,255,0.1);
-  border-radius: 2px; margin: -12px auto 22px;
+  width: 36px; height: 4px; border-radius: 2px;
+  background: rgba(255,255,255,0.12); margin: 12px auto 0;
+  flex-shrink: 0;
 }
 .close-btn {
-  position: absolute; top: 18px; right: 18px; width: 30px; height: 30px;
-  background: rgba(255,255,255,0.04); border: 1px solid var(--border-soft);
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 11px; color: var(--muted);
-  transition: background 0.2s, color 0.2s, border-color 0.2s;
+  position: absolute; top: 10px; right: 16px;
+  color: var(--muted); font-size: 18px; cursor: pointer; z-index: 10;
+  padding: 6px; line-height: 1;
 }
-.close-btn:hover { background: rgba(255,45,85,0.12); color: var(--red); border-color: rgba(255,45,85,0.3); }
-
-/* Sheet header */
+#sheetBody {
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+  flex: 1; padding: 20px 18px 0;
+}
 .sheet-name {
-  font-family: var(--font-d); font-size: 20px; font-weight: 700;
-  letter-spacing: 1px; line-height: 1.15;
+  font-family: var(--font-d); font-size: 18px; font-weight: 700;
+  color: #fff; letter-spacing: 1px; line-height: 1.2;
 }
 .sheet-sub {
-  font-family: var(--font-m); font-size: 10px; color: var(--muted-light);
-  margin-top: 5px; margin-bottom: 20px; display: flex; gap: 8px; align-items: center;
-  flex-wrap: wrap;
+  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
+  font-family: var(--font-m); font-size: 9px; color: var(--muted);
+  margin-top: 5px; letter-spacing: 1px;
 }
+.sheet-sub .sep { color: var(--muted); }
 .sheet-sub .accent { color: var(--cyan); }
-.sheet-sub .gain   { color: var(--green); }
-.sheet-sub .sep    { color: var(--muted); }
-
-/* Sheet section label */
+.sheet-sub .gain { color: var(--green); }
 .sh-sec {
-  font-family: var(--font-m); font-size: 7.5px; letter-spacing: 3px;
+  font-family: var(--font-d); font-size: 7px; letter-spacing: 3px;
   color: var(--muted); text-transform: uppercase;
-  margin-bottom: 12px; display: flex; align-items: center; gap: 10px;
+  margin: 22px 0 12px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-soft);
 }
-.sh-sec::after { content: ''; flex: 1; height: 1px; background: var(--border-soft); }
-
-/* Grade badge large */
-.g-badge-lg {
-  font-family: var(--font-d); font-size: 16px; font-weight: 800;
-  padding: 6px 12px; border-radius: 6px;
-}
-
-/* Radar chart */
-.radar-wrap { width: 100%; max-width: 260px; margin: 0 auto 24px; aspect-ratio: 1; }
+.radar-wrap { position: relative; width: 100%; max-width: 240px; margin: 0 auto; }
+.chart-wrap { position: relative; height: 130px; }
 
 /* Category bars */
-.cat-bars { display: flex; flex-direction: column; gap: 9px; margin-bottom: 24px; }
-.cat-row  { display: grid; grid-template-columns: 76px 1fr 38px; align-items: center; gap: 10px; }
-.cat-lbl  { font-family: var(--font-m); font-size: 9px; color: var(--muted-light); }
-.cat-track { height: 5px; background: rgba(255,255,255,0.05); border-radius: 3px; overflow: hidden; }
-.cat-fill  {
-  height: 100%; border-radius: 3px;
-  transition: width 1.1s cubic-bezier(0.4,0,0.2,1);
-  position: relative;
+.cat-bars { display: flex; flex-direction: column; gap: 9px; }
+.cat-row  { display: flex; align-items: center; gap: 10px; }
+.cat-lbl  { font-family: var(--font-m); font-size: 8px; color: var(--muted); width: 42px; }
+.cat-track {
+  flex: 1; height: 4px; background: rgba(255,255,255,0.04);
+  border-radius: 2px; overflow: hidden;
 }
-.cat-fill::after {
-  content: ''; position: absolute; right: 0; top: -1px; bottom: -1px;
-  width: 6px; border-radius: 3px;
-  background: inherit; filter: brightness(1.8) blur(1px);
-}
-.cat-val  { font-family: var(--font-m); font-size: 10px; font-weight: 700; text-align: right; }
+.cat-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
+.cat-val  { font-family: var(--font-m); font-size: 8px; min-width: 76px; text-align: right; }
 
-/* Donations display */
+/* Donations */
 .donations-val {
-  font-family: var(--font-d); font-size: 26px; font-weight: 700;
-  color: var(--cyan); text-shadow: 0 0 14px rgba(0,240,255,0.45);
-  margin-bottom: 24px;
+  font-family: var(--font-d); font-size: 28px; font-weight: 700;
+  color: var(--purple); text-shadow: 0 0 20px rgba(180,0,255,0.4);
 }
-.donations-val span { font-size: 10px; color: var(--muted); font-family: var(--font-m); margin-left: 6px; font-weight: 400; }
-
-/* 30-day chart */
-.chart-wrap { height: 170px; width: 100%; position: relative; margin-bottom: 8px; }
+.donations-val span { font-family: var(--font-b); font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 400; }
 
 /* ─────────────────────────────────────────────
-   HALL OF FAME
+   DEEP SYNC PANEL STYLES
+───────────────────────────────────────────── */
+
+/* ── Section header for Deep Sync ── */
+.sh-sec-ds {
+  font-family: var(--font-d); font-size: 7px; letter-spacing: 3px;
+  color: var(--ds-green); text-transform: uppercase;
+  margin: 22px 0 12px; padding-bottom: 6px;
+  border-bottom: 1px solid rgba(0,255,157,0.15);
+  display: flex; align-items: center; gap: 8px;
+}
+.sh-sec-ds::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ds-green); box-shadow: 0 0 10px var(--ds-green);
+  animation: blink 2s ease-in-out infinite;
+}
+
+/* ── Village Integrity Meter ── */
+.integrity-meter {
+  background: rgba(0,255,157,0.04);
+  border: 1px solid rgba(0,255,157,0.12);
+  border-radius: 12px; padding: 14px 16px; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 16px;
+}
+.integrity-pct {
+  font-family: var(--font-d); font-size: 32px; font-weight: 900;
+  color: var(--ds-green); line-height: 1;
+  text-shadow: 0 0 24px rgba(0,255,157,0.5); flex-shrink: 0;
+}
+.integrity-pct .unit { font-size: 14px; opacity: 0.5; font-weight: 400; }
+.integrity-detail { flex: 1; }
+.integrity-row {
+  font-family: var(--font-m); font-size: 8px; color: var(--muted);
+  letter-spacing: 1px; margin-bottom: 4px;
+}
+.integrity-row b { color: #fff; }
+.integrity-track {
+  height: 3px; background: rgba(255,255,255,0.05);
+  border-radius: 2px; overflow: hidden; margin-top: 6px;
+}
+.integrity-fill {
+  height: 100%; border-radius: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--ds-green));
+  box-shadow: 0 0 8px rgba(0,255,157,0.4);
+  transition: width 1.2s ease;
+}
+
+/* ── Gantt Chart ── */
+.gantt-container { display: flex; flex-direction: column; gap: 8px; }
+.gantt-hdr {
+  display: grid; grid-template-columns: 24px 1fr 72px;
+  gap: 10px; align-items: center;
+  font-family: var(--font-m); font-size: 7px; color: var(--muted);
+  letter-spacing: 1.5px; margin-bottom: 4px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-soft);
+}
+.gantt-row {
+  display: grid; grid-template-columns: 24px 1fr 72px;
+  gap: 10px; align-items: center;
+}
+.gantt-icon {
+  font-size: 14px; text-align: center; filter: drop-shadow(0 0 4px var(--ds-amber));
+}
+.gantt-info { display: flex; flex-direction: column; gap: 5px; }
+.gantt-name {
+  font-family: var(--font-b); font-size: 12px; font-weight: 600; color: #fff;
+}
+.gantt-level {
+  font-family: var(--font-m); font-size: 8px; color: var(--muted); letter-spacing: 1px;
+}
+.gantt-track {
+  height: 5px; background: rgba(255,255,255,0.05);
+  border-radius: 3px; overflow: hidden;
+}
+.gantt-bar {
+  height: 100%; border-radius: 3px;
+  transition: width 1.1s ease;
+}
+.gantt-time {
+  font-family: var(--font-m); font-size: 9px;
+  text-align: right; letter-spacing: 0.5px;
+}
+.gantt-done {
+  font-family: var(--font-m); font-size: 8px; color: var(--muted);
+  text-align: center; padding: 8px 0;
+  border: 1px dashed rgba(255,255,255,0.06); border-radius: 8px;
+}
+
+/* ── SPT / LPT Queue ── */
+.queue-toggle {
+  display: flex; gap: 0; margin-bottom: 12px;
+  border: 1px solid var(--border-soft); border-radius: 8px; overflow: hidden;
+}
+.queue-tab {
+  flex: 1; padding: 8px 10px; cursor: pointer;
+  font-family: var(--font-m); font-size: 8px; letter-spacing: 1.5px;
+  text-align: center; color: var(--muted);
+  transition: background 0.2s, color 0.2s;
+}
+.queue-tab.active {
+  background: rgba(0,240,255,0.1); color: var(--cyan);
+  text-shadow: 0 0 8px rgba(0,240,255,0.5);
+}
+.queue-tab:first-child { border-right: 1px solid var(--border-soft); }
+.queue-desc {
+  font-family: var(--font-m); font-size: 8px; color: var(--muted);
+  line-height: 1.6; margin-bottom: 12px; padding: 8px 10px;
+  background: rgba(255,255,255,0.02); border-radius: 6px;
+  border-left: 2px solid var(--cyan);
+}
+.queue-list { display: flex; flex-direction: column; gap: 6px; }
+.queue-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; border-radius: 8px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: border-color 0.2s;
+}
+.queue-rank {
+  font-family: var(--font-d); font-size: 10px; font-weight: 700;
+  width: 18px; text-align: center;
+}
+.queue-rank.q1 { color: var(--gold); }
+.queue-rank.q2 { color: var(--muted-light); }
+.queue-rank.q3 { color: var(--ds-amber); }
+.queue-info { flex: 1; }
+.queue-name { font-family: var(--font-b); font-size: 13px; font-weight: 600; color: #fff; }
+.queue-meta { font-family: var(--font-m); font-size: 7.5px; color: var(--muted); margin-top: 2px; letter-spacing: 0.5px; }
+.queue-time {
+  font-family: var(--font-m); font-size: 10px; font-weight: 700;
+  text-align: right; min-width: 46px;
+}
+.queue-upgrading {
+  font-family: var(--font-m); font-size: 7px; letter-spacing: 1px;
+  color: var(--ds-amber); border: 1px solid rgba(255,159,10,0.3);
+  border-radius: 4px; padding: 2px 5px; margin-top: 3px; display: inline-block;
+}
+.queue-empty {
+  font-family: var(--font-m); font-size: 9px; color: var(--muted);
+  text-align: center; padding: 14px 0;
+}
+
+/* ── 1-Click Clipboard Sync Button ── */
+.sync-section {
+  margin: 24px 0 0;
+  padding: 16px; border-radius: 14px;
+  border: 1px solid rgba(0,255,157,0.15);
+  background: linear-gradient(135deg, rgba(0,255,157,0.03) 0%, rgba(0,240,255,0.02) 100%);
+}
+.sync-title {
+  font-family: var(--font-d); font-size: 8px; letter-spacing: 3px;
+  color: var(--ds-green); margin-bottom: 8px;
+}
+.sync-hint {
+  font-family: var(--font-m); font-size: 8px; color: var(--muted);
+  line-height: 1.6; margin-bottom: 12px;
+}
+.sync-hint b { color: var(--muted-light); }
+.sync-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 13px; border-radius: 10px; cursor: pointer;
+  background: linear-gradient(135deg, rgba(0,255,157,0.15), rgba(0,240,255,0.08));
+  border: 1px solid rgba(0,255,157,0.4);
+  color: var(--ds-green); font-family: var(--font-d); font-size: 10px;
+  font-weight: 700; letter-spacing: 2px;
+  text-shadow: 0 0 12px rgba(0,255,157,0.6);
+  box-shadow: 0 0 20px rgba(0,255,157,0.08);
+  transition: all 0.2s; user-select: none;
+}
+.sync-btn:active { transform: scale(0.97); box-shadow: 0 0 30px rgba(0,255,157,0.18); }
+.sync-btn.loading { opacity: 0.6; pointer-events: none; }
+.sync-btn .sync-icon { font-size: 16px; }
+.sync-no-ds {
+  padding: 18px 16px; border-radius: 14px;
+  border: 1px dashed rgba(0,255,157,0.12);
+  background: rgba(0,0,0,0.2);
+  text-align: center;
+}
+.sync-no-ds-icon { font-size: 28px; margin-bottom: 10px; }
+.sync-no-ds-title {
+  font-family: var(--font-d); font-size: 9px; letter-spacing: 3px;
+  color: var(--muted); margin-bottom: 6px;
+}
+.sync-no-ds-hint {
+  font-family: var(--font-m); font-size: 8px; color: var(--muted);
+  line-height: 1.6; margin-bottom: 14px;
+}
+
+/* ── Toast notification ── */
+#toast {
+  position: fixed; bottom: calc(100px + env(safe-area-inset-bottom, 0px));
+  left: 50%; transform: translateX(-50%) translateY(20px);
+  background: rgba(8,12,24,0.97); border-radius: 10px;
+  padding: 10px 16px; z-index: 9000;
+  font-family: var(--font-m); font-size: 9px; letter-spacing: 1px;
+  white-space: nowrap; border: 1px solid var(--border-soft);
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s, transform 0.25s;
+}
+#toast.show {
+  opacity: 1; transform: translateX(-50%) translateY(0);
+}
+#toast.success { border-color: rgba(0,255,157,0.4); color: var(--ds-green); }
+#toast.error   { border-color: rgba(255,45,85,0.4);  color: var(--red); }
+#toast.info    { border-color: rgba(0,240,255,0.3);  color: var(--cyan); }
+
+/* ─────────────────────────────────────────────
+   HOF CARDS
 ───────────────────────────────────────────── */
 .hof-card {
-  background: linear-gradient(140deg, rgba(10,12,24,0.96), rgba(4,5,14,0.99));
-  border: 1px solid var(--border-soft); border-radius: 16px;
-  padding: 18px 18px 18px 22px; margin-bottom: 12px;
-  position: relative; overflow: hidden;
-}
-.hof-card::before {
-  content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
-  background: linear-gradient(180deg, var(--cyan), var(--purple));
-  border-radius: 3px 0 0 3px;
+  border: 1px solid var(--border-soft); border-radius: 14px;
+  padding: 16px; margin-bottom: 14px;
+  background: rgba(8,10,20,0.8);
 }
 .hof-hdr {
   font-family: var(--font-d); font-size: 8px; letter-spacing: 3px;
-  color: var(--cyan); text-transform: uppercase; margin-bottom: 14px;
+  color: var(--gold); text-transform: uppercase; margin-bottom: 12px;
+  text-shadow: 0 0 12px rgba(255,214,10,0.4);
 }
 .hof-row {
-  display: flex; align-items: center; gap: 12px; padding: 9px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.03);
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid var(--border-soft);
 }
 .hof-row:last-child { border-bottom: none; }
-.hof-rank { font-family: var(--font-d); font-size: 14px; width: 22px; text-align: center; }
-.hof-info { flex: 1; }
-.hof-name { font-size: 13px; font-weight: 600; font-family: var(--font-b); }
-.hof-th   { font-family: var(--font-m); font-size: 8px; color: var(--muted); margin-left: 5px; }
-.hof-val  { font-family: var(--font-m); font-size: 13px; font-weight: 700; color: #fff; }
+.hof-rank { font-size: 18px; width: 26px; text-align: center; }
+.hof-info { flex: 1; display: flex; align-items: center; gap: 8px; }
+.hof-name { font-family: var(--font-b); font-size: 14px; font-weight: 600; }
+.hof-th { font-family: var(--font-m); font-size: 8px; color: var(--muted); }
+.hof-val { font-family: var(--font-m); font-size: 12px; color: var(--cyan); min-width: 60px; text-align: right; }
 
 /* ─────────────────────────────────────────────
-   VELOCITY BOARD (NEW FEATURE #1)
+   VELOCITY BOARD
 ───────────────────────────────────────────── */
 .vel-intro {
-  background: rgba(0,255,157,0.04); border: 1px solid rgba(0,255,157,0.1);
+  border: 1px solid var(--border-soft);
   border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
   font-family: var(--font-m); font-size: 9px; color: var(--muted-light);
   line-height: 1.7;
 }
 .vel-intro b { color: var(--green); }
-
 .vel-row {
   display: flex; align-items: center; gap: 12px;
   padding: 13px 0; border-bottom: 1px solid var(--border-soft);
   transition: opacity 0.3s;
 }
 .vel-row:last-child { border-bottom: none; }
-
 .vel-rank-num {
   font-family: var(--font-d); font-size: 12px; font-weight: 700;
   width: 22px; text-align: center; color: var(--muted);
 }
 .vel-rank-num.top { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
-
 .vel-info { flex: 1; min-width: 0; }
 .vel-name { font-size: 14px; font-weight: 600; font-family: var(--font-b); }
 .vel-meta { font-family: var(--font-m); font-size: 8px; color: var(--muted); margin-top: 2px; }
-
 .vel-bar-col { display: flex; flex-direction: column; justify-content: center; width: 52px; }
 .vel-bar-trk { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
 .vel-bar-fill { height: 100%; border-radius: 2px; background: var(--green); transition: width 1s ease; box-shadow: 0 0 6px var(--green-glow); }
-
 .vel-gain {
   font-family: var(--font-m); font-size: 16px; font-weight: 700;
   min-width: 52px; text-align: right; color: var(--green);
   text-shadow: 0 0 12px rgba(0,255,157,0.4);
 }
 .vel-gain.zero { color: var(--muted); font-size: 12px; text-shadow: none; }
-
 .stag-divider {
   font-family: var(--font-m); font-size: 7.5px; letter-spacing: 2.5px;
   color: rgba(255,45,85,0.4); text-transform: uppercase; margin: 20px 0 8px;
@@ -490,10 +704,6 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
 ───────────────────────────────────────────── */
 .tab-content { display: none; }
 .tab-content.active { display: block; animation: fadeUp 0.38s ease both; }
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
 
 /* ─────────────────────────────────────────────
    LOADER
@@ -519,11 +729,7 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
   font-family: var(--font-m); font-size: 8px; color: var(--muted);
   letter-spacing: 2px; margin-top: 10px; animation: textCycle 4s ease-in-out infinite;
 }
-@keyframes textCycle {
-  0%,25%   { opacity: 1; }
-  30%,70%  { opacity: 0.3; }
-  75%,100% { opacity: 1; }
-}
+@keyframes textCycle { 0%,25%{opacity:1} 30%,70%{opacity:0.3} 75%,100%{opacity:1} }
 
 /* ─────────────────────────────────────────────
    REFRESH BUTTON
@@ -564,8 +770,6 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
 
 <!-- ░░ REFRESH ░░ -->
 <div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()">↺</div>
-<div class="refresh-btn" id="deepSyncBtn" onclick="autoDeepSync()" style="right: 60px;" title="Auto-Sync Clipboard">🚀</div>
-
 
 <!-- ░░ LOADER ░░ -->
 <div class="loader-overlay" id="loaderOverlay">
@@ -574,24 +778,25 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
   <div class="loader-lbl" id="loaderText">SYNCING MATRIX...</div>
 </div>
 
+<!-- ░░ TOAST ░░ -->
+<div id="toast"></div>
+
 <!-- ░░ MAIN ░░ -->
 <div class="main-scroll" id="mainScroll">
   <div class="container">
 
     <!-- ── ROSTER TAB ── -->
     <div id="roster-tab" class="tab-content active">
-
       <div class="header">
         <div>
           <div class="header-wordmark">MOLLY<em>_</em>METRICS</div>
-          <div class="header-build">V8.0 // PROGRESSION ENGINE</div>
+          <div class="header-build">V8.0 // DEEP MATRIX ENABLED</div>
         </div>
         <div class="header-live">
           <div class="live-dot"></div>LIVE
         </div>
       </div>
 
-      <!-- Global Stat -->
       <div class="global-card">
         <div class="global-tag">Clan Progression Index</div>
         <div class="global-num" id="gPct">–<span class="unit">%</span></div>
@@ -605,13 +810,12 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
             <div class="meta-val c" id="gCount">–</div>
           </div>
           <div class="meta-item">
-            <div class="meta-label">CLIMBING</div>
-            <div class="meta-val g" id="gClimbing">–</div>
+            <div class="meta-label">DEEP SYNCED</div>
+            <div class="meta-val g" id="gDeepSync">–</div>
           </div>
         </div>
       </div>
 
-      <!-- Controls -->
       <div class="control-row" id="rosterControls" style="display:none;">
         <input type="text" id="searchInput" placeholder="Search operators..." oninput="filterRoster()">
         <div class="v-divider"></div>
@@ -620,6 +824,7 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
           <option value="grade">Grade</option>
           <option value="th">Town Hall</option>
           <option value="vel">30D Velocity</option>
+          <option value="ds">Deep Sync ★</option>
         </select>
       </div>
 
@@ -631,9 +836,7 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
     <!-- ── TROPHY TAB ── -->
     <div id="trophy-tab" class="tab-content">
       <div class="sec-title">Hall of Fame</div>
-      <div id="hofContainer">
-        <div class="empty">LOADING RECORDS...</div>
-      </div>
+      <div id="hofContainer"><div class="empty">LOADING RECORDS...</div></div>
     </div>
 
     <!-- ── VELOCITY TAB ── -->
@@ -644,13 +847,11 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
         Ranks every operator by the raw percentage gained over the last 30 snapshot days.
         The fastest climbers surface immediately — identify who's grinding vs. who has gone cold.
       </div>
-      <div id="velocityContainer">
-        <div class="empty">COMPUTING TRAJECTORIES...</div>
-      </div>
+      <div id="velocityContainer"><div class="empty">COMPUTING TRAJECTORIES...</div></div>
     </div>
 
-  </div><!-- /container -->
-</div><!-- /main-scroll -->
+  </div>
+</div>
 
 <!-- ░░ BOTTOM NAV ░░ -->
 <div class="nav-wrapper">
@@ -677,20 +878,125 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
 
 <!-- ░░ SCRIPT ░░ -->
 <script>
-/* ───────────────────────────── CONFIG ───────────────────────────── */
+/* ─────────────────────────────── CONFIG ─────────────────────────────── */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
-/* ───────────────────────────── STATE ───────────────────────────── */
-let globalPlayers  = [];
-let hallOfFame     = {};
-let displayList    = [];
-let bsLineChart    = null;
-let bsRadarChart   = null;
+/* ─────────────────────────────── COC ID DICTIONARY ─────────────────────
+   Extracted from SamBro2901/coc-upgrade-optimizer (mapping.json) +
+   pghant/cocMapping.json gist. Translates Supercell internal dataIds to
+   human-readable building names automatically — no manual mapping needed.
+────────────────────────────────────────────────────────────────────────── */
+const COC_ID_MAP = {
+  1000097:"Crafted Defense", 1000008:"Cannon",             1000009:"Archer Tower",
+  1000013:"Mortar",          1000012:"Air Defense",         1000011:"Wizard Tower",
+  1000028:"Air Sweeper",     1000019:"Hidden Tesla",        1000032:"Bomb Tower",
+  1000021:"X-Bow",           1000027:"Inferno Tower",       1000031:"Eagle Artillery",
+  1000067:"Scattershot",     1000015:"Builder's Hut",       1000072:"Spell Tower",
+  1000077:"Monolith",        1000089:"Firespitter",         1000010:"Wall",
+  1000084:"Multi-Archer Tower", 1000085:"Ricochet Cannon",  1000079:"Multi-Gear Tower",
+  12000000:"Bomb",           12000001:"Spring Trap",        12000002:"Giant Bomb",
+  12000005:"Air Bomb",       12000006:"Seeking Air Mine",   12000008:"Skeleton Trap",
+  12000016:"Tornado Trap",   12000020:"Giga Bomb",
+  1000004:"Gold Mine",       1000002:"Elixir Collector",    1000005:"Gold Storage",
+  1000003:"Elixir Storage",  1000023:"Dark Elixir Drill",   1000024:"Dark Elixir Storage",
+  1000014:"Clan Castle",     1000000:"Army Camp",           1000006:"Barracks",
+  1000026:"Dark Barracks",   1000007:"Laboratory",          1000020:"Spell Factory",
+  1000071:"Hero Hall",       1000029:"Dark Spell Factory",  1000070:"Blacksmith",
+  1000059:"Workshop",        1000068:"Pet House",           1000001:"Town Hall",
+  28000000:"Barbarian King", 28000001:"Archer Queen",       28000006:"Minion Prince",
+  28000002:"Grand Warden",   28000004:"Royal Champion",
+  4000051:"Wall Wrecker",    4000052:"Battle Blimp",        4000062:"Stone Slammer",
+  4000075:"Siege Barracks",  4000087:"Log Launcher",        4000091:"Flame Flinger",
+  4000092:"Battle Drill",    4000135:"Troop Launcher",
+  73000000:"L.A.S.S.I",     73000001:"Electro Owl",        73000002:"Mighty Yak",
+  73000003:"Unicorn",        73000004:"Phoenix",            73000007:"Poison Lizard",
+  73000008:"Diggy",          73000009:"Frosty",             73000010:"Spirit Fox",
+  73000011:"Angry Jelly",    73000016:"Sneezy",
+  4000000:"Barbarian",       4000001:"Archer",              4000002:"Goblin",
+  4000003:"Giant",           4000004:"Wall Breaker",        4000005:"Balloon",
+  4000006:"Wizard",          4000007:"Healer",              4000008:"Dragon",
+  4000009:"P.E.K.K.A",      4000010:"Minion",              4000011:"Hog Rider",
+  4000012:"Valkyrie",        4000013:"Golem",               4000015:"Witch",
+  4000017:"Lava Hound",      4000022:"Bowler",              4000023:"Baby Dragon",
+  4000024:"Miner",           4000053:"Yeti",                4000058:"Ice Golem",
+  4000059:"Electro Dragon",  4000065:"Dragon Rider",        4000082:"Headhunter",
+  4000095:"Electro Titan",   4000097:"Apprentice Warden",   4000110:"Root Rider",
+  4000123:"Druid",           4000132:"Thrower",             4000150:"Furnace",
+  26000000:"Lightning Spell",26000001:"Healing Spell",      26000002:"Rage Spell",
+  26000003:"Jump Spell",     26000005:"Freeze Spell",       26000009:"Poison Spell",
+  26000010:"Earthquake Spell",26000011:"Haste Spell",       26000016:"Clone Spell",
+  26000017:"Skeleton Spell", 26000028:"Bat Spell",          26000035:"Invisibility Spell",
+  26000053:"Recall Spell",   26000070:"Overgrowth Spell",   26000098:"Revive Spell",
+  26000109:"Ice Block Spell"
+};
 
-const GRADE_ORDER  = { S:5, A:4, B:3, C:2, D:1, "N/A":0 };
-const GRADE_COLOR  = { S:'#ffd60a', A:'#00f0ff', B:'#00ff9d', C:'#ff9f0a', D:'#ff2d55', 'N/A':'#3d4a5c' };
+/* Max levels by dataId (TH16 approximations for un-maxed detection) */
+const COC_MAX_LEVELS = {
+  1000008:21, 1000009:22, 1000013:14, 1000012:14, 1000011:16,
+  1000019:14, 1000032:12, 1000021:11, 1000027:10, 1000031:6,
+  1000067:6,  1000077:3,  1000084:3,  1000085:3,  1000089:3,
+  1000079:3,  1000005:16, 1000003:16, 1000024:14, 1000004:18,
+  1000002:18, 1000023:9,  1000014:12, 1000001:16,
+  12000000:9, 12000001:6, 12000002:7, 12000005:8, 12000006:6,
+  12000008:4, 12000016:5
+};
 
-/* Category display config */
+/* Upgrade time estimates in hours [indexed by level].
+   Inspired by SamBro's optimizer scheduling logic for SPT/LPT queues.
+   These power the Shortest/Longest Processing Time sort. */
+const UPGRADE_HOURS = {
+  "Cannon":          [0,2,4,8,12,18,24,36,48,60,72,84,96,108,120,144,168,192,216,240,288,312],
+  "Archer Tower":    [0,2,4,8,12,18,24,36,48,60,72,84,96,108,120,144,168,192,216,240,288,312,336],
+  "Mortar":          [0,4,8,12,18,24,36,48,72,96,120,144,168,192,216],
+  "Air Defense":     [0,4,8,12,18,24,36,48,72,96,120,144,168,192],
+  "Wizard Tower":    [0,6,12,18,24,36,48,72,96,120,144,168,192,216,240,264,288],
+  "Hidden Tesla":    [0,4,8,12,18,24,36,48,72,96,120,144,168,192],
+  "Bomb Tower":      [0,4,8,12,18,24,36,48,72,96,120,144],
+  "X-Bow":           [0,12,24,36,48,72,96,120,144,168,192,216],
+  "Inferno Tower":   [0,12,24,48,72,96,120,144,168,192,216,240],
+  "Eagle Artillery": [0,24,48,72,96,120,144],
+  "Scattershot":     [0,24,48,96,120,144,168],
+  "Monolith":        [0,96,168,240],
+  "Multi-Archer Tower":[0,48,120,192],
+  "Ricochet Cannon": [0,48,120,192],
+  "Firespitter":     [0,48,120,192],
+  "Multi-Gear Tower":[0,48,120,192],
+  "Gold Storage":    [0,2,4,6,8,12,18,24,36,48,60,72,84,96,108,120,144],
+  "Elixir Storage":  [0,2,4,6,8,12,18,24,36,48,60,72,84,96,108,120,144],
+  "Dark Elixir Storage":[0,4,8,12,18,24,36,48,72,96,120,144,168,192,216],
+  "Clan Castle":     [0,0,0,0,12,24,36,48,72,96,120,144,168],
+  "DEFAULT":         [0,4,8,12,18,24,36,48,72,96,120,144,168]
+};
+
+function getEstimatedHours(name, level) {
+  const table = UPGRADE_HOURS[name] || UPGRADE_HOURS["DEFAULT"];
+  const idx = Math.min(level, table.length - 1);
+  return table[idx] || Math.round(4 * Math.pow(1.3, level));
+}
+
+/* Building type emoji lookup for Gantt rows */
+const BUILD_EMOJI = {
+  "Cannon":"💣","Archer Tower":"🏹","Mortar":"💥","Air Defense":"🎯",
+  "Wizard Tower":"🧙","X-Bow":"⚡","Inferno Tower":"🔥","Eagle Artillery":"🦅",
+  "Scattershot":"🌑","Monolith":"🗿","Multi-Archer Tower":"🏹","Hidden Tesla":"⚡",
+  "Bomb Tower":"💣","Ricochet Cannon":"💣","Firespitter":"🔥",
+  "Gold Storage":"💰","Elixir Storage":"💜","Dark Elixir Storage":"🖤",
+  "Clan Castle":"🏰","Town Hall":"🏛️","Laboratory":"🧪","Blacksmith":"⚒️",
+  "DEFAULT":"🏗️"
+};
+function getBuildEmoji(n) { return BUILD_EMOJI[n] || BUILD_EMOJI["DEFAULT"]; }
+
+/* ─────────────────────────────── STATE ─────────────────────────────── */
+let globalPlayers = [];
+let hallOfFame    = {};
+let displayList   = [];
+let bsLineChart   = null;
+let bsRadarChart  = null;
+let currentQueueMode = 'spt'; // 'spt' | 'lpt'
+
+const GRADE_ORDER = { S:5, A:4, B:3, C:2, D:1, "N/A":0 };
+const GRADE_COLOR = { S:'#ffd60a', A:'#00f0ff', B:'#00ff9d', C:'#ff9f0a', D:'#ff2d55', 'N/A':'#3d4a5c' };
+
 const CATS = [
   { key:'heroes',    label:'Heroes',    color:'#00f0ff' },
   { key:'equipment', label:'Equip',     color:'#b400ff' },
@@ -699,10 +1005,10 @@ const CATS = [
   { key:'spells',    label:'Spells',    color:'#ff2d55' },
 ];
 
-/* ───────────────────────────── INIT ───────────────────────────── */
+/* ─────────────────────────────── INIT ─────────────────────────────── */
 window.addEventListener('DOMContentLoaded', () => fetchData());
 
-/* ───────────────────────────── DATA ───────────────────────────── */
+/* ─────────────────────────────── DATA ─────────────────────────────── */
 async function fetchData() {
   setLoading(true);
   try {
@@ -736,19 +1042,16 @@ function setLoading(on) {
   document.getElementById('refreshBtn').classList.toggle('spinning', on);
 }
 
-/* ───────────────────────────── GLOBAL STATS ───────────────────────────── */
+/* ─────────────────────────────── GLOBAL STATS ─────────────────────── */
 function updateGlobalStats() {
   const n = globalPlayers.length || 1;
-  let totalPct   = 0;
-  let gainers    = 0;
-  let totalGain  = 0;
-  let gainSamples = 0;
+  let totalPct = 0, gainers = 0, totalGain = 0, gainSamples = 0, deepCount = 0;
 
   globalPlayers.forEach(p => {
     totalPct += parseFloat(p.percentage) || 0;
-    // Compute velocity from history array (most accurate) or fallback field
     const gain = computeVelocity(p);
     if (gain > 0) { gainers++; totalGain += gain; gainSamples++; }
+    if (p.hasDeepSync) deepCount++;
   });
 
   const avg     = (totalPct / n).toFixed(1);
@@ -761,7 +1064,7 @@ function updateGlobalStats() {
   velEl.className   = 'meta-val ' + (avgGain >= 0 ? 'g' : 'r');
 
   document.getElementById('gCount').textContent    = n;
-  document.getElementById('gClimbing').textContent = gainers;
+  document.getElementById('gDeepSync').textContent = deepCount;
 }
 
 function computeVelocity(p) {
@@ -780,16 +1083,15 @@ function animCounter(id, target, suffix) {
   const duration = 1100;
   const step = ts => {
     if (!start) start = ts;
-    const p   = Math.min((ts - start) / duration, 1);
-    const e   = 1 - Math.pow(1 - p, 3);
-    const val = (target * e).toFixed(1);
-    el.innerHTML = `${val}<span class="unit">${suffix}</span>`;
+    const p  = Math.min((ts - start) / duration, 1);
+    const e  = 1 - Math.pow(1 - p, 3);
+    el.innerHTML = `${(target * e).toFixed(1)}<span class="unit">${suffix}</span>`;
     if (p < 1) requestAnimationFrame(step);
   };
   requestAnimationFrame(step);
 }
 
-/* ───────────────────────────── TAB SWITCHING ───────────────────────────── */
+/* ─────────────────────────────── TABS ─────────────────────────────── */
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
@@ -798,7 +1100,7 @@ function switchTab(tab) {
   document.getElementById('mainScroll').scrollTop = 0;
 }
 
-/* ───────────────────────────── ROSTER ───────────────────────────── */
+/* ─────────────────────────────── ROSTER ────────────────────────────── */
 function filterRoster() {
   const term = document.getElementById('searchInput').value.toLowerCase();
   const sort = document.getElementById('sortSelect').value;
@@ -806,10 +1108,11 @@ function filterRoster() {
   displayList = globalPlayers.filter(p => p.name.toLowerCase().includes(term));
 
   displayList.sort((a, b) => {
-    if (sort === 'comp')  return (parseFloat(b.percentage) || 0) - (parseFloat(a.percentage) || 0);
-    if (sort === 'grade') return (GRADE_ORDER[b.grade] || 0) - (GRADE_ORDER[a.grade] || 0);
-    if (sort === 'th')    return (parseInt(b.thLevel) || 0) - (parseInt(a.thLevel) || 0);
+    if (sort === 'comp')  return (parseFloat(b.percentage)||0) - (parseFloat(a.percentage)||0);
+    if (sort === 'grade') return (GRADE_ORDER[b.grade]||0) - (GRADE_ORDER[a.grade]||0);
+    if (sort === 'th')    return (parseInt(b.thLevel)||0) - (parseInt(a.thLevel)||0);
     if (sort === 'vel')   return computeVelocity(b) - computeVelocity(a);
+    if (sort === 'ds')    return (b.hasDeepSync ? 1 : 0) - (a.hasDeepSync ? 1 : 0);
     return 0;
   });
 
@@ -823,25 +1126,29 @@ function renderRoster() {
     return;
   }
 
-  const CIRC = 2 * Math.PI * 19; // r=19
+  const CIRC = 2 * Math.PI * 19;
   let html = '';
 
   displayList.forEach((p, i) => {
-    const realIdx   = globalPlayers.findIndex(gp => gp.tag === p.tag);
-    const pct       = Math.min(100, Math.max(0, parseFloat(p.percentage) || 0));
-    const offset    = CIRC - (pct / 100) * CIRC;
-    const gColor    = GRADE_COLOR[p.grade] || '#3d4a5c';
-    const gCls      = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
-    const vel       = computeVelocity(p);
-    const delayMs   = (i % 9) * 45;
+    const realIdx  = globalPlayers.findIndex(gp => gp.tag === p.tag);
+    const pct      = Math.min(100, Math.max(0, parseFloat(p.percentage) || 0));
+    const offset   = CIRC - (pct / 100) * CIRC;
+    const gColor   = GRADE_COLOR[p.grade] || '#3d4a5c';
+    const gCls     = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
+    const vel      = computeVelocity(p);
+    const delayMs  = (i % 9) * 45;
+    const dsClass  = p.hasDeepSync ? 'ds-verified' : '';
+    const dsPip    = p.hasDeepSync
+      ? `<div class="ds-pip"><div class="ds-pip-dot"></div>DS</div>` : '';
 
     html += `
-      <div class="glass-card" onclick="openSheet(${realIdx})" style="animation-delay:${delayMs}ms">
+      <div class="glass-card ${dsClass}" onclick="openSheet(${realIdx})" style="animation-delay:${delayMs}ms">
         ${gCls ? `<div class="g-badge ${gCls}">${p.grade}</div>` : ''}
+        ${dsPip}
         <div class="ring-wrap">
           <svg class="ring-svg" viewBox="0 0 48 48">
             <circle class="ring-track" cx="24" cy="24" r="19"/>
-            <circle class="ring-fill" cx="24" cy="24" r="19"
+            <circle class="ring-fill"  cx="24" cy="24" r="19"
               stroke="${gColor}"
               stroke-dasharray="${CIRC.toFixed(2)}"
               stroke-dashoffset="${offset.toFixed(2)}"
@@ -857,51 +1164,44 @@ function renderRoster() {
   container.innerHTML = html;
 }
 
-/* ───────────────────────────── HALL OF FAME ───────────────────────────── */
+/* ─────────────────────────────── HOF ───────────────────────────────── */
 const HOF_ICONS = {
-  "Friend in Need":          "🤝 Lifetime Donations",
-  "Conqueror":               "⚔️ Attacks Won",
-  "Unbreakable":             "🛡️ Defenses Won",
-  "Shattered and Scattered": "🎯 Scattershots Destroyed",
-  "Anti-Artillery":          "🦅 Eagles Destroyed",
-  "Heroic Heist":            "💧 Dark Elixir Looted"
+  "Friend in Need":"🤝 Lifetime Donations",
+  "Conqueror":"⚔️ Attacks Won",
+  "Unbreakable":"🛡️ Defenses Won",
+  "Shattered and Scattered":"🎯 Scattershots Destroyed",
+  "Anti-Artillery":"🦅 Eagles Destroyed",
+  "Heroic Heist":"💧 Dark Elixir Looted"
 };
 
 function renderHoF() {
   const container = document.getElementById('hofContainer');
   if (!Object.keys(hallOfFame).length) {
-    container.innerHTML = `<div class="empty">Awaiting sync.</div>`;
-    return;
+    container.innerHTML = `<div class="empty">Awaiting sync.</div>`; return;
   }
-
   const medals = ['🥇','🥈','🥉'];
   let html = '';
-
   for (const ach in hallOfFame) {
     if (!hallOfFame[ach].length) continue;
-    const title = HOF_ICONS[ach] || ach;
-    html += `<div class="hof-card"><div class="hof-hdr">${title}</div>`;
+    html += `<div class="hof-card"><div class="hof-hdr">${HOF_ICONS[ach] || ach}</div>`;
     hallOfFame[ach].forEach((p, idx) => {
-      html += `
-        <div class="hof-row">
-          <div class="hof-rank">${medals[idx] || `#${idx+1}`}</div>
-          <div class="hof-info">
-            <span class="hof-name">${escHtml(p.name)}</span>
-            <span class="hof-th">TH${p.th}</span>
-          </div>
-          <div class="hof-val">${parseInt(p.value).toLocaleString()}</div>
-        </div>`;
+      html += `<div class="hof-row">
+        <div class="hof-rank">${medals[idx] || `#${idx+1}`}</div>
+        <div class="hof-info">
+          <span class="hof-name">${escHtml(p.name)}</span>
+          <span class="hof-th">TH${p.th}</span>
+        </div>
+        <div class="hof-val">${parseInt(p.value).toLocaleString()}</div>
+      </div>`;
     });
     html += `</div>`;
   }
-
   container.innerHTML = html;
 }
 
-/* ───────────────────────────── VELOCITY BOARD ───────────────────────────── */
+/* ─────────────────────────────── VELOCITY ──────────────────────────── */
 function renderVelocityBoard() {
   const container = document.getElementById('velocityContainer');
-
   const ranked = globalPlayers
     .map(p => ({ ...p, _gain: computeVelocity(p) }))
     .sort((a, b) => b._gain - a._gain);
@@ -911,77 +1211,127 @@ function renderVelocityBoard() {
   const stagnant = ranked.filter(p => p._gain <= 0);
 
   let html = '';
-
   active.forEach((p, i) => {
     const barPct = (p._gain / maxGain) * 100;
     const isTop  = i < 3;
-    html += `
-      <div class="vel-row">
-        <div class="vel-rank-num ${isTop ? 'top' : ''}">${i + 1}</div>
-        <div class="vel-info">
-          <div class="vel-name">${escHtml(p.name)}</div>
-          <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% overall &nbsp;·&nbsp; Grade ${p.grade || 'N/A'}</div>
-        </div>
-        <div class="vel-bar-col">
-          <div class="vel-bar-trk">
-            <div class="vel-bar-fill" style="width:${barPct.toFixed(1)}%"></div>
-          </div>
-        </div>
-        <div class="vel-gain">+${p._gain.toFixed(2)}%</div>
-      </div>`;
+    html += `<div class="vel-row">
+      <div class="vel-rank-num ${isTop ? 'top' : ''}">${i + 1}</div>
+      <div class="vel-info">
+        <div class="vel-name">${escHtml(p.name)}${p.hasDeepSync ? ' <span style="font-size:9px;color:var(--ds-green);">◈</span>' : ''}</div>
+        <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% &nbsp;·&nbsp; Grade ${p.grade || 'N/A'}</div>
+      </div>
+      <div class="vel-bar-col">
+        <div class="vel-bar-trk"><div class="vel-bar-fill" style="width:${barPct.toFixed(1)}%"></div></div>
+      </div>
+      <div class="vel-gain">+${p._gain.toFixed(2)}%</div>
+    </div>`;
   });
-
   if (stagnant.length) {
     html += `<div class="stag-divider">No movement detected</div>`;
     stagnant.forEach(p => {
-      html += `
-        <div class="vel-row" style="opacity:0.38;">
-          <div class="vel-rank-num">–</div>
-          <div class="vel-info">
-            <div class="vel-name">${escHtml(p.name)}</div>
-            <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% overall</div>
-          </div>
-          <div class="vel-bar-col"></div>
-          <div class="vel-gain zero">${p._gain.toFixed(2)}%</div>
-        </div>`;
+      html += `<div class="vel-row" style="opacity:0.38;">
+        <div class="vel-rank-num">–</div>
+        <div class="vel-info">
+          <div class="vel-name">${escHtml(p.name)}</div>
+          <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% overall</div>
+        </div>
+        <div class="vel-bar-col"></div>
+        <div class="vel-gain zero">${p._gain.toFixed(2)}%</div>
+      </div>`;
     });
   }
-
-  container.innerHTML = html || `<div class="empty">No velocity data available.</div>`;
+  container.innerHTML = html || `<div class="empty">No velocity data.</div>`;
 }
 
-/* ───────────────────────────── BOTTOM SHEET ───────────────────────────── */
+/* ─────────────────────────────── BOTTOM SHEET ──────────────────────── */
 function openSheet(index) {
-  const p       = globalPlayers[index];
-  const gColor  = GRADE_COLOR[p.grade] || '#3d4a5c';
-  const gCls    = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
-  const vel     = computeVelocity(p);
+  const p      = globalPlayers[index];
+  const gColor = GRADE_COLOR[p.grade] || '#3d4a5c';
+  const gCls   = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
+  const vel    = computeVelocity(p);
 
-  /* Build category values from the backend's "current/max" string format */
   const catVals = CATS.map(c => {
-    const raw = p[c.key] || "0/1";
+    const raw   = p[c.key] || "0/1";
     const parts = raw.split('/');
-    
-    // If it's correctly formatted as "current/max"
     if (parts.length === 2) {
-      const current = parseFloat(parts[0]) || 0;
+      const cur = parseFloat(parts[0]) || 0;
       const max = parseFloat(parts[1]) || 1;
-      const pct = max > 0 ? (current / max) * 100 : 0;
-      return Math.min(100, Math.max(0, pct));
+      return Math.min(100, Math.max(0, max > 0 ? (cur / max) * 100 : 0));
     }
-    
-    return 0; // Fallback
+    return 0;
   });
 
-  /* Category bars HTML */
   const barsHtml = CATS.map((c, i) => `
     <div class="cat-row">
       <div class="cat-lbl">${c.label}</div>
       <div class="cat-track">
-        <div class="cat-fill" style="width:${catVals[i].toFixed(1)}%; background:${c.color}; box-shadow:0 0 8px ${c.color}44;"></div>
+        <div class="cat-fill" style="width:${catVals[i].toFixed(1)}%;background:${c.color};box-shadow:0 0 8px ${c.color}44;"></div>
       </div>
-      <div class="cat-val" style="color:${c.color}">${p[c.key]} <span style="font-size:7px; color:var(--muted); margin-left:4px;">(${catVals[i].toFixed(0)}%)</span></div>
+      <div class="cat-val" style="color:${c.color}">${p[c.key]} <span style="font-size:7px;color:var(--muted);margin-left:4px;">(${catVals[i].toFixed(0)}%)</span></div>
     </div>`).join('');
+
+  /* ── Build the Deep Sync section ── */
+  let deepSection = '';
+  if (p.hasDeepSync && p.deepSync) {
+    const ds = p.deepSync;
+    const maxPct = parseFloat(ds.maxPct) || 0;
+    deepSection = `
+      <div class="sh-sec-ds">DEEP MATRIX INTEL</div>
+
+      <!-- Village Integrity Meter -->
+      <div class="integrity-meter">
+        <div class="integrity-pct">${maxPct.toFixed(1)}<span class="unit">%</span></div>
+        <div class="integrity-detail">
+          <div class="integrity-row">
+            <b>${ds.maxedBuildings}</b> / ${ds.totalBuildings} buildings maxed
+          </div>
+          <div class="integrity-row">
+            <b>${ds.activeUpgrades.length}</b> builder${ds.activeUpgrades.length !== 1 ? 's' : ''} active
+            &nbsp;·&nbsp; last sync ${formatRelTime(ds.timestamp)}
+          </div>
+          <div class="integrity-track">
+            <div class="integrity-fill" style="width:${Math.min(100,maxPct).toFixed(1)}%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Builder Gantt Chart -->
+      <div class="sh-sec-ds">BUILDER COMMAND CENTER</div>
+      ${renderGanttHtml(ds.activeUpgrades)}
+
+      <!-- SPT / LPT Queue -->
+      <div class="sh-sec-ds">UPGRADE INTELLIGENCE</div>
+      ${renderQueueHtml(ds.unmaxedBuildings, p.tag)}
+    `;
+  } else {
+    deepSection = `
+      <div class="sh-sec">DEEP MATRIX</div>
+      <div class="sync-no-ds">
+        <div class="sync-no-ds-icon">🔒</div>
+        <div class="sync-no-ds-title">NO DEEP SYNC RECORDED</div>
+        <div class="sync-no-ds-hint">
+          Export your village data from the CoC game, copy the JSON to your clipboard,
+          then tap the button below to inject it into the Deep Matrix.
+        </div>
+      </div>
+    `;
+  }
+
+  /* ── Sync Button (always present at bottom) ── */
+  const syncSection = `
+    <div class="sync-section">
+      <div class="sync-title">⬡ DEEP SYNC ${p.hasDeepSync ? '— UPDATE DATA' : '— ACTIVATE'}</div>
+      <div class="sync-hint">
+        Copy your <b>Village Data JSON</b> to clipboard, then tap. The JSON tag
+        must match this player's tag (<b>${escHtml(p.tag)}</b>).
+      </div>
+      <div class="sync-btn" id="syncBtn_${escHtml(p.tag)}" onclick="clipboardSync('${escHtml(p.tag)}')">
+        <span class="sync-icon">📋</span>
+        1-CLICK CLIPBOARD SYNC
+      </div>
+    </div>
+    <div style="height:16px;"></div>
+  `;
 
   document.getElementById('sheetBody').innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
@@ -993,6 +1343,7 @@ function openSheet(index) {
           <span class="accent">${parseFloat(p.percentage).toFixed(1)}% OVERALL</span>
           <span class="sep">·</span>
           <span class="gain">${vel >= 0 ? '+' : ''}${vel.toFixed(2)}% (30d)</span>
+          ${p.hasDeepSync ? '<span style="color:var(--ds-green);letter-spacing:1px;">· ◈ VERIFIED</span>' : ''}
         </div>
       </div>
       ${gCls ? `<div class="g-badge g-badge-lg ${gCls}">${p.grade}</div>` : ''}
@@ -1012,20 +1363,20 @@ function openSheet(index) {
 
     <div class="sh-sec">30-Day Trajectory</div>
     <div class="chart-wrap"><canvas id="lineCanvas"></canvas></div>
+
+    ${deepSection}
+    ${syncSection}
   `;
 
   document.getElementById('playerSheet').classList.add('open');
   document.getElementById('sheetBg').classList.add('active');
 
-  /* ── Destroy old charts ── */
   if (bsLineChart)  { bsLineChart.destroy();  bsLineChart  = null; }
   if (bsRadarChart) { bsRadarChart.destroy(); bsRadarChart = null; }
 
-  /* ── Shared Chart.js defaults ── */
-  Chart.defaults.color      = '#3d4a5c';
+  Chart.defaults.color       = '#3d4a5c';
   Chart.defaults.font.family = "'Share Tech Mono', monospace";
 
-  /* ── Radar chart ── */
   const rCtx = document.getElementById('radarCanvas').getContext('2d');
   bsRadarChart = new Chart(rCtx, {
     type: 'radar',
@@ -1034,11 +1385,9 @@ function openSheet(index) {
       datasets: [{
         data: catVals,
         backgroundColor: 'rgba(0,240,255,0.06)',
-        borderColor: '#00f0ff',
-        borderWidth: 1.5,
+        borderColor: '#00f0ff', borderWidth: 1.5,
         pointBackgroundColor: CATS.map(c => c.color),
-        pointRadius: 4,
-        pointHoverRadius: 6,
+        pointRadius: 4, pointHoverRadius: 6,
       }]
     },
     options: {
@@ -1049,7 +1398,7 @@ function openSheet(index) {
           min: 0, max: 100,
           grid:        { color: 'rgba(255,255,255,0.05)' },
           angleLines:  { color: 'rgba(255,255,255,0.05)' },
-          pointLabels: { color: '#64748b', font: { size: 9, family: "'Share Tech Mono', monospace" } },
+          pointLabels: { color: '#64748b', font: { size: 9, family:"'Share Tech Mono',monospace" } },
           ticks:       { display: false, stepSize: 25 },
         }
       },
@@ -1057,44 +1406,43 @@ function openSheet(index) {
     }
   });
 
-  /* ── 30-day line chart ── */
   if (p.historyDates && p.historyDates.length > 0) {
     const lCtx = document.getElementById('lineCanvas').getContext('2d');
     const grad = lCtx.createLinearGradient(0, 0, 0, 170);
     grad.addColorStop(0, 'rgba(0,240,255,0.28)');
     grad.addColorStop(1, 'rgba(0,240,255,0.00)');
-
     bsLineChart = new Chart(lCtx, {
       type: 'line',
       data: {
         labels: p.historyDates,
         datasets: [{
           data: p.historyPcts,
-          borderColor: '#00f0ff',
-          backgroundColor: grad,
+          borderColor: '#00f0ff', backgroundColor: grad,
           borderWidth: 1.5, fill: true, tension: 0.4,
-          pointBackgroundColor: '#00f0ff',
-          pointRadius: 2.5, pointHoverRadius: 5,
+          pointBackgroundColor: '#00f0ff', pointRadius: 2.5, pointHoverRadius: 5,
         }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: {
-          x: {
-            grid: { display: false },
-            ticks: { font: { size: 8 }, maxRotation: 0, maxTicksLimit: 6 }
-          },
-          y: {
-            grid:   { color: 'rgba(255,255,255,0.04)' },
-            border: { display: false },
-            ticks:  { font: { size: 8 } }
-          }
+          x: { grid: { display: false }, ticks: { font: { size: 8 }, maxRotation: 0, maxTicksLimit: 6 } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false }, ticks: { font: { size: 8 } } }
         },
         animation: { duration: 700 }
       }
     });
   }
+
+  /* Animate Gantt bars after render */
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.gantt-bar[data-w]').forEach(el => {
+      el.style.width = el.dataset.w;
+    });
+    document.querySelectorAll('.integrity-fill[data-w]').forEach(el => {
+      el.style.width = el.dataset.w;
+    });
+  });
 }
 
 function closeSheet() {
@@ -1104,101 +1452,380 @@ function closeSheet() {
   if (bsRadarChart) { bsRadarChart.destroy(); bsRadarChart = null; }
 }
 
-/* ───────────────────────────── UTILS ───────────────────────────── */
+/* ─────────────────────────────── GANTT CHART ───────────────────────
+   Builder Command Center: shows active upgrades as a timeline.
+   Bar fill = remaining time relative to longest active upgrade.
+   Color gradient: green (nearly done) → amber (just started).
+────────────────────────────────────────────────────────────────────── */
+function renderGanttHtml(activeUpgrades) {
+  if (!activeUpgrades || activeUpgrades.length === 0) {
+    return `<div class="gantt-done">🏗️ &nbsp; All builders are free — ready to upgrade!</div>`;
+  }
+
+  const maxRemaining = Math.max(...activeUpgrades.map(u => u.remainingHours || 0), 1);
+
+  let rows = '';
+  activeUpgrades.forEach((u, i) => {
+    const remaining = u.remainingHours || 0;
+    const pct = Math.min(100, (remaining / maxRemaining) * 100);
+
+    // Color: interpolate green→amber→red based on remaining time
+    // <48h = green, 48-168h = amber, >168h = red-ish
+    let barColor;
+    if (remaining <= 48) {
+      barColor = 'linear-gradient(90deg,#00ff9d,#00f0ff)';
+    } else if (remaining <= 168) {
+      barColor = 'linear-gradient(90deg,#ff9f0a,#ffd60a)';
+    } else {
+      barColor = 'linear-gradient(90deg,#ff2d55,#b400ff)';
+    }
+
+    const emoji = getBuildEmoji(u.name);
+    const timeLabel = formatHours(remaining);
+
+    rows += `
+      <div class="gantt-row">
+        <div class="gantt-icon">${emoji}</div>
+        <div class="gantt-info">
+          <div class="gantt-name">${escHtml(u.name)}</div>
+          <div class="gantt-level">LVL ${u.level} → ${u.level + 1}</div>
+          <div class="gantt-track">
+            <div class="gantt-bar" data-w="${pct.toFixed(1)}%" style="width:0%;background:${barColor};box-shadow:0 0 6px rgba(0,255,157,0.3);"></div>
+          </div>
+        </div>
+        <div class="gantt-time" style="color:${remaining<=48?'var(--ds-green)':remaining<=168?'var(--ds-amber)':'var(--red)'}">${timeLabel}</div>
+      </div>`;
+  });
+
+  return `
+    <div class="gantt-container">
+      <div class="gantt-hdr">
+        <span></span><span>BUILDING / LEVEL</span><span style="text-align:right;">REMAINING</span>
+      </div>
+      ${rows}
+    </div>`;
+}
+
+/* ─────────────────────────────── SPT / LPT QUEUES ─────────────────
+   SPT — Shortest Processing Time: upgrade quick wins first.
+         Clears queue, maintains momentum, maximizes completion count.
+   LPT — Longest Processing Time: tackle biggest upgrades first.
+         Maximizes long-term defensive/offensive value per builder.
+   Inspired by SamBro2901/coc-upgrade-optimizer scheduling logic.
+────────────────────────────────────────────────────────────────────── */
+function renderQueueHtml(unmaxedBuildings, playerTag) {
+  if (!unmaxedBuildings || unmaxedBuildings.length === 0) {
+    return `<div class="queue-empty">Village fully maxed — legendary status! 🏆</div>`;
+  }
+
+  // Attach estimated upgrade time for next level to each building
+  const withTimes = unmaxedBuildings
+    .filter(b => !b.name.includes('Wall')) // Skip walls
+    .map(b => ({
+      ...b,
+      estimatedHours: getEstimatedHours(b.name, b.level + 1)
+    }));
+
+  if (withTimes.length === 0) {
+    return `<div class="queue-empty">No upgradeable buildings detected.</div>`;
+  }
+
+  const spt = [...withTimes].sort((a, b) => a.estimatedHours - b.estimatedHours);
+  const lpt = [...withTimes].sort((a, b) => b.estimatedHours - a.estimatedHours);
+
+  // Store for tab switching
+  window._dsQueues = window._dsQueues || {};
+  window._dsQueues[playerTag] = { spt, lpt };
+
+  return buildQueueToggleHtml(playerTag, spt, lpt);
+}
+
+function buildQueueToggleHtml(playerTag, spt, lpt) {
+  const list    = currentQueueMode === 'spt' ? spt : lpt;
+  const top     = list.slice(0, 7);
+  const desc    = currentQueueMode === 'spt'
+    ? '⚡ SPT: Shortest first — maximize completed upgrades. Ideal for active builders who want rapid turnover.'
+    : '🔱 LPT: Longest first — prioritize high-value upgrades. Best when you upgrade infrequently and want maximum impact.';
+
+  const colorMap = ['q1','q2','q3','','','',''];
+
+  const items = top.map((b, i) => {
+    const rankCls = colorMap[i] || '';
+    const rankStr = i === 0 ? '01' : i === 1 ? '02' : i === 2 ? '03' : `0${i+1}`;
+    const timeStr = formatHours(b.estimatedHours);
+    const maxColor = b.levelsRemaining <= 2 ? 'var(--ds-green)' : b.levelsRemaining <= 5 ? 'var(--ds-amber)' : 'var(--muted-light)';
+    const upgradingTag = b.isUpgrading ? `<div class="queue-upgrading">▲ UPGRADING NOW</div>` : '';
+    return `
+      <div class="queue-item">
+        <div class="queue-rank ${rankCls}">${rankStr}</div>
+        <div class="queue-info">
+          <div class="queue-name">${escHtml(b.name)}</div>
+          <div class="queue-meta">
+            LVL ${b.level} → ${b.level+1} &nbsp;·&nbsp;
+            <span style="color:${maxColor}">${b.levelsRemaining} to max</span>
+          </div>
+          ${upgradingTag}
+        </div>
+        <div class="queue-time" style="color:${currentQueueMode==='spt'?'var(--cyan)':'var(--purple)'}">
+          ${timeStr}
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="queue-toggle">
+      <div class="queue-tab ${currentQueueMode==='spt'?'active':''}"
+           onclick="switchQueueMode('spt','${escHtml(playerTag)}')">
+        ⚡ SPT &nbsp; Quick Wins
+      </div>
+      <div class="queue-tab ${currentQueueMode==='lpt'?'active':''}"
+           onclick="switchQueueMode('lpt','${escHtml(playerTag)}')">
+        🔱 LPT &nbsp; Power Chain
+      </div>
+    </div>
+    <div class="queue-desc">${desc}</div>
+    <div class="queue-list" id="queueList_${escHtml(playerTag)}">${items}</div>`;
+}
+
+function switchQueueMode(mode, playerTag) {
+  currentQueueMode = mode;
+  const queues = window._dsQueues?.[playerTag];
+  if (!queues) return;
+
+  const { spt, lpt } = queues;
+  const list = mode === 'spt' ? spt : lpt;
+  const top  = list.slice(0, 7);
+  const desc = mode === 'spt'
+    ? '⚡ SPT: Shortest first — maximize completed upgrades. Ideal for active builders who want rapid turnover.'
+    : '🔱 LPT: Longest first — prioritize high-value upgrades. Best when you upgrade infrequently and want maximum impact.';
+
+  // Update toggle styling
+  document.querySelectorAll('.queue-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.queue-tab').forEach(t => {
+    if (t.textContent.includes(mode.toUpperCase())) t.classList.add('active');
+  });
+  document.querySelector('.queue-desc').textContent = desc;
+
+  const colorMap = ['q1','q2','q3','','','',''];
+  const container = document.getElementById(`queueList_${playerTag}`);
+  if (!container) return;
+
+  container.innerHTML = top.map((b, i) => {
+    const rankCls  = colorMap[i] || '';
+    const rankStr  = `0${i+1}`;
+    const timeStr  = formatHours(b.estimatedHours);
+    const maxColor = b.levelsRemaining <= 2 ? 'var(--ds-green)' : b.levelsRemaining <= 5 ? 'var(--ds-amber)' : 'var(--muted-light)';
+    const upgTag   = b.isUpgrading ? `<div class="queue-upgrading">▲ UPGRADING NOW</div>` : '';
+    return `<div class="queue-item">
+      <div class="queue-rank ${rankCls}">${rankStr}</div>
+      <div class="queue-info">
+        <div class="queue-name">${escHtml(b.name)}</div>
+        <div class="queue-meta">LVL ${b.level} → ${b.level+1} &nbsp;·&nbsp; <span style="color:${maxColor}">${b.levelsRemaining} to max</span></div>
+        ${upgTag}
+      </div>
+      <div class="queue-time" style="color:${mode==='spt'?'var(--cyan)':'var(--purple)'}">${timeStr}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ─────────────────────────────── CLIPBOARD SYNC ────────────────────
+   1-Click Deep Sync flow:
+   1. Read clipboard via navigator.clipboard.readText()
+   2. Parse JSON, verify "tag" field matches current player
+   3. Client-side parse using COC_ID_MAP to build processed payload
+   4. POST processed data to GAS doPost endpoint
+   5. Update local player state, re-render sheet section
+────────────────────────────────────────────────────────────────────── */
+async function clipboardSync(playerTag) {
+  const btn = document.getElementById(`syncBtn_${playerTag}`);
+  if (btn) {
+    btn.classList.add('loading');
+    btn.innerHTML = `<span class="sync-icon">⏳</span> READING CLIPBOARD...`;
+  }
+
+  try {
+    // 1. Read clipboard
+    let text;
+    try {
+      text = await navigator.clipboard.readText();
+    } catch(err) {
+      showToast('⚠️ Clipboard permission denied. Please allow clipboard access.', 'error');
+      if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
+      return;
+    }
+
+    // 2. Parse JSON
+    let village;
+    try {
+      village = JSON.parse(text);
+    } catch(e) {
+      showToast('⚠️ Clipboard does not contain valid JSON', 'error');
+      if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
+      return;
+    }
+
+    // 3. Verify tag
+    const jsonTag = village.tag || village.Tag || '';
+    if (jsonTag !== playerTag) {
+      showToast(
+        jsonTag
+          ? `⚠️ Tag mismatch — JSON is for ${jsonTag}`
+          : '⚠️ No "tag" field found in JSON',
+        'error'
+      );
+      if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
+      return;
+    }
+
+    // 4. Client-side parse using COC_ID_MAP
+    if (btn) btn.innerHTML = `<span class="sync-icon">⚙️</span> PARSING VILLAGE...`;
+    const processed = parseVillageJson(playerTag, village);
+
+    // 5. POST to GAS backend
+    if (btn) btn.innerHTML = `<span class="sync-icon">📡</span> TRANSMITTING...`;
+    await postDeepSync(processed);
+
+    // 6. Update local state immediately (optimistic)
+    const playerIdx = globalPlayers.findIndex(p => p.tag === playerTag);
+    if (playerIdx > -1) {
+      globalPlayers[playerIdx].hasDeepSync = true;
+      globalPlayers[playerIdx].deepSync    = processed;
+      // Re-open sheet to reflect new data
+      openSheet(playerIdx);
+      // Re-render roster badge
+      renderRoster();
+    }
+
+    showToast(`✓ Deep Matrix synced — ${processed.activeUpgrades.length} builders active`, 'success');
+
+  } catch(err) {
+    console.error('Sync error:', err);
+    showToast('⚠️ Sync failed: ' + err.message, 'error');
+    if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
+  }
+}
+
+/* Parse the raw village JSON into the processed payload the backend expects */
+function parseVillageJson(playerTag, village) {
+  const buildings = village.buildings || village.village_buildings || [];
+  const nowSec    = Math.floor(Date.now() / 1000);
+
+  let activeUpgrades   = [];
+  let unmaxedBuildings = [];
+  let totalBuildings   = 0;
+  let maxedBuildings   = 0;
+
+  buildings.forEach(b => {
+    const dataId  = b.data || b.data_id || b.dataId;
+    const level   = b.l || b.level || b.Level || 0;
+    const endTime = b.upgrade_end_time || b.upgradeEndTime || null;
+    const name    = COC_ID_MAP[dataId] || null;
+
+    if (!name) return;                          // Unknown ID — skip
+    if (name === 'Wall') return;                // Skip walls (they're not upgradings)
+    if (dataId >= 12000000 && dataId < 13000000) return; // Skip traps (no builder needed)
+
+    totalBuildings++;
+
+    const maxLvl = COC_MAX_LEVELS[dataId];
+    const isUpgrading = !!(endTime && endTime > nowSec);
+
+    // Active builder detection
+    if (isUpgrading) {
+      const remainingHours = Math.max(0, Math.round((endTime - nowSec) / 3600));
+      activeUpgrades.push({ name, level, endTime, remainingHours });
+    }
+
+    // Un-maxed building detection
+    if (maxLvl !== undefined) {
+      if (level >= maxLvl) {
+        maxedBuildings++;
+      } else {
+        unmaxedBuildings.push({
+          name, level, maxLevel: maxLvl,
+          levelsRemaining: maxLvl - level,
+          isUpgrading
+        });
+      }
+    }
+  });
+
+  const maxPct = totalBuildings > 0
+    ? ((maxedBuildings / totalBuildings) * 100).toFixed(1) : 0;
+
+  return {
+    tag: playerTag,
+    timestamp: Date.now(),
+    totalBuildings,
+    maxedBuildings,
+    maxPct: parseFloat(maxPct),
+    activeUpgrades,
+    unmaxedBuildings: unmaxedBuildings.sort((a, b) => a.levelsRemaining - b.levelsRemaining)
+  };
+}
+
+/* POST processed village data to GAS doPost endpoint */
+async function postDeepSync(payload) {
+  try {
+    // GAS Web Apps accept POST from fetch; use no-cors as fallback if CORS preflight fails
+    const res = await fetch(WEB_APP_URL, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.error) throw new Error(data.error);
+    }
+    // If no-cors, res.type === 'opaque' — we trust the GAS backend processed it
+  } catch(e) {
+    // Try no-cors fallback (silently fires, no response body readable)
+    try {
+      await fetch(WEB_APP_URL, {
+        method:  'POST',
+        mode:    'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+      });
+    } catch(e2) {
+      throw new Error('Network error — check GAS deployment settings.');
+    }
+  }
+}
+
+/* ─────────────────────────────── UTILS ─────────────────────────────── */
 function escHtml(str) {
+  if (!str) return '';
   const d = document.createElement('div');
-  d.appendChild(document.createTextNode(str));
+  d.appendChild(document.createTextNode(String(str)));
   return d.innerHTML;
 }
-/* ───────────────────────────── DEEP SYNC LOGIC ───────────────────────────── */
 
-/* ───────────────────────────── 1-CLICK DEEP SYNC ───────────────────────────── */
-async function autoDeepSync() {
-  try {
-    // 1. Request access to read the user's clipboard
-    const clipboardText = await navigator.clipboard.readText();
-    
-    if (!clipboardText) {
-      alert("System Error: Your clipboard is empty. Please copy your Village JSON first.");
-      return;
-    }
-
-    // 2. Try to parse the clipboard text into a JSON object
-    let parsedData;
-    try {
-      parsedData = JSON.parse(clipboardText);
-    } catch (err) {
-      alert("System Error: The copied text is not valid JSON.");
-      return;
-    }
-
-    // 3. Verify the JSON actually belongs to Clash of Clans by checking for the tag
-    if (!parsedData.tag) {
-      alert("System Error: Could not find a player tag in the copied data. Are you sure this is your Village Data?");
-      return;
-    }
-
-    // 4. Fire up the loader and send the payload
-    document.getElementById('loaderText').innerText = `SYNCING ${parsedData.tag}...`;
-    setLoading(true);
-
-    const response = await fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify(parsedData)
-    });
-    
-    const result = await response.json();
-    setLoading(false);
-    
-    if (result.status) {
-      alert(`Deep Sync Successful! Operator ${parsedData.tag} matrix updated.`);
-    } else {
-      alert("Backend Error: " + result.error);
-    }
-
-  } catch (e) {
-    setLoading(false);
-    // If the user denies clipboard permissions, the browser throws an error here
-    alert("Permission Denied: Molly Metrics needs clipboard access to read your Village Data. Please allow clipboard permissions in your browser.");
-    console.error("Clipboard read failed:", e);
-  }
+function formatHours(hours) {
+  if (hours < 1) return '< 1h';
+  if (hours < 24) return `${Math.round(hours)}h`;
+  const d = Math.floor(hours / 24);
+  const h = Math.round(hours % 24);
+  return h > 0 ? `${d}d ${h}h` : `${d}d`;
 }
 
-  // Ensure they included the hashtag
-  if (!tag.startsWith("#")) {
-    tag = "#" + tag;
-  }
-  
-  try {
-    // This checks if what they pasted is actually valid JSON
-    const parsedData = JSON.parse(rawData);
-    
-    // Force the tag they typed into the package so the backend knows who it is
-    parsedData.tag = tag; 
-    
-    // Show the loading screen
-    document.getElementById('loaderText').innerText = "UPLOADING TO DEEP MATRIX...";
-    setLoading(true);
-    
-    // Shoot the data to your Google Apps Script
-    const response = await fetch(WEB_APP_URL, {
-      method: 'POST',
-      body: JSON.stringify(parsedData)
-    });
-    
-    const result = await response.json();
-    setLoading(false);
-    
-    if (result.status) {
-      alert("Deep Sync Successful! Your data has been merged.");
-      closeDeepSync();
-    } else {
-      alert("Backend Error: " + result.error);
-    }
-  } catch (e) {
-    setLoading(false);
-    alert("Invalid Payload! Make sure you copied the entire code block.");
-  }
+function formatRelTime(ts) {
+  if (!ts) return 'unknown';
+  const diff = Date.now() - Number(ts);
+  const min  = Math.floor(diff / 60000);
+  if (min < 60)  return `${min}m ago`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24)   return `${hr}h ago`;
+  return `${Math.floor(hr / 24)}d ago`;
+}
+
+let toastTimer = null;
+function showToast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent  = msg;
+  el.className    = `show ${type}`;
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = type; }, 3200);
 }
 </script>
 </body>
