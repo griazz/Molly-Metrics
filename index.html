@@ -883,65 +883,75 @@ h1,h2,h3,h4,p { margin: 0; }
 /* ─────────────────────────────── CONFIG ─────────────────────────────── */
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
-/* ─────────────────────────────── COC ID DICTIONARY ─────────────────────
-   Extracted from SamBro2901/coc-upgrade-optimizer (mapping.json) +
-   pghant/cocMapping.json gist. Translates Supercell internal dataIds to
-   human-readable building names automatically — no manual mapping needed.
+/* ─────────────────────────────── DYNAMIC ID ENGINE (STATSCELL) ─────────
+   Automatically fetches the latest building and trap IDs directly from 
+   Statscell's raw github repository, making the app 100% future-proof.
 ────────────────────────────────────────────────────────────────────────── */
-const COC_ID_MAP = {
-  1000097:"Crafted Defense", 1000008:"Cannon",             1000009:"Archer Tower",
-  1000013:"Mortar",          1000012:"Air Defense",         1000011:"Wizard Tower",
-  1000028:"Air Sweeper",     1000019:"Hidden Tesla",        1000032:"Bomb Tower",
-  1000021:"X-Bow",           1000027:"Inferno Tower",       1000031:"Eagle Artillery",
-  1000067:"Scattershot",     1000015:"Builder's Hut",       1000072:"Spell Tower",
-  1000077:"Monolith",        1000089:"Firespitter",         1000010:"Wall",
-  1000084:"Multi-Archer Tower", 1000085:"Ricochet Cannon",  1000079:"Multi-Gear Tower",
-  12000000:"Bomb",           12000001:"Spring Trap",        12000002:"Giant Bomb",
-  12000005:"Air Bomb",       12000006:"Seeking Air Mine",   12000008:"Skeleton Trap",
-  12000016:"Tornado Trap",   12000020:"Giga Bomb",
-  1000004:"Gold Mine",       1000002:"Elixir Collector",    1000005:"Gold Storage",
-  1000003:"Elixir Storage",  1000023:"Dark Elixir Drill",   1000024:"Dark Elixir Storage",
-  1000014:"Clan Castle",     1000000:"Army Camp",           1000006:"Barracks",
-  1000026:"Dark Barracks",   1000007:"Laboratory",          1000020:"Spell Factory",
-  1000071:"Hero Hall",       1000029:"Dark Spell Factory",  1000070:"Blacksmith",
-  1000059:"Workshop",        1000068:"Pet House",           1000001:"Town Hall",
-  28000000:"Barbarian King", 28000001:"Archer Queen",       28000006:"Minion Prince",
-  28000002:"Grand Warden",   28000004:"Royal Champion",
-  4000051:"Wall Wrecker",    4000052:"Battle Blimp",        4000062:"Stone Slammer",
-  4000075:"Siege Barracks",  4000087:"Log Launcher",        4000091:"Flame Flinger",
-  4000092:"Battle Drill",    4000135:"Troop Launcher",
-  73000000:"L.A.S.S.I",     73000001:"Electro Owl",        73000002:"Mighty Yak",
-  73000003:"Unicorn",        73000004:"Phoenix",            73000007:"Poison Lizard",
-  73000008:"Diggy",          73000009:"Frosty",             73000010:"Spirit Fox",
-  73000011:"Angry Jelly",    73000016:"Sneezy",
-  4000000:"Barbarian",       4000001:"Archer",              4000002:"Goblin",
-  4000003:"Giant",           4000004:"Wall Breaker",        4000005:"Balloon",
-  4000006:"Wizard",          4000007:"Healer",              4000008:"Dragon",
-  4000009:"P.E.K.K.A",      4000010:"Minion",              4000011:"Hog Rider",
-  4000012:"Valkyrie",        4000013:"Golem",               4000015:"Witch",
-  4000017:"Lava Hound",      4000022:"Bowler",              4000023:"Baby Dragon",
-  4000024:"Miner",           4000053:"Yeti",                4000058:"Ice Golem",
-  4000059:"Electro Dragon",  4000065:"Dragon Rider",        4000082:"Headhunter",
-  4000095:"Electro Titan",   4000097:"Apprentice Warden",   4000110:"Root Rider",
-  4000123:"Druid",           4000132:"Thrower",             4000150:"Furnace",
-  26000000:"Lightning Spell",26000001:"Healing Spell",      26000002:"Rage Spell",
-  26000003:"Jump Spell",     26000005:"Freeze Spell",       26000009:"Poison Spell",
-  26000010:"Earthquake Spell",26000011:"Haste Spell",       26000016:"Clone Spell",
-  26000017:"Skeleton Spell", 26000028:"Bat Spell",          26000035:"Invisibility Spell",
-  26000053:"Recall Spell",   26000070:"Overgrowth Spell",   26000098:"Revive Spell",
-  26000109:"Ice Block Spell"
-};
+let DYNAMIC_ID_MAP = {};
+let DYNAMIC_MAX_LEVELS = {};
 
-/* Max levels by dataId (TH16 approximations for un-maxed detection) */
-const COC_MAX_LEVELS = {
-  1000008:21, 1000009:22, 1000013:14, 1000012:14, 1000011:16,
-  1000019:14, 1000032:12, 1000021:11, 1000027:10, 1000031:6,
-  1000067:6,  1000077:3,  1000084:3,  1000085:3,  1000089:3,
-  1000079:3,  1000005:16, 1000003:16, 1000024:14, 1000004:18,
-  1000002:18, 1000023:9,  1000014:12, 1000001:16,
-  12000000:9, 12000001:6, 12000002:7, 12000005:8, 12000006:6,
-  12000008:4, 12000016:5
-};
+async function fetchStatscellDictionary() {
+  // 1. Check if we already downloaded the latest dictionary this week (7 day cache)
+  const cachedData = localStorage.getItem('molly_dict_v1');
+  const cacheTime = localStorage.getItem('molly_dict_time');
+  
+  if (cachedData && cacheTime && (Date.now() - cacheTime < 7 * 24 * 60 * 60 * 1000)) {
+    const parsed = JSON.parse(cachedData);
+    DYNAMIC_ID_MAP = parsed.idMap;
+    DYNAMIC_MAX_LEVELS = parsed.maxLevels;
+    return;
+  }
+
+  // 2. Fetch fresh data from Statscell's Output folder
+  const baseUrl = "https://raw.githubusercontent.com/Statscell/clash-of-clans-data/main/output";
+  
+  try {
+    const [buildingsRes, trapsRes] = await Promise.all([
+      fetch(`${baseUrl}/buildings.json`).then(r => r.json()),
+      fetch(`${baseUrl}/traps.json`).then(r => r.json())
+    ]);
+
+    let newIdMap = {};
+    let newMaxLevels = {};
+
+    // 3. Robust parser to extract IDs and Max Levels regardless of slight formatting changes
+    const processData = (dataArray) => {
+      const items = Array.isArray(dataArray) ? dataArray : Object.values(dataArray);
+      
+      items.forEach(item => {
+        // Statscell usually provides 'id', 'dataId', or 'data'
+        const id = item.id || item.dataId || item.data; 
+        if (!id) return;
+
+        // Extract the clean name
+        const name = item.name || item.Name || `Unknown Asset ${id}`;
+        newIdMap[id] = name;
+        
+        // Extract the maximum level for this building/trap
+        if (item.levels && Array.isArray(item.levels)) {
+          newMaxLevels[id] = item.levels.length;
+        } else if (item.maxLevel) {
+          newMaxLevels[id] = item.maxLevel;
+        } else {
+          newMaxLevels[id] = 20; // Safe fallback
+        }
+      });
+    };
+
+    processData(buildingsRes);
+    processData(trapsRes);
+
+    // 4. Save to memory and cache in browser
+    DYNAMIC_ID_MAP = newIdMap;
+    DYNAMIC_MAX_LEVELS = newMaxLevels;
+    localStorage.setItem('molly_dict_v1', JSON.stringify({ idMap: newIdMap, maxLevels: newMaxLevels }));
+    localStorage.setItem('molly_dict_time', Date.now().toString());
+
+  } catch (err) {
+    console.error("Failed to fetch Statscell dictionary:", err);
+    throw new Error("Could not reach Statscell database to sync latest game IDs.");
+  }
+}
 
 /* Upgrade time estimates in hours [indexed by level].
    Inspired by SamBro's optimizer scheduling logic for SPT/LPT queues.
@@ -1679,9 +1689,16 @@ async function clipboardSync(playerTag) {
       return;
     }
 
-    // 4. Client-side parse using COC_ID_MAP
+
+    // 4. Client-side parse using dynamic Statscell data
+    if (btn) btn.innerHTML = `<span class="sync-icon">📡</span> FETCHING LATEST GAME IDs...`;
+    
+    // --> THIS IS THE NEW LINE: Wait for the dictionary to update/load
+    await fetchStatscellDictionary(); 
+
     if (btn) btn.innerHTML = `<span class="sync-icon">⚙️</span> PARSING VILLAGE...`;
     const processed = parseVillageJson(playerTag, village);
+
 
     // 5. POST to GAS backend
     if (btn) btn.innerHTML = `<span class="sync-icon">📡</span> TRANSMITTING...`;
@@ -1721,7 +1738,7 @@ function parseVillageJson(playerTag, village) {
     const dataId  = b.data || b.data_id || b.dataId;
     const level   = b.l || b.level || b.Level || 0;
     const endTime = b.upgrade_end_time || b.upgradeEndTime || null;
-    const name    = COC_ID_MAP[dataId] || null;
+    const name = DYNAMIC_ID_MAP[dataId] || null;
 
     if (!name) return;                          // Unknown ID — skip
     if (name === 'Wall') return;                // Skip walls (they're not upgradings)
@@ -1729,7 +1746,7 @@ function parseVillageJson(playerTag, village) {
 
     totalBuildings++;
 
-    const maxLvl = COC_MAX_LEVELS[dataId];
+    const maxLvl = DYNAMIC_MAX_LEVELS[dataId];
     const isUpgrading = !!(endTime && endTime > nowSec);
 
     // Active builder detection
