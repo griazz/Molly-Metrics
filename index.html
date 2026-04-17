@@ -564,6 +564,23 @@ select { font-family: var(--font-m); font-size: 9px; color: var(--cyan); text-tr
 
 <!-- ░░ REFRESH ░░ -->
 <div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()">↺</div>
+<div class="refresh-btn" id="deepSyncBtn" onclick="openDeepSync()" style="right: 60px;">🚀</div>
+
+<div id="deepSyncModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9999; padding:20px; align-items:center; justify-content:center;">
+  <div style="background:#080a14; padding:20px; border-radius:12px; border:1px solid #00f0ff; width:100%; max-width:400px;">
+    <h3 style="color:#00f0ff; margin-bottom:10px; font-family: 'Orbitron', sans-serif;">DEEP SYNC UPLINK</h3>
+    <p style="font-size:10px; color:#64748b; margin-bottom:10px;">Paste your raw Village Data JSON below to merge your defense matrix.</p>
+    
+    <input type="text" id="playerTagInput" placeholder="Your Player Tag (e.g. #YQP0GJ9)" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #3d4a5c; background: transparent; color: white;">
+    
+    <textarea id="jsonInput" placeholder='Paste JSON here... starts with {"tag":...' style="width:100%; height:150px; background:#040508; color:#00ff9d; border:1px solid #3d4a5c; padding:10px; margin-bottom:15px; font-family: monospace; font-size: 10px;"></textarea>
+    
+    <div style="display:flex; gap:10px;">
+      <button onclick="submitDeepSync()" style="flex:1; padding:10px; background:#00f0ff; color:#000; border:none; font-weight:bold; cursor:pointer; border-radius: 6px;">UPLOAD</button>
+      <button onclick="closeDeepSync()" style="flex:1; padding:10px; background:#ff2d55; color:#fff; border:none; font-weight:bold; cursor:pointer; border-radius: 6px;">CANCEL</button>
+    </div>
+  </div>
+</div>
 
 <!-- ░░ LOADER ░░ -->
 <div class="loader-overlay" id="loaderOverlay">
@@ -1107,6 +1124,62 @@ function escHtml(str) {
   const d = document.createElement('div');
   d.appendChild(document.createTextNode(str));
   return d.innerHTML;
+}
+/* ───────────────────────────── DEEP SYNC LOGIC ───────────────────────────── */
+function openDeepSync() {
+  document.getElementById('deepSyncModal').style.display = 'flex';
+}
+
+function closeDeepSync() {
+  document.getElementById('deepSyncModal').style.display = 'none';
+  // Clear the boxes if they cancel
+  document.getElementById('jsonInput').value = '';
+}
+
+async function submitDeepSync() {
+  const rawData = document.getElementById('jsonInput').value;
+  let tag = document.getElementById('playerTagInput').value.trim();
+  
+  if (!rawData || !tag) {
+    alert("System Error: Both the Player Tag and JSON are required.");
+    return;
+  }
+
+  // Ensure they included the hashtag
+  if (!tag.startsWith("#")) {
+    tag = "#" + tag;
+  }
+  
+  try {
+    // This checks if what they pasted is actually valid JSON
+    const parsedData = JSON.parse(rawData);
+    
+    // Force the tag they typed into the package so the backend knows who it is
+    parsedData.tag = tag; 
+    
+    // Show the loading screen
+    document.getElementById('loaderText').innerText = "UPLOADING TO DEEP MATRIX...";
+    setLoading(true);
+    
+    // Shoot the data to your Google Apps Script
+    const response = await fetch(WEB_APP_URL, {
+      method: 'POST',
+      body: JSON.stringify(parsedData)
+    });
+    
+    const result = await response.json();
+    setLoading(false);
+    
+    if (result.status) {
+      alert("Deep Sync Successful! Your data has been merged.");
+      closeDeepSync();
+    } else {
+      alert("Backend Error: " + result.error);
+    }
+  } catch (e) {
+    setLoading(false);
+    alert("Invalid Payload! Make sure you copied the entire code block.");
+  }
 }
 </script>
 </body>
