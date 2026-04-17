@@ -1686,11 +1686,10 @@ async function clipboardSync(playerTag) {
   }
 }
 
-/* Parse the raw village JSON into the processed payload the backend expects */
+/* ─────────────────────────────── CORE PARSER ─────────────────────────────── */
 function parseVillageJson(playerTag, village) {
   const buildings = village.buildings || village.village_buildings || [];
-  const nowSec    = Math.floor(Date.now() / 1000);
-
+  
   let activeUpgrades   = [];
   let unmaxedBuildings = [];
   let totalBuildings   = 0;
@@ -1698,35 +1697,44 @@ function parseVillageJson(playerTag, village) {
 
   buildings.forEach(b => {
     const dataId  = b.data || b.data_id || b.dataId;
-    const level   = b.l || b.level || b.Level || 0;
-    const endTime = b.upgrade_end_time || b.upgradeEndTime || null;
-    const name = DYNAMIC_ID_MAP[dataId] || null;
+    // FIX 1: Support "lvl" from the JSON
+    const level   = b.lvl || b.l || b.level || b.Level || 0;
+    // FIX 2: Support "timer" (remaining seconds)
+    const timer   = b.timer || 0; 
+    // FIX 3: Support "cnt" (quantity of this building)
+    const count   = b.cnt || 1; 
+    
+    const name    = COC_ID_MAP[dataId] || null;
 
     if (!name) return;                          // Unknown ID — skip
-    if (name === 'Wall') return;                // Skip walls (they're not upgradings)
-    if (dataId >= 12000000 && dataId < 13000000) return; // Skip traps (no builder needed)
+    if (name === 'Wall') return;                // Skip walls
+    if (dataId >= 12000000 && dataId < 13000000) return; // Skip traps
 
-    totalBuildings++;
+    totalBuildings += count;
 
-    const maxLvl = DYNAMIC_MAX_LEVELS[dataId];
-    const isUpgrading = !!(endTime && endTime > nowSec);
+    const maxLvl = COC_MAX_LEVELS[dataId];
+    const isUpgrading = timer > 0;
 
-    // Active builder detection
+    // Active builder detection (Convert seconds to hours)
     if (isUpgrading) {
-      const remainingHours = Math.max(0, Math.round((endTime - nowSec) / 3600));
-      activeUpgrades.push({ name, level, endTime, remainingHours });
+      const remainingHours = timer / 3600;
+      // Upgrading buildings are listed individually, so we push once
+      activeUpgrades.push({ name, level, remainingHours });
     }
 
     // Un-maxed building detection
     if (maxLvl !== undefined) {
       if (level >= maxLvl) {
-        maxedBuildings++;
+        maxedBuildings += count;
       } else {
-        unmaxedBuildings.push({
-          name, level, maxLevel: maxLvl,
-          levelsRemaining: maxLvl - level,
-          isUpgrading
-        });
+        // If grouped (e.g., 7 Elixir Collectors), push them all to the queue
+        for (let i = 0; i < count; i++) {
+          unmaxedBuildings.push({
+            name, level, maxLevel: maxLvl,
+            levelsRemaining: maxLvl - level,
+            isUpgrading
+          });
+        }
       }
     }
   });
@@ -1745,32 +1753,22 @@ function parseVillageJson(playerTag, village) {
   };
 }
 
-/* POST processed village data to GAS doPost endpoint */
+/* ─────────────────────────────── TRANSMITTER ─────────────────────────────── */
 async function postDeepSync(payload) {
   try {
-    // GAS Web Apps accept POST from fetch; use no-cors as fallback if CORS preflight fails
+    // FIX 4: Use text/plain to completely bypass Google's strict CORS preflight
     const res = await fetch(WEB_APP_URL, {
       method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       body:    JSON.stringify(payload)
     });
-    if (res.ok) {
-      const data = await res.json().catch(() => ({}));
-      if (data.error) throw new Error(data.error);
-    }
-    // If no-cors, res.type === 'opaque' — we trust the GAS backend processed it
+    
+    const data = await res.json().catch(() => ({}));
+    if (data.error) throw new Error(data.error);
+    
   } catch(e) {
-    // Try no-cors fallback (silently fires, no response body readable)
-    try {
-      await fetch(WEB_APP_URL, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload)
-      });
-    } catch(e2) {
-      throw new Error('Network error — check GAS deployment settings.');
-    }
+    console.error(e);
+    throw new Error('Network timeout. Please ensure you created a NEW deployment in GAS.');
   }
 }
 
