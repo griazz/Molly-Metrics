@@ -955,11 +955,20 @@ function openSheet(index) {
   const gCls    = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
   const vel     = computeVelocity(p);
 
-  /* Build category values — gracefully parse whether they arrive as
-     numbers (75.3), strings ("75.3"), or strings with "%" ("75.3%") */
+  /* Build category values from the backend's "current/max" string format */
   const catVals = CATS.map(c => {
-    const raw = p[c.key];
-    return Math.min(100, Math.max(0, parseFloat(raw) || 0));
+    const raw = p[c.key] || "0/1";
+    const parts = raw.split('/');
+    
+    // If it's correctly formatted as "current/max"
+    if (parts.length === 2) {
+      const current = parseFloat(parts[0]) || 0;
+      const max = parseFloat(parts[1]) || 1;
+      const pct = max > 0 ? (current / max) * 100 : 0;
+      return Math.min(100, Math.max(0, pct));
+    }
+    
+    return 0; // Fallback
   });
 
   /* Category bars HTML */
@@ -969,7 +978,7 @@ function openSheet(index) {
       <div class="cat-track">
         <div class="cat-fill" style="width:${catVals[i].toFixed(1)}%; background:${c.color}; box-shadow:0 0 8px ${c.color}44;"></div>
       </div>
-      <div class="cat-val" style="color:${c.color}">${catVals[i].toFixed(0)}%</div>
+      <div class="cat-val" style="color:${c.color}">${p[c.key]} <span style="font-size:7px; color:var(--muted); margin-left:4px;">(${catVals[i].toFixed(0)}%)</span></div>
     </div>`).join('');
 
   document.getElementById('sheetBody').innerHTML = `
