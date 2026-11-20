@@ -1543,7 +1543,9 @@ function buildCocArmyLink(troopsList, spellsList) {
       const count = Math.max(1, Math.round(rawCount || 1));
       const entry = lookupStaticUnit(name);
       if (!entry || entry.id === null || entry.id === undefined || entry.id === "") return;
-      const idStr = String(entry.id);
+      // Share links use the short game-data index (e.g. 59), not the full ID (e.g. 4000059)
+      const numId = Number(entry.id);
+      const idStr = String(!isNaN(numId) && numId >= 1000000 ? numId % 1000000 : entry.id);
       byId.set(idStr, (byId.get(idStr) || 0) + count);
     });
     const parts = [];
@@ -1575,6 +1577,14 @@ function classifyUnitClient(unit) {
   const staticEntry = lookupStaticUnit(name);
   if (staticEntry && staticEntry.category) return staticEntry.category;
   return "troop";
+}
+
+// Prefer the exact share code Supercell recorded (includes heroes, pets, equipment); fall back to a rebuilt link
+function buildExactArmyLink(battle) {
+  if (battle && battle.armyCode) {
+    return `https://link.clashofclans.com/en?action=CopyArmy&army=${encodeURIComponent(battle.armyCode)}`;
+  }
+  return buildBattleArmyCopyLink(battle && battle.army);
 }
 
 function buildBattleArmyCopyLink(army) {
@@ -1831,7 +1841,8 @@ function normalizeClientBattle(b) {
     lootDark,
     opponentName: String(b.opponentName || (b.opponent && b.opponent.name) || "Unknown"),
     opponentTag: String(b.opponentTag || (b.opponent && b.opponent.tag) || ""),
-    army: Array.isArray(army) ? army : []
+    army: Array.isArray(army) ? army : [],
+    armyCode: String(b.armyCode || b.armyShareCode || "")
   };
 }
 
@@ -2119,6 +2130,66 @@ function setMetaCohort(cohort, btnEl) {
   renderMetaTab();
 }
 
+function renderCohortComparison() {
+  const top = state.globalMeta?.cohorts?.top100;
+  const clan = state.globalMeta?.cohorts?.clan;
+  const topHits = Number(top?.rankedAttacksAnalyzed || 0);
+  const clanHits = Number(clan?.rankedAttacksAnalyzed || 0);
+  if (!topHits || !clanHits) return "";
+
+  const fmtDelta = (d, suffix) => {
+    const cls = d > 0.05 ? "in" : d < -0.05 ? "out" : "amb";
+    const sign = d > 0 ? "+" : "";
+    return `<span class="mini-badge ${cls}">${sign}${d.toFixed(1)}${suffix}</span>`;
+  };
+  const metricRow = (label, clanVal, topVal, suffix) => `
+    <div class="pill-bar-row">
+      <div class="pill-bar-head">
+        <div class="pill-bar-name"><span>${label}</span></div>
+        <div class="pill-bar-metrics">
+          <span class="mono" style="font-size:11px;color:var(--text-sec);">Clan ${clanVal.toFixed(1)}${suffix} · Top 100 ${topVal.toFixed(1)}${suffix}</span>
+          ${fmtDelta(clanVal - topVal, suffix)}
+        </div>
+      </div>
+    </div>`;
+
+  // Unit usage gaps: positive = clan uses it more than Top 100
+  const usageMap = (list) => {
+    const m = {};
+    (Array.isArray(list) ? list : []).forEach(u => { if (u && u.name) m[u.name] = Number(u.usageRate || 0); });
+    return m;
+  };
+  const clanUse = usageMap([].concat(clan.topTroops || [], clan.topSpells || [], clan.topSieges || []));
+  const topUse  = usageMap([].concat(top.topTroops || [], top.topSpells || [], top.topSieges || []));
+  const names = Array.from(new Set(Object.keys(clanUse).concat(Object.keys(topUse))));
+  const gaps = names.map(n => ({ name: n, clan: clanUse[n] || 0, top: topUse[n] || 0, delta: (clanUse[n] || 0) - (topUse[n] || 0) }));
+  const underused = gaps.filter(g => g.delta < -10).sort((a, b) => a.delta - b.delta).slice(0, 4);
+  const overused  = gaps.filter(g => g.delta > 10).sort((a, b) => b.delta - a.delta).slice(0, 4);
+
+  const gapRow = (g) => `
+    <div class="pill-bar-row">
+      <div class="pill-bar-head">
+        <div class="pill-bar-name">${renderUnitIcon(g.name, 18)}<span>${escHtml(g.name)}</span></div>
+        <div class="pill-bar-metrics">
+          <span class="mono" style="font-size:11px;color:var(--text-muted);">Clan ${g.clan.toFixed(0)}% · Top 100 ${g.top.toFixed(0)}%</span>
+        </div>
+      </div>
+    </div>`;
+
+  return `
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Clan vs Top 100</div>
+        <span class="mini-badge ds">BENCHMARK</span>
+      </div>
+      ${metricRow("3★ Rate", Number(clan.avgThreeStarRate || 0), Number(top.avgThreeStarRate || 0), "%")}
+      ${metricRow("Avg Destruction", Number(clan.avgDestruction || 0), Number(top.avgDestruction || 0), "%")}
+      ${underused.length ? `<div class="ranked-group-title" style="margin-top:12px;">Top 100 use these far more than us</div>${underused.map(gapRow).join("")}` : ""}
+      ${overused.length ? `<div class="ranked-group-title" style="margin-top:12px;">We use these far more than the Top 100</div>${overused.map(gapRow).join("")}` : ""}
+      ${(!underused.length && !overused.length) ? `<div style="font-size:12px;color:var(--text-muted);padding-top:8px;">Our unit choices are within 10 points of the Top 100.</div>` : ""}
+    </div>`;
+}
+
 function renderMetaTab() {
   const activeMeta = state.globalMeta?.cohorts?.[state.metaCohort] || state.globalMeta || {};
   const isClanCohort = state.metaCohort === "clan";
@@ -2404,6 +2475,8 @@ function renderMetaTab() {
 
   contentEl.innerHTML = `
     ${kpiHtml}
+
+    ${renderCohortComparison()}
 
     <div class="panel">
       <div class="panel-head">
@@ -2793,6 +2866,53 @@ function renderRankedMetaSection(p, normalizedLogs) {
   `;
 }
 
+function renderLastArmySection(p, normalizedLogs) {
+  const attacks = (normalizedLogs || []).filter(b => b.attack && ((Array.isArray(b.army) && b.army.length) || b.armyCode));
+  const latest = attacks.find(b => b.isRanked) || attacks[0];
+  if (!latest) return "";
+
+  const army = Array.isArray(latest.army) ? latest.army : [];
+  const groups = { hero: [], pet: [], troop: [], siege: [], spell: [] };
+  army.forEach(u => {
+    if (!u || !u.name) return;
+    const cat = classifyUnitClient(u);
+    if (groups[cat]) groups[cat].push(u);
+  });
+
+  const pill = (u, cls) => `<span class="mini-badge ${cls || ""}">${renderUnitIcon(u.name, 18)}${u.count > 1 ? `${u.count}× ` : ""}${escHtml(String(u.name).replace(/\s*Spell$/i, ""))}</span>`;
+  const heroPill = (u) => {
+    const eq = Array.isArray(u.equipment) ? u.equipment : [];
+    const eqIcons = eq.map(e => renderUnitIcon(e, 14)).join("");
+    return `<span class="mini-badge purp">${renderUnitIcon(u.name, 18)}${escHtml(u.name)}${eqIcons ? ` ${eqIcons}` : ""}</span>`;
+  };
+  const row = (label, items, render) => items.length
+    ? `<div style="margin-top:8px;"><div class="hero-sublabel">${label}</div><div class="army-pills">${items.map(render).join("")}</div></div>`
+    : "";
+
+  const stars = Math.min(3, Math.max(0, Number(latest.stars) || 0));
+  const copyUrl = buildExactArmyLink(latest);
+  const resultClass = stars >= 3 ? "in" : stars === 2 ? "amb" : "out";
+
+  return `
+    <div class="sec-label">Last ${latest.isRanked ? "Ranked " : ""}Army Used</div>
+    <div class="cat-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="mini-badge ${resultClass}">${"★".repeat(stars)}${"☆".repeat(3 - stars)} ${Math.round(Number(latest.destruction) || 0)}%</span>
+          <span style="font-size:12px;color:var(--text-muted);">vs ${escHtml(latest.opponentName || "Unknown")}</span>
+        </div>
+        <span class="mono" style="font-size:11px;color:var(--text-muted);">${latest.timestamp ? escHtml(formatRelTime(latest.timestamp)) : ""}</span>
+      </div>
+      ${row("Heroes", groups.hero, heroPill)}
+      ${row("Pets", groups.pet, u => pill(u, "in"))}
+      ${row("Troops", groups.troop, u => pill(u, "ds"))}
+      ${row("Siege", groups.siege, u => pill(u, "amb"))}
+      ${row("Spells", groups.spell, u => pill(u, "purp"))}
+      ${copyUrl ? `<div style="margin-top:10px;"><a class="copy-army-btn" href="${escHtml(copyUrl)}" target="_blank" rel="noopener noreferrer">⚔️ Copy Army</a></div>` : ""}
+    </div>
+  `;
+}
+
 function renderBattleLogSection(p, normalizedLogs) {
   const logs = Array.isArray(normalizedLogs) ? normalizedLogs : [];
   if (!logs.length) {
@@ -2813,7 +2933,7 @@ function renderBattleLogSection(p, normalizedLogs) {
     const typeLabel = formatBattleType(b.battleType);
     const ago = b.timestamp ? formatRelTime(b.timestamp) : "";
     const army = Array.isArray(b.army) ? b.army : [];
-    const copyUrl = isAtk ? buildBattleArmyCopyLink(army) : "";
+    const copyUrl = isAtk ? buildExactArmyLink(b) : "";
 
     const armyDetailsHtml = army.length
       ? `
@@ -2903,6 +3023,7 @@ function renderDrawerContent(p) {
   const metaUpgradesHtml = renderMetaUpgradesSection(p);
   const clockProfile     = computeHourlyAttackProfile(p, normalizedLogs);
   const clockHtml        = renderAttackClockSection(clockProfile);
+  const lastArmyHtml     = renderLastArmySection(p, normalizedLogs);
   const rankedMetaHtml   = renderRankedMetaSection(p, normalizedLogs);
   const battleLogHtml    = renderBattleLogSection(p, normalizedLogs);
 
@@ -2930,6 +3051,8 @@ function renderDrawerContent(p) {
     </div>
 
     ${clockHtml}
+
+    ${lastArmyHtml}
 
     ${rankedMetaHtml}
 
