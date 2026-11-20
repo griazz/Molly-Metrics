@@ -163,12 +163,9 @@
     ============================================================ */
     .kpi-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
       margin-bottom: 16px;
-    }
-    @media (max-width: 520px) {
-      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     }
     .kpi-card {
       background: var(--bg-card);
@@ -305,23 +302,6 @@
       margin-top: 2px;
       text-transform: capitalize;
     }
-    .grade-pill {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      font-weight: 800;
-      min-width: 28px;
-      height: 28px;
-      border-radius: 8px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .grade-S { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber); }
-    .grade-A { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); }
-    .grade-B { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
-    .grade-C { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple); }
-    .grade-D { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
 
     .badge-row {
       display: flex;
@@ -339,7 +319,6 @@
     }
     .mini-badge.in  { background: var(--green-bg); color: var(--green); }
     .mini-badge.out { background: var(--bg-subtle); color: var(--text-muted); }
-    .mini-badge.rush{ background: var(--red-bg); color: var(--red); }
     .mini-badge.ds  { background: var(--accent-bg); color: var(--accent); }
 
     .prog-block {
@@ -356,11 +335,6 @@
     .prog-pct {
       font-family: 'JetBrains Mono', monospace;
       font-size: 16px;
-      font-weight: 700;
-    }
-    .prog-vel {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
       font-weight: 700;
     }
     .bar-track {
@@ -763,12 +737,7 @@
       <div class="kpi-card">
         <div class="kpi-label">Active Roster</div>
         <div class="kpi-val" id="kpiMembers">–</div>
-        <div class="kpi-sub" id="kpiWarIn">– opted IN</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">30D Velocity</div>
-        <div class="kpi-val" id="kpiVelocity" style="color:var(--green);">+0.00%</div>
-        <div class="kpi-sub">Avg active gain</div>
+        <div class="kpi-sub">Clan members</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Deep Synced</div>
@@ -784,14 +753,10 @@
           <option value="comp">Sort: Overall %</option>
           <option value="war">Sort: War Score</option>
           <option value="heroes">Sort: Heroes %</option>
-          <option value="vel">Sort: 30D Velocity</option>
         </select>
       </div>
       <div class="chip-row" id="filterChips">
         <button class="chip active" data-filter="all" onclick="setFilter('all', this)">All Members</button>
-        <button class="chip" data-filter="warIn" onclick="setFilter('warIn', this)">⚔️ War IN</button>
-        <button class="chip" data-filter="th19" onclick="setFilter('th19', this)">🏛️ TH19</button>
-        <button class="chip" data-filter="rushed" onclick="setFilter('rushed', this)">⚠️ Rushed</button>
         <button class="chip" data-filter="deep" onclick="setFilter('deep', this)">◈ Deep Synced</button>
       </div>
     </div>
@@ -1172,27 +1137,11 @@ function renderHeader() {
 function renderKpis() {
   const list = state.players;
   const count = list.length;
-  if (!count) {
-    document.getElementById("kpiAvg").textContent = "0%";
-    document.getElementById("kpiMembers").textContent = "0";
-    document.getElementById("kpiWarIn").textContent = "0 opted IN";
-    document.getElementById("kpiVelocity").textContent = "+0.00%";
-    document.getElementById("kpiDeep").textContent = "0";
-    return;
-  }
-
-  const avgPct = list.reduce((s, p) => s + (parseFloat(p.percentage) || 0), 0) / count;
-  const warIn  = list.filter(p => String(p.warPreference).toLowerCase() === "in").length;
-  const gainers = list.filter(p => (parseFloat(p.progression30d) || 0) > 0);
-  const avgVel = gainers.length
-    ? gainers.reduce((s, p) => s + parseFloat(p.progression30d), 0) / gainers.length
-    : 0;
+  const avgPct = count ? list.reduce((s, p) => s + (parseFloat(p.percentage) || 0), 0) / count : 0;
   const deepCount = list.filter(p => p.hasDeepSync).length;
 
   document.getElementById("kpiAvg").textContent = `${avgPct.toFixed(1)}%`;
   document.getElementById("kpiMembers").textContent = `${count}/50`;
-  document.getElementById("kpiWarIn").textContent = `${warIn} opted IN`;
-  document.getElementById("kpiVelocity").textContent = `${avgVel >= 0 ? "+" : ""}${avgVel.toFixed(2)}%`;
   document.getElementById("kpiDeep").textContent = `${deepCount}/${count}`;
 }
 
@@ -1219,9 +1168,6 @@ function applyFilters() {
   let filtered = state.players.filter(p => {
     const matchText = !q || p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q);
     if (!matchText) return false;
-    if (state.filter === "warIn")  return String(p.warPreference).toLowerCase() === "in";
-    if (state.filter === "th19")   return Number(p.thLevel) === 19;
-    if (state.filter === "rushed") return Boolean(p.isRushed);
     if (state.filter === "deep")   return Boolean(p.hasDeepSync);
     return true;
   });
@@ -1230,7 +1176,6 @@ function applyFilters() {
     if (sortBy === "comp")   return (parseFloat(b.percentage) || 0) - (parseFloat(a.percentage) || 0);
     if (sortBy === "war")    return (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0);
     if (sortBy === "heroes") return parsePct(b.heroes) - parsePct(a.heroes);
-    if (sortBy === "vel")    return (parseFloat(b.progression30d) || 0) - (parseFloat(a.progression30d) || 0);
     return 0;
   });
 
@@ -1257,8 +1202,6 @@ function renderRosterGrid(players) {
 
   grid.innerHTML = players.map(p => {
     const pct = Math.min(100, Math.max(0, parseFloat(p.percentage) || 0));
-    const vel = parseFloat(p.progression30d) || 0;
-    const isWarIn = String(p.warPreference).toLowerCase() === "in";
     const barColor = pct >= 85 ? "var(--green)" : pct >= 60 ? "var(--accent)" : "var(--amber)";
     const roleLabel = p.role === "coLeader" ? "Co-Leader" : p.role === "admin" ? "Elder" : p.role;
 
@@ -1269,22 +1212,16 @@ function renderRosterGrid(players) {
             <div class="player-name">${escHtml(p.name)}</div>
             <div class="player-role">${escHtml(roleLabel)} · ${escHtml(p.tag)}</div>
           </div>
-          <span class="grade-pill grade-${escHtml(p.grade || "C")}">${escHtml(p.grade || "C")}</span>
         </div>
 
         <div class="badge-row">
           <span class="mini-badge">TH${p.thLevel}</span>
-          <span class="mini-badge ${isWarIn ? "in" : "out"}">${isWarIn ? "WAR IN" : "OUT"}</span>
-          ${p.isRushed ? `<span class="mini-badge rush">RUSHED</span>` : ""}
           ${p.hasDeepSync ? `<span class="mini-badge ds">◈ SYNCED</span>` : ""}
         </div>
 
         <div class="prog-block">
           <div class="prog-head">
             <span class="prog-pct">${pct.toFixed(1)}%</span>
-            <span class="prog-vel" style="color:${vel > 0 ? "var(--green)" : "var(--text-muted)"};">
-              ${vel > 0 ? "+" + vel.toFixed(2) + "%" : "0.00%"} (30d)
-            </span>
           </div>
           <div class="bar-track">
             <div class="bar-fill" style="width:${pct}%;background:${barColor};"></div>
@@ -1293,7 +1230,6 @@ function renderRosterGrid(players) {
 
         <div class="card-foot mono">
           <span>Heroes ${Math.round(parsePct(p.heroes))}%</span>
-          <span>Wins ${Number(p.attackWins || 0).toLocaleString()}</span>
         </div>
       </article>
     `;
@@ -1336,7 +1272,7 @@ function openDrawer(tag) {
 
   state.activeDrawerTag = tag;
   document.getElementById("drawerPlayerName").textContent = player.name;
-  document.getElementById("drawerPlayerSub").textContent = `${player.tag} · TH${player.thLevel} · Grade ${player.grade} · War Score ${player.warScore}`;
+  document.getElementById("drawerPlayerSub").textContent = `${player.tag} · TH${player.thLevel} · War Score ${player.warScore}`;
   renderDrawerContent(player);
 
   document.getElementById("drawerBackdrop").classList.add("open");
@@ -1475,14 +1411,6 @@ function renderDrawerContent(p) {
       <div class="stat-pill">
         <div class="kpi-label">Trophies</div>
         <div class="mono" style="font-size:16px;font-weight:700;">${Number(p.trophies || 0).toLocaleString()}</div>
-      </div>
-      <div class="stat-pill">
-        <div class="kpi-label">Attack Wins</div>
-        <div class="mono" style="font-size:16px;font-weight:700;">${Number(p.attackWins || 0).toLocaleString()}</div>
-      </div>
-      <div class="stat-pill">
-        <div class="kpi-label">30D Gain</div>
-        <div class="mono" style="font-size:16px;font-weight:700;color:var(--green);">+${parseFloat(p.progression30d || 0).toFixed(2)}%</div>
       </div>
     </div>
 
