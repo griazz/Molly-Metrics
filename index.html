@@ -865,7 +865,7 @@
       max-width: 780px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       height: 64px;
     }
     .nav-item {
@@ -1070,7 +1070,7 @@
 </div>
 
 <!-- ============================================================
-     BOTTOM NAVIGATION (3 COLUMNS)
+     BOTTOM NAVIGATION (4 COLUMNS)
 ============================================================ -->
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
@@ -1082,6 +1082,9 @@
     </button>
     <button class="nav-item" data-tab="deepsync" onclick="switchTab('deepsync', this)">
       <span class="nav-ico">🔧</span>Deep Sync
+    </button>
+    <button class="nav-item" onclick="window.location.href='bases.html'">
+      <span class="nav-ico">🏰</span>Bases
     </button>
   </div>
 </nav>
@@ -1326,6 +1329,9 @@ window.addEventListener("DOMContentLoaded", () => {
   applyTheme(savedTheme);
   initDrawerSwipe();
   loadDashboard();
+  const initialHash = window.location.hash.replace("#", "");
+if (initialHash === "activity" || initialHash === "deepsync") {
+  switchTab(initialHash, document.querySelector(`.nav-item[data-tab="${initialHash}"]`));
 });
 
 document.addEventListener("keydown", (e) => {
