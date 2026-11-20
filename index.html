@@ -5,7 +5,7 @@
   <base target="_top" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" id="metaThemeColor" />
-  <title>Molly Metrics V11 — TH19 Clan Command & Global Meta</title>
+  <title>Molly Metrics V12 — TH19 Clan Command & Global Meta</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -87,6 +87,37 @@
       margin: 0 auto;
       padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(92px + env(safe-area-inset-bottom, 0px));
     }
+
+    /* ============================================================
+       UNIT ICONS & COPY ARMY BUTTON
+    ============================================================ */
+    .unit-icon {
+      display: inline-block;
+      object-fit: contain;
+      vertical-align: middle;
+      flex-shrink: 0;
+      border-radius: 4px;
+    }
+
+    .copy-army-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--green);
+      background: var(--green-bg);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: transform 0.12s ease, background-color 0.15s ease;
+    }
+    .copy-army-btn:active { transform: scale(0.96); }
+    .copy-army-btn:hover { background: var(--green); color: #062118; }
 
     /* ============================================================
        TOP HEADER BAR
@@ -250,6 +281,7 @@
       gap: 6px;
       overflow-x: auto;
       padding-bottom: 2px;
+      flex-wrap: wrap;
     }
     .chip {
       padding: 6px 11px;
@@ -261,6 +293,7 @@
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
+      transition: background-color 0.15s, border-color 0.15s, color 0.15s;
     }
     .chip.active {
       background: var(--accent-bg);
@@ -326,6 +359,9 @@
       border-radius: 5px;
       background: var(--bg-subtle);
       color: var(--text-sec);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .mini-badge.in  { background: var(--green-bg); color: var(--green); }
     .mini-badge.out { background: var(--bg-subtle); color: var(--text-muted); }
@@ -413,6 +449,14 @@
     /* ============================================================
        GLOBAL RANKED META TAB
     ============================================================ */
+    .meta-cohort-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
     .meta-header-bar {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -492,6 +536,7 @@
       font-size: 11px;
       padding-top: 6px;
       border-top: 1px solid var(--border);
+      flex-wrap: wrap;
     }
 
     .hero-meta-grid {
@@ -557,6 +602,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
     }
     .equip-pair-pct {
       font-family: 'JetBrains Mono', monospace;
@@ -587,7 +635,6 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
-      max-width: 100%;
     }
     .upgrade-row {
       background: var(--bg-input);
@@ -598,8 +645,6 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      min-width: 0;
-      max-width: 100%;
     }
     .upgrade-left {
       min-width: 0;
@@ -751,8 +796,6 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
-      max-width: 100%;
-      overflow: hidden;
     }
     .clock-header {
       display: flex;
@@ -764,7 +807,6 @@
     }
     .clock-canvas-wrap {
       position: relative;
-      width: 100%;
       height: 255px;
       max-width: 310px;
       margin: 0 auto;
@@ -782,8 +824,6 @@
 
     .pill-bar-row {
       margin-bottom: 9px;
-      min-width: 0;
-      max-width: 100%;
     }
     .pill-bar-row:last-child { margin-bottom: 0; }
     .pill-bar-head {
@@ -793,7 +833,6 @@
       gap: 8px;
       margin-bottom: 4px;
       font-size: 12px;
-      min-width: 0;
     }
     .pill-bar-name {
       font-weight: 700;
@@ -825,14 +864,9 @@
     }
     .ranked-stat-grid {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-top: 12px;
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-    .ranked-stat-grid > * {
-      min-width: 0;
     }
 
     /* ============================================================
@@ -844,8 +878,6 @@
       border-radius: 12px;
       padding: 11px 12px;
       margin-bottom: 8px;
-      max-width: 100%;
-      overflow: hidden;
     }
     .battle-card:last-child { margin-bottom: 0; }
     .battle-top {
@@ -854,7 +886,6 @@
       justify-content: space-between;
       gap: 8px;
       margin-bottom: 6px;
-      min-width: 0;
     }
     .battle-mid {
       display: flex;
@@ -868,10 +899,19 @@
       letter-spacing: 1px;
       color: var(--amber);
     }
-    .army-details {
+    .battle-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
       margin-top: 8px;
       padding-top: 7px;
       border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .army-details {
+      flex: 1;
+      min-width: 160px;
     }
     .army-details summary {
       font-size: 11px;
@@ -910,8 +950,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      width: 100%;
-      max-width: min(780px, 100%);
+      max-width: 780px;
       margin: 0 auto;
       height: 92dvh;
       max-height: 92dvh;
@@ -921,7 +960,6 @@
       z-index: 1100;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
       box-shadow: 0 -12px 40px rgba(2, 6, 23, 0.6);
@@ -939,8 +977,6 @@
       border-radius: 22px 22px 0 0;
       padding: 10px 20px 14px 20px;
       flex-shrink: 0;
-      max-width: 100%;
-      overflow-x: hidden;
       touch-action: pan-y;
     }
     .drag-pill {
@@ -955,7 +991,6 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      min-width: 0;
     }
     .drawer-close-btn {
       min-width: 96px;
@@ -983,10 +1018,7 @@
 
     .drawer-scroll {
       flex: 1;
-      width: 100%;
-      max-width: 100%;
       overflow-y: auto;
-      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       padding: 18px 20px calc(32px + env(safe-area-inset-bottom, 0px));
     }
@@ -1005,46 +1037,32 @@
 
     .cat-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      max-width: 100%;
-      overflow-x: hidden;
     }
     @media (min-width: 540px) {
-      .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    }
-    .cat-grid > * {
-      min-width: 0;
+      .cat-grid { grid-template-columns: repeat(3, 1fr); }
     }
     .cat-box {
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 10px 12px;
-      min-width: 0;
-      max-width: 100%;
     }
 
     .stat-pills {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
-      max-width: 100%;
-      overflow-x: hidden;
     }
     @media (min-width: 540px) {
-      .stat-pills { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    }
-    .stat-pills > * {
-      min-width: 0;
+      .stat-pills { grid-template-columns: repeat(4, 1fr); }
     }
     .stat-pill {
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px;
-      min-width: 0;
-      max-width: 100%;
     }
 
     .btn-sync-primary {
@@ -1060,6 +1078,23 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
+    }
+
+    /* ============================================================
+       FOOTER CREDIT
+    ============================================================ */
+    .app-footer {
+      margin-top: 24px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .app-footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
     }
 
     /* ============================================================
@@ -1260,6 +1295,11 @@
         <button class="chip" data-tf="7d" onclick="setActivityTimeframe('7d', this)">Last 7 Days</button>
         <button class="chip" data-tf="30d" onclick="setActivityTimeframe('30d', this)">Last 30 Days</button>
       </div>
+      <div class="chip-row" id="activityModeChips">
+        <button class="chip active" data-mode="all" onclick="setActivityMode('all', this)">All Attacks</button>
+        <button class="chip" data-mode="ranked" onclick="setActivityMode('ranked', this)">🏆 Ranked</button>
+        <button class="chip" data-mode="standard" onclick="setActivityMode('standard', this)">⚔️ Standard</button>
+      </div>
       <div class="toolbar-top">
         <select id="activitySortSelect" class="sort-select" style="width:100%;" onchange="setActivitySort(this.value)">
           <option value="combinedLoot">Rank by: Most Total Loot</option>
@@ -1274,8 +1314,8 @@
 
     <div class="panel" style="padding:10px 12px;">
       <div class="panel-head" style="padding:4px 6px 8px 6px;margin-bottom:4px;border-bottom:1px solid var(--border);">
-        <div class="panel-title">Activity & Loot Leaderboard</div>
-        <span class="mini-badge ds" id="lbTimeBadge">24H</span>
+        <div class="panel-title">Activity &amp; Loot Leaderboard</div>
+        <span class="mini-badge ds" id="lbTimeBadge">24H · ALL</span>
       </div>
       <div id="activityLeaderboard">
         <div style="text-align:center;padding:24px 12px;color:var(--text-muted);font-size:13px;">
@@ -1286,29 +1326,40 @@
   </section>
 
   <!-- ============================================================
-       TAB 3: TOP 100 GLOBAL RANKED META
+       TAB 3: TOP 100 GLOBAL & CLAN RANKED META
   ============================================================ -->
   <section id="tab-meta" class="tab-pane">
-    <div class="meta-header-bar">
-      <div class="meta-header-info">
-        <div class="meta-header-title">
-          <span>🌐 Top 100 Global Ranked Meta</span>
-          <span class="th19-pill" id="metaTargetThBadge">TH19</span>
-        </div>
-        <div class="meta-header-sub" id="metaSyncSub">Awaiting Global Meta snapshot...</div>
-        <div class="meta-source-note">Troops, Spells, Sieges &amp; Pets are tracked from live Ranked Battle Logs; Equipment is tracked from active Hero loadouts.</div>
+    <div class="meta-cohort-bar">
+      <div class="chip-row" id="metaCohortChips">
+        <button class="chip active" data-cohort="top100" onclick="setMetaCohort('top100', this)">🏆 Top 100 Global</button>
+        <button class="chip" data-cohort="clan" onclick="setMetaCohort('clan', this)">🛡️ Our Clan Ranked</button>
       </div>
       <button class="action-btn" id="refreshMetaBtn" onclick="refreshGlobalMeta()">
         <span class="spin-ico">↻</span> Refresh Meta
       </button>
     </div>
 
+    <div class="meta-header-bar">
+      <div class="meta-header-info">
+        <div class="meta-header-title">
+          <span id="metaTitleText">🌐 Top 100 Global Ranked Meta</span>
+          <span class="th19-pill" id="metaTargetThBadge">TH19</span>
+        </div>
+        <div class="meta-header-sub" id="metaSyncSub">Awaiting Global Meta snapshot...</div>
+        <div class="meta-source-note">Troops, Spells, Sieges &amp; Pets are tracked from live Ranked Battle Logs; Equipment is tracked from active Hero loadouts.</div>
+      </div>
+    </div>
+
     <div id="metaContent">
       <div class="panel" style="text-align:center;padding:24px 16px;color:var(--text-muted);font-size:13px;">
-        Loading Top 100 Global Ranked Meta...
+        Loading Ranked Meta...
       </div>
     </div>
   </section>
+
+  <footer class="app-footer">
+    Stats &amp; assets powered by Supercell API &amp; <a href="https://clashk.ing" target="_blank" rel="noopener noreferrer">ClashKing (clashk.ing)</a>
+  </footer>
 </div>
 
 <!-- ============================================================
@@ -1366,7 +1417,7 @@
     <input type="url" id="apiUrlInput" class="search-input" style="width:100%;margin:12px 0;" placeholder="https://script.google.com/macros/s/.../exec" />
     <div style="display:flex;gap:8px;justify-content:flex-end;">
       <button class="action-btn" onclick="resetApiUrl()">Reset Default</button>
-      <button class="btn-sync-primary" style="padding:0 18px;" onclick="saveApiUrl()">Save & Reload</button>
+      <button class="btn-sync-primary" style="padding:0 18px;" onclick="saveApiUrl()">Save &amp; Reload</button>
     </div>
   </div>
 </div>
@@ -1389,6 +1440,19 @@ const HERO_ORDER = [
   "Dragon Duke"
 ];
 
+const PET_NAMES_SET = new Set([
+  "l.a.s.s.i", "electro owl", "mighty yak", "unicorn", "frosty",
+  "diggy", "poison lizard", "phoenix", "spirit fox", "angry jelly",
+  "sneezy", "greedy raven"
+]);
+
+const SIEGE_NAMES_SET = new Set([
+  "wall wrecker", "battle blimp", "stone slammer", "siege barracks",
+  "log launcher", "flame flinger", "battle drill", "troop launcher"
+]);
+
+const HERO_NAMES_SET = new Set(HERO_ORDER.map(h => h.toLowerCase()));
+
 function getWebAppUrl() {
   return localStorage.getItem("molly_web_app_url") || DEFAULT_WEB_APP_URL;
 }
@@ -1400,14 +1464,119 @@ let state = {
   clanMeta: {},
   players: [],
   globalMeta: null,
+  staticDataMap: {},
+  staticDataLower: {},
   lastSyncTs: 0,
   activeDrawerTag: null,
   activityTimeframe: "24h",
-  activitySort: "combinedLoot"
+  activityMode: "all",
+  activitySort: "combinedLoot",
+  metaCohort: "top100"
 };
 
 let radarChart = null;
+let trendChart = null;
 let attackClockChart = null;
+
+/* ============================================================
+   STATIC GAME DATA HELPERS (ICONS + ONE-TAP COPY ARMY LINKS)
+============================================================ */
+function setStaticDataMap(rawMap) {
+  state.staticDataMap = (rawMap && typeof rawMap === "object") ? rawMap : {};
+  const lowerIdx = {};
+  Object.keys(state.staticDataMap).forEach(name => {
+    const entry = state.staticDataMap[name];
+    if (!entry) return;
+    const key = String(name).trim().toLowerCase();
+    lowerIdx[key] = entry;
+    // Also index spell names without trailing " Spell" for flexible matching
+    if (key.endsWith(" spell")) {
+      const shortKey = key.replace(/\s+spell$/, "");
+      if (!lowerIdx[shortKey]) lowerIdx[shortKey] = entry;
+    }
+  });
+  state.staticDataLower = lowerIdx;
+}
+
+function lookupStaticUnit(unitName) {
+  if (!unitName) return null;
+  const trimmed = String(unitName).trim();
+  if (!trimmed) return null;
+  if (state.staticDataMap[trimmed]) return state.staticDataMap[trimmed];
+  const lower = trimmed.toLowerCase();
+  if (state.staticDataLower[lower]) return state.staticDataLower[lower];
+  if (state.staticDataLower[lower + " spell"]) return state.staticDataLower[lower + " spell"];
+  return null;
+}
+
+function renderUnitIcon(unitName, size = 24) {
+  const entry = lookupStaticUnit(unitName);
+  if (!entry || !entry.iconUrl) return "";
+  const px = Math.max(12, Number(size) || 24);
+  return `<img class="unit-icon" src="${escHtml(entry.iconUrl)}" alt="${escHtml(unitName)}" width="${px}" height="${px}" style="width:${px}px;height:${px}px;" loading="lazy" onerror="this.style.display='none'" />`;
+}
+
+function buildCocArmyLink(troopsList, spellsList) {
+  const toEncodedPairs = (list) => {
+    if (!Array.isArray(list) || !list.length) return [];
+    const byId = new Map();
+    list.forEach(item => {
+      if (!item) return;
+      const name = typeof item === "string" ? item : item.name;
+      const rawCount = typeof item === "object" && item.count !== undefined ? Number(item.count) : 1;
+      const count = Math.max(1, Math.round(rawCount || 1));
+      const entry = lookupStaticUnit(name);
+      if (!entry || entry.id === null || entry.id === undefined || entry.id === "") return;
+      const idStr = String(entry.id);
+      byId.set(idStr, (byId.get(idStr) || 0) + count);
+    });
+    const parts = [];
+    byId.forEach((cnt, idStr) => {
+      parts.push(`${cnt}x${idStr}`);
+    });
+    return parts;
+  };
+
+  const troopParts = toEncodedPairs(troopsList);
+  const spellParts = toEncodedPairs(spellsList);
+  if (!troopParts.length && !spellParts.length) return "";
+
+  let armyParam = "";
+  if (troopParts.length) armyParam += "u" + troopParts.join("-");
+  if (spellParts.length) armyParam += "s" + spellParts.join("-");
+  return `https://link.clashofclans.com/en?action=CopyArmy&army=${encodeURIComponent(armyParam)}`;
+}
+
+function classifyUnitClient(unit) {
+  const name = String((unit && unit.name) || "").trim();
+  const lower = name.toLowerCase();
+  const rawType = String((unit && unit.type) || "").toLowerCase();
+  if (rawType === "equipment" || rawType === "heroequipment") return "equipment";
+  if (rawType === "hero" || HERO_NAMES_SET.has(lower)) return "hero";
+  if (rawType === "pet" || PET_NAMES_SET.has(lower)) return "pet";
+  if (rawType === "siege" || SIEGE_NAMES_SET.has(lower)) return "siege";
+  if (rawType === "spell" || lower.includes("spell")) return "spell";
+  const staticEntry = lookupStaticUnit(name);
+  if (staticEntry && staticEntry.category) return staticEntry.category;
+  return "troop";
+}
+
+function buildBattleArmyCopyLink(army) {
+  if (!Array.isArray(army) || !army.length) return "";
+  const troops = [];
+  const spells = [];
+  army.forEach(u => {
+    if (!u || !u.name) return;
+    const cat = classifyUnitClient(u);
+    const cnt = Math.max(1, Math.round(Number(u.count || 1) || 1));
+    if (cat === "troop" || cat === "siege") {
+      troops.push({ name: u.name, count: cnt });
+    } else if (cat === "spell") {
+      spells.push({ name: u.name, count: cnt });
+    }
+  });
+  return buildCocArmyLink(troops, spells);
+}
 
 /* ============================================================
    INITIALIZATION & THEME
@@ -1467,6 +1636,7 @@ async function loadDashboard() {
     state.players    = Array.isArray(data.players) ? data.players : [];
     state.globalMeta = data.globalMeta || null;
     state.lastSyncTs = data.lastSyncTs || 0;
+    setStaticDataMap(data.staticDataMap || {});
 
     renderHeader();
     renderKpis();
@@ -1521,7 +1691,9 @@ async function refreshGlobalMeta() {
       showToast("Meta sync error: " + out.error);
     } else {
       state.globalMeta = out.globalMeta || null;
-      const analyzed = state.globalMeta?.rankedAttacksAnalyzed || 0;
+      const analyzed = state.globalMeta?.cohorts?.top100?.rankedAttacksAnalyzed
+        || state.globalMeta?.rankedAttacksAnalyzed
+        || 0;
       showToast(`Global Meta updated (${analyzed.toLocaleString()} Ranked attacks analyzed)!`);
       await loadDashboard();
     }
@@ -1567,6 +1739,88 @@ function renderKpis() {
 
   document.getElementById("kpiAvg").textContent = `${avgPct.toFixed(1)}%`;
   document.getElementById("kpiMembers").textContent = `${count}/50`;
+}
+
+/* ============================================================
+   BATTLE NORMALIZATION HELPERS (LEGACY + CLASHKING + NEW SCHEMA)
+============================================================ */
+function parseBattleTimeMs(raw) {
+  if (raw === undefined || raw === null || raw === "") return 0;
+  if (typeof raw === "number") {
+    if (isNaN(raw) || raw <= 0) return 0;
+    return raw < 1e12 ? raw * 1000 : raw;
+  }
+  const s = String(raw).trim();
+  if (!s) return 0;
+  if (/^\d{10,13}$/.test(s)) {
+    const n = Number(s);
+    return n < 1e12 ? n * 1000 : n;
+  }
+  const scMatch = s.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(?:\.(\d+))?Z?$/i);
+  if (scMatch) {
+    const ms = scMatch[7] ? parseInt(scMatch[7].slice(0, 3).padEnd(3, "0"), 10) : 0;
+    return Date.UTC(
+      parseInt(scMatch[1], 10),
+      parseInt(scMatch[2], 10) - 1,
+      parseInt(scMatch[3], 10),
+      parseInt(scMatch[4], 10),
+      parseInt(scMatch[5], 10),
+      parseInt(scMatch[6], 10),
+      ms
+    ) || 0;
+  }
+  let iso = s;
+  if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?$/.test(iso)) {
+    iso = iso.replace(" ", "T") + "Z";
+  }
+  const parsed = Date.parse(iso);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+function normalizeClientBattle(b) {
+  if (!b || typeof b !== "object") return null;
+  const ts = parseBattleTimeMs(b.timestamp) || parseBattleTimeMs(b.battleTime || b.time);
+  const attack = b.attack !== undefined ? Boolean(b.attack) : (b.isAttack !== undefined ? Boolean(b.isAttack) : true);
+  const battleType = String(b.battleType || b.battleMode || b.type || "standard");
+  const isRanked = b.isRanked !== undefined ? Boolean(b.isRanked) : /ranked|legend/i.test(battleType);
+  const stars = Number(b.stars || 0) || 0;
+  const destruction = Number(
+    b.destruction !== undefined ? b.destruction : (b.destructionPercentage || 0)
+  ) || 0;
+
+  const lr = (b.lootedResources && typeof b.lootedResources === "object") ? b.lootedResources : {};
+  const lootGold   = Number(b.lootGold !== undefined ? b.lootGold : (lr.gold || b.gold || 0)) || 0;
+  const lootElixir = Number(b.lootElixir !== undefined ? b.lootElixir : (lr.elixir || b.elixir || 0)) || 0;
+  const lootDark   = Number(b.lootDark !== undefined ? b.lootDark : (lr.darkElixir || b.darkElixir || 0)) || 0;
+
+  let army = Array.isArray(b.army) ? b.army : [];
+  if (!army.length && typeof b.armyJSON === "string") {
+    try { army = JSON.parse(b.armyJSON); } catch (e) { army = []; }
+  }
+
+  return {
+    timestamp: ts,
+    battleTime: b.battleTime || (ts ? new Date(ts).toISOString() : ""),
+    attack,
+    battleType,
+    isRanked,
+    stars,
+    destruction,
+    lootGold,
+    lootElixir,
+    lootDark,
+    opponentName: String(b.opponentName || (b.opponent && b.opponent.name) || "Unknown"),
+    opponentTag: String(b.opponentTag || (b.opponent && b.opponent.tag) || ""),
+    army: Array.isArray(army) ? army : []
+  };
+}
+
+function getNormalizedPlayerBattleLog(player) {
+  const raw = Array.isArray(player?.battleLog) ? player.battleLog : [];
+  return raw
+    .map(normalizeClientBattle)
+    .filter(Boolean)
+    .sort((a, b) => b.timestamp - a.timestamp);
 }
 
 /* ============================================================
@@ -1652,18 +1906,86 @@ function renderRosterGrid(players) {
 /* ============================================================
    ACTIVITY & LOOT LEADERBOARD TAB
 ============================================================ */
-function getPlayerTfStats(player, tf) {
+function getPlayerTfStats(player, tf, mode) {
   const empty = {
     attackCount: 0, totalStars: 0, avgDestruction: 0,
     lootGold: 0, lootElixir: 0, lootDark: 0, combinedLoot: 0
   };
-  if (!player || !player.battleStats || !player.battleStats[tf]) return empty;
-  return player.battleStats[tf];
+  if (!player) return empty;
+
+  // 1. Prefer new activityStats[tf][mode] structure
+  const actWin = player.activityStats && player.activityStats[tf];
+  if (actWin && typeof actWin === "object") {
+    const bucket = actWin[mode] || (mode === "all" ? actWin.all : null);
+    if (bucket && typeof bucket === "object") {
+      return {
+        attackCount:    Number(bucket.attackCount || 0) || 0,
+        totalStars:     Number(bucket.totalStars || 0) || 0,
+        avgDestruction: Number(bucket.avgDestruction || 0) || 0,
+        lootGold:       Number(bucket.lootGold || 0) || 0,
+        lootElixir:     Number(bucket.lootElixir || 0) || 0,
+        lootDark:       Number(bucket.lootDark || 0) || 0,
+        combinedLoot:   Number(bucket.combinedLoot || 0) || 0
+      };
+    }
+  }
+
+  // 2. Legacy battleStats[tf] fallback for "all" mode
+  if (mode === "all" && player.battleStats && player.battleStats[tf]) {
+    const b = player.battleStats[tf];
+    return {
+      attackCount:    Number(b.attackCount || 0) || 0,
+      totalStars:     Number(b.totalStars || 0) || 0,
+      avgDestruction: Number(b.avgDestruction || 0) || 0,
+      lootGold:       Number(b.lootGold || 0) || 0,
+      lootElixir:     Number(b.lootElixir || 0) || 0,
+      lootDark:       Number(b.lootDark || 0) || 0,
+      combinedLoot:   Number(b.combinedLoot || 0) || 0
+    };
+  }
+
+  // 3. Defensive client-side fallback from player.battleLog if stats weren't pre-aggregated
+  const logs = getNormalizedPlayerBattleLog(player);
+  if (!logs.length) return empty;
+
+  const now = Date.now();
+  const windowMs = tf === "24h" ? 24 * 3600 * 1000 : tf === "7d" ? 7 * 24 * 3600 * 1000 : 30 * 24 * 3600 * 1000;
+  const cutoff = now - windowMs;
+
+  let attackCount = 0, totalStars = 0, destSum = 0, lootGold = 0, lootElixir = 0, lootDark = 0;
+  logs.forEach(b => {
+    if (!b.attack || !b.timestamp || b.timestamp < cutoff) return;
+    if (mode === "ranked" && !b.isRanked) return;
+    if (mode === "standard" && b.isRanked) return;
+    attackCount++;
+    totalStars += b.stars;
+    destSum += b.destruction;
+    lootGold += b.lootGold;
+    lootElixir += b.lootElixir;
+    lootDark += b.lootDark;
+  });
+
+  return {
+    attackCount,
+    totalStars,
+    avgDestruction: attackCount > 0 ? parseFloat((destSum / attackCount).toFixed(1)) : 0,
+    lootGold,
+    lootElixir,
+    lootDark,
+    combinedLoot: lootGold + lootElixir + (lootDark * 100)
+  };
 }
 
 function setActivityTimeframe(tf, btnEl) {
   state.activityTimeframe = tf;
   document.querySelectorAll("#activityTimeChips .chip").forEach(c => c.classList.remove("active"));
+  if (btnEl) btnEl.classList.add("active");
+  renderActivityTab();
+}
+
+function setActivityMode(mode, btnEl) {
+  state.activityMode = mode;
+  document.querySelectorAll("#activityModeChips .chip").forEach(c => c.classList.remove("active"));
   if (btnEl) btnEl.classList.add("active");
   renderActivityTab();
 }
@@ -1675,11 +1997,13 @@ function setActivitySort(metric) {
 
 function renderActivityTab() {
   const tf = state.activityTimeframe;
+  const mode = state.activityMode;
   const metric = state.activitySort;
   const tfLabels = { "24h": "Last 24h", "7d": "Last 7 Days", "30d": "Last 30 Days" };
+  const modeLabels = { all: "ALL", ranked: "RANKED", standard: "STANDARD" };
 
-  document.getElementById("kpiActTimeSub").textContent = tfLabels[tf] || tf;
-  document.getElementById("lbTimeBadge").textContent = tf.toUpperCase();
+  document.getElementById("kpiActTimeSub").textContent = `${tfLabels[tf] || tf} · ${modeLabels[mode] || "ALL"}`;
+  document.getElementById("lbTimeBadge").textContent = `${tf.toUpperCase()} · ${modeLabels[mode] || "ALL"}`;
 
   let totalAttacks = 0;
   let totalGold = 0;
@@ -1689,7 +2013,7 @@ function renderActivityTab() {
   let topRaider = null;
 
   const rows = state.players.map(p => {
-    const st = getPlayerTfStats(p, tf);
+    const st = getPlayerTfStats(p, tf, mode);
     totalAttacks  += st.attackCount;
     totalGold     += st.lootGold;
     totalElixir   += st.lootElixir;
@@ -1766,42 +2090,92 @@ function renderActivityTab() {
 }
 
 /* ============================================================
-   GLOBAL RANKED META TAB RENDERING
+   GLOBAL & CLAN RANKED META TAB RENDERING
 ============================================================ */
+function setMetaCohort(cohort, btnEl) {
+  state.metaCohort = cohort;
+  document.querySelectorAll("#metaCohortChips .chip").forEach(c => c.classList.remove("active"));
+  if (btnEl) btnEl.classList.add("active");
+  renderMetaTab();
+}
+
 function renderMetaTab() {
-  const meta = state.globalMeta;
-  const subEl = document.getElementById("metaSyncSub");
-  const thBadge = document.getElementById("metaTargetThBadge");
+  const activeMeta = state.globalMeta?.cohorts?.[state.metaCohort] || state.globalMeta || {};
+  const isClanCohort = state.metaCohort === "clan";
+  const titleEl   = document.getElementById("metaTitleText");
+  const subEl     = document.getElementById("metaSyncSub");
+  const thBadge   = document.getElementById("metaTargetThBadge");
   const contentEl = document.getElementById("metaContent");
 
-  if (!meta || !meta.updatedAt) {
-    if (thBadge) thBadge.textContent = "TH19";
-    if (subEl) subEl.textContent = "No Global Meta snapshot cached yet";
+  if (titleEl) {
+    titleEl.textContent = isClanCohort
+      ? "🛡️ Our Clan Ranked Meta"
+      : "🏆 Top 100 Global Ranked Meta";
+  }
+
+  const attacksAnalyzed = Number(activeMeta.rankedAttacksAnalyzed || 0);
+  const hasAnyMetaData = Boolean(
+    attacksAnalyzed > 0 ||
+    (Array.isArray(activeMeta.topTroops) && activeMeta.topTroops.length > 0) ||
+    (Array.isArray(activeMeta.topArchetypes) && activeMeta.topArchetypes.length > 0) ||
+    (activeMeta.topEquipment && Object.keys(activeMeta.topEquipment).length > 0)
+  );
+
+  if (!hasAnyMetaData) {
+    if (thBadge) thBadge.textContent = isClanCohort ? "CLAN" : "TH19";
+    if (subEl) {
+      subEl.textContent = isClanCohort
+        ? "No Clan Ranked attacks logged yet"
+        : "No Global Meta snapshot cached yet";
+    }
     if (contentEl) {
-      contentEl.innerHTML = `
-        <div class="panel" style="text-align:center;padding:28px 18px;">
-          <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Top 100 Global Ranked Meta Not Synced</div>
-          <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-            Scan the Top 100 global players to uncover the strongest TH19 Ranked army combos, actively equipped Hero Equipment pairs, Ranked Pets, and personalized upgrade priorities.
+      contentEl.innerHTML = isClanCohort
+        ? `
+          <div class="panel" style="text-align:center;padding:28px 18px;">
+            <div style="font-size:16px;font-weight:800;margin-bottom:6px;">No Clan Ranked Attacks Logged Yet</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+              Sync clan battle logs to analyze our clan's Ranked armies, 3-star rates, and hero equipment loadouts.
+            </div>
+            <button class="btn-sync-primary" style="padding:0 20px;" onclick="forceClanSync()">↻ Sync Clan Battle Logs</button>
           </div>
-          <button class="btn-sync-primary" style="padding:0 20px;" onclick="refreshGlobalMeta()">↻ Sync Global Meta Now</button>
-        </div>
-      `;
+        `
+        : `
+          <div class="panel" style="text-align:center;padding:28px 18px;">
+            <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Top 100 Global Ranked Meta Not Synced</div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+              Scan the Top 100 global players to uncover the strongest TH19 Ranked army combos, actively equipped Hero Equipment pairs, Ranked Pets, and personalized upgrade priorities.
+            </div>
+            <button class="btn-sync-primary" style="padding:0 20px;" onclick="refreshGlobalMeta()">↻ Sync Global Meta Now</button>
+          </div>
+        `;
     }
     return;
   }
 
-  const thTier = meta.targetTH || 19;
-  const attacksAnalyzed = Number(meta.rankedAttacksAnalyzed || 0);
-  const attacksWithPets = Number(meta.rankedAttacksWithPets || 0);
-  const sampleSize = Number(meta.sampleSize || 0);
-  const avgThreeStar = Number(meta.avgThreeStarRate || 0);
-  const avgDest = Number(meta.avgDestruction || 0);
+  const thTier = activeMeta.targetTH || 19;
+  const attacksWithPets = Number(activeMeta.rankedAttacksWithPets || 0);
+  const sampleSize = Number(activeMeta.sampleSize || 0);
+  const avgThreeStar = Number(activeMeta.avgThreeStarRate || 0);
+  const avgDest = Number(activeMeta.avgDestruction || 0);
+  const updatedAt = state.globalMeta?.updatedAt || activeMeta.updatedAt || state.lastSyncTs;
 
-  if (thBadge) thBadge.textContent = `TH${thTier}`;
+  if (thBadge) thBadge.textContent = isClanCohort ? "CLAN" : `TH${thTier}`;
   if (subEl) {
-    subEl.textContent = `Synced ${formatRelTime(meta.updatedAt)} · ${sampleSize} Top TH${thTier} players · ${attacksAnalyzed.toLocaleString()} Ranked attacks analyzed`;
+    const sampleLabel = isClanCohort
+      ? `${sampleSize} clan members`
+      : `${sampleSize} Top TH${thTier} players`;
+    subEl.textContent = `Synced ${formatRelTime(updatedAt)} · ${sampleLabel} · ${attacksAnalyzed.toLocaleString()} Ranked attacks analyzed`;
   }
+
+  // Build avg count lookup so archetype Copy Army links use realistic meta unit counts
+  const avgTroopCountMap = {};
+  (Array.isArray(activeMeta.topTroops) ? activeMeta.topTroops : []).forEach(t => {
+    if (t && t.name) avgTroopCountMap[String(t.name).trim().toLowerCase()] = Math.max(1, Math.round(Number(t.avgCount || 1)));
+  });
+  const avgSpellCountMap = {};
+  (Array.isArray(activeMeta.topSpells) ? activeMeta.topSpells : []).forEach(s => {
+    if (s && s.name) avgSpellCountMap[String(s.name).trim().toLowerCase()] = Math.max(1, Math.round(Number(s.avgCount || 1)));
+  });
 
   // 1. KPI Summary Strip
   const kpiHtml = `
@@ -1809,23 +2183,23 @@ function renderMetaTab() {
       <div class="kpi-card">
         <div class="kpi-label">Ranked Hits</div>
         <div class="kpi-val" style="color:var(--accent);">${attacksAnalyzed.toLocaleString()}</div>
-        <div class="kpi-sub">${sampleSize} Top TH${thTier} players</div>
+        <div class="kpi-sub">${isClanCohort ? `${sampleSize} clanmates` : `${sampleSize} Top TH${thTier} players`}</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">Global 3★ Rate</div>
+        <div class="kpi-label">${isClanCohort ? "Clan 3★ Rate" : "Global 3★ Rate"}</div>
         <div class="kpi-val" style="color:var(--green);">${avgThreeStar.toFixed(1)}%</div>
         <div class="kpi-sub">Across Ranked hits</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Avg Destr.</div>
         <div class="kpi-val" style="color:var(--amber);">${avgDest.toFixed(1)}%</div>
-        <div class="kpi-sub">Top 100 benchmark</div>
+        <div class="kpi-sub">${isClanCohort ? "Clan benchmark" : "Top 100 benchmark"}</div>
       </div>
     </div>
   `;
 
-  // 2. Top Meta Army Archetypes
-  const archetypes = Array.isArray(meta.topArchetypes) ? meta.topArchetypes : [];
+  // 2. Top Meta Army Archetypes (with Real Icons & One-Tap Copy Army Links)
+  const archetypes = Array.isArray(activeMeta.topArchetypes) ? activeMeta.topArchetypes : [];
   const archetypesHtml = archetypes.length
     ? `
       <div class="archetype-grid">
@@ -1835,6 +2209,12 @@ function renderMetaTab() {
           const winClass = winRate >= 65 ? "in" : winRate >= 45 ? "amb" : "out";
           const troops = Array.isArray(a.troops) ? a.troops : [];
           const spells = Array.isArray(a.spells) ? a.spells : [];
+
+          const copyUrl = buildCocArmyLink(
+            troops.map(t => ({ name: t, count: avgTroopCountMap[String(t).trim().toLowerCase()] || 1 })),
+            spells.map(s => ({ name: s, count: avgSpellCountMap[String(s).trim().toLowerCase()] || 1 }))
+          );
+
           return `
             <div class="archetype-card">
               <div class="archetype-top">
@@ -1842,15 +2222,18 @@ function renderMetaTab() {
                 <span class="mini-badge ${winClass}">${winRate.toFixed(0)}% 3★</span>
               </div>
               <div class="archetype-pills">
-                ${troops.map(t => `<span class="mini-badge ds">${escHtml(t)}</span>`).join("")}
-                ${spells.map(s => `<span class="mini-badge purp">${escHtml(s.replace(/\s*Spell$/i, ""))}</span>`).join("")}
+                ${troops.map(t => `<span class="mini-badge ds">${renderUnitIcon(t, 18)}${escHtml(t)}</span>`).join("")}
+                ${spells.map(s => `<span class="mini-badge purp">${renderUnitIcon(s, 18)}${escHtml(s.replace(/\s*Spell$/i, ""))}</span>`).join("")}
               </div>
               <div class="bar-track">
                 <div class="bar-fill" style="width:${Math.min(100, Math.max(4, usage))}%;background:var(--accent);"></div>
               </div>
               <div class="archetype-metrics mono">
-                <span style="color:var(--text-sec);font-weight:700;">${usage.toFixed(1)}% Meta Share</span>
-                <span style="color:var(--text-muted);">${Number(a.count || 0)} hits · ${Number(a.avgDestruction || 0).toFixed(0)}% avg</span>
+                <div>
+                  <span style="color:var(--text-sec);font-weight:700;">${usage.toFixed(1)}% Share</span>
+                  <span style="color:var(--text-muted);"> · ${Number(a.count || 0)} hits · ${Number(a.avgDestruction || 0).toFixed(0)}%</span>
+                </div>
+                ${copyUrl ? `<a class="copy-army-btn" href="${escHtml(copyUrl)}" target="_blank" rel="noopener noreferrer">⚔️ Copy Army</a>` : ""}
               </div>
             </div>
           `;
@@ -1859,9 +2242,9 @@ function renderMetaTab() {
     `
     : `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px;">No Ranked army archetypes recorded yet.</div>`;
 
-  // 3. Hero Equipment Meta Grid (Actively Equipped 2-Piece Pairs + Individual Gear Rates)
-  const topEquipment = (meta.topEquipment && typeof meta.topEquipment === "object") ? meta.topEquipment : {};
-  const topEquipmentPairs = (meta.topEquipmentPairs && typeof meta.topEquipmentPairs === "object") ? meta.topEquipmentPairs : {};
+  // 3. Hero Equipment Meta Grid (Actively Equipped 2-Piece Pairs + Individual Gear Rates + Icons)
+  const topEquipment = (activeMeta.topEquipment && typeof activeMeta.topEquipment === "object") ? activeMeta.topEquipment : {};
+  const topEquipmentPairs = (activeMeta.topEquipmentPairs && typeof activeMeta.topEquipmentPairs === "object") ? activeMeta.topEquipmentPairs : {};
 
   const allHeroes = Array.from(new Set(
     HERO_ORDER.concat(Object.keys(topEquipment), Object.keys(topEquipmentPairs))
@@ -1878,11 +2261,13 @@ function renderMetaTab() {
           <div class="hero-sublabel">Top Equipped Pair Combos</div>
           <div class="equip-pair-list">
             ${pairList.slice(0, 3).map(pr => {
-              const pairLabel = pr.name || (Array.isArray(pr.pair) ? pr.pair.join(" + ") : "");
+              const pairArr = Array.isArray(pr.pair) ? pr.pair : String(pr.name || "").split("+").map(s => s.trim()).filter(Boolean);
+              const pairLabel = pr.name || pairArr.join(" + ");
               const pct = Math.min(100, Math.max(0, Number(pr.usageRate || 0)));
+              const iconsHtml = pairArr.map(eqName => renderUnitIcon(eqName, 18)).join("");
               return `
                 <div class="equip-pair-row">
-                  <span class="equip-pair-name" title="${escHtml(pairLabel)}">${escHtml(pairLabel)}</span>
+                  <span class="equip-pair-name" title="${escHtml(pairLabel)}">${iconsHtml}<span>${escHtml(pairLabel)}</span></span>
                   <span class="equip-pair-pct">— ${Math.round(pct)}%</span>
                 </div>
               `;
@@ -1901,7 +2286,7 @@ function renderMetaTab() {
             return `
               <div class="pill-bar-row">
                 <div class="pill-bar-head">
-                  <span class="pill-bar-name">${escHtml(eq.name)}</span>
+                  <span class="pill-bar-name">${renderUnitIcon(eq.name, 20)}<span>${escHtml(eq.name)}</span></span>
                   <span class="mono" style="font-size:11px;font-weight:700;color:var(--purple);">${pct.toFixed(0)}%</span>
                 </div>
                 <div class="pill-track" style="height:7px;">
@@ -1917,7 +2302,7 @@ function renderMetaTab() {
     return `
       <div class="hero-meta-card">
         <div class="hero-meta-head">
-          <div class="hero-meta-name">${escHtml(heroName)}</div>
+          <div class="hero-meta-name">${renderUnitIcon(heroName, 24)}<span>${escHtml(heroName)}</span></div>
           <span class="mini-badge purp">ACTIVE GEAR</span>
         </div>
         ${pairsHtml}
@@ -1926,8 +2311,8 @@ function renderMetaTab() {
     `;
   }).filter(Boolean).join("");
 
-  // 4. Dedicated Ranked Pets Meta Card (True Ranked Battle Log Usage % & 3★ Rate %, excluding 0% pets)
-  const activeRankedPets = (Array.isArray(meta.topPets) ? meta.topPets : [])
+  // 4. Dedicated Ranked Pets Meta Card
+  const activeRankedPets = (Array.isArray(activeMeta.topPets) ? activeMeta.topPets : [])
     .filter(pt => pt && Number(pt.usageRate || 0) > 0);
 
   const petsCardHtml = activeRankedPets.length
@@ -1942,6 +2327,7 @@ function renderMetaTab() {
             <div class="pet-meta-item">
               <div class="pill-bar-head">
                 <div class="pill-bar-name">
+                  ${renderUnitIcon(pt.name, 22)}
                   <span>${escHtml(pt.name)}</span>
                   ${battlesUsed > 0 ? `<span class="mono" style="font-size:10px;color:var(--text-muted);">${battlesUsed} hits</span>` : ""}
                 </div>
@@ -1979,6 +2365,7 @@ function renderMetaTab() {
         <div class="pill-bar-row">
           <div class="pill-bar-head">
             <div class="pill-bar-name">
+              ${renderUnitIcon(u.name, 22)}
               <span>${escHtml(u.name)}</span>
               ${avgCnt > 0 ? `<span class="mono" style="font-size:10px;color:var(--text-muted);">avg ${avgCnt.toFixed(1)}×</span>` : ""}
             </div>
@@ -2031,13 +2418,13 @@ function renderMetaTab() {
       </div>
 
       <div class="ranked-group-title">Top Troops</div>
-      ${renderMetaUnitBars((meta.topTroops || []).slice(0, 12), "var(--accent)", "No troop usage data available.")}
+      ${renderMetaUnitBars((activeMeta.topTroops || []).slice(0, 12), "var(--accent)", "No troop usage data available.")}
 
       <div class="ranked-group-title" style="margin-top:16px;">Top Spells</div>
-      ${renderMetaUnitBars((meta.topSpells || []).slice(0, 10), "var(--purple)", "No spell usage data available.")}
+      ${renderMetaUnitBars((activeMeta.topSpells || []).slice(0, 10), "var(--purple)", "No spell usage data available.")}
 
       <div class="ranked-group-title" style="margin-top:16px;">Top Siege Machines</div>
-      ${renderMetaUnitBars((meta.topSieges || []).slice(0, 6), "var(--amber)", "No siege machine usage data available.")}
+      ${renderMetaUnitBars((activeMeta.topSieges || []).slice(0, 6), "var(--amber)", "No siege machine usage data available.")}
     </div>
   `;
 }
@@ -2064,6 +2451,7 @@ function openDrawer(tag) {
 function closeDrawer() {
   state.activeDrawerTag = null;
   if (radarChart) { radarChart.destroy(); radarChart = null; }
+  if (trendChart) { trendChart.destroy(); trendChart = null; }
   if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
 
   document.getElementById("drawerBackdrop").classList.remove("open");
@@ -2114,7 +2502,8 @@ function getUpgradeCategoryBadge(cat) {
 }
 
 function renderMetaUpgradesSection(p) {
-  if (!state.globalMeta || !state.globalMeta.updatedAt) {
+  const hasMeta = Boolean(state.globalMeta && (state.globalMeta.updatedAt || state.globalMeta.cohorts));
+  if (!hasMeta) {
     return `
       <div class="sec-label">Priority Meta Upgrades</div>
       <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">
@@ -2158,6 +2547,7 @@ function renderMetaUpgradesSection(p) {
       <div class="upgrade-row">
         <div class="upgrade-left">
           <div class="upgrade-title-row">
+            ${renderUnitIcon(u.name, 22)}
             <span class="upgrade-name">${escHtml(u.name)}</span>
             <span class="mini-badge ${badge.cls}">${escHtml(badge.label)}</span>
           </div>
@@ -2180,13 +2570,13 @@ function renderMetaUpgradesSection(p) {
 /* ============================================================
    STATS.FM-INSPIRED ANALYTICS HELPERS (24H CLOCK + RANKED META)
 ============================================================ */
-function computeHourlyAttackProfile(p) {
+function computeHourlyAttackProfile(p, normalizedLogs) {
   const counts = new Array(24).fill(0);
-  const timestamps = Array.isArray(p.attackTimestamps30d) && p.attackTimestamps30d.length
-    ? p.attackTimestamps30d
-    : (Array.isArray(p.battleLog) ? p.battleLog.filter(b => b.attack && b.timestamp).map(b => b.timestamp) : []);
+  const rawTimestamps = Array.isArray(p.attackTimestamps30d) && p.attackTimestamps30d.length
+    ? p.attackTimestamps30d.map(parseBattleTimeMs).filter(Boolean)
+    : (normalizedLogs || []).filter(b => b.attack && b.timestamp).map(b => b.timestamp);
 
-  timestamps.forEach(ts => {
+  rawTimestamps.forEach(ts => {
     const d = new Date(Number(ts));
     if (!isNaN(d.getTime())) {
       counts[d.getHours()] += 1;
@@ -2204,7 +2594,7 @@ function computeHourlyAttackProfile(p) {
 
   return {
     counts,
-    totalAttacks: timestamps.length,
+    totalAttacks: rawTimestamps.length,
     peakHour,
     peakCount: maxCount
   };
@@ -2248,19 +2638,77 @@ function renderAttackClockSection(clockProfile) {
   `;
 }
 
-function renderRankedMetaSection(p) {
-  const ra = p.rankedAnalytics || {
-    totalRankedAttacks: 0,
-    threeStarRate: 0,
-    avgDestruction: 0,
-    uniqueUnitCount: 0,
-    topTroops: [],
-    topSpellsSieges: []
+function buildFallbackRankedAnalytics(normalizedLogs) {
+  const rankedLogs = (normalizedLogs || []).filter(b => b.attack && b.isRanked);
+  const total = rankedLogs.length;
+  if (!total) {
+    return {
+      totalRankedAttacks: 0,
+      threeStarRate: 0,
+      avgDestruction: 0,
+      uniqueUnitCount: 0,
+      topTroops: [],
+      topSpellsSieges: []
+    };
+  }
+
+  let threeStars = 0, destSum = 0;
+  const uniqueUnits = new Set();
+  const troopsMap = {};
+  const spellsSiegesMap = {};
+
+  rankedLogs.forEach(b => {
+    if (b.stars >= 3) threeStars++;
+    destSum += b.destruction;
+    const seen = new Set();
+    (b.army || []).forEach(u => {
+      if (!u || !u.name) return;
+      const cat = classifyUnitClient(u);
+      if (cat === "hero" || cat === "pet" || cat === "equipment") return;
+      const name = String(u.name).trim();
+      const cnt = Number(u.count || 1) || 1;
+      uniqueUnits.add(name);
+      const target = cat === "troop" ? troopsMap : spellsSiegesMap;
+      if (!target[name]) target[name] = { type: cat, battlesUsed: 0, totalCount: 0, threeStars: 0 };
+      target[name].totalCount += cnt;
+      if (!seen.has(name)) {
+        seen.add(name);
+        target[name].battlesUsed += 1;
+        if (b.stars >= 3) target[name].threeStars += 1;
+      }
+    });
+  });
+
+  const formatMap = (m, limit) => Object.keys(m).map(name => {
+    const u = m[name];
+    return {
+      name,
+      type: u.type,
+      appearanceRate: parseFloat(((u.battlesUsed / total) * 100).toFixed(1)),
+      totalCount: u.totalCount,
+      battlesUsed: u.battlesUsed,
+      threeStarRate: u.battlesUsed > 0 ? parseFloat(((u.threeStars / u.battlesUsed) * 100).toFixed(1)) : 0
+    };
+  }).sort((a, b) => b.appearanceRate - a.appearanceRate || b.totalCount - a.totalCount).slice(0, limit);
+
+  return {
+    totalRankedAttacks: total,
+    threeStarRate: parseFloat(((threeStars / total) * 100).toFixed(1)),
+    avgDestruction: parseFloat((destSum / total).toFixed(1)),
+    uniqueUnitCount: uniqueUnits.size,
+    topTroops: formatMap(troopsMap, 6),
+    topSpellsSieges: formatMap(spellsSiegesMap, 4)
   };
+}
+
+function renderRankedMetaSection(p, normalizedLogs) {
+  const ra = (p.rankedAnalytics && Number(p.rankedAnalytics.totalRankedAttacks || 0) > 0)
+    ? p.rankedAnalytics
+    : buildFallbackRankedAnalytics(normalizedLogs);
 
   if (!ra.totalRankedAttacks) {
     return `
-      <div class="sec-label">Top Ranked Troops & Spells (30-Day Ranked Only)</div>
+      <div class="sec-label">Top Ranked Troops &amp; Spells (30-Day Ranked Only)</div>
       <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:18px 12px;">
         No Ranked attacks logged yet — check back after your next Ranked tournament hits
       </div>
@@ -2281,6 +2729,7 @@ function renderRankedMetaSection(p) {
         <div class="pill-bar-row">
           <div class="pill-bar-head">
             <div class="pill-bar-name">
+              ${renderUnitIcon(u.name, 20)}
               <span>${escHtml(u.name)}</span>
               ${typeTag}
               <span class="mono" style="font-size:10px;color:var(--text-muted);">(${Number(u.totalCount || 0).toLocaleString()}×)</span>
@@ -2299,12 +2748,12 @@ function renderRankedMetaSection(p) {
   };
 
   return `
-    <div class="sec-label">Top Ranked Troops & Spells (${ra.totalRankedAttacks} Ranked ${ra.totalRankedAttacks === 1 ? "Attack" : "Attacks"})</div>
+    <div class="sec-label">Top Ranked Troops &amp; Spells (${ra.totalRankedAttacks} Ranked ${ra.totalRankedAttacks === 1 ? "Attack" : "Attacks"})</div>
     <div class="cat-box">
       <div class="ranked-group-title">Top Troops</div>
       ${renderPillRows(ra.topTroops, "var(--accent)")}
 
-      <div class="ranked-group-title" style="margin-top:14px;">Top Spells & Sieges</div>
+      <div class="ranked-group-title" style="margin-top:14px;">Top Spells &amp; Sieges</div>
       ${renderPillRows(ra.topSpellsSieges, "var(--purple)")}
 
       <div class="ranked-stat-grid">
@@ -2325,8 +2774,8 @@ function renderRankedMetaSection(p) {
   `;
 }
 
-function renderBattleLogSection(p) {
-  const logs = Array.isArray(p.battleLog) ? p.battleLog : [];
+function renderBattleLogSection(p, normalizedLogs) {
+  const logs = Array.isArray(normalizedLogs) ? normalizedLogs : [];
   if (!logs.length) {
     return `
       <div class="sec-label">Recent Battle Log</div>
@@ -2345,17 +2794,27 @@ function renderBattleLogSection(p) {
     const typeLabel = formatBattleType(b.battleType);
     const ago = b.timestamp ? formatRelTime(b.timestamp) : "";
     const army = Array.isArray(b.army) ? b.army : [];
+    const copyUrl = isAtk ? buildBattleArmyCopyLink(army) : "";
 
-    const armyHtml = army.length
+    const armyDetailsHtml = army.length
       ? `
         <details class="army-details">
           <summary>▸ Army Used (${army.length} unit types)</summary>
           <div class="army-pills">
             ${army.map(u => `
-              <span class="mini-badge">${u.count > 1 ? `${u.count}× ` : ""}${escHtml(u.name)}${u.level ? ` L${u.level}` : ""}</span>
+              <span class="mini-badge">${renderUnitIcon(u.name, 16)}${u.count > 1 ? `${u.count}× ` : ""}${escHtml(u.name)}${u.level ? ` L${u.level}` : ""}</span>
             `).join("")}
           </div>
         </details>
+      `
+      : "";
+
+    const footerActionsHtml = (armyDetailsHtml || copyUrl)
+      ? `
+        <div class="battle-actions-row">
+          ${armyDetailsHtml || `<span style="font-size:11px;color:var(--text-muted);">Attack army</span>`}
+          ${copyUrl ? `<a class="copy-army-btn" href="${escHtml(copyUrl)}" target="_blank" rel="noopener noreferrer">⚔️ Copy Army</a>` : ""}
+        </div>
       `
       : "";
 
@@ -2364,7 +2823,7 @@ function renderBattleLogSection(p) {
         <div class="battle-top">
           <div style="display:flex;align-items:center;gap:6px;min-width:0;">
             <span class="mini-badge ${isAtk ? "in" : "def"}">${isAtk ? "ATK" : "DEF"}</span>
-            <span class="mini-badge">${escHtml(typeLabel)}</span>
+            <span class="mini-badge ${b.isRanked ? "ds" : ""}">${escHtml(typeLabel)}</span>
             <strong style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
               vs ${escHtml(b.opponentName || "Unknown")}
             </strong>
@@ -2384,7 +2843,7 @@ function renderBattleLogSection(p) {
           </div>
         </div>
 
-        ${armyHtml}
+        ${footerActionsHtml}
       </div>
     `;
   }).join("");
@@ -2421,11 +2880,12 @@ function renderDrawerContent(p) {
     `;
   }).join("");
 
+  const normalizedLogs   = getNormalizedPlayerBattleLog(p);
   const metaUpgradesHtml = renderMetaUpgradesSection(p);
-  const clockProfile     = computeHourlyAttackProfile(p);
+  const clockProfile     = computeHourlyAttackProfile(p, normalizedLogs);
   const clockHtml        = renderAttackClockSection(clockProfile);
-  const rankedMetaHtml   = renderRankedMetaSection(p);
-  const battleLogHtml    = renderBattleLogSection(p);
+  const rankedMetaHtml   = renderRankedMetaSection(p, normalizedLogs);
+  const battleLogHtml    = renderBattleLogSection(p, normalizedLogs);
 
   document.getElementById("drawerBody").innerHTML = `
     <div class="sec-label">TH19 Progression Breakdown</div>
@@ -2433,7 +2893,7 @@ function renderDrawerContent(p) {
 
     ${metaUpgradesHtml}
 
-    <div class="sec-label">Season & War Telemetry</div>
+    <div class="sec-label">Season &amp; War Telemetry</div>
     <div class="stat-pills">
       <div class="stat-pill">
         <div class="kpi-label">War Stars</div>
@@ -2445,9 +2905,10 @@ function renderDrawerContent(p) {
       </div>
     </div>
 
-    <div class="sec-label">Balance Radar</div>
-    <div class="cat-box" style="width:100%;max-width:100%;height:220px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;">
-      <canvas id="radarCanvas"></canvas>
+    <div class="sec-label">Balance Radar &amp; 30-Day Trajectory</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="cat-box" style="height:210px;"><canvas id="radarCanvas"></canvas></div>
+      <div class="cat-box" style="height:210px;"><canvas id="trendCanvas"></canvas></div>
     </div>
 
     ${clockHtml}
@@ -2457,46 +2918,78 @@ function renderDrawerContent(p) {
     ${battleLogHtml}
   `;
 
-  renderDrawerCharts(cats, clockProfile);
+  renderDrawerCharts(p, cats, clockProfile);
 }
 
-function renderDrawerCharts(cats, clockProfile) {
+function renderDrawerCharts(p, cats, clockProfile) {
   if (radarChart) { radarChart.destroy(); radarChart = null; }
+  if (trendChart) { trendChart.destroy(); trendChart = null; }
   if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
+
+  if (typeof Chart === "undefined") return;
 
   const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
   const gridColor = isDark ? "rgba(148,163,184,0.16)" : "rgba(15,23,42,0.12)";
   const tickColor = isDark ? "#94a3b8" : "#475569";
 
-  const rCtx = document.getElementById("radarCanvas").getContext("2d");
-  radarChart = new Chart(rCtx, {
-    type: "radar",
-    data: {
-      labels: cats.map(c => c.label),
-      datasets: [{
-        data: cats.map(c => parsePct(c.val)),
-        backgroundColor: "rgba(56, 189, 248, 0.18)",
-        borderColor: "#38bdf8",
-        borderWidth: 2,
-        pointBackgroundColor: "#38bdf8"
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        r: {
-          min: 0,
-          max: 100,
-          ticks: { display: false },
-          grid: { color: gridColor },
-          angleLines: { color: gridColor },
-          pointLabels: { color: tickColor, font: { size: 10, weight: "600" } }
+  const radarEl = document.getElementById("radarCanvas");
+  if (radarEl) {
+    radarChart = new Chart(radarEl.getContext("2d"), {
+      type: "radar",
+      data: {
+        labels: cats.map(c => c.label),
+        datasets: [{
+          data: cats.map(c => parsePct(c.val)),
+          backgroundColor: "rgba(56, 189, 248, 0.18)",
+          borderColor: "#38bdf8",
+          borderWidth: 2,
+          pointBackgroundColor: "#38bdf8"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          r: {
+            min: 0,
+            max: 100,
+            ticks: { display: false },
+            grid: { color: gridColor },
+            angleLines: { color: gridColor },
+            pointLabels: { color: tickColor, font: { size: 10, weight: "600" } }
+          }
         }
       }
-    }
-  });
+    });
+  }
+
+  const trendEl = document.getElementById("trendCanvas");
+  if (trendEl) {
+    trendChart = new Chart(trendEl.getContext("2d"), {
+      type: "line",
+      data: {
+        labels: p.historyDates && p.historyDates.length ? p.historyDates : ["Now"],
+        datasets: [{
+          data: p.historyPcts && p.historyPcts.length ? p.historyPcts : [parseFloat(p.percentage) || 0],
+          borderColor: "#10b981",
+          backgroundColor: "rgba(16, 185, 129, 0.16)",
+          fill: true,
+          tension: 0.35,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 10 } } },
+          y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
+        }
+      }
+    });
+  }
 
   // 24-Hour Attack Clock (Radial Polar Area Chart)
   const clockEl = document.getElementById("attackClockCanvas");
