@@ -848,7 +848,7 @@
     }
 
     /* ============================================================
-       BOTTOM NAVIGATION BAR (3 COLUMNS)
+       BOTTOM NAVIGATION BAR (4 COLUMNS)
     ============================================================ */
     .bottom-nav {
       position: fixed;
@@ -1328,10 +1328,13 @@ window.addEventListener("DOMContentLoaded", () => {
   const savedTheme = localStorage.getItem("molly_theme") || "dark";
   applyTheme(savedTheme);
   initDrawerSwipe();
-  loadDashboard();
+
   const initialHash = window.location.hash.replace("#", "");
-if (initialHash === "activity" || initialHash === "deepsync") {
-  switchTab(initialHash, document.querySelector(`.nav-item[data-tab="${initialHash}"]`));
+  if (initialHash === "activity" || initialHash === "deepsync") {
+    switchTab(initialHash, document.querySelector(`.nav-item[data-tab="${initialHash}"]`));
+  }
+
+  loadDashboard();
 });
 
 document.addEventListener("keydown", (e) => {
@@ -2306,7 +2309,8 @@ async function processAndUploadVillageJson(playerTag, rawText) {
   try {
     await fetch(getWebAppUrl(), {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed)
     });
   } catch (e) {
@@ -2478,3 +2482,4 @@ function showToast(msg) {
 </script>
 </body>
 </html>
+```[cite: 3]
