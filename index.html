@@ -173,6 +173,7 @@
       border-radius: 14px;
       padding: 13px 14px;
       box-shadow: var(--shadow);
+      min-width: 0;
     }
     .kpi-label {
       font-size: 11px;
@@ -184,14 +185,20 @@
     }
     .kpi-val {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 700;
       line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .kpi-sub {
       font-size: 11px;
       color: var(--text-muted);
       margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     /* ============================================================
@@ -320,6 +327,8 @@
     .mini-badge.in  { background: var(--green-bg); color: var(--green); }
     .mini-badge.out { background: var(--bg-subtle); color: var(--text-muted); }
     .mini-badge.ds  { background: var(--accent-bg); color: var(--accent); }
+    .mini-badge.def { background: var(--red-bg); color: var(--red); }
+    .mini-badge.amb { background: var(--amber-bg); color: var(--amber); }
 
     .prog-block {
       display: flex;
@@ -359,7 +368,7 @@
     }
 
     /* ============================================================
-       PANELS
+       PANELS & LISTS
     ============================================================ */
     .panel {
       background: var(--bg-card);
@@ -392,7 +401,6 @@
     }
     .action-btn:active { transform: scale(0.97); }
 
-
     .list-row {
       display: flex;
       align-items: center;
@@ -402,6 +410,149 @@
       border-bottom: 1px solid var(--border);
     }
     .list-row:last-child { border-bottom: none; }
+
+    /* ============================================================
+       ACTIVITY & LOOT LEADERBOARD
+    ============================================================ */
+    .lb-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.15s ease;
+    }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row:hover { background: var(--bg-subtle); }
+    .lb-row:active { transform: scale(0.99); }
+
+    .lb-left {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+      flex: 1;
+    }
+    .rank-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .rank-badge.rank-1 {
+      background: rgba(251, 191, 36, 0.16);
+      border-color: rgba(251, 191, 36, 0.65);
+      color: #fbbf24;
+    }
+    .rank-badge.rank-2 {
+      background: rgba(203, 213, 225, 0.16);
+      border-color: rgba(203, 213, 225, 0.6);
+      color: var(--text-sec);
+    }
+    .rank-badge.rank-3 {
+      background: rgba(217, 119, 6, 0.16);
+      border-color: rgba(217, 119, 6, 0.6);
+      color: #d97706;
+    }
+    .lb-player-info { min-width: 0; }
+    .lb-player-name {
+      font-size: 14px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .lb-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .lb-loot {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .loot-line {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .loot-gold   { color: var(--amber); }
+    .loot-elixir { color: var(--purple); }
+    .loot-dark   { color: var(--accent); }
+
+    /* ============================================================
+       BATTLE LOG CARDS INSIDE PLAYER DRAWER
+    ============================================================ */
+    .battle-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 11px 12px;
+      margin-bottom: 8px;
+    }
+    .battle-card:last-child { margin-bottom: 0; }
+    .battle-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .battle-mid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .battle-stars {
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: var(--amber);
+    }
+    .army-details {
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px solid var(--border);
+    }
+    .army-details summary {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      cursor: pointer;
+      user-select: none;
+      list-style: none;
+    }
+    .army-details summary::-webkit-details-marker { display: none; }
+    .army-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 7px;
+    }
 
     /* ============================================================
        ERGONOMIC MOBILE-FIRST PLAYER DETAIL DRAWER (100dvh)
@@ -615,7 +766,7 @@
     }
 
     /* ============================================================
-       BOTTOM NAVIGATION BAR
+       BOTTOM NAVIGATION BAR (3 COLUMNS)
     ============================================================ */
     .bottom-nav {
       position: fixed;
@@ -632,7 +783,7 @@
       max-width: 780px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       height: 64px;
     }
     .nav-item {
@@ -769,7 +920,60 @@
   </section>
 
   <!-- ============================================================
-       TAB 2: DEEP SYNC HUB (TH19 VILLAGE JSON)
+       TAB 2: ACTIVITY & LOOT LEADERBOARD
+  ============================================================ -->
+  <section id="tab-activity" class="tab-pane">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Clan Attacks</div>
+        <div class="kpi-val" id="kpiActAttacks">0</div>
+        <div class="kpi-sub" id="kpiActTimeSub">Last 24h</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Loot Raided</div>
+        <div class="kpi-val" id="kpiActLoot" style="color:var(--amber);">0</div>
+        <div class="kpi-sub" id="kpiActLootSub">G + E + DE×100</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Top Raider</div>
+        <div class="kpi-val" id="kpiActTop" style="color:var(--green);font-size:16px;">–</div>
+        <div class="kpi-sub" id="kpiActTopSub">0 attacks</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="chip-row" id="activityTimeChips">
+        <button class="chip active" data-tf="24h" onclick="setActivityTimeframe('24h', this)">Last 24h</button>
+        <button class="chip" data-tf="7d" onclick="setActivityTimeframe('7d', this)">Last 7 Days</button>
+        <button class="chip" data-tf="30d" onclick="setActivityTimeframe('30d', this)">Last 30 Days</button>
+      </div>
+      <div class="toolbar-top">
+        <select id="activitySortSelect" class="sort-select" style="width:100%;" onchange="setActivitySort(this.value)">
+          <option value="combinedLoot">Rank by: Most Total Loot</option>
+          <option value="lootGold">Rank by: Most Gold</option>
+          <option value="lootElixir">Rank by: Most Elixir</option>
+          <option value="lootDark">Rank by: Most Dark Elixir</option>
+          <option value="attackCount">Rank by: Most Attacks</option>
+          <option value="totalStars">Rank by: Most Attack Stars</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="panel" style="padding:10px 12px;">
+      <div class="panel-head" style="padding:4px 6px 8px 6px;margin-bottom:4px;border-bottom:1px solid var(--border);">
+        <div class="panel-title">Activity & Loot Leaderboard</div>
+        <span class="mini-badge ds" id="lbTimeBadge">24H</span>
+      </div>
+      <div id="activityLeaderboard">
+        <div style="text-align:center;padding:24px 12px;color:var(--text-muted);font-size:13px;">
+          Loading clan battle activity...
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 3: DEEP SYNC HUB (TH19 VILLAGE JSON)
   ============================================================ -->
   <section id="tab-deepsync" class="tab-pane">
     <div class="panel">
@@ -784,12 +988,15 @@
 </div>
 
 <!-- ============================================================
-     BOTTOM NAVIGATION
+     BOTTOM NAVIGATION (3 COLUMNS)
 ============================================================ -->
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
     <button class="nav-item active" data-tab="roster" onclick="switchTab('roster', this)">
       <span class="nav-ico">🛡️</span>Roster
+    </button>
+    <button class="nav-item" data-tab="activity" onclick="switchTab('activity', this)">
+      <span class="nav-ico">⚔️</span>Activity
     </button>
     <button class="nav-item" data-tab="deepsync" onclick="switchTab('deepsync', this)">
       <span class="nav-ico">🔧</span>Deep Sync
@@ -1020,7 +1227,9 @@ let state = {
   lastSyncTs: 0,
   filter: "all",
   queueMode: "spt",
-  activeDrawerTag: null
+  activeDrawerTag: null,
+  activityTimeframe: "24h",
+  activitySort: "combinedLoot"
 };
 
 let radarChart = null;
@@ -1077,6 +1286,7 @@ async function loadDashboard() {
     renderHeader();
     renderKpis();
     applyFilters();
+    renderActivityTab();
     renderDeepSyncDirectory();
 
     if (state.activeDrawerTag) {
@@ -1093,14 +1303,16 @@ async function loadDashboard() {
 
 async function forceClanSync() {
   setSyncing(true);
-  showToast("Syncing active clan members & live war data...");
+  showToast("Syncing active clan members & battle logs...");
   try {
     const res = await fetch(`${getWebAppUrl()}?action=syncClanData`);
     const out = await res.json();
     if (out.error) {
       showToast("Sync error: " + out.error);
     } else {
-      showToast(`Synced ${out.summary?.syncedMembers || 0} active clan members!`);
+      const members = out.summary?.syncedMembers || 0;
+      const battles = out.summary?.newBattlesLogged || 0;
+      showToast(`Synced ${members} members (+${battles} new battles)!`);
       await loadDashboard();
     }
   } catch (err) {
@@ -1237,6 +1449,122 @@ function renderRosterGrid(players) {
 }
 
 /* ============================================================
+   ACTIVITY & LOOT LEADERBOARD TAB
+============================================================ */
+function getPlayerTfStats(player, tf) {
+  const empty = {
+    attackCount: 0, totalStars: 0, avgDestruction: 0,
+    lootGold: 0, lootElixir: 0, lootDark: 0, combinedLoot: 0
+  };
+  if (!player || !player.battleStats || !player.battleStats[tf]) return empty;
+  return player.battleStats[tf];
+}
+
+function setActivityTimeframe(tf, btnEl) {
+  state.activityTimeframe = tf;
+  document.querySelectorAll("#activityTimeChips .chip").forEach(c => c.classList.remove("active"));
+  if (btnEl) btnEl.classList.add("active");
+  renderActivityTab();
+}
+
+function setActivitySort(metric) {
+  state.activitySort = metric;
+  renderActivityTab();
+}
+
+function renderActivityTab() {
+  const tf = state.activityTimeframe;
+  const metric = state.activitySort;
+  const tfLabels = { "24h": "Last 24h", "7d": "Last 7 Days", "30d": "Last 30 Days" };
+
+  document.getElementById("kpiActTimeSub").textContent = tfLabels[tf] || tf;
+  document.getElementById("lbTimeBadge").textContent = tf.toUpperCase();
+
+  let totalAttacks = 0;
+  let totalGold = 0;
+  let totalElixir = 0;
+  let totalDark = 0;
+  let totalCombined = 0;
+  let topRaider = null;
+
+  const rows = state.players.map(p => {
+    const st = getPlayerTfStats(p, tf);
+    totalAttacks  += st.attackCount;
+    totalGold     += st.lootGold;
+    totalElixir   += st.lootElixir;
+    totalDark     += st.lootDark;
+    totalCombined += st.combinedLoot;
+
+    if (!topRaider || st.attackCount > topRaider.stats.attackCount ||
+        (st.attackCount === topRaider.stats.attackCount && st.combinedLoot > topRaider.stats.combinedLoot)) {
+      topRaider = { player: p, stats: st };
+    }
+    return { player: p, stats: st };
+  });
+
+  document.getElementById("kpiActAttacks").textContent = totalAttacks.toLocaleString();
+  document.getElementById("kpiActLoot").textContent = formatCompactNum(totalCombined);
+  document.getElementById("kpiActLootSub").textContent =
+    `${formatCompactNum(totalGold)}G · ${formatCompactNum(totalElixir)}E · ${formatCompactNum(totalDark)}DE`;
+
+  if (topRaider && topRaider.stats.attackCount > 0) {
+    document.getElementById("kpiActTop").textContent = topRaider.player.name;
+    document.getElementById("kpiActTopSub").textContent =
+      `${topRaider.stats.attackCount} atk · ${topRaider.stats.totalStars}★`;
+  } else {
+    document.getElementById("kpiActTop").textContent = "–";
+    document.getElementById("kpiActTopSub").textContent = "No attacks logged";
+  }
+
+  rows.sort((a, b) => {
+    const diff = (b.stats[metric] || 0) - (a.stats[metric] || 0);
+    if (diff !== 0) return diff;
+    if (b.stats.combinedLoot !== a.stats.combinedLoot) return b.stats.combinedLoot - a.stats.combinedLoot;
+    return b.stats.attackCount - a.stats.attackCount;
+  });
+
+  const container = document.getElementById("activityLeaderboard");
+  if (!state.players.length) {
+    container.innerHTML = `<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">Run a clan sync to load battle activity.</div>`;
+    return;
+  }
+
+  container.innerHTML = rows.map((entry, idx) => {
+    const rank = idx + 1;
+    const p = entry.player;
+    const st = entry.stats;
+    const rankClass = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank === 3 ? "rank-3" : "";
+
+    return `
+      <div class="lb-row" onclick="openDrawer('${escHtml(p.tag)}')">
+        <div class="lb-left">
+          <div class="rank-badge ${rankClass}">#${rank}</div>
+          <div class="lb-player-info">
+            <div class="lb-player-name">
+              <span>${escHtml(p.name)}</span>
+              <span class="mini-badge">TH${p.thLevel}</span>
+            </div>
+            <div class="lb-meta mono">
+              <span>${st.attackCount} ${st.attackCount === 1 ? "atk" : "atks"}</span>
+              <span>${st.totalStars}★ · ${st.avgDestruction.toFixed(0)}%</span>
+            </div>
+          </div>
+        </div>
+        <div class="lb-loot">
+          <div class="loot-line">
+            <span class="loot-gold">${formatCompactNum(st.lootGold)} G</span>
+            <span class="loot-elixir">${formatCompactNum(st.lootElixir)} E</span>
+          </div>
+          <div class="loot-line" style="margin-top:2px;">
+            <span class="loot-dark">${formatCompactNum(st.lootDark)} DE</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ============================================================
    DEEP SYNC DIRECTORY TAB
 ============================================================ */
 function renderDeepSyncDirectory() {
@@ -1316,6 +1644,76 @@ function initDrawerSwipe() {
       drawer.style.transform = "";
     }
   });
+}
+
+function renderBattleLogSection(p) {
+  const logs = Array.isArray(p.battleLog) ? p.battleLog : [];
+  if (!logs.length) {
+    return `
+      <div class="sec-label">Recent Battle Log</div>
+      <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">
+        No battles have been logged for ${escHtml(p.name)} yet. Run a clan sync to pull recent attacks and defenses.
+      </div>
+    `;
+  }
+
+  const cardsHtml = logs.map(b => {
+    const isAtk = Boolean(b.attack);
+    const sign = isAtk ? "+" : "-";
+    const starsNum = Math.min(3, Math.max(0, Number(b.stars) || 0));
+    const starsVisual = "★".repeat(starsNum) + "☆".repeat(3 - starsNum);
+    const destPct = Math.round(Number(b.destruction) || 0);
+    const typeLabel = formatBattleType(b.battleType);
+    const ago = b.timestamp ? formatRelTime(b.timestamp) : "";
+    const army = Array.isArray(b.army) ? b.army : [];
+
+    const armyHtml = army.length
+      ? `
+        <details class="army-details">
+          <summary>▸ Army Used (${army.length} unit types)</summary>
+          <div class="army-pills">
+            ${army.map(u => `
+              <span class="mini-badge">${u.count > 1 ? `${u.count}× ` : ""}${escHtml(u.name)}${u.level ? ` L${u.level}` : ""}</span>
+            `).join("")}
+          </div>
+        </details>
+      `
+      : "";
+
+    return `
+      <div class="battle-card">
+        <div class="battle-top">
+          <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+            <span class="mini-badge ${isAtk ? "in" : "def"}">${isAtk ? "ATK" : "DEF"}</span>
+            <span class="mini-badge">${escHtml(typeLabel)}</span>
+            <strong style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+              vs ${escHtml(b.opponentName || "Unknown")}
+            </strong>
+          </div>
+          <span class="mono" style="font-size:11px;color:var(--text-muted);flex-shrink:0;">${escHtml(ago)}</span>
+        </div>
+
+        <div class="battle-mid">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="battle-stars">${starsVisual}</span>
+            <span class="mono" style="font-size:12px;font-weight:700;">${destPct}%</span>
+          </div>
+          <div class="loot-line">
+            <span class="loot-gold">${sign}${formatCompactNum(b.lootGold)} G</span>
+            <span class="loot-elixir">${sign}${formatCompactNum(b.lootElixir)} E</span>
+            <span class="loot-dark">${sign}${formatCompactNum(b.lootDark)} DE</span>
+          </div>
+        </div>
+
+        ${armyHtml}
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="sec-label">Recent Battle Log (${logs.length})</div>
+    <div>${cardsHtml}</div>
+  `;
 }
 
 function renderDrawerContent(p) {
@@ -1398,6 +1796,8 @@ function renderDrawerContent(p) {
     `;
   }
 
+  const battleLogHtml = renderBattleLogSection(p);
+
   document.getElementById("drawerBody").innerHTML = `
     <div class="sec-label">TH19 Progression Breakdown</div>
     <div class="cat-grid">${catHtml}</div>
@@ -1421,6 +1821,8 @@ function renderDrawerContent(p) {
     </div>
 
     ${deepHtml}
+
+    ${battleLogHtml}
 
     <div class="sec-label">Sync Village Export JSON</div>
     <div style="font-size:12px;color:var(--text-muted);">
@@ -1713,6 +2115,20 @@ function debounce(fn, ms) {
   return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
 }
 const debouncedFilter = debounce(() => applyFilters(), 150);
+
+function formatCompactNum(num) {
+  const n = Number(num) || 0;
+  if (n >= 1000000000) return (n / 1000000000).toFixed(2).replace(/\.00$/, "") + "B";
+  if (n >= 1000000)    return (n / 1000000).toFixed(1).replace(/\.0$/, "") + "M";
+  if (n >= 1000)       return (n / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+  return Math.round(n).toLocaleString();
+}
+
+function formatBattleType(type) {
+  if (!type) return "Standard";
+  const cleaned = String(type).replace(/([A-Z])/g, " $1").replace(/[_-]+/g, " ").trim();
+  return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
+}
 
 function formatHours(hours) {
   if (hours < 24) return `${Math.round(hours)}h`;
