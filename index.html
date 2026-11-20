@@ -587,6 +587,7 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      max-width: 100%;
     }
     .upgrade-row {
       background: var(--bg-input);
@@ -597,6 +598,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      min-width: 0;
+      max-width: 100%;
     }
     .upgrade-left {
       min-width: 0;
@@ -748,6 +751,8 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
+      max-width: 100%;
+      overflow: hidden;
     }
     .clock-header {
       display: flex;
@@ -759,6 +764,7 @@
     }
     .clock-canvas-wrap {
       position: relative;
+      width: 100%;
       height: 255px;
       max-width: 310px;
       margin: 0 auto;
@@ -776,6 +782,8 @@
 
     .pill-bar-row {
       margin-bottom: 9px;
+      min-width: 0;
+      max-width: 100%;
     }
     .pill-bar-row:last-child { margin-bottom: 0; }
     .pill-bar-head {
@@ -785,6 +793,7 @@
       gap: 8px;
       margin-bottom: 4px;
       font-size: 12px;
+      min-width: 0;
     }
     .pill-bar-name {
       font-weight: 700;
@@ -816,9 +825,14 @@
     }
     .ranked-stat-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 8px;
       margin-top: 12px;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+    .ranked-stat-grid > * {
+      min-width: 0;
     }
 
     /* ============================================================
@@ -830,6 +844,8 @@
       border-radius: 12px;
       padding: 11px 12px;
       margin-bottom: 8px;
+      max-width: 100%;
+      overflow: hidden;
     }
     .battle-card:last-child { margin-bottom: 0; }
     .battle-top {
@@ -838,6 +854,7 @@
       justify-content: space-between;
       gap: 8px;
       margin-bottom: 6px;
+      min-width: 0;
     }
     .battle-mid {
       display: flex;
@@ -893,7 +910,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      max-width: 780px;
+      width: 100%;
+      max-width: min(780px, 100%);
       margin: 0 auto;
       height: 92dvh;
       max-height: 92dvh;
@@ -903,6 +921,7 @@
       z-index: 1100;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
       box-shadow: 0 -12px 40px rgba(2, 6, 23, 0.6);
@@ -920,6 +939,8 @@
       border-radius: 22px 22px 0 0;
       padding: 10px 20px 14px 20px;
       flex-shrink: 0;
+      max-width: 100%;
+      overflow-x: hidden;
       touch-action: pan-y;
     }
     .drag-pill {
@@ -934,6 +955,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
+      min-width: 0;
     }
     .drawer-close-btn {
       min-width: 96px;
@@ -961,7 +983,10 @@
 
     .drawer-scroll {
       flex: 1;
+      width: 100%;
+      max-width: 100%;
       overflow-y: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
       padding: 18px 20px calc(32px + env(safe-area-inset-bottom, 0px));
     }
@@ -980,32 +1005,46 @@
 
     .cat-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     @media (min-width: 540px) {
-      .cat-grid { grid-template-columns: repeat(3, 1fr); }
+      .cat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    .cat-grid > * {
+      min-width: 0;
     }
     .cat-box {
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 10px 12px;
+      min-width: 0;
+      max-width: 100%;
     }
 
     .stat-pills {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     @media (min-width: 540px) {
-      .stat-pills { grid-template-columns: repeat(4, 1fr); }
+      .stat-pills { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    .stat-pills > * {
+      min-width: 0;
     }
     .stat-pill {
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 10px;
+      min-width: 0;
+      max-width: 100%;
     }
 
     .btn-sync-primary {
@@ -1368,7 +1407,6 @@ let state = {
 };
 
 let radarChart = null;
-let trendChart = null;
 let attackClockChart = null;
 
 /* ============================================================
@@ -2026,7 +2064,6 @@ function openDrawer(tag) {
 function closeDrawer() {
   state.activeDrawerTag = null;
   if (radarChart) { radarChart.destroy(); radarChart = null; }
-  if (trendChart) { trendChart.destroy(); trendChart = null; }
   if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
 
   document.getElementById("drawerBackdrop").classList.remove("open");
@@ -2408,10 +2445,9 @@ function renderDrawerContent(p) {
       </div>
     </div>
 
-    <div class="sec-label">Balance Radar & 30-Day Trajectory</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="cat-box" style="height:210px;"><canvas id="radarCanvas"></canvas></div>
-      <div class="cat-box" style="height:210px;"><canvas id="trendCanvas"></canvas></div>
+    <div class="sec-label">Balance Radar</div>
+    <div class="cat-box" style="width:100%;max-width:100%;height:220px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;">
+      <canvas id="radarCanvas"></canvas>
     </div>
 
     ${clockHtml}
@@ -2421,12 +2457,11 @@ function renderDrawerContent(p) {
     ${battleLogHtml}
   `;
 
-  renderDrawerCharts(p, cats, clockProfile);
+  renderDrawerCharts(cats, clockProfile);
 }
 
-function renderDrawerCharts(p, cats, clockProfile) {
+function renderDrawerCharts(cats, clockProfile) {
   if (radarChart) { radarChart.destroy(); radarChart = null; }
-  if (trendChart) { trendChart.destroy(); trendChart = null; }
   if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
 
   const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
@@ -2459,31 +2494,6 @@ function renderDrawerCharts(p, cats, clockProfile) {
           angleLines: { color: gridColor },
           pointLabels: { color: tickColor, font: { size: 10, weight: "600" } }
         }
-      }
-    }
-  });
-
-  const tCtx = document.getElementById("trendCanvas").getContext("2d");
-  trendChart = new Chart(tCtx, {
-    type: "line",
-    data: {
-      labels: p.historyDates && p.historyDates.length ? p.historyDates : ["Now"],
-      datasets: [{
-        data: p.historyPcts && p.historyPcts.length ? p.historyPcts : [parseFloat(p.percentage) || 0],
-        borderColor: "#10b981",
-        backgroundColor: "rgba(16, 185, 129, 0.16)",
-        fill: true,
-        tension: 0.35,
-        borderWidth: 2
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 10 } } },
-        y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
       }
     }
   });
