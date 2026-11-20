@@ -1,1 +1,3269 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>Molly Metrics — Base Vault</title>
 
+  <!-- Google Fonts: Inter & Rajdhani -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Rajdhani', 'Inter', 'sans-serif'],
+          },
+          colors: {
+            obsidian: '#0b0f17',
+            stonecard: '#151c28',
+            stonehover: '#1b2434',
+            borderline: '#263145',
+            clashgold: {
+              DEFAULT: '#f5b942',
+              light: '#ffd166',
+              dark: '#c98e1e',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons via CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body {
+      background-color: #0b0f17;
+      color: #f1f5f9;
+      background-image:
+        radial-gradient(ellipse 80% 45% at 50% -10%, rgba(245, 185, 66, 0.09), transparent),
+        radial-gradient(ellipse 60% 40% at 85% 10%, rgba(56, 189, 248, 0.05), transparent);
+      min-height: 100dvh;
+      padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b0f17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #263145;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3b4b68;
+    }
+
+    @keyframes copyFlash {
+      0% { opacity: 0; transform: scale(0.92); }
+      15% { opacity: 1; transform: scale(1); }
+      80% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(1.03); }
+    }
+
+    .animate-copy-flash {
+      animation: copyFlash 1.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes toastSlide {
+      from { opacity: 0; transform: translateY(14px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .animate-toast {
+      animation: toastSlide 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Interactive Popularity Popover */
+    .pop-popover {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(6px) scale(0.97);
+      transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+    }
+    .pop-trigger-group:hover .pop-popover,
+    .pop-trigger-group.popover-open .pop-popover {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Seamless Molly Metrics Bottom Navigation Bar */
+    .molly-bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 40;
+      background: rgba(15, 23, 42, 0.96);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid #334155;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .molly-bottom-nav-inner {
+      max-width: 780px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: 64px;
+    }
+    .molly-nav-item {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+    .molly-nav-item:hover {
+      color: #e2e8f0;
+    }
+    .molly-nav-item .nav-ico {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .molly-nav-item.active {
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-clashgold selection:text-obsidian">
+
+  <!-- ==================== TOP NAVIGATION BAR ==================== -->
+  <header class="sticky top-0 z-30 border-b border-borderline/80 bg-obsidian/85 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-clashgold via-amber-500 to-amber-700 p-[1px] shadow-lg shadow-amber-500/20">
+          <div class="w-full h-full rounded-[11px] bg-stonecard flex items-center justify-center">
+            <svg class="w-6 h-6 text-clashgold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L4 5.5v6.2c0 5.1 3.4 9.8 8 11.3 4.6-1.5 8-6.2 8-11.3V5.5L12 2z" fill="rgba(245,185,66,0.14)"/>
+              <path d="M8.5 11.5l1.5-2.5 2 2 2-2 1.5 2.5v3h-7v-3z" fill="currentColor"/>
+            </svg>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-display text-xl sm:text-2xl font-bold tracking-wide text-white leading-none">
+              CLASH<span class="text-clashgold">VAULT</span>
+            </h1>
+            <span id="cloudSyncPill" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-sky-500/15 text-sky-300 border border-sky-500/30">
+              <span id="cloudSyncDot" class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+              <span id="cloudSyncLabel">Cloud Sync</span>
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 hidden sm:block mt-0.5">Molly Metrics Shared Base Vault · Google Drive &amp; 7-Day X Tracking</p>
+        </div>
+      </div>
+
+      <!-- Vault Stats & Cloud Controls -->
+      <div class="flex items-center gap-2 sm:gap-2.5">
+        <!-- Live Counter Pill -->
+        <div class="hidden xl:flex items-center gap-3 px-3.5 py-1.5 rounded-xl bg-stonecard border border-borderline text-xs">
+          <div class="flex items-center gap-1.5 text-slate-300">
+            <i data-lucide="layout-grid" class="w-3.5 h-3.5 text-clashgold"></i>
+            <span id="headerTotalBases" class="font-bold text-white">0</span>
+            <span class="text-slate-400">Bases</span>
+          </div>
+          <span class="text-borderline">|</span>
+          <div class="flex items-center gap-1.5 text-slate-300">
+            <i data-lucide="copy-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span id="headerTotalCopies" class="font-bold text-white">0</span>
+            <span class="text-slate-400">Copies</span>
+          </div>
+        </div>
+
+        <!-- Refresh from Backend -->
+        <button
+          id="btnRefreshCloud"
+          type="button"
+          title="Reload bases from Google Sheets"
+          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stonecard hover:bg-stonehover text-sky-300 border border-borderline text-xs font-semibold transition cursor-pointer"
+        >
+          <i id="refreshCloudIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Sync</span>
+        </button>
+
+        <!-- API Endpoint Settings -->
+        <button
+          id="btnOpenApiModal"
+          type="button"
+          title="Apps Script Web App URL Settings"
+          class="inline-flex items-center justify-center p-2 rounded-xl bg-stonecard hover:bg-stonehover text-slate-300 border border-borderline transition cursor-pointer"
+        >
+          <i data-lucide="settings" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Import JSON Backup -->
+        <button
+          id="btnTriggerImportJson"
+          type="button"
+          title="Import JSON Vault Backup"
+          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stonecard hover:bg-stonehover text-slate-200 border border-borderline text-xs font-medium transition cursor-pointer"
+        >
+          <i data-lucide="upload" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span class="hidden md:inline">Import</span>
+        </button>
+        <input id="inputImportJson" type="file" accept=".json,application/json" class="hidden" />
+
+        <!-- Export JSON Backup -->
+        <button
+          id="btnExportJson"
+          type="button"
+          title="Export JSON Vault Backup"
+          class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stonecard hover:bg-stonehover text-slate-200 border border-borderline text-xs font-medium transition cursor-pointer"
+        >
+          <i data-lucide="download" class="w-3.5 h-3.5 text-clashgold"></i>
+          <span class="hidden md:inline">Export</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN WORKSPACE ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+
+    <!-- 1. TOP IMPORT COMMAND BAR -->
+    <section class="rounded-2xl bg-stonecard/90 border border-borderline p-4 sm:p-6 shadow-2xl shadow-black/40">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-clashgold/15 text-clashgold">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          </span>
+          <h2 class="text-sm sm:text-base font-semibold text-white">Import Base from X / Twitter Post</h2>
+        </div>
+        <p class="text-xs text-slate-400">
+          Auto-extracts layout, <span class="text-slate-200 font-medium">TH level</span>, <span class="text-slate-200 font-medium">7-day tracked X likes</span>, <span class="text-slate-200 font-medium">CC troops</span> &amp; saves to Google Sheets
+        </p>
+      </div>
+
+      <form id="xImportForm" class="flex flex-col md:flex-row gap-2.5">
+        <div class="relative flex-1 flex items-center">
+          <div class="absolute left-3.5 text-slate-400 pointer-events-none flex items-center">
+            <i data-lucide="link-2" class="w-4 h-4"></i>
+          </div>
+          <input
+            id="xUrlInput"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Paste 1 or more X post URLs (e.g., https://x.com/1darkontop/status/...)"
+            class="w-full pl-10 pr-24 py-3 rounded-xl bg-obsidian border border-borderline focus:border-clashgold focus:ring-2 focus:ring-clashgold/20 text-sm text-white placeholder-slate-500 outline-none transition"
+          />
+          <button
+            id="btnPasteClipboard"
+            type="button"
+            class="absolute right-2 px-2.5 py-1.5 rounded-lg bg-stonecard hover:bg-stonehover border border-borderline text-xs font-medium text-slate-300 hover:text-white inline-flex items-center gap-1 transition cursor-pointer"
+          >
+            <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 text-clashgold"></i>
+            <span>Paste</span>
+          </button>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <button
+            id="btnFetchBase"
+            type="submit"
+            class="px-5 py-3 rounded-xl bg-clashgold hover:bg-clashgold-light active:scale-[0.99] text-obsidian font-bold text-sm inline-flex items-center justify-center gap-2 shadow-lg shadow-clashgold/20 transition cursor-pointer whitespace-nowrap"
+          >
+            <i id="fetchBtnIcon" data-lucide="download-cloud" class="w-4 h-4"></i>
+            <span id="fetchBtnLabel">Fetch &amp; Save Base</span>
+          </button>
+
+          <button
+            id="btnOpenManualModal"
+            type="button"
+            class="px-4 py-3 rounded-xl bg-obsidian hover:bg-stonehover text-slate-200 border border-borderline hover:border-slate-600 font-medium text-sm inline-flex items-center justify-center gap-2 transition cursor-pointer whitespace-nowrap"
+          >
+            <i data-lucide="image-plus" class="w-4 h-4 text-clashgold"></i>
+            <span>+ Manual / Paste Screenshot</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Inline Fetch Status / Error Callout -->
+      <div id="fetchStatusBanner" class="hidden mt-3 p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div class="flex items-start sm:items-center gap-2">
+          <i id="fetchStatusIcon" data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5 sm:mt-0"></i>
+          <span id="fetchStatusText"></span>
+        </div>
+        <button
+          id="btnFallbackManual"
+          type="button"
+          class="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-clashgold text-obsidian font-semibold hover:bg-clashgold-light transition cursor-pointer shrink-0"
+        >
+          Paste Screenshot Manually
+        </button>
+      </div>
+
+      <!-- Duplicate Link Blocked / Original Poster Enforced Banner -->
+      <div id="duplicateAlertBanner" class="hidden mt-3 p-4 rounded-xl border text-xs space-y-2.5"></div>
+    </section>
+
+    <!-- 2. FILTER, SEARCH & GRID CONTROLS BAR -->
+    <section class="space-y-3">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <!-- Town Hall Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 lg:pb-0" id="thFilterContainer"></div>
+
+        <!-- Search, Sort & Grid Density Controls -->
+        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2">
+          <div class="relative flex-1 sm:w-56">
+            <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search @creator, CC, tags..."
+              class="w-full pl-9 pr-8 py-2 rounded-xl bg-stonecard border border-borderline focus:border-clashgold text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition"
+            />
+            <button
+              id="btnClearSearch"
+              type="button"
+              class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
+              title="Clear search"
+            >
+              <i data-lucide="x" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <select
+            id="sortSelect"
+            aria-label="Sort bases"
+            class="px-3 py-2 rounded-xl bg-stonecard border border-borderline text-xs sm:text-sm text-slate-200 focus:border-clashgold outline-none cursor-pointer"
+          >
+            <option value="trending">Trending (Time-Weighted Likes)</option>
+            <option value="most_likes">Most Likes (Raw)</option>
+            <option value="newest_post">Newest Post Date</option>
+            <option value="oldest_post">Oldest Post Date</option>
+            <option value="most_copied">Most Copied</option>
+            <option value="newest">Recently Added</option>
+          </select>
+
+          <div class="hidden md:flex items-center bg-stonecard border border-borderline rounded-xl p-1" role="group" aria-label="Grid column density">
+            <button type="button" data-cols="2" class="col-toggle-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">2</button>
+            <button type="button" data-cols="3" class="col-toggle-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">3</button>
+            <button type="button" data-cols="4" class="col-toggle-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer">4</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category / Archetype Pills + Active Creator Filter Chip -->
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1" id="categoryFilterContainer"></div>
+
+        <div id="activeCreatorChip" class="hidden inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-clashgold/15 border border-clashgold/40 text-xs text-clashgold font-semibold">
+          <i data-lucide="user-check" class="w-3.5 h-3.5"></i>
+          <span>Creator: <strong id="activeCreatorName">@creator</strong></span>
+          <button id="btnClearCreatorFilter" type="button" title="Clear creator filter" class="hover:text-white cursor-pointer">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. BASE GALLERY GRID -->
+    <section aria-label="Saved Clash of Clans Bases">
+      <!-- Loading Skeleton -->
+      <div id="loadingState" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div class="rounded-2xl bg-stonecard border border-borderline overflow-hidden animate-pulse">
+          <div class="aspect-[16/10] bg-obsidian"></div>
+          <div class="p-4 space-y-2.5">
+            <div class="h-3.5 bg-borderline/60 rounded w-2/3"></div>
+            <div class="h-3 bg-borderline/40 rounded w-1/2"></div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-stonecard border border-borderline overflow-hidden animate-pulse hidden sm:block">
+          <div class="aspect-[16/10] bg-obsidian"></div>
+          <div class="p-4 space-y-2.5">
+            <div class="h-3.5 bg-borderline/60 rounded w-2/3"></div>
+            <div class="h-3 bg-borderline/40 rounded w-1/2"></div>
+          </div>
+        </div>
+        <div class="rounded-2xl bg-stonecard border border-borderline overflow-hidden animate-pulse hidden lg:block">
+          <div class="aspect-[16/10] bg-obsidian"></div>
+          <div class="p-4 space-y-2.5">
+            <div class="h-3.5 bg-borderline/60 rounded w-2/3"></div>
+            <div class="h-3 bg-borderline/40 rounded w-1/2"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="baseGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden rounded-2xl bg-stonecard/60 border border-dashed border-borderline p-12 text-center max-w-xl mx-auto my-8">
+        <div class="w-14 h-14 rounded-2xl bg-obsidian border border-borderline flex items-center justify-center mx-auto mb-4">
+          <i data-lucide="shield-off" class="w-7 h-7 text-slate-500"></i>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-1" id="emptyStateTitle">No bases match your filters</h3>
+        <p class="text-sm text-slate-400 mb-5" id="emptyStateDesc">
+          Try clearing your search or switching Town Hall / Category filters, or import a new base from X above.
+        </p>
+        <button
+          id="btnResetFilters"
+          type="button"
+          class="px-4 py-2 rounded-xl bg-clashgold text-obsidian font-semibold text-sm hover:bg-clashgold-light transition cursor-pointer"
+        >
+          Reset Filters
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== SEAMLESS MOLLY METRICS BOTTOM NAVIGATION ==================== -->
+  <nav class="molly-bottom-nav" aria-label="Molly Metrics Navigation">
+    <div class="molly-bottom-nav-inner">
+      <a href="index.html" class="molly-nav-item">
+        <span class="nav-ico">🛡️</span>Roster
+      </a>
+      <a href="index.html#activity" class="molly-nav-item">
+        <span class="nav-ico">⚔️</span>Activity
+      </a>
+      <a href="index.html#deepsync" class="molly-nav-item">
+        <span class="nav-ico">🔧</span>Deep Sync
+      </a>
+      <a href="bases.html" class="molly-nav-item active" aria-current="page">
+        <span class="nav-ico">🏰</span>Bases
+      </a>
+    </div>
+  </nav>
+
+  <!-- ==================== MODAL 1: MULTI-BASE POST DETECTED ==================== -->
+  <div id="multiBaseModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-stonecard border border-borderline rounded-2xl max-w-3xl w-full shadow-2xl overflow-hidden my-auto">
+      <div class="px-5 py-4 border-b border-borderline flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-clashgold/15 text-clashgold flex items-center justify-center">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">Multi-Base Post Detected</h3>
+            <p id="multiBaseSubtitle" class="text-xs text-slate-400">Select which bases from this post to save into your vault</p>
+          </div>
+        </div>
+        <button type="button" class="close-modal-btn p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-stonehover cursor-pointer" data-modal="multiBaseModal">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 max-h-[68vh] overflow-y-auto space-y-4">
+        <div id="multiBasePostMeta" class="p-3 rounded-xl bg-obsidian border border-borderline flex flex-wrap items-center justify-between gap-2 text-xs"></div>
+        <div id="multiBaseItemsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+      </div>
+
+      <div class="px-5 py-4 border-t border-borderline bg-obsidian/60 flex flex-wrap items-center justify-between gap-3">
+        <button id="btnToggleAllMultiBases" type="button" class="text-xs font-semibold text-clashgold hover:underline cursor-pointer">
+          Select All / None
+        </button>
+        <div class="flex items-center gap-2.5">
+          <button type="button" class="close-modal-btn px-4 py-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-xs sm:text-sm font-medium text-slate-300 cursor-pointer" data-modal="multiBaseModal">
+            Cancel
+          </button>
+          <button id="btnConfirmMultiImport" type="button" class="px-5 py-2 rounded-xl bg-clashgold hover:bg-clashgold-light text-obsidian font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 shadow-lg shadow-clashgold/20 cursor-pointer">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+            <span id="btnConfirmMultiLabel">Import Selected (2)</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 2: MANUAL / PASTE SCREENSHOT ==================== -->
+  <div id="manualModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-stonecard border border-borderline rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden my-auto">
+      <div class="px-5 py-4 border-b border-borderline flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-clashgold/15 text-clashgold flex items-center justify-center">
+            <i data-lucide="image-plus" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-white text-base">Manual Base &amp; Screenshot Import</h3>
+            <p class="text-xs text-slate-400">Press <kbd class="px-1.5 py-0.5 rounded bg-obsidian border border-borderline text-slate-300 font-mono text-[10px]">Ctrl+V</kbd> anywhere in this modal — uploaded straight to Google Drive</p>
+          </div>
+        </div>
+        <button type="button" class="close-modal-btn p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-stonehover cursor-pointer" data-modal="manualModal">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="manualBaseForm" class="p-5 max-h-[75vh] overflow-y-auto space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Base Layout Screenshot *</label>
+          <div id="manualDropZone" class="relative rounded-xl border-2 border-dashed border-borderline hover:border-clashgold/60 bg-obsidian/80 p-4 text-center transition cursor-pointer overflow-hidden">
+            <input id="manualFileInput" type="file" accept="image/*" class="hidden" />
+            <div id="manualDropPlaceholder" class="py-4 space-y-2">
+              <div class="w-10 h-10 rounded-xl bg-stonecard border border-borderline flex items-center justify-center mx-auto text-clashgold">
+                <i data-lucide="clipboard-image" class="w-5 h-5"></i>
+              </div>
+              <p class="text-xs sm:text-sm font-medium text-slate-200">
+                Paste screenshot (<span class="text-clashgold font-semibold">Ctrl+V</span>), drag &amp; drop, or <span class="underline text-clashgold">browse file</span>
+              </p>
+              <p class="text-[11px] text-slate-500">Supports PNG, JPG, WebP — automatically saved to Google Drive</p>
+            </div>
+            <div id="manualPreviewWrapper" class="hidden relative">
+              <img id="manualImagePreview" src="" alt="Base layout preview" class="max-h-52 mx-auto rounded-lg object-contain border border-borderline" />
+              <button id="btnRemoveManualImage" type="button" class="mt-2 inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 text-xs font-medium cursor-pointer">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Remove Image
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label for="manualBaseLink" class="text-xs font-semibold text-slate-300">Clash of Clans Base Link *</label>
+            <span id="manualDetectedThBadge" class="hidden px-2 py-0.5 rounded-md bg-clashgold/20 text-clashgold font-display font-bold text-xs border border-clashgold/40">
+              TH19 Detected
+            </span>
+          </div>
+          <input id="manualBaseLink" type="text" required placeholder="https://link.clashofclans.com/en/?action=OpenLayout&id=TH19%3AWB%3A..." class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white placeholder-slate-500 outline-none" />
+        </div>
+
+        <div>
+          <label for="manualTweetCaption" class="block text-xs font-semibold text-slate-300 mb-1.5">
+            Optional Tweet Text / Caption <span class="text-slate-500 font-normal">(auto-extracts CC troops, TH, post date &amp; tags)</span>
+          </label>
+          <textarea id="manualTweetCaption" rows="3" placeholder="Paste post text here..." class="w-full px-3.5 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white placeholder-slate-500 outline-none resize-none"></textarea>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label for="manualThInput" class="block text-xs font-semibold text-slate-300 mb-1">Town Hall</label>
+            <input id="manualThInput" type="text" value="TH19" placeholder="TH19" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white uppercase outline-none" />
+          </div>
+          <div class="sm:col-span-2">
+            <label for="manualCreatorInput" class="block text-xs font-semibold text-slate-300 mb-1">Creator @Handle</label>
+            <input id="manualCreatorInput" type="text" placeholder="@1darkontop" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="manualPostDateInput" class="block text-xs font-semibold text-slate-300 mb-1">X Post Date (Optional)</label>
+            <input id="manualPostDateInput" type="datetime-local" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label for="manualLikesInput" class="block text-xs font-semibold text-slate-300 mb-1">X Likes Count (Optional)</label>
+            <input id="manualLikesInput" type="number" min="0" placeholder="e.g., 53" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="manualCcInput" class="block text-xs font-semibold text-slate-300 mb-1">CC Troops</label>
+            <input id="manualCcInput" type="text" placeholder="e.g., 2 IG, 1 Furnace, 6 Gobs" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label for="manualTagsInput" class="block text-xs font-semibold text-slate-300 mb-1">Tags (comma-separated)</label>
+            <input id="manualTagsInput" type="text" placeholder="Legend, Anti-Bowler" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label for="manualPostUrlInput" class="block text-xs font-semibold text-slate-300 mb-1">Original X Post Link (Optional)</label>
+          <input id="manualPostUrlInput" type="text" placeholder="https://x.com/..." class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-borderline">
+          <button type="button" class="close-modal-btn px-4 py-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-xs sm:text-sm font-medium text-slate-300 cursor-pointer" data-modal="manualModal">
+            Cancel
+          </button>
+          <button id="btnManualSaveSubmit" type="submit" class="px-5 py-2 rounded-xl bg-clashgold hover:bg-clashgold-light text-obsidian font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 shadow-lg shadow-clashgold/20 cursor-pointer">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Save to Vault</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 3: EDIT BASE MODAL ==================== -->
+  <div id="editModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-stonecard border border-borderline rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden my-auto">
+      <div class="px-5 py-4 border-b border-borderline flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="pencil" class="w-4 h-4 text-clashgold"></i>
+          <h3 class="font-bold text-white text-base">Edit Saved Base</h3>
+        </div>
+        <div class="flex items-center gap-2">
+          <button id="btnEditRefreshLiveStats" type="button" title="Re-fetch live X likes and date" class="hidden px-2.5 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-sky-300 text-xs font-semibold inline-flex items-center gap-1.5 transition cursor-pointer">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+            <span>Refresh Live X Stats</span>
+          </button>
+          <button type="button" class="close-modal-btn p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-stonehover cursor-pointer" data-modal="editModal">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <form id="editBaseForm" class="p-5 max-h-[78vh] overflow-y-auto space-y-4">
+        <input type="hidden" id="editBaseId" />
+
+        <div id="editImageSelectorBlock" class="hidden">
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5">Select Base Screenshot from Post</label>
+          <div id="editImageThumbnails" class="flex items-center gap-2 overflow-x-auto pb-1"></div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label for="editThInput" class="block text-xs font-semibold text-slate-300 mb-1">Town Hall</label>
+            <input id="editThInput" type="text" required class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white uppercase outline-none" />
+          </div>
+          <div class="col-span-2">
+            <label for="editCreatorInput" class="block text-xs font-semibold text-slate-300 mb-1">Creator @Handle</label>
+            <input id="editCreatorInput" type="text" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label for="editPostDateInput" class="block text-xs font-semibold text-slate-300 mb-1">X Post Date</label>
+            <input id="editPostDateInput" type="datetime-local" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+          <div>
+            <label for="editLikesInput" class="block text-xs font-semibold text-slate-300 mb-1">X Likes Count</label>
+            <input id="editLikesInput" type="number" min="0" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label for="editLinkInput" class="block text-xs font-semibold text-slate-300 mb-1">Clash of Clans Base Link</label>
+          <input id="editLinkInput" type="text" required class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+        </div>
+
+        <div>
+          <label for="editCcInput" class="block text-xs font-semibold text-slate-300 mb-1">CC Troops</label>
+          <input id="editCcInput" type="text" placeholder="e.g., 1 furnace 3 hh 2 witches" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+        </div>
+
+        <div>
+          <label for="editTagsInput" class="block text-xs font-semibold text-slate-300 mb-1">Archetype Tags (comma-separated)</label>
+          <input id="editTagsInput" type="text" placeholder="Legend, War, Anti-Bowler" class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+        </div>
+
+        <div>
+          <label for="editNotesInput" class="block text-xs font-semibold text-slate-300 mb-1">Notes / Defense Performance</label>
+          <textarea id="editNotesInput" rows="2" placeholder="Optional notes..." class="w-full px-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none resize-none"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-2.5 border-t border-borderline">
+          <button type="button" class="close-modal-btn px-4 py-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-xs sm:text-sm font-medium text-slate-300 cursor-pointer" data-modal="editModal">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-clashgold hover:bg-clashgold-light text-obsidian font-bold text-xs sm:text-sm cursor-pointer">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 4: FULL-SCREEN LIGHTBOX INSPECTOR ==================== -->
+  <div id="lightboxModal" class="hidden fixed inset-0 z-50 bg-black/92 backdrop-blur-md flex flex-col">
+    <div class="px-4 sm:px-6 py-3.5 border-b border-borderline/80 bg-obsidian/90 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-2.5 flex-wrap">
+        <span id="lightboxThBadge" class="px-2.5 py-1 rounded-lg bg-clashgold text-obsidian font-display font-bold text-sm tracking-wide">TH19</span>
+        <div id="lightboxTags" class="flex items-center gap-1.5 flex-wrap"></div>
+        <a id="lightboxCreatorLink" href="#" target="_blank" rel="noopener noreferrer" class="text-xs sm:text-sm font-semibold text-slate-200 hover:text-clashgold inline-flex items-center gap-1 transition">
+          <span id="lightboxCreatorText">@creator</span>
+          <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+        </a>
+        <span id="lightboxDateBadge" class="px-2.5 py-1 rounded-lg bg-stonecard border border-borderline text-xs text-slate-300 inline-flex items-center gap-1.5">
+          <i data-lucide="calendar" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span id="lightboxDateText"></span>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2 flex-wrap">
+        <div class="inline-flex items-center rounded-xl bg-stonecard border border-borderline overflow-hidden text-xs">
+          <span id="lightboxPopularityText" class="px-3 py-2 font-semibold text-rose-300"></span>
+          <button id="btnLightboxEditLikes" type="button" title="Edit likes count" class="px-2.5 py-2 border-l border-borderline hover:bg-stonehover text-slate-300 hover:text-white cursor-pointer">
+            <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <button id="btnLightboxRefreshStats" type="button" title="Re-fetch live X likes & post date" class="hidden px-3 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/40 text-xs font-semibold text-sky-300 inline-flex items-center gap-1.5 transition cursor-pointer">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          <span class="hidden sm:inline">Refresh X Stats</span>
+        </button>
+
+        <button id="btnLightboxZoom" type="button" class="px-3 py-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-xs font-semibold text-slate-200 inline-flex items-center gap-1.5 transition cursor-pointer">
+          <i data-lucide="zoom-in" class="w-4 h-4 text-clashgold"></i>
+          <span id="lightboxZoomLabel">1.75x Zoom</span>
+        </button>
+
+        <a id="btnLightboxOpenCoc" href="#" target="_blank" rel="noopener noreferrer" title="Launch directly in Clash of Clans" class="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-semibold text-xs sm:text-sm inline-flex items-center gap-1.5 transition">
+          <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+          <span class="hidden md:inline">Open in CoC</span>
+        </a>
+
+        <button id="btnLightboxCopyLink" type="button" class="px-4 py-2 rounded-xl bg-clashgold hover:bg-clashgold-light text-obsidian font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 shadow-lg shadow-clashgold/20 transition cursor-pointer">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          <span>Copy Base Link</span>
+        </button>
+
+        <button type="button" class="close-modal-btn p-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-slate-300 hover:text-white transition cursor-pointer" data-modal="lightboxModal" title="Close Lightbox (Esc)">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="lightboxViewport" class="relative flex-1 overflow-auto flex flex-col items-center justify-center p-4 sm:p-8 select-none gap-3">
+      <button id="btnLightboxPrev" type="button" title="Previous Base (Left Arrow)" class="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-10 p-2.5 sm:p-3 rounded-full bg-stonecard/90 hover:bg-clashgold hover:text-obsidian text-white border border-borderline shadow-xl transition cursor-pointer">
+        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+      </button>
+
+      <img id="lightboxImage" src="" alt="Full screen Clash of Clans base layout" class="max-h-[68vh] max-w-full rounded-xl border border-borderline shadow-2xl object-contain transition-transform duration-200 origin-center cursor-zoom-in" />
+
+      <div id="lightboxImageSwitcher" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stonecard/90 border border-borderline"></div>
+
+      <button id="btnLightboxNext" type="button" title="Next Base (Right Arrow)" class="fixed right-3 sm:right-6 top-1/2 -translate-y-1/2 z-10 p-2.5 sm:p-3 rounded-full bg-stonecard/90 hover:bg-clashgold hover:text-obsidian text-white border border-borderline shadow-xl transition cursor-pointer">
+        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+      </button>
+    </div>
+
+    <div class="px-4 sm:px-6 py-3 border-t border-borderline/80 bg-obsidian/95 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-slate-400 font-semibold uppercase tracking-wider text-[11px]">CC Request:</span>
+        <span id="lightboxCcText" class="px-2.5 py-1 rounded-lg bg-stonecard border border-borderline text-slate-200 font-medium">None specified</span>
+        <button id="btnLightboxCopyCc" type="button" class="px-2 py-1 rounded-lg bg-stonecard hover:bg-stonehover border border-borderline text-clashgold font-medium inline-flex items-center gap-1 cursor-pointer">
+          <i data-lucide="copy" class="w-3 h-3"></i> Copy CC
+        </button>
+      </div>
+      <p id="lightboxNotesText" class="text-slate-400 truncate max-w-xl"></p>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 5: CUSTOM CONFIRMATION DIALOG ==================== -->
+  <div id="confirmModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-stonecard border border-borderline rounded-2xl max-w-md w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center shrink-0">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 id="confirmModalTitle" class="font-bold text-white text-base">Confirm Action</h3>
+          <p id="confirmModalMessage" class="text-xs sm:text-sm text-slate-300 mt-1">Are you sure you want to proceed?</p>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-2.5 pt-2">
+        <button id="btnConfirmCancel" type="button" class="px-4 py-2 rounded-xl bg-obsidian hover:bg-stonehover border border-borderline text-xs sm:text-sm font-medium text-slate-300 cursor-pointer">
+          Cancel
+        </button>
+        <button id="btnConfirmProceed" type="button" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm cursor-pointer">
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL 6: APPS SCRIPT API SETTINGS ==================== -->
+  <div id="apiModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-stonecard border border-borderline rounded-2xl max-w-lg w-full p-5 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-white text-base">Apps Script Web App URL</h3>
+        <button type="button" class="close-modal-btn p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-stonehover cursor-pointer" data-modal="apiModal">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400">
+        Shared with Molly Metrics (<code class="text-sky-300">localStorage.molly_web_app_url</code>). Paste your deployed Apps Script <code class="text-sky-300">/exec</code> URL below:
+      </p>
+      <input id="apiUrlInput" type="url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white outline-none" />
+      <div class="flex items-center justify-end gap-2">
+        <button id="btnResetApiUrl" type="button" class="px-3.5 py-2 rounded-xl bg-obsidian hover:bg-stonehover border border-borderline text-xs font-semibold text-slate-300 cursor-pointer">
+          Reset Default
+        </button>
+        <button id="btnSaveApiUrl" type="button" class="px-4 py-2 rounded-xl bg-clashgold hover:bg-clashgold-light text-obsidian font-bold text-xs cursor-pointer">
+          Save &amp; Sync
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION STACK ==================== -->
+  <div id="toastContainer" class="fixed bottom-20 right-4 z-50 flex flex-col gap-2 max-w-sm w-[calc(100vw-2rem)] pointer-events-none"></div>
+
+  <!-- ==================== APPLICATION JAVASCRIPT ==================== -->
+  <script>
+    (() => {
+      'use strict';
+
+      /* -------------------------------------------------------------------------
+         1. BACKEND CONFIG & STORAGE KEYS (SHARED WITH index.html)
+      ------------------------------------------------------------------------- */
+      const DEFAULT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
+
+      function getWebAppUrl() {
+        return localStorage.getItem("molly_web_app_url") || DEFAULT_WEB_APP_URL;
+      }
+
+      const STORAGE_KEYS = {
+        CACHE: 'molly_basevault_cache_v1',
+        FAVORITES: 'molly_basevault_favorites_v1',
+        COLS: 'clashvault_grid_cols_v1',
+      };
+
+      const STANDARD_TH_LEVELS = ['All', 'TH19', 'TH18', 'TH17', 'TH16'];
+      const STANDARD_CATEGORIES = ['All', 'Legend', 'Ranked', 'War', 'Anti-Bowler', 'Tested', 'Favorites'];
+
+      /* -------------------------------------------------------------------------
+         2. APPLICATION STATE
+      ------------------------------------------------------------------------- */
+      const state = {
+        bases: [],
+        favoriteIds: new Set(),
+        selectedTh: 'All',
+        selectedCategory: 'All',
+        selectedCreator: '',
+        searchQuery: '',
+        sortBy: 'trending',
+        gridCols: 3,
+        copiedCardId: null,
+        copiedCardTimer: null,
+        pendingMultiBase: null,
+        manualImageDataUrl: '',
+        lightboxBaseId: null,
+        lightboxImageIndex: 0,
+        lightboxZoomed: false,
+        confirmCallback: null,
+      };
+
+      /* -------------------------------------------------------------------------
+         3. NORMALIZATION & LOCAL CACHE / FAVORITES HELPERS
+      ------------------------------------------------------------------------- */
+      function formatThLabel(rawTh, baseLink = '', notes = '') {
+        if (typeof rawTh === 'number' && rawTh > 0) return `TH${rawTh}`;
+        const s = String(rawTh || '').trim().toUpperCase();
+        if (/^(TH|BH)\d{1,2}$/.test(s)) return s;
+        if (/^\d{1,2}$/.test(s) && Number(s) > 0) return `TH${s}`;
+        return extractTownHallFromLinkOrText(baseLink, notes);
+      }
+
+      function parseThNumber(thLabel) {
+        const m = String(thLabel || '').match(/\d{1,2}/);
+        return m ? parseInt(m[0], 10) : 19;
+      }
+
+      function normalizeBaseRecord(raw) {
+        const baseLink = String(raw.baseLink || raw.BaseLink || '').trim();
+        const notes = String(raw.notes || raw.Notes || '');
+        const thLevel = formatThLabel(raw.thLevel ?? raw.THLevel, baseLink, notes);
+        const images = Array.isArray(raw.images)
+          ? raw.images.filter(Boolean)
+          : (raw.imageUrl ? [raw.imageUrl] : []);
+        const imageUrl = String(raw.imageUrl || raw.ImageUrl || images[0] || '').trim();
+        const id = String(raw.id || raw.ID || '');
+        const likesHistory = Array.isArray(raw.likesHistory) ? raw.likesHistory : [];
+
+        return {
+          id,
+          thLevel,
+          baseLink,
+          canonicalId: String(raw.canonicalId || raw.CanonicalID || extractCanonicalLayoutId(baseLink)),
+          imageUrl,
+          images: images.length > 0 ? images : (imageUrl ? [imageUrl] : []),
+          creatorHandle: String(raw.creatorHandle || raw.CreatorHandle || '@unknown').trim(),
+          postUrl: String(raw.postUrl || raw.PostUrl || '').trim(),
+          postTimestamp: Number(raw.postTimestamp) || Number(raw.createdAt) || Date.now(),
+          likes: Number.isFinite(Number(raw.likes)) ? Number(raw.likes) : 0,
+          likesHistory,
+          lastLikesSyncTs: Number(raw.lastLikesSyncTs) || 0,
+          ccTroops: String(raw.ccTroops || raw.CCTroops || '').trim(),
+          tags: Array.isArray(raw.tags) && raw.tags.length > 0 ? raw.tags : ['Legend'],
+          notes,
+          copies: Number(raw.copies) || 0,
+          createdAt: Number(raw.createdAt) || Date.now(),
+          favorite: state.favoriteIds.has(id) || Boolean(raw.favorite),
+        };
+      }
+
+      function toBackendBasePayload(b) {
+        return {
+          id: b.id,
+          thLevel: parseThNumber(b.thLevel),
+          baseLink: b.baseLink,
+          canonicalId: b.canonicalId || extractCanonicalLayoutId(b.baseLink),
+          imageUrl: b.imageUrl,
+          images: Array.isArray(b.images) ? b.images : (b.imageUrl ? [b.imageUrl] : []),
+          creatorHandle: b.creatorHandle,
+          postUrl: b.postUrl || '',
+          postTimestamp: Number(b.postTimestamp) || Date.now(),
+          likes: Number(b.likes) || 0,
+          ccTroops: b.ccTroops || '',
+          tags: Array.isArray(b.tags) ? b.tags : ['Legend'],
+          notes: b.notes || '',
+          copies: Number(b.copies) || 0,
+        };
+      }
+
+      function loadLocalPreferences() {
+        try {
+          const savedCols = parseInt(localStorage.getItem(STORAGE_KEYS.COLS) || '3', 10);
+          if ([2, 3, 4].includes(savedCols)) state.gridCols = savedCols;
+
+          const favRaw = localStorage.getItem(STORAGE_KEYS.FAVORITES);
+          if (favRaw) {
+            const arr = JSON.parse(favRaw);
+            if (Array.isArray(arr)) state.favoriteIds = new Set(arr);
+          }
+
+          const cacheRaw = localStorage.getItem(STORAGE_KEYS.CACHE);
+          if (cacheRaw) {
+            const cached = JSON.parse(cacheRaw);
+            if (Array.isArray(cached) && cached.length > 0) {
+              state.bases = cached.map(normalizeBaseRecord);
+            }
+          }
+        } catch (_) {}
+      }
+
+      function saveLocalCache() {
+        try {
+          localStorage.setItem(STORAGE_KEYS.CACHE, JSON.stringify(state.bases));
+        } catch (_) {}
+      }
+
+      function saveFavorites() {
+        try {
+          localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(Array.from(state.favoriteIds)));
+        } catch (_) {}
+      }
+
+      /* -------------------------------------------------------------------------
+         4. GOOGLE APPS SCRIPT BACKEND API LAYER
+      ------------------------------------------------------------------------- */
+      function setCloudStatus(mode, text) {
+        const pill = document.getElementById('cloudSyncPill');
+        const dot = document.getElementById('cloudSyncDot');
+        const label = document.getElementById('cloudSyncLabel');
+        label.textContent = text;
+
+        if (mode === 'syncing') {
+          pill.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-amber-500/15 text-amber-300 border border-amber-500/30';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse';
+        } else if (mode === 'ok') {
+          pill.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-emerald-500/15 text-emerald-300 border border-emerald-500/30';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400';
+        } else {
+          pill.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-rose-500/15 text-rose-300 border border-rose-500/30';
+          dot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400';
+        }
+      }
+
+      async function apiPost(bodyObj) {
+        const res = await fetch(getWebAppUrl(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(bodyObj),
+        });
+        if (!res.ok) {
+          throw new Error(`Backend HTTP ${res.status}`);
+        }
+        const data = await res.json();
+        if (data && data.error) {
+          throw new Error(data.error);
+        }
+        return data;
+      }
+
+      async function loadBasesFromBackend(showSuccessToast = false) {
+        const refreshIcon = document.getElementById('refreshCloudIcon');
+        const loadingEl = document.getElementById('loadingState');
+        setCloudStatus('syncing', 'Syncing...');
+        if (refreshIcon) refreshIcon.classList.add('animate-spin');
+        if (state.bases.length === 0) loadingEl.classList.remove('hidden');
+
+        try {
+          const res = await fetch(`${getWebAppUrl()}?action=getBases`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          if (data.error) throw new Error(data.error);
+
+          const serverBases = Array.isArray(data.bases) ? data.bases : [];
+          state.bases = serverBases.map(normalizeBaseRecord);
+          saveLocalCache();
+          setCloudStatus('ok', 'Synced');
+          renderAll();
+          if (showSuccessToast) {
+            showToast(`Loaded ${state.bases.length} base(s) from Google Sheets.`, 'success');
+          }
+        } catch (err) {
+          console.error('Failed to load bases from backend:', err);
+          setCloudStatus('error', 'Offline');
+          showToast('Could not reach Apps Script backend. Showing cached bases.', 'error');
+          renderAll();
+        } finally {
+          loadingEl.classList.add('hidden');
+          if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+        }
+      }
+
+      /**
+       * Saves a candidate base to Google Sheets + Google Drive via action: "saveBase".
+       * Handles duplicate blocking and earlier-post replacement returned by the backend.
+       */
+      async function saveBaseToBackend(candidateBase) {
+        setCloudStatus('syncing', 'Saving...');
+        try {
+          const res = await apiPost({
+            action: 'saveBase',
+            base: toBackendBasePayload(candidateBase),
+          });
+
+          if (res.status === 'duplicate_blocked') {
+            setCloudStatus('ok', 'Synced');
+            return {
+              action: 'blocked',
+              canonicalId: res.canonicalId || candidateBase.canonicalId,
+              originalBase: res.existingBase ? normalizeBaseRecord(res.existingBase) : candidateBase,
+              duplicateBase: candidateBase,
+            };
+          }
+
+          if (res.status === 'success' && res.base) {
+            const saved = normalizeBaseRecord(res.base);
+            const existingIdx = state.bases.findIndex(
+              (b) => b.id === saved.id || (saved.canonicalId && b.canonicalId === saved.canonicalId)
+            );
+            const displaced = existingIdx > -1 ? { ...state.bases[existingIdx] } : null;
+
+            if (existingIdx > -1) {
+              state.bases[existingIdx] = saved;
+            } else {
+              state.bases.unshift(saved);
+            }
+
+            saveLocalCache();
+            setCloudStatus('ok', 'Synced');
+
+            if (res.replacedDuplicate) {
+              return {
+                action: 'replaced_with_earlier',
+                canonicalId: saved.canonicalId,
+                originalBase: saved,
+                duplicateBase: displaced || candidateBase,
+              };
+            }
+            return { action: 'inserted', base: saved };
+          }
+
+          throw new Error('Unexpected response from saveBase.');
+        } catch (err) {
+          setCloudStatus('error', 'Sync Error');
+          throw err;
+        }
+      }
+
+      async function updateBaseOnBackend(id, updates, extraFlags = {}) {
+        setCloudStatus('syncing', 'Updating...');
+        try {
+          const payload = {
+            action: 'updateBase',
+            id,
+            ...extraFlags,
+          };
+          if (updates) {
+            const mapped = { ...updates };
+            if (mapped.thLevel !== undefined) mapped.thLevel = parseThNumber(mapped.thLevel);
+            payload.base = mapped;
+          }
+
+          const res = await apiPost(payload);
+          if (res.status === 'success' && res.base) {
+            const updated = normalizeBaseRecord(res.base);
+            const idx = state.bases.findIndex((b) => b.id === id);
+            if (idx > -1) state.bases[idx] = updated;
+            saveLocalCache();
+            setCloudStatus('ok', 'Synced');
+            return updated;
+          }
+          setCloudStatus('ok', 'Synced');
+          return null;
+        } catch (err) {
+          setCloudStatus('error', 'Sync Error');
+          throw err;
+        }
+      }
+
+      async function deleteBaseOnBackend(id) {
+        setCloudStatus('syncing', 'Deleting...');
+        try {
+          await apiPost({ action: 'deleteBase', id });
+          state.bases = state.bases.filter((b) => b.id !== id);
+          state.favoriteIds.delete(id);
+          saveFavorites();
+          saveLocalCache();
+          setCloudStatus('ok', 'Synced');
+        } catch (err) {
+          setCloudStatus('error', 'Sync Error');
+          throw err;
+        }
+      }
+
+      /* -------------------------------------------------------------------------
+         5. DATE PARSING, FORMATTING & TIME-WEIGHTED POPULARITY ENGINE
+      ------------------------------------------------------------------------- */
+      function parsePostTimestamp(createdAt, createdTimestampSeconds) {
+        if (createdTimestampSeconds !== undefined && createdTimestampSeconds !== null) {
+          const num = Number(createdTimestampSeconds);
+          if (!Number.isNaN(num) && num > 0) {
+            return num < 1e12 ? Math.round(num * 1000) : Math.round(num);
+          }
+        }
+        if (createdAt) {
+          const parsed = Date.parse(createdAt);
+          if (!Number.isNaN(parsed)) return parsed;
+        }
+        return Date.now();
+      }
+
+      function extractDateFromCaption(captionText) {
+        if (!captionText) return null;
+        const slashMatch = captionText.match(/\b(\d{1,2})\/(\d{1,2})\/(\d{2,4})\b/);
+        if (slashMatch) {
+          const month = parseInt(slashMatch[1], 10) - 1;
+          const day = parseInt(slashMatch[2], 10);
+          let year = parseInt(slashMatch[3], 10);
+          if (year < 100) year += 2000;
+          const d = new Date(year, month, day, 12, 0, 0);
+          if (!Number.isNaN(d.getTime())) return d.getTime();
+        }
+        const monthTextMatch = captionText.match(
+          /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{1,2}),?\s+(\d{4})\b/i
+        );
+        if (monthTextMatch) {
+          const parsed = Date.parse(`${monthTextMatch[1]} ${monthTextMatch[2]}, ${monthTextMatch[3]} 12:00:00`);
+          if (!Number.isNaN(parsed)) return parsed;
+        }
+        return null;
+      }
+
+      function formatExactDate(timestamp) {
+        if (!timestamp) return 'Unknown date';
+        const d = new Date(timestamp);
+        if (Number.isNaN(d.getTime())) return 'Unknown date';
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      }
+
+      function formatRelativeAge(timestamp) {
+        if (!timestamp) return '';
+        const diffMs = Math.max(0, Date.now() - timestamp);
+        const mins = Math.floor(diffMs / 60000);
+        if (mins < 60) return `${Math.max(1, mins)}m ago`;
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        if (days < 14) return `${days}d ago`;
+        const weeks = Math.floor(days / 7);
+        if (days < 60) return `${weeks}w ago`;
+        const months = Math.floor(days / 30);
+        if (months < 12) return `${months}mo ago`;
+        return `${Math.floor(days / 365)}y ago`;
+      }
+
+      function toDatetimeLocalValue(timestamp) {
+        const d = new Date(timestamp || Date.now());
+        if (Number.isNaN(d.getTime())) return '';
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
+
+      function formatCompactNumber(num) {
+        const n = Number(num) || 0;
+        if (n >= 1000000) return `${(n / 1000000).toFixed(1).replace(/\.0$/, '')}M`;
+        if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K`;
+        return String(n);
+      }
+
+      /**
+       * Computes 7-day tracked like growth from LikesHistoryJSON synced daily by Apps Script.
+       */
+      function computeTrackedLikesGrowth(base) {
+        const history = Array.isArray(base.likesHistory) ? base.likesHistory : [];
+        const ageDays = Math.max(0, (Date.now() - (Number(base.postTimestamp) || Date.now())) / 86400000);
+        const isTrackingActive = Boolean(base.postUrl && parseXPostUrl(base.postUrl) && ageDays <= 7);
+
+        if (history.length < 2) {
+          return {
+            hasHistory: history.length > 0,
+            snapshots: history.length,
+            totalDelta: 0,
+            dailyDelta: 0,
+            isTrackingActive,
+            lastSyncLabel: base.lastLikesSyncTs ? formatRelativeAge(base.lastLikesSyncTs) : '',
+          };
+        }
+
+        const sorted = [...history].sort((a, b) => (Number(a.ts) || 0) - (Number(b.ts) || 0));
+        const first = sorted[0];
+        const latest = sorted[sorted.length - 1];
+        const prev = sorted[sorted.length - 2];
+        const totalDelta = (Number(latest.likes) || 0) - (Number(first.likes) || 0);
+        const dailyDelta = (Number(latest.likes) || 0) - (Number(prev.likes) || 0);
+
+        return {
+          hasHistory: true,
+          snapshots: sorted.length,
+          totalDelta,
+          dailyDelta,
+          isTrackingActive,
+          lastSyncLabel: base.lastLikesSyncTs ? formatRelativeAge(base.lastLikesSyncTs) : '',
+        };
+      }
+
+      function computePopularityMetrics(likes = 0, postTimestamp = Date.now()) {
+        const safeLikes = Math.max(0, Number(likes) || 0);
+        const ageHours = Math.max(1, (Date.now() - (Number(postTimestamp) || Date.now())) / 3600000);
+        const ageDays = ageHours / 24;
+        const likesPerDay = safeLikes / Math.max(0.25, ageDays);
+        const rawScore = (safeLikes + 1) / Math.pow(ageDays + 1.5, 0.65);
+        const popScore = Math.max(
+          1,
+          Math.min(100, Math.round((Math.log10(rawScore + 1) / Math.log10(120)) * 100))
+        );
+
+        let tierEmoji = '🌱';
+        let tierName = 'Fresh';
+        let badgeClass = 'bg-slate-800/90 text-slate-300 border-slate-700';
+
+        if (popScore >= 85) {
+          tierEmoji = '🔥';
+          tierName = 'Viral';
+          badgeClass = 'bg-rose-500/20 text-rose-300 border-rose-500/40';
+        } else if (popScore >= 70) {
+          tierEmoji = '⚡';
+          tierName = 'Trending';
+          badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-500/40';
+        } else if (popScore >= 52) {
+          tierEmoji = '⭐';
+          tierName = 'Popular';
+          badgeClass = 'bg-sky-500/20 text-sky-300 border-sky-500/40';
+        } else if (popScore >= 30) {
+          tierEmoji = '👍';
+          tierName = 'Solid';
+          badgeClass = 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35';
+        }
+
+        return {
+          likes: safeLikes,
+          ageHours,
+          ageDays,
+          likesPerDay,
+          rawScore,
+          popScore,
+          tierEmoji,
+          tierName,
+          tierLabel: `${tierEmoji} ${tierName}`,
+          badgeClass,
+        };
+      }
+
+      /* -------------------------------------------------------------------------
+         6. CANONICAL LAYOUT ID & DUPLICATE BANNER HELPERS
+      ------------------------------------------------------------------------- */
+      function normalizeHandleKey(handle) {
+        if (!handle) return '';
+        const clean = handle.trim().toLowerCase();
+        return clean.startsWith('@') ? clean : `@${clean}`;
+      }
+
+      function extractCanonicalLayoutId(baseLink) {
+        if (!baseLink) return '';
+        const trimmed = baseLink.trim();
+        try {
+          const urlObj = new URL(trimmed);
+          const idParam = urlObj.searchParams.get('id');
+          if (idParam) return decodeURIComponent(idParam).trim();
+        } catch (_) {}
+
+        let decoded = trimmed;
+        try { decoded = decodeURIComponent(trimmed); } catch (_) {}
+        const idMatch = decoded.match(/[?&]id=([^&#\s]+)/i);
+        if (idMatch && idMatch[1]) return idMatch[1].trim();
+
+        return decoded
+          .replace(/^https?:\/\/(?:www\.)?/i, '')
+          .replace(/^link\.clashofclans\.com\/[a-z]{2}\/?/i, 'link.clashofclans.com/')
+          .toLowerCase();
+      }
+
+      function showDuplicateResolutionBanner(result) {
+        const banner = document.getElementById('duplicateAlertBanner');
+        if (!result) return;
+
+        const keptDate = `${formatExactDate(result.originalBase.postTimestamp)} (${formatRelativeAge(result.originalBase.postTimestamp)})`;
+        const skippedDate = `${formatExactDate(result.duplicateBase.postTimestamp)} (${formatRelativeAge(result.duplicateBase.postTimestamp)})`;
+
+        if (result.action === 'blocked') {
+          banner.className = 'mt-3 p-4 rounded-xl border border-amber-500/50 bg-amber-500/10 text-amber-100 text-xs space-y-2.5';
+          banner.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2 font-bold text-sm text-amber-300">
+                <i data-lucide="copy-x" class="w-4 h-4 shrink-0"></i>
+                <span>Duplicate Base Link Detected — Earlier Post Kept</span>
+              </div>
+              <button type="button" id="btnDismissDupBanner" class="text-amber-300/70 hover:text-white cursor-pointer">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div class="p-2.5 rounded-lg bg-obsidian/80 border border-emerald-500/40">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Earlier Post (Kept in Vault)</div>
+                <div class="font-bold text-white text-xs sm:text-sm mt-0.5">${escapeHtml(result.originalBase.creatorHandle)}</div>
+                <div class="text-slate-400 text-[11px]">Posted: ${escapeHtml(keptDate)}</div>
+              </div>
+              <div class="p-2.5 rounded-lg bg-obsidian/80 border border-rose-500/40">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-rose-400">Newer Duplicate Post (Blocked)</div>
+                <div class="font-bold text-white text-xs sm:text-sm mt-0.5">${escapeHtml(result.duplicateBase.creatorHandle)}</div>
+                <div class="text-slate-400 text-[11px]">Posted: ${escapeHtml(skippedDate)}</div>
+              </div>
+            </div>
+          `;
+        } else if (result.action === 'replaced_with_earlier') {
+          banner.className = 'mt-3 p-4 rounded-xl border border-emerald-500/50 bg-emerald-500/10 text-emerald-100 text-xs space-y-2.5';
+          banner.innerHTML = `
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2 font-bold text-sm text-emerald-300">
+                <i data-lucide="history" class="w-4 h-4 shrink-0"></i>
+                <span>Earlier Post Found — Replaced Newer Duplicate in Vault!</span>
+              </div>
+              <button type="button" id="btnDismissDupBanner" class="text-emerald-300/70 hover:text-white cursor-pointer">
+                <i data-lucide="x" class="w-4 h-4"></i>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div class="p-2.5 rounded-lg bg-obsidian/80 border border-emerald-500/40">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Earlier Post (Saved Now)</div>
+                <div class="font-bold text-white text-xs sm:text-sm mt-0.5">${escapeHtml(result.originalBase.creatorHandle)}</div>
+                <div class="text-slate-400 text-[11px]">Posted: ${escapeHtml(keptDate)}</div>
+              </div>
+              <div class="p-2.5 rounded-lg bg-obsidian/80 border border-slate-600">
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Newer Post (Replaced)</div>
+                <div class="font-bold text-white text-xs sm:text-sm mt-0.5">${escapeHtml(result.duplicateBase.creatorHandle)}</div>
+                <div class="text-slate-400 text-[11px]">Posted: ${escapeHtml(skippedDate)}</div>
+              </div>
+            </div>
+          `;
+        }
+
+        banner.classList.remove('hidden');
+        lucide.createIcons({ root: banner });
+        const dismissBtn = document.getElementById('btnDismissDupBanner');
+        if (dismissBtn) dismissBtn.onclick = () => banner.classList.add('hidden');
+      }
+
+      /* -------------------------------------------------------------------------
+         7. CLIPBOARD, TOAST & ESCAPE UTILITIES
+      ------------------------------------------------------------------------- */
+      async function copyTextToClipboard(text) {
+        if (!text) return false;
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return true;
+          }
+        } catch (_) {}
+
+        try {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', '');
+          textarea.style.position = 'fixed';
+          textarea.style.top = '-9999px';
+          textarea.style.left = '-9999px';
+          document.body.appendChild(textarea);
+          textarea.select();
+          textarea.setSelectionRange(0, textarea.value.length);
+          const success = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          return success;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        const stylesByType = {
+          success: 'bg-stonecard border-emerald-500/50 text-white shadow-emerald-950/50',
+          gold: 'bg-stonecard border-clashgold/60 text-white shadow-amber-950/50',
+          error: 'bg-stonecard border-rose-500/60 text-white shadow-rose-950/50',
+          info: 'bg-stonecard border-sky-500/50 text-white shadow-sky-950/50',
+        };
+        const iconByType = {
+          success: '<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0"></i>',
+          gold: '<i data-lucide="sparkles" class="w-4 h-4 text-clashgold shrink-0"></i>',
+          error: '<i data-lucide="alert-circle" class="w-4 h-4 text-rose-400 shrink-0"></i>',
+          info: '<i data-lucide="info" class="w-4 h-4 text-sky-400 shrink-0"></i>',
+        };
+
+        toast.className = `pointer-events-auto animate-toast rounded-xl border px-4 py-3 shadow-2xl flex items-center gap-2.5 text-xs sm:text-sm font-medium ${stylesByType[type] || stylesByType.success}`;
+        toast.innerHTML = `${iconByType[type] || iconByType.success}<span class="leading-snug">${escapeHtml(message)}</span>`;
+        container.appendChild(toast);
+        lucide.createIcons({ root: toast });
+
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transform = 'translateY(8px)';
+          toast.style.transition = 'all 0.2s ease';
+          setTimeout(() => toast.remove(), 220);
+        }, 3200);
+      }
+
+      function escapeHtml(str) {
+        if (str === null || str === undefined) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      /* -------------------------------------------------------------------------
+         8. X / TWITTER URL PARSING & SYNDICATION API FETCHING
+      ------------------------------------------------------------------------- */
+      function parseXPostUrl(inputUrl) {
+        const trimmed = (inputUrl || '').trim();
+        const match = trimmed.match(/(?:x\.com|twitter\.com|fxtwitter\.com|vxtwitter\.com)\/(?:i\/web\/)?([^\/?#]+)\/status\/(\d+)/i);
+        if (!match) return null;
+        return {
+          user: match[1],
+          id: match[2],
+          canonicalUrl: `https://x.com/${match[1]}/status/${match[2]}`,
+        };
+      }
+
+      function extractAllXPostUrls(rawInput) {
+        const regex = /https?:\/\/(?:www\.|mobile\.)?(?:x\.com|twitter\.com|fxtwitter\.com|vxtwitter\.com)\/(?:i\/web\/)?[^\/?#\s]+\/status\/\d+[^\s]*/gi;
+        const matches = (rawInput || '').match(regex) || [];
+        const unique = [];
+        for (const m of matches) {
+          const parsed = parseXPostUrl(m);
+          if (parsed && !unique.some((u) => u.id === parsed.id)) {
+            unique.push(parsed);
+          }
+        }
+        return unique;
+      }
+
+      async function fetchTweetFromSyndication(user, id) {
+        const endpoints = [
+          { name: 'fxtwitter', url: `https://api.fxtwitter.com/${encodeURIComponent(user)}/status/${encodeURIComponent(id)}` },
+          { name: 'vxtwitter', url: `https://api.vxtwitter.com/${encodeURIComponent(user)}/status/${encodeURIComponent(id)}` },
+        ];
+
+        let lastError = null;
+        for (const ep of endpoints) {
+          try {
+            const response = await fetch(ep.url, { headers: { Accept: 'application/json' } });
+            if (!response.ok) throw new Error(`${ep.name} responded with HTTP ${response.status}`);
+            const data = await response.json();
+
+            if (ep.name === 'fxtwitter' && data && data.tweet) {
+              return normalizeFxTwitterPayload(data.tweet, user, id);
+            }
+            if (ep.name === 'vxtwitter' && data && (data.text !== undefined || data.tweetID)) {
+              return normalizeVxTwitterPayload(data, user, id);
+            }
+          } catch (err) {
+            lastError = err;
+          }
+        }
+        throw lastError || new Error('Unable to retrieve post data from X syndication APIs.');
+      }
+
+      function normalizeFxTwitterPayload(tweet, fallbackUser, id) {
+        const author = tweet.author || {};
+        const handle = author.screen_name ? `@${author.screen_name}` : `@${fallbackUser}`;
+        const rawText = tweet.text || '';
+
+        const facetUrls = [];
+        if (tweet.raw_text && Array.isArray(tweet.raw_text.facets)) {
+          for (const f of tweet.raw_text.facets) {
+            if (f.replacement) facetUrls.push(f.replacement);
+            if (f.original && f.original.startsWith('http')) facetUrls.push(f.original);
+          }
+        }
+
+        const images = [];
+        if (tweet.media) {
+          if (Array.isArray(tweet.media.photos) && tweet.media.photos.length > 0) {
+            for (const photo of tweet.media.photos) {
+              if (photo.url) images.push(photo.url);
+            }
+          } else if (Array.isArray(tweet.media.all)) {
+            for (const item of tweet.media.all) {
+              if (item.type === 'photo' && item.url) images.push(item.url);
+              else if (item.thumbnail_url) images.push(item.thumbnail_url);
+            }
+          }
+        }
+
+        return {
+          postUrl: tweet.url || `https://x.com/${fallbackUser}/status/${id}`,
+          creatorHandle: handle,
+          text: rawText,
+          extraUrls: facetUrls,
+          images: [...new Set(images)],
+          postTimestamp: parsePostTimestamp(tweet.created_at, tweet.created_timestamp),
+          likes: Number.isFinite(Number(tweet.likes)) ? Number(tweet.likes) : 0,
+        };
+      }
+
+      function normalizeVxTwitterPayload(data, fallbackUser, id) {
+        const handle = data.user_screen_name ? `@${data.user_screen_name}` : `@${fallbackUser}`;
+        const images = [];
+        if (Array.isArray(data.media_extended) && data.media_extended.length > 0) {
+          for (const m of data.media_extended) {
+            if (m.type === 'image' && m.url) images.push(m.url);
+            else if (m.thumbnail_url) images.push(m.thumbnail_url);
+          }
+        } else if (Array.isArray(data.mediaURLs)) {
+          for (const u of data.mediaURLs) {
+            if (u) images.push(u);
+          }
+        }
+
+        return {
+          postUrl: data.tweetURL || `https://x.com/${fallbackUser}/status/${id}`,
+          creatorHandle: handle,
+          text: data.text || '',
+          extraUrls: [],
+          images: [...new Set(images)],
+          postTimestamp: parsePostTimestamp(data.date, data.date_epoch),
+          likes: Number.isFinite(Number(data.likes)) ? Number(data.likes) : 0,
+        };
+      }
+
+      async function refreshLiveStatsForBase(baseId) {
+        const base = state.bases.find((b) => b.id === baseId);
+        if (!base || !base.postUrl) {
+          showToast('No X post status URL attached to this base.', 'info');
+          return false;
+        }
+
+        const parsed = parseXPostUrl(base.postUrl);
+        if (!parsed) {
+          showToast('Base post URL is not a direct X status link.', 'info');
+          return false;
+        }
+
+        showToast(`Refreshing live X stats for ${base.creatorHandle}...`, 'info');
+        try {
+          const payload = await fetchTweetFromSyndication(parsed.user, parsed.id);
+          await updateBaseOnBackend(
+            base.id,
+            { likes: payload.likes, postTimestamp: payload.postTimestamp },
+            { recordLikesHistory: true }
+          );
+
+          renderAll();
+          if (!document.getElementById('lightboxModal').classList.contains('hidden') && state.lightboxBaseId === baseId) {
+            openLightbox(baseId);
+          }
+          showToast(`Updated: ❤️ ${payload.likes} likes · Posted ${formatExactDate(payload.postTimestamp)}`, 'gold');
+          return true;
+        } catch (err) {
+          console.error('Failed to refresh live X stats:', err);
+          showToast('Could not fetch live X stats right now.', 'error');
+          return false;
+        }
+      }
+
+      /* -------------------------------------------------------------------------
+         9. CLASH OF CLANS LINK, TH LEVEL, CC TROOPS & TAGS PARSER
+      ------------------------------------------------------------------------- */
+      function extractClashBaseLinks(text, extraUrls = []) {
+        const combinedSources = [text || '', ...(extraUrls || [])].join('\n');
+        const regex = /https?:\/\/(?:www\.)?link\.clashofclans\.com\/[^\s<>"')\]\}]+/gi;
+        const matches = combinedSources.match(regex) || [];
+        const cleaned = [];
+        for (const raw of matches) {
+          const cleanUrl = raw.replace(/[.,;!?]+$/, '');
+          if (!cleaned.includes(cleanUrl)) cleaned.push(cleanUrl);
+        }
+        return cleaned;
+      }
+
+      function extractTownHallFromLinkOrText(baseLink, fallbackText = '') {
+        if (baseLink) {
+          try {
+            const decoded = decodeURIComponent(baseLink);
+            const idMatch = decoded.match(/[?&]id=([^&]+)/i);
+            const target = idMatch ? idMatch[1] : decoded;
+            const thInUrl = target.match(/\b(TH|BH)\s*(\d{1,2})\b/i);
+            if (thInUrl) return `${thInUrl[1].toUpperCase()}${thInUrl[2]}`;
+          } catch (_) {
+            const rawMatch = baseLink.match(/\b(TH|BH)(\d{1,2})\b/i);
+            if (rawMatch) return `${rawMatch[1].toUpperCase()}${rawMatch[2]}`;
+          }
+        }
+        if (fallbackText) {
+          const textMatch = fallbackText.match(/\b(TH|BH)\s*(\d{1,2})\b/i);
+          if (textMatch) return `${textMatch[1].toUpperCase()}${textMatch[2]}`;
+        }
+        return 'TH19';
+      }
+
+      function extractLinkLabelsFromText(text, baseLinks) {
+        if (!text || baseLinks.length <= 1) return baseLinks.map((_, i) => `Base #${i + 1}`);
+        const lines = text.split(/\r?\n/);
+        return baseLinks.map((link, idx) => {
+          const matchingLine = lines.find((line) => line.includes(link) || line.includes('link.clashofclans.com'));
+          if (matchingLine) {
+            const beforeLink = matchingLine.split(/https?:\/\//i)[0].trim();
+            const cleanedPrefix = beforeLink.replace(/[:\-–—•]+$/, '').trim();
+            if (cleanedPrefix && cleanedPrefix.length <= 24) {
+              return cleanedPrefix.replace(/^(\d+)\)$/, 'Base #$1');
+            }
+          }
+          return `Base #${idx + 1}`;
+        });
+      }
+
+      function extractCcTroops(text) {
+        if (!text) return '';
+        const lines = text.split(/\r?\n/);
+        for (const line of lines) {
+          const match = line.match(/^\s*(?:cc|clan\s*castle)(?:\s*[:\-–—]\s*|\s+)(.+)$/i);
+          if (match && match[1]) {
+            return match[1]
+              .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+          }
+        }
+        return '';
+      }
+
+      function extractArchetypeTags(text, label = '') {
+        const haystack = `${text || ''} ${label || ''}`;
+        const tagRules = [
+          { tag: 'Ranked', regex: /\branked\b/i },
+          { tag: 'Legend', regex: /\b(?:legend|legends|ll|l\s*1|l1)\b/i },
+          { tag: 'War', regex: /\b(?:war|cwl)\b/i },
+          { tag: 'Tested', regex: /\b(?:tested|unburnt)\b/i },
+          { tag: 'Anti-Bowler', regex: /\banti[\s-]?bowler\b/i },
+          { tag: 'Rage Poison', regex: /\brage[\s-]?poison\b/i },
+          { tag: 'CWL', regex: /\bcwl\b/i },
+          { tag: 'Trophy', regex: /\b(?:trophy|push|pushing)\b/i },
+          { tag: 'Anti-3', regex: /\banti[\s-]?3\b/i },
+        ];
+        const detected = [];
+        for (const rule of tagRules) {
+          if (rule.regex.test(haystack) && !detected.includes(rule.tag)) {
+            detected.push(rule.tag);
+          }
+        }
+        return detected.length > 0 ? detected : ['Legend'];
+      }
+
+      function extractHandleFromText(text) {
+        if (!text) return '';
+        const match = text.match(/@([a-zA-Z0-9_]{1,15})/);
+        return match ? `@${match[1]}` : '';
+      }
+
+      /* -------------------------------------------------------------------------
+         10. IMPORT WORKFLOW (X POST -> BACKEND SAVE)
+      ------------------------------------------------------------------------- */
+      async function handleXPostImport(rawUrl) {
+        const statusBanner = document.getElementById('fetchStatusBanner');
+        const dupBanner = document.getElementById('duplicateAlertBanner');
+        statusBanner.classList.add('hidden');
+        dupBanner.classList.add('hidden');
+
+        if (/link\.clashofclans\.com/i.test(rawUrl) && !/(?:x\.com|twitter\.com)/i.test(rawUrl)) {
+          openManualModal({ baseLink: rawUrl.trim() });
+          showToast('Clash base link detected! Paste or drop the base screenshot to finish.', 'info');
+          return;
+        }
+
+        const allPosts = extractAllXPostUrls(rawUrl);
+        if (allPosts.length === 0) {
+          showFetchError('Please paste a valid X / Twitter post link (e.g., https://x.com/username/status/123456789).');
+          return;
+        }
+
+        if (allPosts.length > 1) {
+          await handleBatchXPostImport(allPosts);
+          return;
+        }
+
+        const parsed = allPosts[0];
+        setFetchLoading(true);
+
+        try {
+          const payload = await fetchTweetFromSyndication(parsed.user, parsed.id);
+          const baseLinks = extractClashBaseLinks(payload.text, payload.extraUrls);
+
+          if (baseLinks.length === 0) {
+            setFetchLoading(false);
+            showFetchError(
+              `Fetched post by ${payload.creatorHandle}, but no "link.clashofclans.com" URL was found in the post text.`,
+              parsed.canonicalUrl
+            );
+            return;
+          }
+
+          if (payload.images.length === 0) {
+            setFetchLoading(false);
+            openManualModal({
+              baseLink: baseLinks[0],
+              postUrl: payload.postUrl,
+              creatorHandle: payload.creatorHandle,
+              caption: payload.text,
+              postTimestamp: payload.postTimestamp,
+              likes: payload.likes,
+            });
+            showToast('Base link found, but post had no attached images. Paste screenshot manually.', 'info');
+            return;
+          }
+
+          const ccTroops = extractCcTroops(payload.text);
+
+          if (baseLinks.length === 1) {
+            const baseLink = baseLinks[0];
+            const thLevel = extractTownHallFromLinkOrText(baseLink, payload.text);
+            const tags = extractArchetypeTags(payload.text);
+
+            const candidateBase = {
+              id: `base_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+              thLevel,
+              baseLink,
+              canonicalId: extractCanonicalLayoutId(baseLink),
+              imageUrl: payload.images[0],
+              images: payload.images,
+              creatorHandle: payload.creatorHandle,
+              postUrl: payload.postUrl,
+              postTimestamp: payload.postTimestamp,
+              likes: payload.likes,
+              ccTroops,
+              tags,
+              notes: payload.text ? payload.text.slice(0, 140) : '',
+              copies: 0,
+              createdAt: Date.now(),
+            };
+
+            const res = await saveBaseToBackend(candidateBase);
+            document.getElementById('xUrlInput').value = '';
+            renderAll();
+
+            if (res.action === 'blocked') {
+              showDuplicateResolutionBanner(res);
+              showToast(`Duplicate link blocked! Earlier post (${res.originalBase.creatorHandle}) kept.`, 'error');
+              return;
+            }
+            if (res.action === 'replaced_with_earlier') {
+              showDuplicateResolutionBanner(res);
+              showToast(`Earlier post (${candidateBase.creatorHandle}) replaced newer duplicate!`, 'gold');
+              return;
+            }
+
+            showToast(
+              `Saved ${thLevel} base from ${payload.creatorHandle} (${formatExactDate(payload.postTimestamp)} · ❤️ ${payload.likes})!`,
+              'gold'
+            );
+          } else {
+            const labels = extractLinkLabelsFromText(payload.text, baseLinks);
+            const items = baseLinks.map((link, idx) => {
+              const label = labels[idx];
+              const thLevel = extractTownHallFromLinkOrText(link, payload.text);
+              const tags = extractArchetypeTags(payload.text, label);
+              return {
+                selected: true,
+                label,
+                thLevel,
+                baseLink: link,
+                tags,
+                imageIndex: idx < payload.images.length ? idx : 0,
+              };
+            });
+
+            state.pendingMultiBase = {
+              postUrl: payload.postUrl,
+              creatorHandle: payload.creatorHandle,
+              postTimestamp: payload.postTimestamp,
+              likes: payload.likes,
+              ccTroops,
+              images: payload.images,
+              items,
+            };
+            openMultiBaseModal();
+          }
+        } catch (err) {
+          console.error('X Post Import Error:', err);
+          showFetchError(
+            err.message || 'Could not fetch this X post or save to backend. You can paste the screenshot & link manually.',
+            parsed.canonicalUrl
+          );
+        } finally {
+          setFetchLoading(false);
+        }
+      }
+
+      async function handleBatchXPostImport(parsedPosts) {
+        setFetchLoading(true);
+        let added = 0, replaced = 0, blocked = 0, failed = 0;
+        let lastDupResult = null;
+
+        for (const p of parsedPosts) {
+          try {
+            const payload = await fetchTweetFromSyndication(p.user, p.id);
+            const baseLinks = extractClashBaseLinks(payload.text, payload.extraUrls);
+            if (baseLinks.length === 0 || payload.images.length === 0) {
+              failed++;
+              continue;
+            }
+            const ccTroops = extractCcTroops(payload.text);
+            const labels = extractLinkLabelsFromText(payload.text, baseLinks);
+
+            for (let idx = 0; idx < baseLinks.length; idx++) {
+              const link = baseLinks[idx];
+              const thLevel = extractTownHallFromLinkOrText(link, payload.text);
+              const tags = extractArchetypeTags(payload.text, labels[idx]);
+              const candidate = {
+                id: `base_${Date.now()}_${idx}_${Math.random().toString(36).slice(2, 6)}`,
+                thLevel,
+                baseLink: link,
+                canonicalId: extractCanonicalLayoutId(link),
+                imageUrl: payload.images[idx < payload.images.length ? idx : 0],
+                images: payload.images,
+                creatorHandle: payload.creatorHandle,
+                postUrl: payload.postUrl,
+                postTimestamp: payload.postTimestamp,
+                likes: payload.likes,
+                ccTroops,
+                tags,
+                notes: payload.text ? payload.text.slice(0, 140) : '',
+                copies: 0,
+                createdAt: Date.now(),
+              };
+
+              const res = await saveBaseToBackend(candidate);
+              if (res.action === 'blocked') {
+                blocked++;
+                lastDupResult = res;
+              } else if (res.action === 'replaced_with_earlier') {
+                replaced++;
+                lastDupResult = res;
+              } else {
+                added++;
+              }
+            }
+          } catch (_) {
+            failed++;
+          }
+        }
+
+        document.getElementById('xUrlInput').value = '';
+        setFetchLoading(false);
+        renderAll();
+        if (lastDupResult) showDuplicateResolutionBanner(lastDupResult);
+
+        const parts = [`Batch processed ${parsedPosts.length} posts:`];
+        if (added > 0) parts.push(`${added} saved`);
+        if (replaced > 0) parts.push(`${replaced} replaced`);
+        if (blocked > 0) parts.push(`${blocked} duplicate(s) blocked`);
+        if (failed > 0) parts.push(`${failed} skipped`);
+        showToast(parts.join(' · '), added > 0 || replaced > 0 ? 'gold' : 'info');
+      }
+
+      function setFetchLoading(isLoading) {
+        const btn = document.getElementById('btnFetchBase');
+        const label = document.getElementById('fetchBtnLabel');
+        const icon = document.getElementById('fetchBtnIcon');
+        btn.disabled = isLoading;
+        if (isLoading) {
+          btn.classList.add('opacity-80', 'cursor-wait');
+          label.textContent = 'Saving to Vault...';
+          icon.setAttribute('data-lucide', 'loader-2');
+          icon.classList.add('animate-spin');
+        } else {
+          btn.classList.remove('opacity-80', 'cursor-wait');
+          label.textContent = 'Fetch & Save Base';
+          icon.setAttribute('data-lucide', 'download-cloud');
+          icon.classList.remove('animate-spin');
+        }
+        lucide.createIcons({ root: btn });
+      }
+
+      function showFetchError(message, fallbackPostUrl = '') {
+        const banner = document.getElementById('fetchStatusBanner');
+        const textEl = document.getElementById('fetchStatusText');
+        const fallbackBtn = document.getElementById('btnFallbackManual');
+        banner.className = 'mt-3 p-3 rounded-xl border border-rose-500/40 bg-rose-500/10 text-rose-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2';
+        textEl.textContent = message;
+        fallbackBtn.onclick = () => {
+          banner.classList.add('hidden');
+          openManualModal({ postUrl: fallbackPostUrl });
+        };
+        banner.classList.remove('hidden');
+        lucide.createIcons({ root: banner });
+      }
+
+      /* -------------------------------------------------------------------------
+         11. MULTI-BASE POST MODAL LOGIC
+      ------------------------------------------------------------------------- */
+      function openMultiBaseModal() {
+        const data = state.pendingMultiBase;
+        if (!data) return;
+
+        document.getElementById('multiBaseSubtitle').textContent =
+          `Found ${data.items.length} base links and ${data.images.length} image(s) in ${data.creatorHandle}'s post`;
+
+        document.getElementById('multiBasePostMeta').innerHTML = `
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="font-semibold text-clashgold">${escapeHtml(data.creatorHandle)}</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-slate-300">${escapeHtml(formatExactDate(data.postTimestamp))} (${escapeHtml(formatRelativeAge(data.postTimestamp))})</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-rose-300 font-semibold">❤️ ${escapeHtml(formatCompactNumber(data.likes))}</span>
+            <span class="text-slate-500">•</span>
+            <span class="text-slate-300">CC: <strong class="text-white">${escapeHtml(data.ccTroops || 'None detected')}</strong></span>
+          </div>
+          <a href="${escapeHtml(data.postUrl)}" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:underline inline-flex items-center gap-1">
+            View Post <i data-lucide="external-link" class="w-3 h-3"></i>
+          </a>
+        `;
+
+        renderMultiBaseItems();
+        document.getElementById('multiBaseModal').classList.remove('hidden');
+        lucide.createIcons({ root: document.getElementById('multiBaseModal') });
+      }
+
+      function renderMultiBaseItems() {
+        const data = state.pendingMultiBase;
+        if (!data) return;
+
+        const container = document.getElementById('multiBaseItemsContainer');
+        container.innerHTML = data.items.map((item, idx) => {
+          const currentImg = data.images[item.imageIndex] || data.images[0];
+          const imageOptions = data.images
+            .map((_, imgIdx) => `<option value="${imgIdx}" ${item.imageIndex === imgIdx ? 'selected' : ''}>Image #${imgIdx + 1}</option>`)
+            .join('');
+
+          return `
+            <div class="rounded-xl border ${item.selected ? 'border-clashgold/70 bg-obsidian' : 'border-borderline bg-obsidian/40 opacity-65'} p-3 space-y-2.5 transition">
+              <div class="flex items-center justify-between gap-2">
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                  <input type="checkbox" data-multi-idx="${idx}" class="multi-select-checkbox w-4 h-4 rounded accent-amber-400 cursor-pointer" ${item.selected ? 'checked' : ''} />
+                  <span class="font-bold text-xs sm:text-sm text-white">${escapeHtml(item.label)}</span>
+                </label>
+                <span class="px-2 py-0.5 rounded bg-clashgold/20 text-clashgold font-display font-bold text-xs border border-clashgold/30">${escapeHtml(item.thLevel)}</span>
+              </div>
+              <div class="relative aspect-video rounded-lg overflow-hidden bg-stonecard border border-borderline">
+                <img src="${escapeHtml(currentImg)}" alt="${escapeHtml(item.label)}" onerror="this.src='https://placehold.co/600x360/151c28/f5b942?text=Base+Layout'" class="w-full h-full object-cover" />
+                ${data.images.length > 1
+                  ? `<div class="absolute bottom-2 right-2">
+                      <select data-multi-img-idx="${idx}" class="multi-img-select px-2 py-1 rounded-lg bg-obsidian/90 border border-borderline text-[11px] text-white font-medium cursor-pointer">${imageOptions}</select>
+                    </div>`
+                  : ''}
+              </div>
+              <div class="flex items-center justify-between gap-2 text-[11px] text-slate-400">
+                <span class="truncate">${escapeHtml(item.tags.join(', '))}</span>
+                <span class="font-mono text-slate-500 shrink-0">...${escapeHtml(item.baseLink.slice(-12))}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        container.querySelectorAll('.multi-select-checkbox').forEach((cb) => {
+          cb.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.dataset.multiIdx, 10);
+            state.pendingMultiBase.items[idx].selected = e.target.checked;
+            renderMultiBaseItems();
+            updateMultiImportButtonCount();
+          });
+        });
+
+        container.querySelectorAll('.multi-img-select').forEach((sel) => {
+          sel.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.dataset.multiImgIdx, 10);
+            state.pendingMultiBase.items[idx].imageIndex = parseInt(e.target.value, 10);
+            renderMultiBaseItems();
+          });
+        });
+
+        updateMultiImportButtonCount();
+      }
+
+      function updateMultiImportButtonCount() {
+        const data = state.pendingMultiBase;
+        if (!data) return;
+        const selectedCount = data.items.filter((i) => i.selected).length;
+        const btn = document.getElementById('btnConfirmMultiImport');
+        btn.disabled = selectedCount === 0;
+        btn.classList.toggle('opacity-50', selectedCount === 0);
+        document.getElementById('btnConfirmMultiLabel').textContent = `Import Selected (${selectedCount})`;
+      }
+
+      async function commitMultiBaseImport() {
+        const data = state.pendingMultiBase;
+        if (!data) return;
+        const chosen = data.items.filter((i) => i.selected);
+        if (chosen.length === 0) return;
+
+        const btn = document.getElementById('btnConfirmMultiImport');
+        btn.disabled = true;
+        document.getElementById('btnConfirmMultiLabel').textContent = 'Saving...';
+
+        const now = Date.now();
+        let importedCount = 0, blockedCount = 0, replacedCount = 0;
+        let lastDupResult = null;
+
+        try {
+          for (let offset = 0; offset < chosen.length; offset++) {
+            const item = chosen[offset];
+            const tags = [...item.tags];
+            if (item.label && !/^Base #\d+$/i.test(item.label) && !tags.includes(item.label)) {
+              tags.unshift(item.label);
+            }
+
+            const candidate = {
+              id: `base_${now + offset}_${Math.random().toString(36).slice(2, 7)}`,
+              thLevel: item.thLevel,
+              baseLink: item.baseLink,
+              canonicalId: extractCanonicalLayoutId(item.baseLink),
+              imageUrl: data.images[item.imageIndex] || data.images[0],
+              images: data.images,
+              creatorHandle: data.creatorHandle,
+              postUrl: data.postUrl,
+              postTimestamp: data.postTimestamp || now,
+              likes: data.likes || 0,
+              ccTroops: data.ccTroops,
+              tags,
+              notes: item.label ? `Imported from pack: ${item.label}` : '',
+              copies: 0,
+              createdAt: now + offset,
+            };
+
+            const res = await saveBaseToBackend(candidate);
+            if (res.action === 'blocked') {
+              blockedCount++;
+              lastDupResult = res;
+            } else if (res.action === 'replaced_with_earlier') {
+              replacedCount++;
+              lastDupResult = res;
+            } else {
+              importedCount++;
+            }
+          }
+
+          state.pendingMultiBase = null;
+          document.getElementById('multiBaseModal').classList.add('hidden');
+          document.getElementById('xUrlInput').value = '';
+          renderAll();
+          if (lastDupResult) showDuplicateResolutionBanner(lastDupResult);
+
+          const parts = [];
+          if (importedCount > 0) parts.push(`Imported ${importedCount} new`);
+          if (replacedCount > 0) parts.push(`Replaced ${replacedCount} with earlier post`);
+          if (blockedCount > 0) parts.push(`Blocked ${blockedCount} duplicate(s)`);
+          showToast(`${parts.join(' · ')} from ${data.creatorHandle}!`, blockedCount > 0 && importedCount === 0 ? 'error' : 'gold');
+        } catch (err) {
+          showToast('Error saving multi-base pack: ' + err.message, 'error');
+        } finally {
+          btn.disabled = false;
+        }
+      }
+
+      /* -------------------------------------------------------------------------
+         12. MANUAL / PASTE SCREENSHOT MODAL (UPLOADS BASE64 TO GOOGLE DRIVE)
+      ------------------------------------------------------------------------- */
+      function openManualModal(prefill = {}) {
+        document.getElementById('manualBaseForm').reset();
+        clearManualImagePreview();
+
+        if (prefill.baseLink) {
+          document.getElementById('manualBaseLink').value = prefill.baseLink;
+          updateManualLinkThBadge(prefill.baseLink);
+        } else {
+          document.getElementById('manualDetectedThBadge').classList.add('hidden');
+        }
+
+        if (prefill.postUrl) document.getElementById('manualPostUrlInput').value = prefill.postUrl;
+        if (prefill.creatorHandle) document.getElementById('manualCreatorInput').value = prefill.creatorHandle;
+        if (prefill.postTimestamp) document.getElementById('manualPostDateInput').value = toDatetimeLocalValue(prefill.postTimestamp);
+        if (prefill.likes !== undefined && prefill.likes !== null) document.getElementById('manualLikesInput').value = prefill.likes;
+        if (prefill.caption) {
+          document.getElementById('manualTweetCaption').value = prefill.caption;
+          autoFillFromManualCaption(prefill.caption);
+        }
+
+        document.getElementById('manualModal').classList.remove('hidden');
+        lucide.createIcons({ root: document.getElementById('manualModal') });
+      }
+
+      function updateManualLinkThBadge(linkVal) {
+        const badge = document.getElementById('manualDetectedThBadge');
+        if (/link\.clashofclans\.com/i.test(linkVal)) {
+          const detectedTh = extractTownHallFromLinkOrText(linkVal);
+          badge.textContent = `${detectedTh} Detected`;
+          badge.classList.remove('hidden');
+          document.getElementById('manualThInput').value = detectedTh;
+        } else {
+          badge.classList.add('hidden');
+        }
+      }
+
+      function autoFillFromManualCaption(captionText) {
+        if (!captionText) return;
+        const cc = extractCcTroops(captionText);
+        if (cc) document.getElementById('manualCcInput').value = cc;
+        const tags = extractArchetypeTags(captionText);
+        if (tags.length > 0) document.getElementById('manualTagsInput').value = tags.join(', ');
+        const handle = extractHandleFromText(captionText);
+        if (handle && !document.getElementById('manualCreatorInput').value) {
+          document.getElementById('manualCreatorInput').value = handle;
+        }
+        const parsedDateTs = extractDateFromCaption(captionText);
+        if (parsedDateTs && !document.getElementById('manualPostDateInput').value) {
+          document.getElementById('manualPostDateInput').value = toDatetimeLocalValue(parsedDateTs);
+        }
+        const links = extractClashBaseLinks(captionText);
+        if (links.length > 0 && !document.getElementById('manualBaseLink').value) {
+          document.getElementById('manualBaseLink').value = links[0];
+          updateManualLinkThBadge(links[0]);
+        } else if (!/link\.clashofclans\.com/i.test(document.getElementById('manualBaseLink').value)) {
+          document.getElementById('manualThInput').value = extractTownHallFromLinkOrText('', captionText);
+        }
+      }
+
+      function compressImageFileToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+              const maxDim = 1280;
+              let { width, height } = img;
+              if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                  height = Math.round((height * maxDim) / width);
+                  width = maxDim;
+                } else {
+                  width = Math.round((width * maxDim) / height);
+                  height = maxDim;
+                }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = width;
+              canvas.height = height;
+              canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+              resolve(canvas.toDataURL('image/jpeg', 0.86));
+            };
+            img.onerror = reject;
+            img.src = ev.target.result;
+          };
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      async function setManualImageFromFile(file) {
+        if (!file || !file.type.startsWith('image/')) {
+          showToast('Please select or paste a valid image file.', 'error');
+          return;
+        }
+        try {
+          const optimizedUrl = await compressImageFileToDataUrl(file);
+          state.manualImageDataUrl = optimizedUrl;
+          document.getElementById('manualImagePreview').src = optimizedUrl;
+          document.getElementById('manualDropPlaceholder').classList.add('hidden');
+          document.getElementById('manualPreviewWrapper').classList.remove('hidden');
+          showToast('Screenshot attached! Ready to upload to Google Drive.', 'success');
+        } catch (_) {
+          showToast('Could not process pasted image.', 'error');
+        }
+      }
+
+      function clearManualImagePreview() {
+        state.manualImageDataUrl = '';
+        document.getElementById('manualImagePreview').src = '';
+        document.getElementById('manualFileInput').value = '';
+        document.getElementById('manualDropPlaceholder').classList.remove('hidden');
+        document.getElementById('manualPreviewWrapper').classList.add('hidden');
+      }
+
+      /* -------------------------------------------------------------------------
+         13. FILTERING, SORTING & RENDERING GALLERY CARDS
+      ------------------------------------------------------------------------- */
+      function getFilteredAndSortedBases() {
+        const query = state.searchQuery.trim().toLowerCase();
+
+        const filtered = state.bases.filter((base) => {
+          if (state.selectedTh !== 'All' && base.thLevel.toUpperCase() !== state.selectedTh.toUpperCase()) return false;
+          if (state.selectedCreator && normalizeHandleKey(base.creatorHandle) !== normalizeHandleKey(state.selectedCreator)) return false;
+
+          if (state.selectedCategory === 'Favorites') {
+            if (!base.favorite) return false;
+          } else if (state.selectedCategory !== 'All') {
+            const hasTag = (base.tags || []).some((t) => t.toLowerCase() === state.selectedCategory.toLowerCase());
+            if (!hasTag) return false;
+          }
+
+          if (query) {
+            const searchable = [
+              base.thLevel,
+              base.creatorHandle,
+              base.ccTroops,
+              ...(base.tags || []),
+              base.notes,
+              formatExactDate(base.postTimestamp),
+            ].join(' ').toLowerCase();
+            if (!searchable.includes(query)) return false;
+          }
+          return true;
+        });
+
+        return filtered.sort((a, b) => {
+          if (state.sortBy === 'trending') {
+            const popA = computePopularityMetrics(a.likes, a.postTimestamp).rawScore;
+            const popB = computePopularityMetrics(b.likes, b.postTimestamp).rawScore;
+            return popB - popA || (b.postTimestamp || 0) - (a.postTimestamp || 0);
+          }
+          if (state.sortBy === 'most_likes') {
+            return (Number(b.likes) || 0) - (Number(a.likes) || 0) || (b.postTimestamp || 0) - (a.postTimestamp || 0);
+          }
+          if (state.sortBy === 'newest_post') return (Number(b.postTimestamp) || 0) - (Number(a.postTimestamp) || 0);
+          if (state.sortBy === 'oldest_post') return (Number(a.postTimestamp) || 0) - (Number(b.postTimestamp) || 0);
+          if (state.sortBy === 'most_copied') return (b.copies || 0) - (a.copies || 0) || (b.createdAt || 0) - (a.createdAt || 0);
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        });
+      }
+
+      function renderFilterPills() {
+        const dynamicThSet = new Set(STANDARD_TH_LEVELS);
+        state.bases.forEach((b) => { if (b.thLevel) dynamicThSet.add(b.thLevel.toUpperCase()); });
+
+        const thContainer = document.getElementById('thFilterContainer');
+        thContainer.innerHTML = Array.from(dynamicThSet).map((th) => {
+          const count = th === 'All'
+            ? state.bases.length
+            : state.bases.filter((b) => b.thLevel.toUpperCase() === th).length;
+          const active = state.selectedTh === th;
+          return `
+            <button type="button" data-th-filter="${escapeHtml(th)}" class="px-3 py-1.5 rounded-xl text-xs font-semibold inline-flex items-center gap-1.5 border transition cursor-pointer shrink-0 ${
+              active
+                ? 'bg-clashgold text-obsidian border-clashgold shadow-md shadow-clashgold/20'
+                : 'bg-stonecard hover:bg-stonehover text-slate-300 border-borderline'
+            }">
+              <span>${escapeHtml(th)}</span>
+              <span class="px-1.5 py-0.2 rounded-full text-[10px] ${active ? 'bg-obsidian/20 text-obsidian font-bold' : 'bg-obsidian text-slate-400'}">${count}</span>
+            </button>
+          `;
+        }).join('');
+
+        thContainer.querySelectorAll('button').forEach((btn) => {
+          btn.addEventListener('click', () => { state.selectedTh = btn.dataset.thFilter; renderAll(); });
+        });
+
+        const catContainer = document.getElementById('categoryFilterContainer');
+        catContainer.innerHTML = STANDARD_CATEGORIES.map((cat) => {
+          const active = state.selectedCategory === cat;
+          const favCount = cat === 'Favorites' ? state.bases.filter((b) => b.favorite).length : null;
+          return `
+            <button type="button" data-cat-filter="${escapeHtml(cat)}" class="px-3 py-1.5 rounded-xl text-xs font-medium inline-flex items-center gap-1.5 border transition cursor-pointer shrink-0 ${
+              active
+                ? 'bg-slate-100 text-obsidian border-white font-semibold'
+                : 'bg-stonecard/70 hover:bg-stonehover text-slate-400 hover:text-slate-200 border-borderline'
+            }">
+              ${cat === 'Favorites' ? '<i data-lucide="star" class="w-3 h-3 fill-current text-clashgold"></i>' : ''}
+              <span>${escapeHtml(cat)}</span>
+              ${favCount !== null ? `<span class="text-[10px] opacity-80">(${favCount})</span>` : ''}
+            </button>
+          `;
+        }).join('');
+
+        catContainer.querySelectorAll('button').forEach((btn) => {
+          btn.addEventListener('click', () => { state.selectedCategory = btn.dataset.catFilter; renderAll(); });
+        });
+
+        const creatorChip = document.getElementById('activeCreatorChip');
+        if (state.selectedCreator) {
+          document.getElementById('activeCreatorName').textContent = state.selectedCreator;
+          creatorChip.classList.remove('hidden');
+        } else {
+          creatorChip.classList.add('hidden');
+        }
+      }
+
+      function renderGallery() {
+        const grid = document.getElementById('baseGrid');
+        const emptyState = document.getElementById('emptyState');
+        const filteredBases = getFilteredAndSortedBases();
+
+        const colClassMap = {
+          2: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2',
+          3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+          4: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+        };
+        grid.className = `grid ${colClassMap[state.gridCols] || colClassMap[3]} gap-5`;
+
+        document.querySelectorAll('.col-toggle-btn').forEach((btn) => {
+          const cols = parseInt(btn.dataset.cols, 10);
+          btn.className = cols === state.gridCols
+            ? 'col-toggle-btn px-2.5 py-1 rounded-lg text-xs font-bold bg-clashgold text-obsidian transition cursor-pointer'
+            : 'col-toggle-btn px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition cursor-pointer';
+        });
+
+        document.getElementById('headerTotalBases').textContent = state.bases.length;
+        document.getElementById('headerTotalCopies').textContent = state.bases.reduce((acc, b) => acc + (b.copies || 0), 0);
+
+        if (filteredBases.length === 0) {
+          grid.innerHTML = '';
+          emptyState.classList.remove('hidden');
+          document.getElementById('emptyStateTitle').textContent =
+            state.bases.length === 0 ? 'Your Shared Base Vault is Empty' : 'No bases match your filters';
+          document.getElementById('emptyStateDesc').textContent =
+            state.bases.length === 0
+              ? 'Paste an X/Twitter Clash of Clans base post URL above or paste a screenshot manually to save your first layout to Google Sheets!'
+              : 'Try resetting your search query or switching Town Hall / Category filters.';
+          lucide.createIcons({ root: emptyState });
+          return;
+        }
+
+        emptyState.classList.add('hidden');
+
+        grid.innerHTML = filteredBases.map((base) => {
+          const primaryTag = (base.tags && base.tags[0]) || 'LEGEND';
+          const secondaryTags = (base.tags || []).slice(1, 3);
+          const isCopied = state.copiedCardId === base.id;
+          const hasMultiImages = Array.isArray(base.images) && base.images.length > 1;
+          const activeImgIndex = hasMultiImages ? Math.max(0, base.images.indexOf(base.imageUrl)) : 0;
+          const creatorClean = (base.creatorHandle || '@unknown').startsWith('@')
+            ? base.creatorHandle
+            : `@${base.creatorHandle}`;
+
+          const pop = computePopularityMetrics(base.likes, base.postTimestamp);
+          const growth = computeTrackedLikesGrowth(base);
+          const exactDateStr = formatExactDate(base.postTimestamp);
+          const relAgeStr = formatRelativeAge(base.postTimestamp);
+          const deltaPill = growth.dailyDelta > 0
+            ? `<span class="text-emerald-300 font-bold">+${formatCompactNumber(growth.dailyDelta)}/d</span>`
+            : '';
+
+          return `
+            <article data-card-id="${escapeHtml(base.id)}" class="group rounded-2xl bg-stonecard border ${
+              isCopied ? 'border-emerald-400 ring-2 ring-emerald-400/30' : 'border-borderline hover:border-clashgold/60'
+            } overflow-hidden shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/50 transition-all duration-200 flex flex-col">
+
+              <!-- CLICKABLE BASE THUMBNAIL AREA (1-CLICK COPY) -->
+              <div data-copy-base-id="${escapeHtml(base.id)}" role="button" tabindex="0" aria-label="Click to copy ${escapeHtml(base.thLevel)} base link from ${escapeHtml(creatorClean)}" class="base-image-trigger relative aspect-[16/10] bg-obsidian overflow-hidden cursor-pointer select-none">
+                <img src="${escapeHtml(base.imageUrl)}" alt="${escapeHtml(base.thLevel)} Clash of Clans Base Layout" loading="lazy" onerror="this.src='https://placehold.co/800x500/151c28/f5b942?text=${encodeURIComponent(base.thLevel + ' Base Layout')}'" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
+                <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/75 via-black/30 to-transparent pointer-events-none"></div>
+                <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
+
+                <!-- TOP-LEFT: TH Badge -->
+                <div class="absolute top-3 left-3 flex items-center gap-1.5 pointer-events-none">
+                  <span class="px-2.5 py-1 rounded-lg bg-obsidian/90 backdrop-blur-md border border-clashgold/70 text-clashgold font-display font-bold text-sm tracking-wider shadow-lg">
+                    ${escapeHtml(base.thLevel)}
+                  </span>
+                </div>
+
+                <!-- TOP-RIGHT: Primary Tag & Favorite -->
+                <div class="absolute top-3 right-3 flex items-center gap-1.5">
+                  <span class="px-2.5 py-1 rounded-lg bg-obsidian/85 backdrop-blur-md border border-borderline text-[11px] font-bold uppercase tracking-wider text-white pointer-events-none">
+                    ${escapeHtml(primaryTag)}
+                  </span>
+                  <button type="button" data-fav-id="${escapeHtml(base.id)}" title="${base.favorite ? 'Remove from Favorites' : 'Add to Favorites'}" class="fav-toggle-btn p-1.5 rounded-lg bg-obsidian/85 hover:bg-obsidian backdrop-blur-md border border-borderline transition cursor-pointer ${
+                    base.favorite ? 'text-clashgold border-clashgold/50' : 'text-slate-300 hover:text-clashgold'
+                  }">
+                    <i data-lucide="star" class="w-3.5 h-3.5 ${base.favorite ? 'fill-current' : ''}"></i>
+                  </button>
+                </div>
+
+                <!-- BOTTOM-LEFT: Multi-Image Switcher or Copy Hint -->
+                <div class="absolute bottom-2.5 left-3 flex items-center gap-1.5">
+                  ${hasMultiImages
+                    ? `<button type="button" data-cycle-img-id="${escapeHtml(base.id)}" title="Switch between Base Layout & Extra images" class="cycle-img-btn px-2 py-1 rounded-lg bg-obsidian/90 hover:bg-clashgold hover:text-obsidian border border-borderline text-[11px] font-semibold text-slate-200 inline-flex items-center gap-1 transition cursor-pointer">
+                        <i data-lucide="images" class="w-3 h-3"></i>
+                        <span>${activeImgIndex === 0 ? 'Layout' : 'Log/Extra'} ${activeImgIndex + 1}/${base.images.length}</span>
+                      </button>`
+                    : `<span class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 inline-flex items-center gap-1 text-[11px] font-semibold text-clashgold drop-shadow pointer-events-none">
+                        <i data-lucide="copy" class="w-3 h-3"></i> Click to copy link
+                      </span>`}
+                </div>
+
+                <!-- BOTTOM-RIGHT: Lightbox Button -->
+                <button type="button" data-lightbox-id="${escapeHtml(base.id)}" title="Inspect Layout Full-Screen" class="lightbox-open-btn absolute bottom-2.5 right-3 p-2 rounded-lg bg-obsidian/90 hover:bg-clashgold hover:text-obsidian text-slate-200 border border-borderline opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 shadow-lg cursor-pointer">
+                  <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
+                </button>
+
+                <!-- COPY FLASH OVERLAY -->
+                ${isCopied
+                  ? `<div class="animate-copy-flash absolute inset-0 bg-gradient-to-br from-emerald-950/90 via-obsidian/90 to-amber-950/90 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 text-center pointer-events-none">
+                      <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 text-emerald-300 flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/30">
+                        <i data-lucide="check" class="w-7 h-7 stroke-[2.75]"></i>
+                      </div>
+                      <span class="font-display font-bold text-lg tracking-wider text-clashgold drop-shadow">COPIED BASE LINK!</span>
+                      <span class="text-[11px] text-emerald-200 mt-0.5">Ready to paste in Clash of Clans</span>
+                    </div>`
+                  : ''}
+              </div>
+
+              <!-- COMPACT CARD FOOTER -->
+              <div class="p-3.5 flex-1 flex flex-col justify-between gap-2.5">
+                <div class="flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-1 min-w-0">
+                    <button type="button" data-filter-creator="${escapeHtml(creatorClean)}" title="Filter vault by ${escapeHtml(creatorClean)}" class="filter-creator-btn text-xs font-bold text-slate-100 hover:text-clashgold truncate transition cursor-pointer">
+                      ${escapeHtml(creatorClean)}
+                    </button>
+                    ${base.postUrl
+                      ? `<a href="${escapeHtml(base.postUrl)}" target="_blank" rel="noopener noreferrer" title="Open original X post" class="p-0.5 text-slate-400 hover:text-sky-400 shrink-0 transition">
+                          <i data-lucide="external-link" class="w-3 h-3"></i>
+                        </a>`
+                      : ''}
+                  </div>
+                  <span class="text-[11px] text-slate-400 inline-flex items-center gap-1 shrink-0" title="Posted on X: ${escapeHtml(exactDateStr)}">
+                    <i data-lucide="calendar" class="w-3 h-3 text-slate-500"></i>
+                    <span>${escapeHtml(exactDateStr)}</span>
+                    <span class="text-slate-500">· ${escapeHtml(relAgeStr)}</span>
+                  </span>
+                </div>
+
+                <!-- Tags & Time-Adjusted Popularity + 7-Day Tracked Growth -->
+                <div class="flex items-center justify-between gap-2 text-[11px]">
+                  <div class="flex items-center gap-1 min-w-0 overflow-hidden">
+                    ${secondaryTags.length > 0
+                      ? secondaryTags.map((t) => `<span class="px-2 py-0.5 rounded-md bg-obsidian border border-borderline text-[10px] font-medium text-slate-300 truncate">${escapeHtml(t)}</span>`).join('')
+                      : `<span class="text-[11px] text-slate-500 truncate">${escapeHtml(base.notes ? base.notes.slice(0, 32) : primaryTag)}</span>`}
+                  </div>
+
+                  <div class="relative pop-trigger-group shrink-0">
+                    <button type="button" class="pop-badge-btn px-2 py-0.5 rounded-lg border text-[11px] font-semibold inline-flex items-center gap-1 transition cursor-pointer ${pop.badgeClass}">
+                      <span>❤️ ${escapeHtml(formatCompactNumber(pop.likes))}</span>
+                      ${deltaPill}
+                      <span class="opacity-60">·</span>
+                      <span>${escapeHtml(pop.tierLabel)} ${pop.popScore}</span>
+                    </button>
+
+                    <div class="pop-popover absolute right-0 bottom-full mb-2 w-64 rounded-xl bg-obsidian border border-borderline p-3 shadow-2xl z-20 text-[11px] space-y-1.5 pointer-events-none">
+                      <div class="flex items-center justify-between font-bold text-white border-b border-borderline pb-1">
+                        <span>Time-Weighted Popularity</span>
+                        <span class="text-clashgold">${pop.popScore}/100</span>
+                      </div>
+                      <div class="flex justify-between text-slate-300">
+                        <span class="text-slate-400">Live X Likes:</span>
+                        <span class="font-semibold text-rose-300">❤️ ${pop.likes.toLocaleString()}</span>
+                      </div>
+                      <div class="flex justify-between text-slate-300">
+                        <span class="text-slate-400">Post Age:</span>
+                        <span>${escapeHtml(relAgeStr)} (${pop.ageDays.toFixed(1)}d)</span>
+                      </div>
+                      <div class="flex justify-between text-slate-300">
+                        <span class="text-slate-400">Like Velocity:</span>
+                        <span class="text-emerald-300 font-semibold">${pop.likesPerDay.toFixed(1)} likes/day</span>
+                      </div>
+                      <div class="flex justify-between text-slate-300 pt-1 border-t border-borderline/70">
+                        <span class="text-slate-400">7-Day Tracking:</span>
+                        <span class="${growth.isTrackingActive ? 'text-sky-300' : 'text-slate-400'} font-semibold">
+                          ${growth.isTrackingActive ? 'Active (Daily)' : 'Archived (>7d)'}
+                        </span>
+                      </div>
+                      ${growth.snapshots >= 2
+                        ? `<div class="flex justify-between text-slate-300">
+                            <span class="text-slate-400">Tracked Growth (${growth.snapshots}d):</span>
+                            <span class="text-emerald-300 font-semibold">${growth.totalDelta >= 0 ? '+' : ''}${growth.totalDelta} (${growth.dailyDelta >= 0 ? '+' : ''}${growth.dailyDelta} last)</span>
+                          </div>`
+                        : ''}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- CC Troops, Copy Count & Edit/Delete -->
+                <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-borderline/60">
+                  ${base.ccTroops
+                    ? `<button type="button" data-copy-cc="${escapeHtml(base.ccTroops)}" title="Click to copy CC troop request" class="copy-cc-btn min-w-0 flex-1 text-left px-2.5 py-1 rounded-lg bg-obsidian hover:bg-stonehover border border-borderline text-[11px] text-slate-300 hover:text-clashgold truncate inline-flex items-center gap-1.5 transition cursor-pointer">
+                        <i data-lucide="shield" class="w-3 h-3 text-clashgold shrink-0"></i>
+                        <span class="truncate">${escapeHtml(base.ccTroops)}</span>
+                      </button>`
+                    : `<span class="text-[11px] text-slate-500 italic truncate flex-1">No CC specified</span>`}
+
+                  <div class="flex items-center gap-1 shrink-0">
+                    <span title="Times base link copied" class="px-1.5 text-[11px] font-medium text-slate-400 inline-flex items-center gap-0.5">
+                      <i data-lucide="copy-check" class="w-3 h-3 text-emerald-400/80"></i>
+                      <span>${base.copies || 0}</span>
+                    </span>
+                    <button type="button" data-edit-id="${escapeHtml(base.id)}" title="Edit Base Details" class="edit-base-btn p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-stonehover transition cursor-pointer">
+                      <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <button type="button" data-delete-id="${escapeHtml(base.id)}" title="Delete Base" class="delete-base-btn p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition cursor-pointer">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        bindGalleryCardEvents();
+        lucide.createIcons({ root: grid });
+      }
+
+      function bindGalleryCardEvents() {
+        document.querySelectorAll('.base-image-trigger').forEach((el) => {
+          const triggerCopy = async () => copyBaseLinkById(el.dataset.copyBaseId);
+          el.addEventListener('click', triggerCopy);
+          el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); triggerCopy(); }
+          });
+        });
+
+        document.querySelectorAll('.fav-toggle-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.favId;
+            const target = state.bases.find((b) => b.id === id);
+            if (!target) return;
+            target.favorite = !target.favorite;
+            if (target.favorite) state.favoriteIds.add(id);
+            else state.favoriteIds.delete(id);
+            saveFavorites();
+            saveLocalCache();
+            renderAll();
+            showToast(target.favorite ? 'Added to Favorites' : 'Removed from Favorites', 'info');
+          });
+        });
+
+        document.querySelectorAll('.cycle-img-btn').forEach((btn) => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.cycleImgId;
+            const target = state.bases.find((b) => b.id === id);
+            if (!target || !Array.isArray(target.images) || target.images.length < 2) return;
+            const currIdx = Math.max(0, target.images.indexOf(target.imageUrl));
+            const nextIdx = (currIdx + 1) % target.images.length;
+            target.imageUrl = target.images[nextIdx];
+            renderGallery();
+            showToast(`Switched to image ${nextIdx + 1} of ${target.images.length}`, 'info');
+            try { await updateBaseOnBackend(id, { imageUrl: target.imageUrl }); } catch (_) {}
+          });
+        });
+
+        document.querySelectorAll('.lightbox-open-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openLightbox(btn.dataset.lightboxId);
+          });
+        });
+
+        document.querySelectorAll('.copy-cc-btn').forEach((btn) => {
+          btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const ccText = btn.dataset.copyCc;
+            if (await copyTextToClipboard(ccText)) {
+              showToast(`Copied CC request: "${ccText}"`, 'success');
+            }
+          });
+        });
+
+        document.querySelectorAll('.edit-base-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openEditModal(btn.dataset.editId);
+          });
+        });
+
+        document.querySelectorAll('.filter-creator-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const handle = btn.dataset.filterCreator;
+            state.selectedCreator =
+              normalizeHandleKey(state.selectedCreator) === normalizeHandleKey(handle) ? '' : handle;
+            renderAll();
+          });
+        });
+
+        document.querySelectorAll('.pop-badge-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const group = btn.closest('.pop-trigger-group');
+            const wasOpen = group.classList.contains('popover-open');
+            document.querySelectorAll('.pop-trigger-group.popover-open').forEach((g) => g.classList.remove('popover-open'));
+            if (!wasOpen) group.classList.add('popover-open');
+          });
+        });
+
+        document.querySelectorAll('.delete-base-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.deleteId;
+            const target = state.bases.find((b) => b.id === id);
+            if (!target) return;
+
+            openConfirmModal({
+              title: 'Delete Saved Base?',
+              message: `Remove this ${target.thLevel} base (${target.creatorHandle}) from Google Sheets and trash its Drive screenshot?`,
+              confirmLabel: 'Delete Base',
+              onConfirm: async () => {
+                try {
+                  await deleteBaseOnBackend(id);
+                  renderAll();
+                  showToast('Base deleted from Google Sheets & Drive.', 'info');
+                } catch (err) {
+                  showToast('Delete failed: ' + err.message, 'error');
+                }
+              },
+            });
+          });
+        });
+      }
+
+      async function copyBaseLinkById(id) {
+        const base = state.bases.find((b) => b.id === id);
+        if (!base) return;
+
+        const copied = await copyTextToClipboard(base.baseLink);
+        if (!copied) {
+          showToast('Could not access clipboard. Open Edit to copy link manually.', 'error');
+          return;
+        }
+
+        // Optimistic UI update + flash
+        base.copies = (base.copies || 0) + 1;
+        saveLocalCache();
+
+        if (state.copiedCardTimer) clearTimeout(state.copiedCardTimer);
+        state.copiedCardId = id;
+        renderGallery();
+
+        state.copiedCardTimer = setTimeout(() => {
+          state.copiedCardId = null;
+          renderGallery();
+        }, 1650);
+
+        showToast(`Copied ${base.thLevel} base link (${base.creatorHandle})!`, 'gold');
+
+        // Persist incremented copy count to Google Sheets
+        try {
+          await updateBaseOnBackend(id, null, { incrementCopies: true });
+        } catch (_) {}
+      }
+
+      /* -------------------------------------------------------------------------
+         14. EDIT MODAL LOGIC
+      ------------------------------------------------------------------------- */
+      function openEditModal(id) {
+        const base = state.bases.find((b) => b.id === id);
+        if (!base) return;
+
+        document.getElementById('editBaseId').value = base.id;
+        document.getElementById('editThInput').value = base.thLevel || 'TH19';
+        document.getElementById('editCreatorInput').value = base.creatorHandle || '';
+        document.getElementById('editPostDateInput').value = toDatetimeLocalValue(base.postTimestamp || base.createdAt);
+        document.getElementById('editLikesInput').value = Number(base.likes) || 0;
+        document.getElementById('editLinkInput').value = base.baseLink || '';
+        document.getElementById('editCcInput').value = base.ccTroops || '';
+        document.getElementById('editTagsInput').value = (base.tags || []).join(', ');
+        document.getElementById('editNotesInput').value = base.notes || '';
+
+        const refreshBtn = document.getElementById('btnEditRefreshLiveStats');
+        if (base.postUrl && parseXPostUrl(base.postUrl)) {
+          refreshBtn.classList.remove('hidden');
+          refreshBtn.onclick = async () => {
+            if (await refreshLiveStatsForBase(base.id)) openEditModal(base.id);
+          };
+        } else {
+          refreshBtn.classList.add('hidden');
+        }
+
+        const imgSelectorBlock = document.getElementById('editImageSelectorBlock');
+        const thumbsContainer = document.getElementById('editImageThumbnails');
+        if (Array.isArray(base.images) && base.images.length > 1) {
+          imgSelectorBlock.classList.remove('hidden');
+          thumbsContainer.innerHTML = base.images.map((url, idx) => `
+            <button type="button" data-select-thumb="${escapeHtml(url)}" class="edit-thumb-option relative w-24 h-16 rounded-lg overflow-hidden border-2 shrink-0 cursor-pointer ${
+              base.imageUrl === url ? 'border-clashgold' : 'border-borderline opacity-70 hover:opacity-100'
+            }">
+              <img src="${escapeHtml(url)}" alt="Post image ${idx + 1}" class="w-full h-full object-cover" />
+              <span class="absolute bottom-0.5 right-1 text-[10px] font-bold bg-black/75 text-white px-1 rounded">#${idx + 1}</span>
+            </button>
+          `).join('');
+
+          thumbsContainer.querySelectorAll('.edit-thumb-option').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              base.imageUrl = btn.dataset.selectThumb;
+              openEditModal(id);
+            });
+          });
+        } else {
+          imgSelectorBlock.classList.add('hidden');
+        }
+
+        document.getElementById('editModal').classList.remove('hidden');
+        lucide.createIcons({ root: document.getElementById('editModal') });
+      }
+
+      /* -------------------------------------------------------------------------
+         15. FULL-SCREEN LIGHTBOX INSPECTOR LOGIC
+      ------------------------------------------------------------------------- */
+      function openLightbox(id) {
+        const base = state.bases.find((b) => b.id === id);
+        if (!base) return;
+
+        state.lightboxBaseId = id;
+        state.lightboxZoomed = false;
+
+        const allImages = Array.isArray(base.images) && base.images.length > 0 ? base.images : [base.imageUrl];
+        state.lightboxImageIndex = Math.max(0, allImages.indexOf(base.imageUrl));
+
+        const img = document.getElementById('lightboxImage');
+        img.src = allImages[state.lightboxImageIndex];
+        img.style.transform = 'scale(1)';
+        img.classList.remove('cursor-zoom-out');
+        img.classList.add('cursor-zoom-in');
+
+        const switcher = document.getElementById('lightboxImageSwitcher');
+        if (allImages.length > 1) {
+          switcher.innerHTML = allImages.map((_, idx) => `
+            <button type="button" data-lb-img-idx="${idx}" class="lb-img-pill px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+              idx === state.lightboxImageIndex ? 'bg-clashgold text-obsidian' : 'bg-obsidian text-slate-300 hover:text-white'
+            }">
+              ${idx === 0 ? 'Img 1: Base Layout' : `Img ${idx + 1}: Extra / Log`}
+            </button>
+          `).join('');
+          switcher.classList.remove('hidden');
+          switcher.querySelectorAll('.lb-img-pill').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const nextIdx = parseInt(btn.dataset.lbImgIdx, 10);
+              state.lightboxImageIndex = nextIdx;
+              img.src = allImages[nextIdx];
+              switcher.querySelectorAll('.lb-img-pill').forEach((b, bIdx) => {
+                b.className = `lb-img-pill px-2.5 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
+                  bIdx === nextIdx ? 'bg-clashgold text-obsidian' : 'bg-obsidian text-slate-300 hover:text-white'
+                }`;
+              });
+            });
+          });
+        } else {
+          switcher.classList.add('hidden');
+        }
+
+        document.getElementById('lightboxZoomLabel').textContent = '1.75x Zoom';
+        document.getElementById('lightboxThBadge').textContent = base.thLevel;
+        document.getElementById('lightboxTags').innerHTML = (base.tags || [])
+          .map((t) => `<span class="px-2 py-0.5 rounded-md bg-stonecard border border-borderline text-xs font-semibold text-slate-200">${escapeHtml(t)}</span>`)
+          .join('');
+
+        const creatorClean = (base.creatorHandle || '@unknown').startsWith('@')
+          ? base.creatorHandle
+          : `@${base.creatorHandle}`;
+        const creatorLink = document.getElementById('lightboxCreatorLink');
+        document.getElementById('lightboxCreatorText').textContent = creatorClean;
+        if (base.postUrl) {
+          creatorLink.href = base.postUrl;
+          creatorLink.classList.remove('pointer-events-none', 'opacity-70');
+        } else {
+          creatorLink.href = '#';
+          creatorLink.classList.add('pointer-events-none', 'opacity-70');
+        }
+
+        document.getElementById('btnLightboxOpenCoc').href = base.baseLink || '#';
+        document.getElementById('lightboxDateText').textContent =
+          `${formatExactDate(base.postTimestamp)} (${formatRelativeAge(base.postTimestamp)})`;
+
+        const pop = computePopularityMetrics(base.likes, base.postTimestamp);
+        const growth = computeTrackedLikesGrowth(base);
+        const growthSuffix = growth.snapshots >= 2 && growth.totalDelta !== 0
+          ? ` (${growth.totalDelta > 0 ? '+' : ''}${growth.totalDelta} tracked)`
+          : '';
+        document.getElementById('lightboxPopularityText').textContent =
+          `❤️ ${formatCompactNumber(pop.likes)}${growthSuffix} · ${pop.tierLabel} ${pop.popScore}`;
+
+        const lbRefreshBtn = document.getElementById('btnLightboxRefreshStats');
+        if (base.postUrl && parseXPostUrl(base.postUrl)) {
+          lbRefreshBtn.classList.remove('hidden');
+          lbRefreshBtn.onclick = () => refreshLiveStatsForBase(base.id);
+        } else {
+          lbRefreshBtn.classList.add('hidden');
+        }
+
+        document.getElementById('lightboxCcText').textContent = base.ccTroops || 'None specified';
+        document.getElementById('btnLightboxCopyCc').classList.toggle('hidden', !base.ccTroops);
+        document.getElementById('lightboxNotesText').textContent = base.notes || '';
+
+        document.getElementById('lightboxModal').classList.remove('hidden');
+        lucide.createIcons({ root: document.getElementById('lightboxModal') });
+      }
+
+      function toggleLightboxZoom() {
+        const img = document.getElementById('lightboxImage');
+        const label = document.getElementById('lightboxZoomLabel');
+        state.lightboxZoomed = !state.lightboxZoomed;
+        if (state.lightboxZoomed) {
+          img.style.transform = 'scale(1.75)';
+          img.classList.remove('cursor-zoom-in');
+          img.classList.add('cursor-zoom-out');
+          label.textContent = 'Reset Zoom (1x)';
+        } else {
+          img.style.transform = 'scale(1)';
+          img.classList.remove('cursor-zoom-out');
+          img.classList.add('cursor-zoom-in');
+          label.textContent = '1.75x Zoom';
+        }
+      }
+
+      function stepLightboxBase(direction) {
+        const list = getFilteredAndSortedBases();
+        if (list.length <= 1 || !state.lightboxBaseId) return;
+        const currIdx = list.findIndex((b) => b.id === state.lightboxBaseId);
+        if (currIdx === -1) return;
+        openLightbox(list[(currIdx + direction + list.length) % list.length].id);
+      }
+
+      /* -------------------------------------------------------------------------
+         16. CONFIRMATION MODAL & JSON BACKUP EXPORT / IMPORT
+      ------------------------------------------------------------------------- */
+      function openConfirmModal({ title, message, confirmLabel = 'Confirm', onConfirm }) {
+        document.getElementById('confirmModalTitle').textContent = title;
+        document.getElementById('confirmModalMessage').textContent = message;
+        document.getElementById('btnConfirmProceed').textContent = confirmLabel;
+        state.confirmCallback = onConfirm;
+        document.getElementById('confirmModal').classList.remove('hidden');
+        lucide.createIcons({ root: document.getElementById('confirmModal') });
+      }
+
+      function exportVaultJson() {
+        const payload = {
+          app: 'MollyMetrics-BaseVault',
+          version: 3,
+          exportedAt: new Date().toISOString(),
+          bases: state.bases,
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `molly-basevault-backup-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`Exported ${state.bases.length} base(s) to JSON backup!`, 'gold');
+      }
+
+      function importVaultJsonFile(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const parsed = JSON.parse(e.target.result);
+            const incomingBases = Array.isArray(parsed) ? parsed : parsed.bases;
+            if (!Array.isArray(incomingBases)) throw new Error('Invalid JSON structure');
+
+            showToast(`Importing ${incomingBases.length} base(s) to Google Sheets...`, 'info');
+            let addedCount = 0, replacedCount = 0, blockedCount = 0;
+
+            for (let idx = 0; idx < incomingBases.length; idx++) {
+              const item = incomingBases[idx];
+              if (!item || !item.baseLink || !item.imageUrl) continue;
+              const normalized = normalizeBaseRecord({
+                ...item,
+                id: item.id || `imported_${Date.now()}_${idx}`,
+              });
+              try {
+                const res = await saveBaseToBackend(normalized);
+                if (res.action === 'blocked') blockedCount++;
+                else if (res.action === 'replaced_with_earlier') replacedCount++;
+                else addedCount++;
+              } catch (_) {}
+            }
+
+            renderAll();
+            showToast(
+              addedCount > 0 || replacedCount > 0
+                ? `Imported ${addedCount} new, replaced ${replacedCount}, blocked ${blockedCount} duplicate(s)!`
+                : 'No new bases imported (all layout IDs already exist in vault).',
+              addedCount > 0 || replacedCount > 0 ? 'gold' : 'info'
+            );
+          } catch (_) {
+            showToast('Invalid Base Vault JSON backup file.', 'error');
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      /* -------------------------------------------------------------------------
+         17. MASTER RENDER & EVENT LISTENERS
+      ------------------------------------------------------------------------- */
+      function renderAll() {
+        renderFilterPills();
+        renderGallery();
+      }
+
+      function initEventListeners() {
+        // Cloud Refresh & API Settings
+        document.getElementById('btnRefreshCloud').addEventListener('click', () => loadBasesFromBackend(true));
+        document.getElementById('btnOpenApiModal').addEventListener('click', () => {
+          document.getElementById('apiUrlInput').value = getWebAppUrl();
+          document.getElementById('apiModal').classList.remove('hidden');
+        });
+        document.getElementById('btnSaveApiUrl').addEventListener('click', () => {
+          const val = document.getElementById('apiUrlInput').value.trim();
+          if (!val) return;
+          localStorage.setItem('molly_web_app_url', val);
+          document.getElementById('apiModal').classList.add('hidden');
+          loadBasesFromBackend(true);
+        });
+        document.getElementById('btnResetApiUrl').addEventListener('click', () => {
+          localStorage.removeItem('molly_web_app_url');
+          document.getElementById('apiUrlInput').value = DEFAULT_WEB_APP_URL;
+          showToast('Reset to default Web App URL.', 'info');
+        });
+
+        // Top X Post Import Form
+        document.getElementById('xImportForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          const urlVal = document.getElementById('xUrlInput').value.trim();
+          if (!urlVal) {
+            showToast('Paste an X/Twitter post URL first.', 'info');
+            document.getElementById('xUrlInput').focus();
+            return;
+          }
+          handleXPostImport(urlVal);
+        });
+
+        // Quick Clipboard Paste Button
+        document.getElementById('btnPasteClipboard').addEventListener('click', async () => {
+          const input = document.getElementById('xUrlInput');
+          try {
+            if (navigator.clipboard && navigator.clipboard.readText) {
+              const text = await navigator.clipboard.readText();
+              if (text && text.trim()) {
+                input.value = text.trim();
+                showToast('Pasted link from clipboard!', 'info');
+                return;
+              }
+            }
+            throw new Error('Clipboard read unavailable');
+          } catch (_) {
+            input.focus();
+            showToast('Press Ctrl+V (or Cmd+V) in the input box to paste your link.', 'info');
+          }
+        });
+
+        // Manual Modal & Drag/Drop/Paste Screenshot
+        document.getElementById('btnOpenManualModal').addEventListener('click', () => openManualModal());
+        const manualDropZone = document.getElementById('manualDropZone');
+        const manualFileInput = document.getElementById('manualFileInput');
+
+        manualDropZone.addEventListener('click', (e) => {
+          if (e.target.closest('#btnRemoveManualImage')) return;
+          manualFileInput.click();
+        });
+        manualFileInput.addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) setManualImageFromFile(e.target.files[0]);
+        });
+        manualDropZone.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          manualDropZone.classList.add('border-clashgold', 'bg-clashgold/5');
+        });
+        manualDropZone.addEventListener('dragleave', () => {
+          manualDropZone.classList.remove('border-clashgold', 'bg-clashgold/5');
+        });
+        manualDropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          manualDropZone.classList.remove('border-clashgold', 'bg-clashgold/5');
+          if (e.dataTransfer.files && e.dataTransfer.files[0]) setManualImageFromFile(e.dataTransfer.files[0]);
+        });
+        document.getElementById('btnRemoveManualImage').addEventListener('click', (e) => {
+          e.stopPropagation();
+          clearManualImagePreview();
+        });
+
+        window.addEventListener('paste', (e) => {
+          if (document.getElementById('manualModal').classList.contains('hidden')) return;
+          const items = e.clipboardData && e.clipboardData.items;
+          if (!items) return;
+          for (const item of items) {
+            if (item.type && item.type.startsWith('image/')) {
+              e.preventDefault();
+              const file = item.getAsFile();
+              if (file) setManualImageFromFile(file);
+              return;
+            }
+          }
+        });
+
+        document.getElementById('manualBaseLink').addEventListener('input', (e) => updateManualLinkThBadge(e.target.value));
+        document.getElementById('manualTweetCaption').addEventListener('input', (e) => autoFillFromManualCaption(e.target.value));
+
+        // Manual Base Form Submit -> Uploads Base64 to Google Drive via saveBase
+        document.getElementById('manualBaseForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const baseLink = document.getElementById('manualBaseLink').value.trim();
+          if (!baseLink) { showToast('Please enter a Clash of Clans base link.', 'error'); return; }
+          if (!state.manualImageDataUrl) { showToast('Please paste (Ctrl+V) or upload a screenshot of the base layout.', 'error'); return; }
+
+          const submitBtn = document.getElementById('btnManualSaveSubmit');
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Uploading to Drive...</span>';
+          lucide.createIcons({ root: submitBtn });
+
+          try {
+            const rawTh = document.getElementById('manualThInput').value.trim().toUpperCase();
+            const thLevel = rawTh || extractTownHallFromLinkOrText(baseLink);
+            const creatorRaw = document.getElementById('manualCreatorInput').value.trim();
+            const creatorHandle = creatorRaw ? (creatorRaw.startsWith('@') ? creatorRaw : `@${creatorRaw}`) : '@manual';
+            const ccTroops = document.getElementById('manualCcInput').value.trim();
+            const tagsRaw = document.getElementById('manualTagsInput').value.trim();
+            const tags = tagsRaw ? tagsRaw.split(',').map((t) => t.trim()).filter(Boolean) : ['Legend'];
+            const postUrl = document.getElementById('manualPostUrlInput').value.trim();
+            const caption = document.getElementById('manualTweetCaption').value.trim();
+            const postDateVal = document.getElementById('manualPostDateInput').value;
+            const postTimestamp = postDateVal
+              ? Date.parse(postDateVal) || Date.now()
+              : extractDateFromCaption(caption) || Date.now();
+            const likesVal = Math.max(0, parseInt(document.getElementById('manualLikesInput').value, 10) || 0);
+
+            const candidateBase = {
+              id: `base_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+              thLevel,
+              baseLink,
+              canonicalId: extractCanonicalLayoutId(baseLink),
+              imageUrl: state.manualImageDataUrl,
+              images: [state.manualImageDataUrl],
+              creatorHandle,
+              postUrl,
+              postTimestamp,
+              likes: likesVal,
+              ccTroops,
+              tags,
+              notes: caption ? caption.slice(0, 140) : '',
+              copies: 0,
+              createdAt: Date.now(),
+            };
+
+            const res = await saveBaseToBackend(candidateBase);
+            document.getElementById('manualModal').classList.add('hidden');
+            clearManualImagePreview();
+            renderAll();
+
+            if (res.action === 'blocked') {
+              showDuplicateResolutionBanner(res);
+              showToast(`Duplicate link blocked! Earlier post (${res.originalBase.creatorHandle}) kept.`, 'error');
+              return;
+            }
+            if (res.action === 'replaced_with_earlier') {
+              showDuplicateResolutionBanner(res);
+              showToast(`Earlier post (${creatorHandle}) replaced newer duplicate!`, 'gold');
+              return;
+            }
+
+            showToast(`Saved ${thLevel} base & uploaded screenshot to Google Drive!`, 'gold');
+          } catch (err) {
+            showToast('Failed to save base: ' + err.message, 'error');
+          } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i><span>Save to Vault</span>';
+            lucide.createIcons({ root: submitBtn });
+          }
+        });
+
+        // Multi-Base Modal Controls
+        document.getElementById('btnToggleAllMultiBases').addEventListener('click', () => {
+          const data = state.pendingMultiBase;
+          if (!data) return;
+          const allSelected = data.items.every((i) => i.selected);
+          data.items.forEach((i) => { i.selected = !allSelected; });
+          renderMultiBaseItems();
+        });
+        document.getElementById('btnConfirmMultiImport').addEventListener('click', commitMultiBaseImport);
+
+        // Edit Base Form Submit -> Sends action: "updateBase"
+        document.getElementById('editBaseForm').addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const id = document.getElementById('editBaseId').value;
+          const target = state.bases.find((b) => b.id === id);
+          if (!target) return;
+
+          const creatorVal = document.getElementById('editCreatorInput').value.trim();
+          const editDateVal = document.getElementById('editPostDateInput').value;
+          const parsedTs = editDateVal ? Date.parse(editDateVal) : NaN;
+          const tagsList = document.getElementById('editTagsInput').value.split(',').map((t) => t.trim()).filter(Boolean);
+
+          const updates = {
+            thLevel: document.getElementById('editThInput').value.trim().toUpperCase() || target.thLevel,
+            creatorHandle: creatorVal ? (creatorVal.startsWith('@') ? creatorVal : `@${creatorVal}`) : '@unknown',
+            baseLink: document.getElementById('editLinkInput').value.trim() || target.baseLink,
+            postTimestamp: !Number.isNaN(parsedTs) ? parsedTs : target.postTimestamp,
+            likes: Math.max(0, parseInt(document.getElementById('editLikesInput').value, 10) || 0),
+            ccTroops: document.getElementById('editCcInput').value.trim(),
+            tags: tagsList.length > 0 ? tagsList : ['Legend'],
+            notes: document.getElementById('editNotesInput').value.trim(),
+            imageUrl: target.imageUrl,
+          };
+
+          try {
+            await updateBaseOnBackend(id, updates);
+            document.getElementById('editModal').classList.add('hidden');
+            renderAll();
+            showToast('Base details saved to Google Sheets!', 'success');
+          } catch (err) {
+            showToast('Update failed: ' + err.message, 'error');
+          }
+        });
+
+        // Lightbox Controls
+        document.getElementById('btnLightboxZoom').addEventListener('click', toggleLightboxZoom);
+        document.getElementById('lightboxImage').addEventListener('click', toggleLightboxZoom);
+        document.getElementById('btnLightboxPrev').addEventListener('click', () => stepLightboxBase(-1));
+        document.getElementById('btnLightboxNext').addEventListener('click', () => stepLightboxBase(1));
+        document.getElementById('btnLightboxCopyLink').addEventListener('click', () => {
+          if (state.lightboxBaseId) copyBaseLinkById(state.lightboxBaseId);
+        });
+        document.getElementById('btnLightboxEditLikes').addEventListener('click', () => {
+          if (!state.lightboxBaseId) return;
+          document.getElementById('lightboxModal').classList.add('hidden');
+          openEditModal(state.lightboxBaseId);
+        });
+        document.getElementById('btnLightboxCopyCc').addEventListener('click', async () => {
+          const ccText = document.getElementById('lightboxCcText').textContent;
+          if (ccText && ccText !== 'None specified' && (await copyTextToClipboard(ccText))) {
+            showToast(`Copied CC request: "${ccText}"`, 'success');
+          }
+        });
+
+        // Search, Sort & Grid Column Density
+        const searchInput = document.getElementById('searchInput');
+        const btnClearSearch = document.getElementById('btnClearSearch');
+        searchInput.addEventListener('input', (e) => {
+          state.searchQuery = e.target.value;
+          btnClearSearch.classList.toggle('hidden', !state.searchQuery);
+          renderGallery();
+        });
+        btnClearSearch.addEventListener('click', () => {
+          state.searchQuery = '';
+          searchInput.value = '';
+          btnClearSearch.classList.add('hidden');
+          renderGallery();
+        });
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+          state.sortBy = e.target.value;
+          renderGallery();
+        });
+        document.getElementById('btnClearCreatorFilter').addEventListener('click', () => {
+          state.selectedCreator = '';
+          renderAll();
+        });
+        document.querySelectorAll('.col-toggle-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            state.gridCols = parseInt(btn.dataset.cols, 10);
+            localStorage.setItem(STORAGE_KEYS.COLS, String(state.gridCols));
+            renderGallery();
+          });
+        });
+        document.getElementById('btnResetFilters').addEventListener('click', () => {
+          state.selectedTh = 'All';
+          state.selectedCategory = 'All';
+          state.selectedCreator = '';
+          state.searchQuery = '';
+          searchInput.value = '';
+          btnClearSearch.classList.add('hidden');
+          renderAll();
+        });
+
+        // Export & Import JSON Vault Controls
+        document.getElementById('btnExportJson').addEventListener('click', exportVaultJson);
+        document.getElementById('btnTriggerImportJson').addEventListener('click', () => {
+          document.getElementById('inputImportJson').click();
+        });
+        document.getElementById('inputImportJson').addEventListener('change', (e) => {
+          if (e.target.files && e.target.files[0]) {
+            importVaultJsonFile(e.target.files[0]);
+            e.target.value = '';
+          }
+        });
+
+        // Confirm Modal
+        document.getElementById('btnConfirmCancel').addEventListener('click', () => {
+          state.confirmCallback = null;
+          document.getElementById('confirmModal').classList.add('hidden');
+        });
+        document.getElementById('btnConfirmProceed').addEventListener('click', async () => {
+          const cb = state.confirmCallback;
+          state.confirmCallback = null;
+          document.getElementById('confirmModal').classList.add('hidden');
+          if (typeof cb === 'function') await cb();
+        });
+
+        // Generic Close Modal Buttons & Backdrop Clicks
+        document.querySelectorAll('.close-modal-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            if (btn.dataset.modal) document.getElementById(btn.dataset.modal).classList.add('hidden');
+          });
+        });
+        ['multiBaseModal', 'manualModal', 'editModal', 'confirmModal', 'apiModal'].forEach((modalId) => {
+          const overlay = document.getElementById(modalId);
+          overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) overlay.classList.add('hidden');
+          });
+        });
+
+        document.addEventListener('click', () => {
+          document.querySelectorAll('.pop-trigger-group.popover-open').forEach((g) => g.classList.remove('popover-open'));
+        });
+
+        window.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') {
+            ['lightboxModal', 'multiBaseModal', 'manualModal', 'editModal', 'confirmModal', 'apiModal'].forEach((id) => {
+              document.getElementById(id).classList.add('hidden');
+            });
+          } else if (!document.getElementById('lightboxModal').classList.contains('hidden')) {
+            if (e.key === 'ArrowLeft') stepLightboxBase(-1);
+            if (e.key === 'ArrowRight') stepLightboxBase(1);
+          }
+        });
+      }
+
+      /* -------------------------------------------------------------------------
+         18. BOOTSTRAP APPLICATION
+      ------------------------------------------------------------------------- */
+      window.addEventListener('DOMContentLoaded', () => {
+        loadLocalPreferences();
+        initEventListeners();
+        renderAll();
+        lucide.createIcons();
+        loadBasesFromBackend(false);
+      });
+    })();
+  </script>
+</body>
+</html>
