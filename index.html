@@ -443,6 +443,13 @@
       color: var(--text-muted);
       margin-top: 4px;
     }
+    .meta-source-note {
+      font-size: 11px;
+      color: var(--text-sec);
+      margin-top: 6px;
+      font-style: italic;
+      opacity: 0.88;
+    }
 
     .archetype-grid {
       display: grid;
@@ -525,7 +532,38 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
       color: var(--text-muted);
-      margin-bottom: 5px;
+      margin-bottom: 6px;
+    }
+    .equip-pair-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .equip-pair-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 9px;
+      font-size: 11px;
+    }
+    .equip-pair-name {
+      font-weight: 700;
+      color: var(--text);
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .equip-pair-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      flex-shrink: 0;
     }
     .pet-grid {
       display: grid;
@@ -539,7 +577,7 @@
       background: var(--bg-input);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 9px 11px;
+      padding: 10px 12px;
     }
 
     /* ============================================================
@@ -1219,6 +1257,7 @@
           <span class="th19-pill" id="metaTargetThBadge">TH19</span>
         </div>
         <div class="meta-header-sub" id="metaSyncSub">Awaiting Global Meta snapshot...</div>
+        <div class="meta-source-note">Troops, Spells, Sieges &amp; Pets are tracked from live Ranked Battle Logs; Equipment is tracked from active Hero loadouts.</div>
       </div>
       <button class="action-btn" id="refreshMetaBtn" onclick="refreshGlobalMeta()">
         <span class="spin-ico">↻</span> Refresh Meta
@@ -1705,7 +1744,7 @@ function renderMetaTab() {
         <div class="panel" style="text-align:center;padding:28px 18px;">
           <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Top 100 Global Ranked Meta Not Synced</div>
           <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-            Scan the Top 100 global players to uncover the strongest TH19 Ranked army combos, Hero Equipment loadouts, Pets, and personalized upgrade priorities.
+            Scan the Top 100 global players to uncover the strongest TH19 Ranked army combos, actively equipped Hero Equipment pairs, Ranked Pets, and personalized upgrade priorities.
           </div>
           <button class="btn-sync-primary" style="padding:0 20px;" onclick="refreshGlobalMeta()">↻ Sync Global Meta Now</button>
         </div>
@@ -1716,6 +1755,7 @@ function renderMetaTab() {
 
   const thTier = meta.targetTH || 19;
   const attacksAnalyzed = Number(meta.rankedAttacksAnalyzed || 0);
+  const attacksWithPets = Number(meta.rankedAttacksWithPets || 0);
   const sampleSize = Number(meta.sampleSize || 0);
   const avgThreeStar = Number(meta.avgThreeStarRate || 0);
   const avgDest = Number(meta.avgDestruction || 0);
@@ -1781,106 +1821,112 @@ function renderMetaTab() {
     `
     : `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px;">No Ranked army archetypes recorded yet.</div>`;
 
-  // 3. Hero Equipment & Pet Meta Grid (Grouped by Hero)
+  // 3. Hero Equipment Meta Grid (Actively Equipped 2-Piece Pairs + Individual Gear Rates)
   const topEquipment = (meta.topEquipment && typeof meta.topEquipment === "object") ? meta.topEquipment : {};
-  const topPets = Array.isArray(meta.topPets) ? meta.topPets : [];
+  const topEquipmentPairs = (meta.topEquipmentPairs && typeof meta.topEquipmentPairs === "object") ? meta.topEquipmentPairs : {};
 
-  const petsByHero = {};
-  let hasHeroPairedPets = false;
-  topPets.forEach(pet => {
-    if (pet && pet.topHero) {
-      hasHeroPairedPets = true;
-      if (!petsByHero[pet.topHero]) petsByHero[pet.topHero] = [];
-      petsByHero[pet.topHero].push(pet);
-    }
-  });
+  const allHeroes = Array.from(new Set(
+    HERO_ORDER.concat(Object.keys(topEquipment), Object.keys(topEquipmentPairs))
+  ));
 
-  const allHeroes = Array.from(new Set(HERO_ORDER.concat(Object.keys(topEquipment))));
   const heroCardsHtml = allHeroes.map(heroName => {
     const eqList = Array.isArray(topEquipment[heroName]) ? topEquipment[heroName] : [];
-    const heroPets = Array.isArray(petsByHero[heroName]) ? petsByHero[heroName] : [];
-    if (!eqList.length && !heroPets.length) return "";
+    const pairList = Array.isArray(topEquipmentPairs[heroName]) ? topEquipmentPairs[heroName] : [];
+    if (!eqList.length && !pairList.length) return "";
+
+    const pairsHtml = pairList.length
+      ? `
+        <div>
+          <div class="hero-sublabel">Top Equipped Pair Combos</div>
+          <div class="equip-pair-list">
+            ${pairList.slice(0, 3).map(pr => {
+              const pairLabel = pr.name || (Array.isArray(pr.pair) ? pr.pair.join(" + ") : "");
+              const pct = Math.min(100, Math.max(0, Number(pr.usageRate || 0)));
+              return `
+                <div class="equip-pair-row">
+                  <span class="equip-pair-name" title="${escHtml(pairLabel)}">${escHtml(pairLabel)}</span>
+                  <span class="equip-pair-pct">— ${Math.round(pct)}%</span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `
+      : "";
 
     const eqBarsHtml = eqList.length
-      ? eqList.slice(0, 4).map(eq => {
-          const pct = Math.min(100, Math.max(0, Number(eq.usageRate || 0)));
-          return `
-            <div class="pill-bar-row">
-              <div class="pill-bar-head">
-                <span class="pill-bar-name">${escHtml(eq.name)}</span>
-                <span class="mono" style="font-size:11px;font-weight:700;color:var(--purple);">${pct.toFixed(0)}%</span>
-              </div>
-              <div class="pill-track" style="height:7px;">
-                <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--purple);"></div>
-              </div>
-            </div>
-          `;
-        }).join("")
-      : `<div style="font-size:11px;color:var(--text-muted);">No equipment data</div>`;
-
-    const petBarsHtml = heroPets.length
       ? `
-        <div style="margin-top:4px;padding-top:8px;border-top:1px solid var(--border);">
-          <div class="hero-sublabel">Top Paired Pets</div>
-          ${heroPets.slice(0, 2).map(pt => {
-            const pct = Math.min(100, Math.max(0, Number(pt.usageRate || 0)));
+        <div style="${pairList.length ? "padding-top:8px;border-top:1px solid var(--border);" : ""}">
+          <div class="hero-sublabel">Individual Gear Equip Rate</div>
+          ${eqList.slice(0, 4).map(eq => {
+            const pct = Math.min(100, Math.max(0, Number(eq.usageRate || 0)));
             return `
               <div class="pill-bar-row">
                 <div class="pill-bar-head">
-                  <span class="pill-bar-name">${escHtml(pt.name)}</span>
-                  <span class="mono" style="font-size:11px;font-weight:700;color:var(--green);">${pct.toFixed(0)}%</span>
+                  <span class="pill-bar-name">${escHtml(eq.name)}</span>
+                  <span class="mono" style="font-size:11px;font-weight:700;color:var(--purple);">${pct.toFixed(0)}%</span>
                 </div>
                 <div class="pill-track" style="height:7px;">
-                  <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--green);"></div>
+                  <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--purple);"></div>
                 </div>
               </div>
             `;
           }).join("")}
         </div>
       `
-      : "";
+      : `<div style="font-size:11px;color:var(--text-muted);">No active equipment data</div>`;
 
     return `
       <div class="hero-meta-card">
         <div class="hero-meta-head">
           <div class="hero-meta-name">${escHtml(heroName)}</div>
-          <span class="mini-badge purp">TOP EQUIP</span>
+          <span class="mini-badge purp">ACTIVE GEAR</span>
         </div>
-        <div>${eqBarsHtml}</div>
-        ${petBarsHtml}
+        ${pairsHtml}
+        ${eqBarsHtml}
       </div>
     `;
   }).filter(Boolean).join("");
 
-  const globalPetsBlock = topPets.length
+  // 4. Dedicated Ranked Pets Meta Card (True Ranked Battle Log Usage % & 3★ Rate %, excluding 0% pets)
+  const activeRankedPets = (Array.isArray(meta.topPets) ? meta.topPets : [])
+    .filter(pt => pt && Number(pt.usageRate || 0) > 0);
+
+  const petsCardHtml = activeRankedPets.length
     ? `
-      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
-        <div class="ranked-group-title" style="margin-top:0;">${hasHeroPairedPets ? "All Top Hero Pets (Global Usage)" : "Top Hero Pets (Global Usage)"}</div>
-        <div class="pet-grid">
-          ${topPets.slice(0, 8).map(pt => {
-            const pct = Math.min(100, Math.max(0, Number(pt.usageRate || 0)));
-            const heroTag = pt.topHero ? `<span class="mini-badge ds">${escHtml(pt.topHero.split(" ").pop())}</span>` : "";
-            return `
-              <div class="pet-meta-item">
-                <div class="pill-bar-head">
-                  <div class="pill-bar-name">
-                    <span>${escHtml(pt.name)}</span>
-                    ${heroTag}
-                  </div>
-                  <span class="mono" style="font-size:11px;font-weight:700;color:var(--green);">${pct.toFixed(0)}%</span>
+      <div class="pet-grid">
+        ${activeRankedPets.map(pt => {
+          const pct = Math.min(100, Math.max(0, Number(pt.usageRate || 0)));
+          const threeStar = Number(pt.threeStarRate || 0);
+          const winClass = threeStar >= 65 ? "in" : threeStar >= 45 ? "amb" : "out";
+          const battlesUsed = Number(pt.battlesUsed || 0);
+          return `
+            <div class="pet-meta-item">
+              <div class="pill-bar-head">
+                <div class="pill-bar-name">
+                  <span>${escHtml(pt.name)}</span>
+                  ${battlesUsed > 0 ? `<span class="mono" style="font-size:10px;color:var(--text-muted);">${battlesUsed} hits</span>` : ""}
                 </div>
-                <div class="pill-track" style="height:7px;">
-                  <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--green);"></div>
+                <div class="pill-bar-metrics">
+                  <span class="mono" style="font-size:11px;font-weight:700;color:var(--green);">${pct.toFixed(1)}%</span>
+                  <span class="mini-badge ${winClass}">${threeStar.toFixed(0)}% 3★</span>
                 </div>
               </div>
-            `;
-          }).join("")}
-        </div>
+              <div class="pill-track" style="height:8px;">
+                <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--green);"></div>
+              </div>
+            </div>
+          `;
+        }).join("")}
       </div>
     `
-    : "";
+    : `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:14px 8px;">No pet deployment data present in recent Ranked battle log payloads yet.</div>`;
 
-  // 4. Top Ranked Troops, Spells & Sieges
+  const petBadgeLabel = attacksWithPets > 0
+    ? `${attacksWithPets.toLocaleString()} RANKED HITS`
+    : "RANKED BATTLE LOGS";
+
+  // 5. Top Ranked Troops, Spells & Sieges
   const renderMetaUnitBars = (items, barColor, emptyMsg) => {
     if (!Array.isArray(items) || !items.length) {
       return `<div style="font-size:12px;color:var(--text-muted);padding:4px 0;">${escHtml(emptyMsg)}</div>`;
@@ -1924,19 +1970,26 @@ function renderMetaTab() {
 
     <div class="panel">
       <div class="panel-head">
-        <div class="panel-title">Hero Equipment & Pet Meta</div>
-        <span class="mini-badge purp">TOP 100 LOADOUTS</span>
+        <div class="panel-title">Hero Equipment Meta</div>
+        <span class="mini-badge purp">ACTIVE LOADOUTS</span>
       </div>
       <div class="hero-meta-grid">
         ${heroCardsHtml || `<div style="color:var(--text-muted);font-size:12px;">No hero equipment data available.</div>`}
       </div>
-      ${globalPetsBlock}
     </div>
 
     <div class="panel">
       <div class="panel-head">
-        <div class="panel-title">Top Ranked Troops, Spells & Sieges</div>
-        <span class="mini-badge in">USAGE & 3★ RATE</span>
+        <div class="panel-title">Ranked Pets Meta</div>
+        <span class="mini-badge in">${petBadgeLabel}</span>
+      </div>
+      ${petsCardHtml}
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Top Ranked Troops, Spells &amp; Sieges</div>
+        <span class="mini-badge in">USAGE &amp; 3★ RATE</span>
       </div>
 
       <div class="ranked-group-title">Top Troops</div>
@@ -2047,11 +2100,22 @@ function renderMetaUpgradesSection(p) {
   }
 
   const rowsHtml = rawUpgrades.map(u => {
+    const catLower = String(u.category || "").toLowerCase();
+    const isEquip = catLower === "equipment";
     const badge = getUpgradeCategoryBadge(u.category);
     const usagePct = Math.round(Number(u.metaUsageRate || 0));
     const curLvl = Number(u.currentLevel || 0);
     const maxLvl = Number(u.maxLevel || 0);
     const heroSuffix = u.hero ? ` · ${escHtml(u.hero)}` : "";
+    const threeStarSuffix = (!isEquip && u.threeStarRate !== null && u.threeStarRate !== undefined)
+      ? ` · ${Math.round(Number(u.threeStarRate))}% 3★`
+      : "";
+
+    const usageBadgeText = isEquip ? `${usagePct}% Equipped` : `${usagePct}% Ranked Pick`;
+    const usageBadgeCls  = isEquip ? "purp" : "ds";
+    const subText = isEquip
+      ? `Active on <strong style="color:var(--text);">${usagePct}%</strong> of Top 100${heroSuffix}`
+      : `Used in <strong style="color:var(--text);">${usagePct}%</strong> of Ranked hits${threeStarSuffix}`;
 
     return `
       <div class="upgrade-row">
@@ -2060,13 +2124,11 @@ function renderMetaUpgradesSection(p) {
             <span class="upgrade-name">${escHtml(u.name)}</span>
             <span class="mini-badge ${badge.cls}">${escHtml(badge.label)}</span>
           </div>
-          <div class="upgrade-sub">
-            Used by <strong style="color:var(--text);">${usagePct}%</strong> of Top 100${heroSuffix}
-          </div>
+          <div class="upgrade-sub">${subText}</div>
         </div>
         <div class="upgrade-right">
           <span class="upgrade-lvl">Lvl ${curLvl} → ${maxLvl}</span>
-          <span class="mini-badge ds">${usagePct}% Meta</span>
+          <span class="mini-badge ${usageBadgeCls}">${escHtml(usageBadgeText)}</span>
         </div>
       </div>
     `;
