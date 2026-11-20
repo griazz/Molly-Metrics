@@ -2509,7 +2509,7 @@ function extractAllXPostUrls(rawInput) {
   return unique;
 }
 
-async function fetchTweetFromSyndication(user, id) {
+async function fetchTweetClientSide(user, id) {
   const endpoints = [
     { name: "fxtwitter", url: `https://api.fxtwitter.com/${encodeURIComponent(user)}/status/${encodeURIComponent(id)}` },
     { name: "vxtwitter", url: `https://api.vxtwitter.com/${encodeURIComponent(user)}/status/${encodeURIComponent(id)}` }
@@ -2542,7 +2542,9 @@ async function fetchTweetFromSyndication(user, id) {
           extraUrls: facetUrls,
           images: Array.from(new Set(images)),
           postTimestamp: parsePostTimestamp(t.created_at, t.created_timestamp),
-          likes: Number.isFinite(Number(t.likes)) ? Number(t.likes) : 0
+          likes: Number.isFinite(Number(t.likes)) ? Number(t.likes) : 0,
+          replyingToStatusId: t.replying_to_status ? String(t.replying_to_status) : "",
+          replyingToUser: t.replying_to ? String(t.replying_to) : ""
         };
       }
       if (ep.name === "vxtwitter" && data && (data.text !== undefined || data.tweetID)) {
@@ -2560,7 +2562,9 @@ async function fetchTweetFromSyndication(user, id) {
           extraUrls: [],
           images: Array.from(new Set(images)),
           postTimestamp: parsePostTimestamp(data.date, data.date_epoch),
-          likes: Number.isFinite(Number(data.likes)) ? Number(data.likes) : 0
+          likes: Number.isFinite(Number(data.likes)) ? Number(data.likes) : 0,
+          replyingToStatusId: data.replyingToID ? String(data.replyingToID) : "",
+          replyingToUser: data.replyingTo ? String(data.replyingTo) : ""
         };
       }
     } catch (err) {
@@ -2568,6 +2572,48 @@ async function fetchTweetFromSyndication(user, id) {
     }
   }
   throw lastErr || new Error("Could not fetch post from X syndication API.");
+}
+
+// Fast client-side fetch first; if the Clash link lives in a reply (or the pasted reply has no images),
+// ask the Apps Script backend to resolve the author's replies / parent tweet and merge the result.
+// resolveReplies is opt-in so cheap callers (e.g. like-count refresh) never hit the backend.
+async function fetchTweetFromSyndication(user, id, resolveReplies = false) {
+  const payload = await fetchTweetClientSide(user, id);
+  payload.foundInReply = false;
+  if (!resolveReplies) return payload;
+
+  const hasLinks = extractClashBaseLinks(payload.text, payload.extraUrls).length > 0;
+  const hasImages = Array.isArray(payload.images) && payload.images.length > 0;
+  const needsBackend = !hasLinks || (hasLinks && !hasImages && !!payload.replyingToStatusId);
+  if (!needsBackend) return payload;
+
+  try {
+    const res = await fetch(
+      `${getWebAppUrl()}?action=fetchXPost&user=${encodeURIComponent(user)}&id=${encodeURIComponent(id)}`
+    );
+    if (!res.ok) return payload;
+    const data = await res.json();
+    if (data && data.status === "success" && data.tweet) {
+      const t = data.tweet;
+      const tImages = Array.isArray(t.images) ? t.images : [];
+      const tHandle = t.creatorHandle ? (String(t.creatorHandle).startsWith("@") ? t.creatorHandle : `@${t.creatorHandle}`) : "";
+      const useTweetMeta = tImages.length > 0 || !hasImages;
+      return {
+        ...payload,
+        postUrl: (useTweetMeta && t.postUrl) ? t.postUrl : payload.postUrl,
+        creatorHandle: (useTweetMeta && tHandle) ? tHandle : payload.creatorHandle,
+        text: t.text || payload.text,
+        extraUrls: Array.from(new Set([...(payload.extraUrls || []), ...(Array.isArray(t.extraUrls) ? t.extraUrls : [])])),
+        images: Array.from(new Set([...(payload.images || []), ...tImages])),
+        postTimestamp: (useTweetMeta && t.postTimestamp) ? Number(t.postTimestamp) : payload.postTimestamp,
+        likes: (useTweetMeta && Number.isFinite(Number(t.likes))) ? Number(t.likes) : payload.likes,
+        foundInReply: !!t.foundInReply
+      };
+    }
+  } catch (_) {
+    // Backend unreachable — fall back to the client-side payload
+  }
+  return payload;
 }
 
 function extractClashBaseLinks(text, extraUrls = []) {
@@ -2700,18 +2746,18 @@ async function handleXImportSubmit(e) {
   submitBtn.disabled = true;
   submitBtn.textContent = "Fetching & Grouping...";
 
-  let savedCount = 0, replacedCount = 0, blockedCount = 0, skippedCount = 0;
+  let savedCount = 0, replacedCount = 0, blockedCount = 0, skippedCount = 0, foundInReplyCount = 0;
   let lastDupResult = null;
 
   try {
     for (const p of posts) {
       try {
-        const payload = await fetchTweetFromSyndication(p.user, p.id);
+        const payload = await fetchTweetFromSyndication(p.user, p.id, true);
         const rawLinks = extractClashBaseLinks(payload.text, payload.extraUrls);
         if (rawLinks.length === 0) {
           skippedCount++;
           if (posts.length === 1) {
-            errBox.textContent = `Fetched post by ${payload.creatorHandle}, but no Clash of Clans base link was found.`;
+            errBox.textContent = "No Clash base link found in post or recent replies. Tip: copy the direct link to the reply tweet that has the base link and paste that URL instead.";
             errBox.classList.add("open");
           }
           continue;
@@ -2769,6 +2815,7 @@ async function handleXImportSubmit(e) {
         } else {
           savedCount++;
         }
+        if (payload.foundInReply) foundInReplyCount++;
       } catch (innerErr) {
         skippedCount++;
         if (posts.length === 1) {
@@ -2785,7 +2832,7 @@ async function handleXImportSubmit(e) {
       if (lastDupResult) showDuplicateBanner(lastDupResult);
 
       const summary = [];
-      if (savedCount > 0) summary.push(`Saved ${savedCount} grouped post(s)`);
+      if (savedCount > 0) summary.push(`Saved ${savedCount} grouped post(s)${foundInReplyCount > 0 ? " (link found in replies)" : ""}`);
       if (replacedCount > 0) summary.push(`Replaced ${replacedCount} with earlier post`);
       if (blockedCount > 0) summary.push(`Blocked ${blockedCount} duplicate(s)`);
       if (skippedCount > 0) summary.push(`Skipped ${skippedCount}`);
