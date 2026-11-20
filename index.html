@@ -329,6 +329,7 @@
     .mini-badge.ds  { background: var(--accent-bg); color: var(--accent); }
     .mini-badge.def { background: var(--red-bg); color: var(--red); }
     .mini-badge.amb { background: var(--amber-bg); color: var(--amber); }
+    .mini-badge.purp{ background: var(--purple-bg); color: var(--purple); }
 
     .prog-block {
       display: flex;
@@ -502,6 +503,87 @@
     .loot-gold   { color: var(--amber); }
     .loot-elixir { color: var(--purple); }
     .loot-dark   { color: var(--accent); }
+
+    /* ============================================================
+       STATS.FM-INSPIRED ANALYTICS MODULES (DRAWER)
+    ============================================================ */
+    .clock-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+    .clock-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .clock-canvas-wrap {
+      position: relative;
+      height: 255px;
+      max-width: 310px;
+      margin: 0 auto;
+    }
+
+    .ranked-group-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 12px 0 8px 0;
+    }
+    .ranked-group-title:first-child { margin-top: 0; }
+
+    .pill-bar-row {
+      margin-bottom: 9px;
+    }
+    .pill-bar-row:last-child { margin-bottom: 0; }
+    .pill-bar-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .pill-bar-name {
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .pill-bar-metrics {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .pill-track {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .pill-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .ranked-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
 
     /* ============================================================
        BATTLE LOG CARDS INSIDE PLAYER DRAWER
@@ -1234,6 +1316,7 @@ let state = {
 
 let radarChart = null;
 let trendChart = null;
+let attackClockChart = null;
 
 /* ============================================================
    INITIALIZATION & THEME
@@ -1256,6 +1339,10 @@ document.addEventListener("keydown", (e) => {
 function toggleTheme() {
   const current = document.documentElement.getAttribute("data-theme") || "dark";
   applyTheme(current === "dark" ? "light" : "dark");
+  if (state.activeDrawerTag) {
+    const p = state.players.find(x => x.tag === state.activeDrawerTag);
+    if (p) renderDrawerContent(p);
+  }
 }
 
 function applyTheme(theme) {
@@ -1612,6 +1699,10 @@ function openDrawer(tag) {
 
 function closeDrawer() {
   state.activeDrawerTag = null;
+  if (radarChart) { radarChart.destroy(); radarChart = null; }
+  if (trendChart) { trendChart.destroy(); trendChart = null; }
+  if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
+
   document.getElementById("drawerBackdrop").classList.remove("open");
   const drawer = document.getElementById("playerDrawer");
   drawer.classList.remove("open");
@@ -1644,6 +1735,154 @@ function initDrawerSwipe() {
       drawer.style.transform = "";
     }
   });
+}
+
+/* ============================================================
+   STATS.FM-INSPIRED ANALYTICS HELPERS (24H CLOCK + RANKED META)
+============================================================ */
+function computeHourlyAttackProfile(p) {
+  const counts = new Array(24).fill(0);
+  const timestamps = Array.isArray(p.attackTimestamps30d) && p.attackTimestamps30d.length
+    ? p.attackTimestamps30d
+    : (Array.isArray(p.battleLog) ? p.battleLog.filter(b => b.attack && b.timestamp).map(b => b.timestamp) : []);
+
+  timestamps.forEach(ts => {
+    const d = new Date(Number(ts));
+    if (!isNaN(d.getTime())) {
+      counts[d.getHours()] += 1;
+    }
+  });
+
+  let maxCount = 0;
+  let peakHour = 0;
+  for (let h = 0; h < 24; h++) {
+    if (counts[h] > maxCount) {
+      maxCount = counts[h];
+      peakHour = h;
+    }
+  }
+
+  return {
+    counts,
+    totalAttacks: timestamps.length,
+    peakHour,
+    peakCount: maxCount
+  };
+}
+
+function formatHourWindow12h(hour) {
+  const fmt = (h) => {
+    const mod = ((h % 24) + 24) % 24;
+    if (mod === 0) return "12 AM";
+    if (mod < 12) return `${mod} AM`;
+    if (mod === 12) return "12 PM";
+    return `${mod - 12} PM`;
+  };
+  return `${fmt(hour)} – ${fmt(hour + 1)}`;
+}
+
+function renderAttackClockSection(clockProfile) {
+  if (clockProfile.totalAttacks === 0) {
+    return `
+      <div class="sec-label">24-Hour Attack Clock (30-Day Local Time)</div>
+      <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">
+        No attacks logged in the last 30 days yet. Sync battle logs to map peak raiding hours.
+      </div>
+    `;
+  }
+
+  const peakLabel = formatHourWindow12h(clockProfile.peakHour);
+  return `
+    <div class="sec-label">24-Hour Attack Clock (30-Day Local Time)</div>
+    <div class="clock-card">
+      <div class="clock-header">
+        <span class="mini-badge in">🕒 Peak Activity: ${escHtml(peakLabel)}</span>
+        <span class="mono" style="font-size:11px;color:var(--text-muted);">
+          ${clockProfile.peakCount} in peak hr · ${clockProfile.totalAttacks} total attacks
+        </span>
+      </div>
+      <div class="clock-canvas-wrap">
+        <canvas id="attackClockCanvas"></canvas>
+      </div>
+    </div>
+  `;
+}
+
+function renderRankedMetaSection(p) {
+  const ra = p.rankedAnalytics || {
+    totalRankedAttacks: 0,
+    threeStarRate: 0,
+    avgDestruction: 0,
+    uniqueUnitCount: 0,
+    topTroops: [],
+    topSpellsSieges: []
+  };
+
+  if (!ra.totalRankedAttacks) {
+    return `
+      <div class="sec-label">Top Ranked Troops & Spells (30-Day Ranked Only)</div>
+      <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:18px 12px;">
+        No Ranked attacks logged yet — check back after your next Ranked tournament hits
+      </div>
+    `;
+  }
+
+  const renderPillRows = (items, barColor) => {
+    if (!items || !items.length) {
+      return `<div style="font-size:12px;color:var(--text-muted);padding:4px 0;">No unit composition recorded for these Ranked hits.</div>`;
+    }
+    return items.map(u => {
+      const pct = Math.min(100, Math.max(0, Number(u.appearanceRate) || 0));
+      const threeStar = Number(u.threeStarRate) || 0;
+      const winClass = threeStar >= 65 ? "in" : threeStar >= 40 ? "amb" : "out";
+      const typeTag = u.type === "siege" ? `<span class="mini-badge purp">SIEGE</span>` : "";
+
+      return `
+        <div class="pill-bar-row">
+          <div class="pill-bar-head">
+            <div class="pill-bar-name">
+              <span>${escHtml(u.name)}</span>
+              ${typeTag}
+              <span class="mono" style="font-size:10px;color:var(--text-muted);">(${Number(u.totalCount || 0).toLocaleString()}×)</span>
+            </div>
+            <div class="pill-bar-metrics">
+              <span class="mono" style="font-size:11px;font-weight:700;color:var(--text-sec);">${pct.toFixed(0)}%</span>
+              <span class="mini-badge ${winClass}">${threeStar.toFixed(0)}% 3★</span>
+            </div>
+          </div>
+          <div class="pill-track">
+            <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:${barColor};"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  };
+
+  return `
+    <div class="sec-label">Top Ranked Troops & Spells (${ra.totalRankedAttacks} Ranked ${ra.totalRankedAttacks === 1 ? "Attack" : "Attacks"})</div>
+    <div class="cat-box">
+      <div class="ranked-group-title">Top Troops</div>
+      ${renderPillRows(ra.topTroops, "var(--accent)")}
+
+      <div class="ranked-group-title" style="margin-top:14px;">Top Spells & Sieges</div>
+      ${renderPillRows(ra.topSpellsSieges, "var(--purple)")}
+
+      <div class="ranked-stat-grid">
+        <div class="stat-pill">
+          <div class="kpi-label">3-Star Rate</div>
+          <div class="mono" style="font-size:16px;font-weight:700;color:var(--green);">${Number(ra.threeStarRate || 0).toFixed(1)}%</div>
+        </div>
+        <div class="stat-pill">
+          <div class="kpi-label">Avg Destr.</div>
+          <div class="mono" style="font-size:16px;font-weight:700;color:var(--amber);">${Number(ra.avgDestruction || 0).toFixed(1)}%</div>
+        </div>
+        <div class="stat-pill">
+          <div class="kpi-label">Army Variety</div>
+          <div class="mono" style="font-size:16px;font-weight:700;color:var(--accent);">${Number(ra.uniqueUnitCount || 0)}</div>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function renderBattleLogSection(p) {
@@ -1796,7 +2035,10 @@ function renderDrawerContent(p) {
     `;
   }
 
-  const battleLogHtml = renderBattleLogSection(p);
+  const clockProfile   = computeHourlyAttackProfile(p);
+  const clockHtml      = renderAttackClockSection(clockProfile);
+  const rankedMetaHtml = renderRankedMetaSection(p);
+  const battleLogHtml  = renderBattleLogSection(p);
 
   document.getElementById("drawerBody").innerHTML = `
     <div class="sec-label">TH19 Progression Breakdown</div>
@@ -1820,6 +2062,10 @@ function renderDrawerContent(p) {
       <div class="cat-box" style="height:210px;"><canvas id="trendCanvas"></canvas></div>
     </div>
 
+    ${clockHtml}
+
+    ${rankedMetaHtml}
+
     ${deepHtml}
 
     ${battleLogHtml}
@@ -1834,7 +2080,7 @@ function renderDrawerContent(p) {
     </div>
   `;
 
-  renderDrawerCharts(p, cats);
+  renderDrawerCharts(p, cats, clockProfile);
 }
 
 function switchQueueMode(mode) {
@@ -1845,9 +2091,10 @@ function switchQueueMode(mode) {
   }
 }
 
-function renderDrawerCharts(p, cats) {
+function renderDrawerCharts(p, cats, clockProfile) {
   if (radarChart) { radarChart.destroy(); radarChart = null; }
   if (trendChart) { trendChart.destroy(); trendChart = null; }
+  if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
 
   const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
   const gridColor = isDark ? "rgba(148,163,184,0.16)" : "rgba(15,23,42,0.12)";
@@ -1907,6 +2154,74 @@ function renderDrawerCharts(p, cats) {
       }
     }
   });
+
+  // 24-Hour Attack Clock (Radial Polar Area Chart)
+  const clockEl = document.getElementById("attackClockCanvas");
+  if (clockEl && clockProfile && clockProfile.totalAttacks > 0) {
+    const labels = Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0"));
+    const maxVal = Math.max(1, clockProfile.peakCount);
+
+    const bgColors = clockProfile.counts.map(cnt => {
+      if (cnt === 0) return isDark ? "rgba(51, 65, 85, 0.22)" : "rgba(203, 213, 225, 0.35)";
+      const ratio = cnt / maxVal;
+      if (ratio >= 0.85) return isDark ? "rgba(16, 185, 129, 0.82)" : "rgba(5, 150, 105, 0.82)";
+      if (ratio >= 0.5)  return isDark ? "rgba(56, 189, 248, 0.68)" : "rgba(2, 132, 199, 0.68)";
+      return isDark ? "rgba(56, 189, 248, 0.34)" : "rgba(2, 132, 199, 0.34)";
+    });
+
+    const borderColors = clockProfile.counts.map(cnt => {
+      if (cnt === 0) return isDark ? "rgba(71, 85, 105, 0.35)" : "rgba(148, 163, 184, 0.45)";
+      const ratio = cnt / maxVal;
+      if (ratio >= 0.85) return isDark ? "#10b981" : "#059669";
+      return isDark ? "#38bdf8" : "#0284c7";
+    });
+
+    attackClockChart = new Chart(clockEl.getContext("2d"), {
+      type: "polarArea",
+      data: {
+        labels: labels,
+        datasets: [{
+          data: clockProfile.counts,
+          backgroundColor: bgColors,
+          borderColor: borderColors,
+          borderWidth: 1.25
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        startAngle: -0.5 * Math.PI,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: () => "",
+              label: (ctx) => {
+                const hr = String(ctx.dataIndex).padStart(2, "0");
+                const val = ctx.raw || 0;
+                return `Hour ${hr}:00 — ${val} ${val === 1 ? "attack" : "attacks"}`;
+              }
+            }
+          }
+        },
+        scales: {
+          r: {
+            beginAtZero: true,
+            ticks: { display: false, stepSize: Math.max(1, Math.ceil(maxVal / 4)) },
+            grid: { color: gridColor, circular: true },
+            angleLines: { display: true, color: gridColor },
+            pointLabels: {
+              display: true,
+              centerPointLabels: true,
+              color: tickColor,
+              font: { size: 9, weight: "700", family: "'JetBrains Mono', monospace" },
+              callback: (val, index) => (index % 3 === 0 ? `${val}h` : "")
+            }
+          }
+        }
+      }
+    });
+  }
 }
 
 /* ============================================================
