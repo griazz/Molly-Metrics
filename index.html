@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" id="metaThemeColor" />
   <title>Molly Metrics V9 — TH19 Clan Command</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
@@ -385,7 +385,7 @@
     }
 
     /* ============================================================
-       WAR COMMAND & ACTIVITY SECTIONS
+       PANELS
     ============================================================ */
     .panel {
       background: var(--bg-card);
@@ -418,39 +418,6 @@
     }
     .action-btn:active { transform: scale(0.97); }
 
-    .war-scoreboard {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 12px;
-      background: var(--bg-input);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-    }
-    .war-side { text-align: center; }
-    .war-clan-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
-    .war-stars {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 24px;
-      font-weight: 800;
-      color: var(--amber);
-    }
-    .war-dest {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      color: var(--text-sec);
-    }
-    .war-vs {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 8px;
-      border-radius: 6px;
-      background: var(--bg-subtle);
-      color: var(--text-muted);
-    }
 
     .list-row {
       display: flex;
@@ -461,17 +428,6 @@
       border-bottom: 1px solid var(--border);
     }
     .list-row:last-child { border-bottom: none; }
-    .cutoff-line {
-      margin: 8px 0;
-      padding: 5px 10px;
-      border-radius: 7px;
-      background: var(--amber-bg);
-      color: var(--amber);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      text-align: center;
-    }
 
     /* ============================================================
        ERGONOMIC MOBILE-FIRST PLAYER DETAIL DRAWER (100dvh)
@@ -702,7 +658,7 @@
       max-width: 780px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       height: 64px;
     }
     .nav-item {
@@ -823,13 +779,12 @@
 
     <div class="toolbar">
       <div class="toolbar-top">
-        <input type="search" id="searchInput" class="search-input" placeholder="Search player or #tag..." oninput="applyFilters()" />
+        <input type="search" id="searchInput" class="search-input" placeholder="Search player or #tag..." oninput="debouncedFilter()" />
         <select id="sortSelect" class="sort-select" onchange="applyFilters()">
           <option value="comp">Sort: Overall %</option>
           <option value="war">Sort: War Score</option>
           <option value="heroes">Sort: Heroes %</option>
           <option value="vel">Sort: 30D Velocity</option>
-          <option value="don">Sort: Donations</option>
         </select>
       </div>
       <div class="chip-row" id="filterChips">
@@ -849,64 +804,7 @@
   </section>
 
   <!-- ============================================================
-       TAB 2: WAR COMMAND
-  ============================================================ -->
-  <section id="tab-war" class="tab-pane">
-    <div class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">Live War Command</div>
-          <div style="font-size:12px;color:var(--text-muted);" id="warStateLabel">Checking war log...</div>
-        </div>
-        <button class="action-btn" onclick="copyMissedAttackPing()">📋 Copy Attack Ping</button>
-      </div>
-      <div id="liveWarContainer"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">War Lineup Optimizer</div>
-          <div style="font-size:12px;color:var(--text-muted);">Ranked by War Readiness (TH19 + Heroes + Offense)</div>
-        </div>
-        <div style="display:flex;gap:6px;">
-          <button class="chip active" id="btn15v15" onclick="setWarSize(15)">15v15</button>
-          <button class="chip" id="btn30v30" onclick="setWarSize(30)">30v30</button>
-          <button class="action-btn" onclick="copyWarLineup()">📋 Copy</button>
-        </div>
-      </div>
-      <div id="lineupContainer"></div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       TAB 3: VELOCITY & CLAN HEALTH
-  ============================================================ -->
-  <section id="tab-activity" class="tab-pane">
-    <div class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">30-Day Progression Velocity</div>
-          <div style="font-size:12px;color:var(--text-muted);">Who is grinding vs. stalled over the last 30 days</div>
-        </div>
-        <button class="action-btn" onclick="copyInactiveReport()">📋 Copy Watchlist</button>
-      </div>
-      <div id="velocityList"></div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head">
-        <div>
-          <div class="panel-title">Donation & Activity Watchlist</div>
-          <div style="font-size:12px;color:var(--text-muted);">Flags low donations (&lt;200) or heavy leech ratios</div>
-        </div>
-      </div>
-      <div id="donationWatchlist"></div>
-    </div>
-  </section>
-
-  <!-- ============================================================
-       TAB 4: DEEP SYNC HUB (TH19 VILLAGE JSON)
+       TAB 2: DEEP SYNC HUB (TH19 VILLAGE JSON)
   ============================================================ -->
   <section id="tab-deepsync" class="tab-pane">
     <div class="panel">
@@ -927,12 +825,6 @@
   <div class="bottom-nav-inner">
     <button class="nav-item active" data-tab="roster" onclick="switchTab('roster', this)">
       <span class="nav-ico">🛡️</span>Roster
-    </button>
-    <button class="nav-item" data-tab="war" onclick="switchTab('war', this)">
-      <span class="nav-ico">⚔️</span>War
-    </button>
-    <button class="nav-item" data-tab="activity" onclick="switchTab('activity', this)">
-      <span class="nav-ico">⚡</span>Activity
     </button>
     <button class="nav-item" data-tab="deepsync" onclick="switchTab('deepsync', this)">
       <span class="nav-ico">🔧</span>Deep Sync
@@ -1160,10 +1052,8 @@ function getEstimatedHours(name, level) {
 let state = {
   clanMeta: {},
   players: [],
-  currentWar: { state: "notInWar" },
   lastSyncTs: 0,
   filter: "all",
-  warSize: 15,
   queueMode: "spt",
   activeDrawerTag: null
 };
@@ -1217,14 +1107,11 @@ async function loadDashboard() {
 
     state.clanMeta   = data.clanMeta || {};
     state.players    = Array.isArray(data.players) ? data.players : [];
-    state.currentWar = data.currentWar || { state: "notInWar" };
     state.lastSyncTs = data.lastSyncTs || 0;
 
     renderHeader();
     renderKpis();
     applyFilters();
-    renderWarTab();
-    renderActivityTab();
     renderDeepSyncDirectory();
 
     if (state.activeDrawerTag) {
@@ -1344,7 +1231,6 @@ function applyFilters() {
     if (sortBy === "war")    return (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0);
     if (sortBy === "heroes") return parsePct(b.heroes) - parsePct(a.heroes);
     if (sortBy === "vel")    return (parseFloat(b.progression30d) || 0) - (parseFloat(a.progression30d) || 0);
-    if (sortBy === "don")    return (Number(b.donations) || 0) - (Number(a.donations) || 0);
     return 0;
   });
 
@@ -1407,186 +1293,11 @@ function renderRosterGrid(players) {
 
         <div class="card-foot mono">
           <span>Heroes ${Math.round(parsePct(p.heroes))}%</span>
-          <span>Don: ${Number(p.donations || 0).toLocaleString()}</span>
+          <span>Wins ${Number(p.attackWins || 0).toLocaleString()}</span>
         </div>
       </article>
     `;
   }).join("");
-}
-
-/* ============================================================
-   WAR COMMAND TAB
-============================================================ */
-function setWarSize(size) {
-  state.warSize = size;
-  document.getElementById("btn15v15").classList.toggle("active", size === 15);
-  document.getElementById("btn30v30").classList.toggle("active", size === 30);
-  renderWarTab();
-}
-
-function renderWarTab() {
-  const war = state.currentWar || { state: "notInWar" };
-  const labelEl = document.getElementById("warStateLabel");
-  const container = document.getElementById("liveWarContainer");
-
-  if (!war || war.state === "notInWar" || war.state === "error") {
-    labelEl.textContent = "Status: Not Currently in War";
-    container.innerHTML = `<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">
-      No active war detected right now. Use the <b>War Lineup Optimizer</b> below to prepare your next ${state.warSize}v${state.warSize} roster.
-    </div>`;
-  } else {
-    const stateText = war.state === "inWar" ? "⚔️ BATTLE DAY LIVE" : war.state === "preparation" ? "🛡️ PREPARATION DAY" : "🏁 WAR ENDED";
-    labelEl.textContent = `${stateText} · ${war.teamSize}v${war.teamSize} · ${war.clan.attacksUsed}/${war.clan.totalAttacks} Attacks Used`;
-
-    const missing = (war.members || []).filter(m => m.attacksLeft > 0);
-    const membersHtml = (war.members || []).map(m => `
-      <div class="list-row">
-        <div>
-          <strong style="font-size:14px;">#${m.mapPosition} ${escHtml(m.name)}</strong>
-          <div style="font-size:11px;color:var(--text-muted);">TH${m.townhallLevel} · ${m.starsEarned}★ earned</div>
-        </div>
-        <span class="mini-badge ${m.attacksLeft === 0 ? "in" : "rush"}">
-          ${m.attacksLeft === 0 ? "✓ DONE" : `${m.attacksLeft} LEFT`}
-        </span>
-      </div>
-    `).join("");
-
-    container.innerHTML = `
-      <div class="war-scoreboard">
-        <div class="war-side">
-          <div class="war-clan-name">${escHtml(war.clan.name)}</div>
-          <div class="war-stars">${war.clan.stars}★</div>
-          <div class="war-dest">${Number(war.clan.destructionPercentage).toFixed(1)}%</div>
-        </div>
-        <div class="war-vs">VS</div>
-        <div class="war-side">
-          <div class="war-clan-name">${escHtml(war.opponent.name)}</div>
-          <div class="war-stars">${war.opponent.stars}★</div>
-          <div class="war-dest">${Number(war.opponent.destructionPercentage).toFixed(1)}%</div>
-        </div>
-      </div>
-      <div style="font-size:12px;font-weight:700;margin-bottom:6px;color:${missing.length ? "var(--amber)" : "var(--green)"};">
-        ${missing.length ? `⚠️ ${missing.length} members still have attacks remaining:` : "✅ All war attacks completed!"}
-      </div>
-      <div>${membersHtml}</div>
-    `;
-  }
-
-  const optedIn = state.players
-    .filter(p => String(p.warPreference).toLowerCase() === "in")
-    .sort((a, b) => (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0));
-
-  const lineupEl = document.getElementById("lineupContainer");
-  if (!optedIn.length) {
-    lineupEl.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">No players currently opted IN for war.</div>`;
-    return;
-  }
-
-  let html = "";
-  optedIn.forEach((p, idx) => {
-    if (idx === state.warSize) {
-      html += `<div class="cutoff-line">▲ TOP ${state.warSize} STARTER CUTOFF — BENCH BELOW ▼</div>`;
-    }
-    html += `
-      <div class="list-row" style="cursor:pointer;" onclick="openDrawer('${escHtml(p.tag)}')">
-        <div>
-          <strong style="font-size:14px;">${idx + 1}. ${escHtml(p.name)}</strong>
-          <div style="font-size:11px;color:var(--text-muted);">
-            TH${p.thLevel} · Heroes ${Math.round(parsePct(p.heroes))}% · Overall ${parseFloat(p.percentage).toFixed(1)}%
-            ${p.isRushed ? " · ⚠️ Rushed" : ""}
-          </div>
-        </div>
-        <span class="mini-badge ds">WAR ${p.warScore}</span>
-      </div>
-    `;
-  });
-  lineupEl.innerHTML = html;
-}
-
-function copyMissedAttackPing() {
-  const war = state.currentWar;
-  if (!war || !war.members || war.state === "notInWar") {
-    showToast("No active war right now.");
-    return;
-  }
-  const missing = war.members.filter(m => m.attacksLeft > 0);
-  if (!missing.length) {
-    showToast("Everyone has already used their attacks!");
-    return;
-  }
-  const lines = missing.map(m => `• #${m.mapPosition} ${m.name} (${m.attacksLeft} attack${m.attacksLeft > 1 ? "s" : ""} left)`);
-  const msg = `⚔️ **WAR ATTACK REMINDER (${war.clan.name} vs ${war.opponent.name})**\n` + lines.join("\n");
-  copyText(msg, "Copied missed-attack ping to clipboard!");
-}
-
-function copyWarLineup() {
-  const optedIn = state.players
-    .filter(p => String(p.warPreference).toLowerCase() === "in")
-    .sort((a, b) => (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0))
-    .slice(0, state.warSize);
-
-  const lines = optedIn.map((p, i) => `${i + 1}. ${p.name} (TH${p.thLevel} · War Score ${p.warScore})`);
-  const msg = `🛡️ **RECOMMENDED ${state.warSize}v${state.warSize} WAR LINEUP**\n` + lines.join("\n");
-  copyText(msg, `Copied ${optedIn.length}-player war lineup!`);
-}
-
-/* ============================================================
-   ACTIVITY & CLAN HEALTH TAB
-============================================================ */
-function renderActivityTab() {
-  const ranked = [...state.players].sort((a, b) => (parseFloat(b.progression30d) || 0) - (parseFloat(a.progression30d) || 0));
-  const velEl = document.getElementById("velocityList");
-
-  velEl.innerHTML = ranked.map((p, i) => {
-    const gain = parseFloat(p.progression30d) || 0;
-    return `
-      <div class="list-row" style="cursor:pointer;" onclick="openDrawer('${escHtml(p.tag)}')">
-        <div>
-          <strong style="font-size:14px;">${i + 1}. ${escHtml(p.name)}</strong>
-          <div style="font-size:11px;color:var(--text-muted);">TH${p.thLevel} · ${parseFloat(p.percentage).toFixed(1)}% overall · ${p.attackWins || 0} season wins</div>
-        </div>
-        <span class="mini-badge ${gain > 0 ? "in" : "out"}">${gain > 0 ? "+" + gain.toFixed(2) + "%" : "0.00% STALLED"}</span>
-      </div>
-    `;
-  }).join("");
-
-  const flagged = state.players.filter(p => {
-    const gain = parseFloat(p.progression30d) || 0;
-    const don = Number(p.donations) || 0;
-    const rec = Number(p.donationsReceived) || 0;
-    return gain <= 0 || (don < 200 && rec > 600);
-  });
-
-  const watchEl = document.getElementById("donationWatchlist");
-  if (!flagged.length) {
-    watchEl.innerHTML = `<div style="font-size:13px;color:var(--green);">All active clan members are progressing and donating well!</div>`;
-    return;
-  }
-
-  watchEl.innerHTML = flagged.map(p => {
-    const gain = parseFloat(p.progression30d) || 0;
-    const don = Number(p.donations) || 0;
-    const rec = Number(p.donationsReceived) || 0;
-    const reasons = [];
-    if (gain <= 0) reasons.push("0% 30d progress");
-    if (don < 200 && rec > 600) reasons.push(`Ratio ${don}/${rec}`);
-    return `
-      <div class="list-row" style="cursor:pointer;" onclick="openDrawer('${escHtml(p.tag)}')">
-        <div>
-          <strong style="font-size:14px;">${escHtml(p.name)}</strong>
-          <div style="font-size:11px;color:var(--text-muted);">Donated: ${don.toLocaleString()} · Received: ${rec.toLocaleString()}</div>
-        </div>
-        <span class="mini-badge rush">${reasons.join(" · ")}</span>
-      </div>
-    `;
-  }).join("");
-}
-
-function copyInactiveReport() {
-  const stalled = state.players.filter(p => (parseFloat(p.progression30d) || 0) <= 0);
-  const lines = stalled.map(p => `• ${p.name} (TH${p.thLevel} · Donated ${p.donations || 0} / Rec ${p.donationsReceived || 0})`);
-  const msg = `📋 **CLAN ACTIVITY & STAGNANT WATCHLIST (${stalled.length})**\n` + (lines.length ? lines.join("\n") : "None!");
-  copyText(msg, "Copied clan activity watchlist!");
 }
 
 /* ============================================================
@@ -1762,8 +1473,8 @@ function renderDrawerContent(p) {
         <div class="mono" style="font-size:16px;font-weight:700;">${Number(p.warStars || 0).toLocaleString()}</div>
       </div>
       <div class="stat-pill">
-        <div class="kpi-label">Donated / Rec</div>
-        <div class="mono" style="font-size:14px;font-weight:700;">${Number(p.donations || 0).toLocaleString()} / ${Number(p.donationsReceived || 0).toLocaleString()}</div>
+        <div class="kpi-label">Trophies</div>
+        <div class="mono" style="font-size:16px;font-weight:700;">${Number(p.trophies || 0).toLocaleString()}</div>
       </div>
       <div class="stat-pill">
         <div class="kpi-label">Attack Wins</div>
@@ -2065,10 +1776,15 @@ function switchTab(tabKey, btnEl) {
    UTILITIES
 ============================================================ */
 function escHtml(str) {
-  const d = document.createElement("div");
-  d.textContent = str == null ? "" : String(str);
-  return d.innerHTML;
+  return String(str == null ? "" : str).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
+
+function debounce(fn, ms) {
+  let t;
+  return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); };
+}
+const debouncedFilter = debounce(() => applyFilters(), 150);
 
 function formatHours(hours) {
   if (hours < 24) return `${Math.round(hours)}h`;
@@ -2085,15 +1801,6 @@ function formatRelTime(ts) {
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
   return `${Math.floor(hrs / 24)}d ago`;
-}
-
-async function copyText(text, successMsg) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast(successMsg);
-  } catch (e) {
-    showToast("Could not copy automatically.");
-  }
 }
 
 let toastTimer = null;
