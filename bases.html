@@ -68,17 +68,6 @@
       background: #3b4b68;
     }
 
-    @keyframes copyFlash {
-      0% { opacity: 0; transform: scale(0.92); }
-      15% { opacity: 1; transform: scale(1); }
-      80% { opacity: 1; transform: scale(1); }
-      100% { opacity: 0; transform: scale(1.03); }
-    }
-
-    .animate-copy-flash {
-      animation: copyFlash 1.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-
     @keyframes toastSlide {
       from { opacity: 0; transform: translateY(14px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
@@ -127,7 +116,7 @@
       max-width: 780px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       height: 64px;
     }
     .molly-nav-item {
@@ -183,7 +172,7 @@
               <span id="cloudSyncLabel">Cloud Sync</span>
             </span>
           </div>
-          <p class="text-xs text-slate-400 hidden sm:block mt-0.5">Molly Metrics Shared Base Vault · Google Drive &amp; 7-Day X Tracking</p>
+          <p class="text-xs text-slate-400 hidden sm:block mt-0.5">Molly Metrics Shared Base Vault · Live Ranked Defense Telemetry</p>
         </div>
       </div>
 
@@ -198,9 +187,15 @@
           </div>
           <span class="text-borderline">|</span>
           <div class="flex items-center gap-1.5 text-slate-300">
-            <i data-lucide="copy-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i>
+            <span id="headerTotalDefenses" class="font-bold text-white">0</span>
+            <span class="text-slate-400">Defenses</span>
+          </div>
+          <span class="text-borderline">|</span>
+          <div class="flex items-center gap-1.5 text-slate-300">
+            <i data-lucide="copy-check" class="w-3.5 h-3.5 text-sky-400"></i>
             <span id="headerTotalCopies" class="font-bold text-white">0</span>
-            <span class="text-slate-400">Copies</span>
+            <span class="text-slate-400">Equips</span>
           </div>
         </div>
 
@@ -208,7 +203,7 @@
         <button
           id="btnRefreshCloud"
           type="button"
-          title="Reload bases from Google Sheets"
+          title="Reload bases & live defense telemetry from Google Sheets"
           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-stonecard hover:bg-stonehover text-sky-300 border border-borderline text-xs font-semibold transition cursor-pointer"
         >
           <i id="refreshCloudIcon" data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
@@ -253,6 +248,65 @@
 
   <!-- ==================== MAIN WORKSPACE ==================== -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+
+    <!-- 0. CLAN DEFENSE KILLERS & TOP BUILDERS SUMMARY STRIP (COLLAPSIBLE) -->
+    <section class="rounded-2xl bg-stonecard/90 border border-borderline overflow-hidden shadow-xl shadow-black/35">
+      <button
+        id="btnToggleInsights"
+        type="button"
+        aria-expanded="true"
+        class="w-full px-4 sm:px-5 py-3 flex items-center justify-between gap-3 hover:bg-stonehover/60 transition cursor-pointer text-left"
+      >
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-rose-500/15 text-rose-400 border border-rose-500/30 shrink-0">
+            <i data-lucide="swords" class="w-4 h-4"></i>
+          </span>
+          <div class="min-w-0">
+            <h2 class="text-xs sm:text-sm font-bold text-white tracking-wide flex items-center gap-2">
+              <span>Ranked Defense Telemetry</span>
+              <span class="hidden sm:inline-flex px-2 py-0.5 rounded-md bg-obsidian border border-borderline text-[10px] font-semibold text-slate-300">
+                Defense Killers &amp; Top Builders
+              </span>
+            </h2>
+            <p class="text-[11px] text-slate-400 truncate">Live BattleLogs intel — see what's tripling clanmates &amp; which builders hold strongest</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 shrink-0 text-xs text-slate-400">
+          <span id="insightsToggleLabel" class="hidden sm:inline font-medium">Hide</span>
+          <i id="insightsChevron" data-lucide="chevron-up" class="w-4 h-4 text-slate-400 transition-transform duration-200"></i>
+        </div>
+      </button>
+
+      <div id="insightsBody" class="px-4 sm:px-5 pb-4 pt-1 border-t border-borderline/60 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- Card A: Clan Defense Killers -->
+        <div class="rounded-xl bg-obsidian/80 border border-borderline/80 p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="skull" class="w-4 h-4 text-rose-400"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-rose-300">Clan Defense Killers</h3>
+            </div>
+            <span class="text-[10px] text-slate-500 font-medium">Top Ranked 3★ Enemy Troops</span>
+          </div>
+          <div id="defenseKillersList" class="space-y-1.5 text-xs">
+            <p class="text-slate-500 italic text-xs py-2">Loading live Ranked defense telemetry...</p>
+          </div>
+        </div>
+
+        <!-- Card B: Top Vault Builders -->
+        <div class="rounded-xl bg-obsidian/80 border border-borderline/80 p-3.5 space-y-2.5">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <i data-lucide="trophy" class="w-4 h-4 text-clashgold"></i>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-clashgold">Top Vault Builders</h3>
+            </div>
+            <span class="text-[10px] text-slate-500 font-medium">Lowest Avg ★ Allowed &amp; Popularity</span>
+          </div>
+          <div id="topBuildersList" class="space-y-1.5 text-xs">
+            <p class="text-slate-500 italic text-xs py-2">Loading builder rankings...</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- 1. TOP IMPORT COMMAND BAR -->
     <section class="rounded-2xl bg-stonecard/90 border border-borderline p-4 sm:p-6 shadow-2xl shadow-black/40">
@@ -344,7 +398,7 @@
             <input
               id="searchInput"
               type="text"
-              placeholder="Search @creator, CC, tags..."
+              placeholder="Search @creator, CC, tags, runner..."
               class="w-full pl-9 pr-8 py-2 rounded-xl bg-stonecard border border-borderline focus:border-clashgold text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition"
             />
             <button
@@ -363,10 +417,11 @@
             class="px-3 py-2 rounded-xl bg-stonecard border border-borderline text-xs sm:text-sm text-slate-200 focus:border-clashgold outline-none cursor-pointer"
           >
             <option value="trending">Trending (Time-Weighted Likes)</option>
+            <option value="best_defense">Best Defense (Lowest Stars Allowed)</option>
             <option value="most_likes">Most Likes (Raw)</option>
             <option value="newest_post">Newest Post Date</option>
             <option value="oldest_post">Oldest Post Date</option>
-            <option value="most_copied">Most Copied</option>
+            <option value="most_copied">Most Equipped</option>
             <option value="newest">Recently Added</option>
           </select>
 
@@ -450,14 +505,86 @@
       <a href="index.html#activity" class="molly-nav-item">
         <span class="nav-ico">⚔️</span>Activity
       </a>
-      <a href="index.html#deepsync" class="molly-nav-item">
-        <span class="nav-ico">🔧</span>Deep Sync
-      </a>
       <a href="bases.html" class="molly-nav-item active" aria-current="page">
         <span class="nav-ico">🏰</span>Bases
       </a>
     </div>
   </nav>
+
+  <!-- ==================== MODAL 0: ACCOUNT-SELECTION LAUNCH MODAL ==================== -->
+  <div id="equipBaseModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-stonecard border border-borderline rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden my-auto">
+      <div class="px-5 py-4 border-b border-borderline flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center shrink-0">
+            <i data-lucide="gamepad-2" class="w-5 h-5"></i>
+          </div>
+          <div class="min-w-0">
+            <h3 class="font-bold text-white text-base leading-tight">Who is equipping this base?</h3>
+            <p id="equipModalBaseMeta" class="text-xs text-slate-400 truncate mt-0.5">Select 1 or more clan accounts to track live defenses</p>
+          </div>
+        </div>
+        <button type="button" class="close-modal-btn p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-stonehover cursor-pointer" data-modal="equipBaseModal">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-3.5">
+        <!-- Ranked Schedule Info Note -->
+        <div class="p-3 rounded-xl bg-sky-500/10 border border-sky-500/30 flex items-start gap-2.5 text-xs text-sky-200 leading-relaxed">
+          <i data-lucide="clock" class="w-4 h-4 text-sky-400 shrink-0 mt-0.5"></i>
+          <span>Bases equipped Thu 11 PM – Sun 11 PM CST automatically begin tracking defenses after Sunday's 11 PM CST reset.</span>
+        </div>
+
+        <!-- Search Roster inside Modal -->
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+          <input
+            id="equipRosterSearch"
+            type="text"
+            placeholder="Filter clanmates by name or #tag..."
+            class="w-full pl-9 pr-3 py-2 rounded-xl bg-obsidian border border-borderline focus:border-clashgold text-xs sm:text-sm text-white placeholder-slate-500 outline-none transition"
+          />
+        </div>
+
+        <!-- Multi-Select Account List -->
+        <div id="equipRosterList" class="max-h-64 overflow-y-auto space-y-1.5 pr-1">
+          <div class="text-center py-6 text-xs text-slate-400">Loading active clan roster...</div>
+        </div>
+      </div>
+
+      <!-- Modal Action Footer -->
+      <div class="px-5 py-4 border-t border-borderline bg-obsidian/70 space-y-2.5">
+        <button
+          id="btnConfirmEquipLaunch"
+          type="button"
+          class="w-full px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.99] text-obsidian font-bold text-sm inline-flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition cursor-pointer"
+        >
+          <i data-lucide="external-link" class="w-4 h-4"></i>
+          <span id="btnConfirmEquipLabel">Equip &amp; Open in Clash of Clans</span>
+        </button>
+
+        <div class="flex items-center justify-between gap-2">
+          <button
+            id="btnOpenWithoutTagging"
+            type="button"
+            class="flex-1 px-4 py-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer"
+          >
+            Open Link Without Tagging
+          </button>
+          <button
+            id="btnCopyLinkFallback"
+            type="button"
+            title="Copy layout URL to clipboard"
+            class="px-3 py-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-xs font-medium text-clashgold inline-flex items-center gap-1 transition cursor-pointer"
+          >
+            <i data-lucide="copy" class="w-3.5 h-3.5"></i>
+            <span>Copy URL</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- ==================== MODAL 1: MULTI-BASE POST DETECTED ==================== -->
   <div id="multiBaseModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
@@ -723,14 +850,9 @@
           <span id="lightboxZoomLabel">1.75x Zoom</span>
         </button>
 
-        <a id="btnLightboxOpenCoc" href="#" target="_blank" rel="noopener noreferrer" title="Launch directly in Clash of Clans" class="px-3 py-2 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-semibold text-xs sm:text-sm inline-flex items-center gap-1.5 transition">
+        <button id="btnLightboxEquipBase" type="button" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-obsidian font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 shadow-lg shadow-emerald-500/20 transition cursor-pointer">
           <i data-lucide="gamepad-2" class="w-4 h-4"></i>
-          <span class="hidden md:inline">Open in CoC</span>
-        </a>
-
-        <button id="btnLightboxCopyLink" type="button" class="px-4 py-2 rounded-xl bg-clashgold hover:bg-clashgold-light text-obsidian font-bold text-xs sm:text-sm inline-flex items-center gap-1.5 shadow-lg shadow-clashgold/20 transition cursor-pointer">
-          <i data-lucide="copy" class="w-4 h-4"></i>
-          <span>Copy Base Link</span>
+          <span>Equip &amp; Open in CoC</span>
         </button>
 
         <button type="button" class="close-modal-btn p-2 rounded-xl bg-stonecard hover:bg-stonehover border border-borderline text-slate-300 hover:text-white transition cursor-pointer" data-modal="lightboxModal" title="Close Lightbox (Esc)">
@@ -739,12 +861,15 @@
       </div>
     </div>
 
+    <!-- Live Defense Telemetry Strip inside Lightbox -->
+    <div id="lightboxDefenseBar" class="px-4 sm:px-6 py-2.5 border-b border-borderline/60 bg-stonecard/90 flex flex-wrap items-center justify-between gap-2 text-xs"></div>
+
     <div id="lightboxViewport" class="relative flex-1 overflow-auto flex flex-col items-center justify-center p-4 sm:p-8 select-none gap-3">
       <button id="btnLightboxPrev" type="button" title="Previous Base (Left Arrow)" class="fixed left-3 sm:left-6 top-1/2 -translate-y-1/2 z-10 p-2.5 sm:p-3 rounded-full bg-stonecard/90 hover:bg-clashgold hover:text-obsidian text-white border border-borderline shadow-xl transition cursor-pointer">
         <i data-lucide="chevron-left" class="w-5 h-5"></i>
       </button>
 
-      <img id="lightboxImage" src="" alt="Full screen Clash of Clans base layout" class="max-h-[68vh] max-w-full rounded-xl border border-borderline shadow-2xl object-contain transition-transform duration-200 origin-center cursor-zoom-in" />
+      <img id="lightboxImage" src="" alt="Full screen Clash of Clans base layout" class="max-h-[64vh] max-w-full rounded-xl border border-borderline shadow-2xl object-contain transition-transform duration-200 origin-center cursor-zoom-in" />
 
       <div id="lightboxImageSwitcher" class="hidden flex items-center gap-2 px-3 py-1.5 rounded-xl bg-stonecard/90 border border-borderline"></div>
 
@@ -830,9 +955,11 @@
       }
 
       const STORAGE_KEYS = {
-        CACHE: 'molly_basevault_cache_v1',
+        CACHE: 'molly_basevault_cache_v2',
         FAVORITES: 'molly_basevault_favorites_v1',
         COLS: 'clashvault_grid_cols_v1',
+        MY_ACCOUNTS: 'molly_my_accounts',
+        INSIGHTS_COLLAPSED: 'molly_vault_insights_collapsed_v1',
       };
 
       const STANDARD_TH_LEVELS = ['All', 'TH19', 'TH18', 'TH17', 'TH16'];
@@ -843,6 +970,10 @@
       ------------------------------------------------------------------------- */
       const state = {
         bases: [],
+        roster: [],
+        defenseKillers: [],
+        topBuilders: [],
+        myAccounts: [],
         favoriteIds: new Set(),
         selectedTh: 'All',
         selectedCategory: 'All',
@@ -850,8 +981,11 @@
         searchQuery: '',
         sortBy: 'trending',
         gridCols: 3,
-        copiedCardId: null,
-        copiedCardTimer: null,
+        insightsCollapsed: false,
+        expandedRunnersBaseIds: new Set(),
+        equipModalBaseId: null,
+        equipSelectedTags: new Set(),
+        equipRosterFilter: '',
         pendingMultiBase: null,
         manualImageDataUrl: '',
         lightboxBaseId: null,
@@ -861,8 +995,15 @@
       };
 
       /* -------------------------------------------------------------------------
-         3. NORMALIZATION & LOCAL CACHE / FAVORITES HELPERS
+         3. NORMALIZATION & LOCAL CACHE / FAVORITES / MY ACCOUNTS HELPERS
       ------------------------------------------------------------------------- */
+      function normalizeTag(tag) {
+        if (!tag) return '';
+        let clean = String(tag).trim().toUpperCase();
+        if (!clean.startsWith('#')) clean = '#' + clean;
+        return clean;
+      }
+
       function formatThLabel(rawTh, baseLink = '', notes = '') {
         if (typeof rawTh === 'number' && rawTh > 0) return `TH${rawTh}`;
         const s = String(rawTh || '').trim().toUpperCase();
@@ -874,6 +1015,19 @@
       function parseThNumber(thLabel) {
         const m = String(thLabel || '').match(/\d{1,2}/);
         return m ? parseInt(m[0], 10) : 19;
+      }
+
+      function normalizeDefenseStats(rawStats) {
+        const ds = (rawStats && typeof rawStats === 'object') ? rawStats : {};
+        return {
+          totalDefenses:   Number(ds.totalDefenses) || 0,
+          rankedDefenses:  Number(ds.rankedDefenses) || 0,
+          avgStarsAllowed: Number(ds.avgStarsAllowed) || 0,
+          avgDestruction:  Number(ds.avgDestruction) || 0,
+          triplesAllowed:  Number(ds.triplesAllowed) || 0,
+          activePlayers:   Array.isArray(ds.activePlayers) ? ds.activePlayers : [],
+          topKillers:      Array.isArray(ds.topKillers) ? ds.topKillers : [],
+        };
       }
 
       function normalizeBaseRecord(raw) {
@@ -906,6 +1060,7 @@
           copies: Number(raw.copies) || 0,
           createdAt: Number(raw.createdAt) || Date.now(),
           favorite: state.favoriteIds.has(id) || Boolean(raw.favorite),
+          defenseStats: normalizeDefenseStats(raw.defenseStats),
         };
       }
 
@@ -928,10 +1083,33 @@
         };
       }
 
+      function loadMyAccounts() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEYS.MY_ACCOUNTS);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) {
+            return Array.from(new Set(parsed.map(normalizeTag).filter(Boolean)));
+          }
+        } catch (_) {}
+        return [];
+      }
+
+      function saveMyAccounts(tags) {
+        const clean = Array.from(new Set((tags || []).map(normalizeTag).filter(Boolean)));
+        state.myAccounts = clean;
+        try {
+          localStorage.setItem(STORAGE_KEYS.MY_ACCOUNTS, JSON.stringify(clean));
+        } catch (_) {}
+      }
+
       function loadLocalPreferences() {
         try {
           const savedCols = parseInt(localStorage.getItem(STORAGE_KEYS.COLS) || '3', 10);
           if ([2, 3, 4].includes(savedCols)) state.gridCols = savedCols;
+
+          state.insightsCollapsed = localStorage.getItem(STORAGE_KEYS.INSIGHTS_COLLAPSED) === 'true';
+          state.myAccounts = loadMyAccounts();
 
           const favRaw = localStorage.getItem(STORAGE_KEYS.FAVORITES);
           if (favRaw) {
@@ -942,8 +1120,11 @@
           const cacheRaw = localStorage.getItem(STORAGE_KEYS.CACHE);
           if (cacheRaw) {
             const cached = JSON.parse(cacheRaw);
-            if (Array.isArray(cached) && cached.length > 0) {
-              state.bases = cached.map(normalizeBaseRecord);
+            if (cached && typeof cached === 'object') {
+              if (Array.isArray(cached.bases)) state.bases = cached.bases.map(normalizeBaseRecord);
+              if (Array.isArray(cached.roster)) state.roster = cached.roster;
+              if (Array.isArray(cached.defenseKillers)) state.defenseKillers = cached.defenseKillers;
+              if (Array.isArray(cached.topBuilders)) state.topBuilders = cached.topBuilders;
             }
           }
         } catch (_) {}
@@ -951,7 +1132,12 @@
 
       function saveLocalCache() {
         try {
-          localStorage.setItem(STORAGE_KEYS.CACHE, JSON.stringify(state.bases));
+          localStorage.setItem(STORAGE_KEYS.CACHE, JSON.stringify({
+            bases: state.bases,
+            roster: state.roster,
+            defenseKillers: state.defenseKillers,
+            topBuilders: state.topBuilders,
+          }));
         } catch (_) {}
       }
 
@@ -982,11 +1168,12 @@
         }
       }
 
-      async function apiPost(bodyObj) {
+      async function apiPost(bodyObj, keepalive = false) {
         const res = await fetch(getWebAppUrl(), {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify(bodyObj),
+          keepalive: keepalive,
         });
         if (!res.ok) {
           throw new Error(`Backend HTTP ${res.status}`);
@@ -998,7 +1185,7 @@
         return data;
       }
 
-      async function loadBasesFromBackend(showSuccessToast = false) {
+      async function loadVaultAndRosterFromBackend(showSuccessToast = false) {
         const refreshIcon = document.getElementById('refreshCloudIcon');
         const loadingEl = document.getElementById('loadingState');
         setCloudStatus('syncing', 'Syncing...');
@@ -1006,23 +1193,51 @@
         if (state.bases.length === 0) loadingEl.classList.remove('hidden');
 
         try {
-          const res = await fetch(`${getWebAppUrl()}?action=getBases`);
+          // Fetch getDashboardData so we get active clan roster + bases + defenseKillers + topBuilders in one call
+          const res = await fetch(`${getWebAppUrl()}?action=getDashboardData`);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
-          if (data.error) throw new Error(data.error);
+          if (data.error && !Array.isArray(data.bases)) throw new Error(data.error);
 
-          const serverBases = Array.isArray(data.bases) ? data.bases : [];
-          state.bases = serverBases.map(normalizeBaseRecord);
+          if (Array.isArray(data.players)) {
+            state.roster = data.players.map((p) => ({
+              tag: normalizeTag(p.tag),
+              name: String(p.name || p.tag),
+              thLevel: Number(p.thLevel) || 0,
+              role: String(p.role || 'member'),
+            }));
+          }
+
+          if (Array.isArray(data.bases)) {
+            state.bases = data.bases.map(normalizeBaseRecord);
+            state.defenseKillers = Array.isArray(data.defenseKillers) ? data.defenseKillers : [];
+            state.topBuilders = Array.isArray(data.topBuilders) ? data.topBuilders : [];
+          } else {
+            // Fallback to getBases if dashboard payload didn't include bases
+            const baseRes = await fetch(`${getWebAppUrl()}?action=getBases`);
+            if (baseRes.ok) {
+              const baseData = await baseRes.json();
+              state.bases = Array.isArray(baseData.bases) ? baseData.bases.map(normalizeBaseRecord) : [];
+              state.defenseKillers = Array.isArray(baseData.defenseKillers) ? baseData.defenseKillers : [];
+              state.topBuilders = Array.isArray(baseData.topBuilders) ? baseData.topBuilders : [];
+            }
+          }
+
           saveLocalCache();
           setCloudStatus('ok', 'Synced');
           renderAll();
+
+          if (!document.getElementById('lightboxModal').classList.contains('hidden') && state.lightboxBaseId) {
+            openLightbox(state.lightboxBaseId);
+          }
+
           if (showSuccessToast) {
-            showToast(`Loaded ${state.bases.length} base(s) from Google Sheets.`, 'success');
+            showToast(`Synced ${state.bases.length} base(s) & live defense telemetry.`, 'success');
           }
         } catch (err) {
-          console.error('Failed to load bases from backend:', err);
+          console.error('Failed to load vault from backend:', err);
           setCloudStatus('error', 'Offline');
-          showToast('Could not reach Apps Script backend. Showing cached bases.', 'error');
+          showToast('Could not reach Apps Script backend. Showing cached data.', 'error');
           renderAll();
         } finally {
           loadingEl.classList.add('hidden');
@@ -1030,10 +1245,27 @@
         }
       }
 
-      /**
-       * Saves a candidate base to Google Sheets + Google Drive via action: "saveBase".
-       * Handles duplicate blocking and earlier-post replacement returned by the backend.
-       */
+      async function ensureRosterLoaded() {
+        if (state.roster.length > 0) return state.roster;
+        try {
+          const res = await fetch(`${getWebAppUrl()}?action=getDashboardData`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          if (Array.isArray(data.players)) {
+            state.roster = data.players.map((p) => ({
+              tag: normalizeTag(p.tag),
+              name: String(p.name || p.tag),
+              thLevel: Number(p.thLevel) || 0,
+              role: String(p.role || 'member'),
+            }));
+            saveLocalCache();
+          }
+        } catch (err) {
+          console.error('Failed to fetch clan roster:', err);
+        }
+        return state.roster;
+      }
+
       async function saveBaseToBackend(candidateBase) {
         setCloudStatus('syncing', 'Saving...');
         try {
@@ -1086,7 +1318,7 @@
         }
       }
 
-      async function updateBaseOnBackend(id, updates, extraFlags = {}) {
+      async function updateBaseOnBackend(id, updates, extraFlags = {}, keepalive = false) {
         setCloudStatus('syncing', 'Updating...');
         try {
           const payload = {
@@ -1100,9 +1332,13 @@
             payload.base = mapped;
           }
 
-          const res = await apiPost(payload);
+          const res = await apiPost(payload, keepalive);
           if (res.status === 'success' && res.base) {
-            const updated = normalizeBaseRecord(res.base);
+            const existing = state.bases.find((b) => b.id === id);
+            const updated = normalizeBaseRecord({
+              ...res.base,
+              defenseStats: existing ? existing.defenseStats : undefined,
+            });
             const idx = state.bases.findIndex((b) => b.id === id);
             if (idx > -1) state.bases[idx] = updated;
             saveLocalCache();
@@ -1132,8 +1368,248 @@
         }
       }
 
+      async function unassignPlayerFromBase(baseId, playerTag, playerName) {
+        setCloudStatus('syncing', 'Updating...');
+        try {
+          await apiPost({
+            action: 'unassignBase',
+            baseId: baseId,
+            playerTags: [normalizeTag(playerTag)],
+          });
+
+          // Optimistically remove player from activePlayers on this base
+          const base = state.bases.find((b) => b.id === baseId);
+          if (base && base.defenseStats && Array.isArray(base.defenseStats.activePlayers)) {
+            base.defenseStats.activePlayers = base.defenseStats.activePlayers.filter(
+              (p) => normalizeTag(p.tag) !== normalizeTag(playerTag)
+            );
+          }
+
+          saveLocalCache();
+          setCloudStatus('ok', 'Synced');
+          renderAll();
+
+          if (!document.getElementById('lightboxModal').classList.contains('hidden') && state.lightboxBaseId === baseId) {
+            openLightbox(baseId);
+          }
+
+          showToast(`Unassigned ${playerName || playerTag} from base.`, 'info');
+          // Refresh telemetry in background
+          loadVaultAndRosterFromBackend(false);
+        } catch (err) {
+          setCloudStatus('error', 'Sync Error');
+          showToast('Failed to unassign account: ' + err.message, 'error');
+        }
+      }
+
       /* -------------------------------------------------------------------------
-         5. DATE PARSING, FORMATTING & TIME-WEIGHTED POPULARITY ENGINE
+         5. ACCOUNT-SELECTION LAUNCH MODAL LOGIC
+      ------------------------------------------------------------------------- */
+      async function openEquipModal(baseId) {
+        const base = state.bases.find((b) => b.id === baseId);
+        if (!base) return;
+
+        state.equipModalBaseId = baseId;
+        state.equipRosterFilter = '';
+        document.getElementById('equipRosterSearch').value = '';
+
+        // Pre-select the user's saved "My Accounts" for 1-tap selection
+        state.equipSelectedTags = new Set(state.myAccounts);
+
+        const creatorClean = (base.creatorHandle || '@unknown').startsWith('@')
+          ? base.creatorHandle
+          : `@${base.creatorHandle}`;
+        document.getElementById('equipModalBaseMeta').textContent =
+          `${base.thLevel} · ${creatorClean} · ${(base.tags || []).slice(0, 2).join(', ')}`;
+
+        document.getElementById('equipBaseModal').classList.remove('hidden');
+        lucide.createIcons({ root: document.getElementById('equipBaseModal') });
+
+        if (state.roster.length === 0) {
+          document.getElementById('equipRosterList').innerHTML =
+            '<div class="text-center py-6 text-xs text-slate-400">Fetching active clan roster...</div>';
+          await ensureRosterLoaded();
+        }
+
+        // Keep only tags that exist in the active roster (if roster loaded)
+        if (state.roster.length > 0) {
+          const validSet = new Set(state.roster.map((p) => normalizeTag(p.tag)));
+          state.equipSelectedTags = new Set(
+            Array.from(state.equipSelectedTags).filter((t) => validSet.has(t))
+          );
+        }
+
+        renderEquipRosterList();
+      }
+
+      function renderEquipRosterList() {
+        const container = document.getElementById('equipRosterList');
+        const q = state.equipRosterFilter.trim().toLowerCase();
+        const mySet = new Set(state.myAccounts);
+
+        if (state.roster.length === 0) {
+          container.innerHTML = `
+            <div class="rounded-xl bg-obsidian border border-borderline p-4 text-center space-y-2">
+              <p class="text-xs text-slate-400">Could not load active clan roster. You can still launch the base directly below.</p>
+            </div>
+          `;
+          updateEquipSubmitButton();
+          return;
+        }
+
+        const filtered = state.roster.filter((p) => {
+          if (!q) return true;
+          return p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q);
+        });
+
+        if (filtered.length === 0) {
+          container.innerHTML = `<div class="text-center py-6 text-xs text-slate-500">No clanmates match "${escapeHtml(state.equipRosterFilter)}"</div>`;
+          updateEquipSubmitButton();
+          return;
+        }
+
+        const pinned = filtered.filter((p) => mySet.has(p.tag));
+        const others = filtered.filter((p) => !mySet.has(p.tag));
+
+        const renderRow = (p, isPinned) => {
+          const checked = state.equipSelectedTags.has(p.tag);
+          return `
+            <label class="flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl border transition cursor-pointer select-none ${
+              checked
+                ? 'bg-emerald-500/12 border-emerald-500/50 text-white'
+                : 'bg-obsidian/80 hover:bg-stonehover border-borderline text-slate-200'
+            }">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <input
+                  type="checkbox"
+                  data-equip-tag="${escapeHtml(p.tag)}"
+                  class="equip-account-cb w-4 h-4 rounded accent-emerald-400 cursor-pointer shrink-0"
+                  ${checked ? 'checked' : ''}
+                />
+                <div class="min-w-0">
+                  <div class="text-xs sm:text-sm font-semibold truncate flex items-center gap-1.5">
+                    <span>${escapeHtml(p.name)}</span>
+                    ${isPinned ? '<span class="px-1.5 py-0.5 rounded bg-clashgold/15 text-clashgold text-[9px] font-bold uppercase tracking-wider">Mine</span>' : ''}
+                  </div>
+                  <div class="text-[10px] font-mono text-slate-400">${escapeHtml(p.tag)}</div>
+                </div>
+              </div>
+              <span class="px-2 py-0.5 rounded-md bg-stonecard border border-borderline text-[11px] font-display font-bold text-clashgold shrink-0">
+                TH${p.thLevel || '?'}
+              </span>
+            </label>
+          `;
+        };
+
+        let html = '';
+        if (pinned.length > 0) {
+          html += `
+            <div class="text-[10px] font-bold uppercase tracking-wider text-clashgold px-1 pt-0.5 flex items-center justify-between">
+              <span>My Accounts (Pinned)</span>
+              <button type="button" id="btnSelectAllMyAccounts" class="text-sky-400 hover:underline font-semibold cursor-pointer">Toggle All Mine</button>
+            </div>
+            ${pinned.map((p) => renderRow(p, true)).join('')}
+          `;
+        }
+
+        if (others.length > 0) {
+          if (pinned.length > 0) {
+            html += `<div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 pt-2">Clan Roster (${others.length})</div>`;
+          }
+          html += others.map((p) => renderRow(p, false)).join('');
+        }
+
+        container.innerHTML = html;
+
+        container.querySelectorAll('.equip-account-cb').forEach((cb) => {
+          cb.addEventListener('change', (e) => {
+            const tag = normalizeTag(e.target.dataset.equipTag);
+            if (e.target.checked) state.equipSelectedTags.add(tag);
+            else state.equipSelectedTags.delete(tag);
+            renderEquipRosterList();
+          });
+        });
+
+        const toggleMineBtn = document.getElementById('btnSelectAllMyAccounts');
+        if (toggleMineBtn) {
+          toggleMineBtn.addEventListener('click', () => {
+            const allPinnedChecked = pinned.every((p) => state.equipSelectedTags.has(p.tag));
+            pinned.forEach((p) => {
+              if (allPinnedChecked) state.equipSelectedTags.delete(p.tag);
+              else state.equipSelectedTags.add(p.tag);
+            });
+            renderEquipRosterList();
+          });
+        }
+
+        updateEquipSubmitButton();
+      }
+
+      function updateEquipSubmitButton() {
+        const count = state.equipSelectedTags.size;
+        const btn = document.getElementById('btnConfirmEquipLaunch');
+        const label = document.getElementById('btnConfirmEquipLabel');
+        btn.disabled = count === 0;
+        btn.classList.toggle('opacity-50', count === 0);
+        btn.classList.toggle('cursor-not-allowed', count === 0);
+        label.textContent = count > 0
+          ? `Equip (${count}) & Open in Clash of Clans`
+          : 'Select Account(s) to Equip';
+      }
+
+      async function handleEquipAndLaunch() {
+        const base = state.bases.find((b) => b.id === state.equipModalBaseId);
+        if (!base) return;
+
+        const selectedTags = Array.from(state.equipSelectedTags);
+        if (selectedTags.length === 0) {
+          showToast('Select at least 1 account or tap "Open Link Without Tagging".', 'info');
+          return;
+        }
+
+        // Persist user's chosen accounts to localStorage ("molly_my_accounts")
+        saveMyAccounts(selectedTags);
+
+        // Immediately launch Clash of Clans link (synchronously inside click event to prevent popup blocking)
+        if (base.baseLink) {
+          window.open(base.baseLink, '_blank', 'noopener,noreferrer');
+        }
+
+        // Close modal and update optimistic copy count
+        document.getElementById('equipBaseModal').classList.add('hidden');
+        base.copies = (base.copies || 0) + 1;
+        saveLocalCache();
+        renderGallery();
+
+        setCloudStatus('syncing', 'Assigning...');
+        try {
+          const [assignRes] = await Promise.all([
+            apiPost({
+              action: 'assignBase',
+              baseId: base.id,
+              playerTags: selectedTags,
+            }, true),
+            updateBaseOnBackend(base.id, null, { incrementCopies: true }, true).catch(() => null),
+          ]);
+
+          const isScheduled = Boolean(assignRes && assignRes.isScheduled);
+          showToast(
+            isScheduled
+              ? `Equipped for ${selectedTags.length} account(s) — ⏳ active Sun 11 PM CST!`
+              : `Equipped for ${selectedTags.length} account(s) — live defense tracking active!`,
+            'gold'
+          );
+
+          // Reload live defenseStats & runner badges from backend
+          await loadVaultAndRosterFromBackend(false);
+        } catch (err) {
+          setCloudStatus('error', 'Sync Error');
+          showToast('Opened base, but failed to save assignment: ' + err.message, 'error');
+        }
+      }
+
+      /* -------------------------------------------------------------------------
+         6. DATE PARSING, FORMATTING & TIME-WEIGHTED POPULARITY ENGINE
       ------------------------------------------------------------------------- */
       function parsePostTimestamp(createdAt, createdTimestampSeconds) {
         if (createdTimestampSeconds !== undefined && createdTimestampSeconds !== null) {
@@ -1207,9 +1683,6 @@
         return String(n);
       }
 
-      /**
-       * Computes 7-day tracked like growth from LikesHistoryJSON synced daily by Apps Script.
-       */
       function computeTrackedLikesGrowth(base) {
         const history = Array.isArray(base.likesHistory) ? base.likesHistory : [];
         const ageDays = Math.max(0, (Date.now() - (Number(base.postTimestamp) || Date.now())) / 86400000);
@@ -1290,8 +1763,31 @@
         };
       }
 
+      function getAvgStarsColorClasses(avgStars) {
+        if (avgStars < 1.8) {
+          return {
+            text: 'text-emerald-300',
+            badge: 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300',
+          };
+        }
+        if (avgStars <= 2.3) {
+          return {
+            text: 'text-amber-300',
+            badge: 'bg-amber-500/15 border-amber-500/40 text-amber-300',
+          };
+        }
+        return {
+          text: 'text-rose-300',
+          badge: 'bg-rose-500/15 border-rose-500/40 text-rose-300',
+        };
+      }
+
+      function isPlayerScheduled(p) {
+        return p.status === 'scheduled' || (Number(p.effectiveFrom) > Date.now());
+      }
+
       /* -------------------------------------------------------------------------
-         6. CANONICAL LAYOUT ID & DUPLICATE BANNER HELPERS
+         7. CANONICAL LAYOUT ID & DUPLICATE BANNER HELPERS
       ------------------------------------------------------------------------- */
       function normalizeHandleKey(handle) {
         if (!handle) return '';
@@ -1385,7 +1881,7 @@
       }
 
       /* -------------------------------------------------------------------------
-         7. CLIPBOARD, TOAST & ESCAPE UTILITIES
+         8. CLIPBOARD, TOAST & ESCAPE UTILITIES
       ------------------------------------------------------------------------- */
       async function copyTextToClipboard(text) {
         if (!text) return false;
@@ -1454,7 +1950,7 @@
       }
 
       /* -------------------------------------------------------------------------
-         8. X / TWITTER URL PARSING & SYNDICATION API FETCHING
+         9. X / TWITTER URL PARSING & SYNDICATION API FETCHING
       ------------------------------------------------------------------------- */
       function parseXPostUrl(inputUrl) {
         const trimmed = (inputUrl || '').trim();
@@ -1605,7 +2101,7 @@
       }
 
       /* -------------------------------------------------------------------------
-         9. CLASH OF CLANS LINK, TH LEVEL, CC TROOPS & TAGS PARSER
+         10. CLASH OF CLANS LINK, TH LEVEL, CC TROOPS & TAGS PARSER
       ------------------------------------------------------------------------- */
       function extractClashBaseLinks(text, extraUrls = []) {
         const combinedSources = [text || '', ...(extraUrls || [])].join('\n');
@@ -1699,7 +2195,7 @@
       }
 
       /* -------------------------------------------------------------------------
-         10. IMPORT WORKFLOW (X POST -> BACKEND SAVE)
+         11. IMPORT WORKFLOW (X POST -> BACKEND SAVE)
       ------------------------------------------------------------------------- */
       async function handleXPostImport(rawUrl) {
         const statusBanner = document.getElementById('fetchStatusBanner');
@@ -1937,7 +2433,7 @@
       }
 
       /* -------------------------------------------------------------------------
-         11. MULTI-BASE POST MODAL LOGIC
+         12. MULTI-BASE POST MODAL LOGIC
       ------------------------------------------------------------------------- */
       function openMultiBaseModal() {
         const data = state.pendingMultiBase;
@@ -2103,7 +2599,7 @@
       }
 
       /* -------------------------------------------------------------------------
-         12. MANUAL / PASTE SCREENSHOT MODAL (UPLOADS BASE64 TO GOOGLE DRIVE)
+         13. MANUAL / PASTE SCREENSHOT MODAL (UPLOADS BASE64 TO GOOGLE DRIVE)
       ------------------------------------------------------------------------- */
       function openManualModal(prefill = {}) {
         document.getElementById('manualBaseForm').reset();
@@ -2221,7 +2717,84 @@
       }
 
       /* -------------------------------------------------------------------------
-         13. FILTERING, SORTING & RENDERING GALLERY CARDS
+         14. RENDER INSIGHTS STRIP (DEFENSE KILLERS & TOP BUILDERS)
+      ------------------------------------------------------------------------- */
+      function renderInsightsStrip() {
+        const body = document.getElementById('insightsBody');
+        const chevron = document.getElementById('insightsChevron');
+        const label = document.getElementById('insightsToggleLabel');
+        const toggleBtn = document.getElementById('btnToggleInsights');
+
+        body.classList.toggle('hidden', state.insightsCollapsed);
+        toggleBtn.setAttribute('aria-expanded', String(!state.insightsCollapsed));
+        label.textContent = state.insightsCollapsed ? 'Show' : 'Hide';
+        chevron.style.transform = state.insightsCollapsed ? 'rotate(180deg)' : 'rotate(0deg)';
+
+        // 1. Clan Defense Killers
+        const killersEl = document.getElementById('defenseKillersList');
+        const killers = (state.defenseKillers || []).slice(0, 5);
+        if (killers.length === 0) {
+          killersEl.innerHTML = `<p class="text-slate-500 italic text-xs py-2">No Ranked 3★ enemy defenses logged yet. Sync clan data to populate.</p>`;
+        } else {
+          killersEl.innerHTML = killers.map((k, i) => `
+            <div class="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-stonecard/80 border border-borderline/60">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-5 h-5 rounded-md bg-rose-500/15 text-rose-300 font-display font-bold text-xs flex items-center justify-center shrink-0">${i + 1}</span>
+                <span class="font-semibold text-slate-100 truncate">${escapeHtml(k.name)}</span>
+              </div>
+              <div class="flex items-center gap-2 shrink-0 text-[11px]">
+                <span class="text-rose-300 font-bold">${k.triples} 3★</span>
+                <span class="px-1.5 py-0.5 rounded bg-obsidian border border-borderline text-slate-300 font-medium">${k.appearanceRate}%</span>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        // 2. Top Vault Builders
+        const buildersEl = document.getElementById('topBuildersList');
+        const builders = (state.topBuilders || []).slice(0, 5);
+        if (builders.length === 0) {
+          buildersEl.innerHTML = `<p class="text-slate-500 italic text-xs py-2">Add bases to the vault to rank creators by defense &amp; popularity.</p>`;
+        } else {
+          buildersEl.innerHTML = builders.map((b, i) => {
+            const handle = b.creatorHandle.startsWith('@') ? b.creatorHandle : `@${b.creatorHandle}`;
+            const hasDefs = b.totalDefenses > 0 && b.avgStarsAllowed !== null;
+            const starColors = hasDefs ? getAvgStarsColorClasses(b.avgStarsAllowed) : null;
+            return `
+              <button
+                type="button"
+                data-builder-filter="${escapeHtml(handle)}"
+                class="builder-insight-btn w-full flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-stonecard/80 hover:bg-stonehover border border-borderline/60 hover:border-clashgold/50 transition cursor-pointer text-left"
+              >
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-5 h-5 rounded-md bg-clashgold/15 text-clashgold font-display font-bold text-xs flex items-center justify-center shrink-0">${i + 1}</span>
+                  <span class="font-semibold text-slate-100 truncate">${escapeHtml(handle)}</span>
+                  <span class="text-[10px] text-slate-500 shrink-0">(${b.baseCount})</span>
+                </div>
+                <div class="flex items-center gap-2 shrink-0 text-[11px]">
+                  ${hasDefs
+                    ? `<span class="px-1.5 py-0.5 rounded border font-bold ${starColors.badge}">${b.avgStarsAllowed.toFixed(2)}★ <span class="font-normal opacity-80">(${b.totalDefenses})</span></span>`
+                    : `<span class="text-slate-500 italic text-[10px]">No defs</span>`}
+                  <span class="text-slate-400">❤️ ${escapeHtml(formatCompactNumber(b.totalLikes))}</span>
+                  <span class="text-sky-300 font-medium">${b.totalCopies} eq</span>
+                </div>
+              </button>
+            `;
+          }).join('');
+
+          buildersEl.querySelectorAll('.builder-insight-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+              const handle = btn.dataset.builderFilter;
+              state.selectedCreator =
+                normalizeHandleKey(state.selectedCreator) === normalizeHandleKey(handle) ? '' : handle;
+              renderAll();
+            });
+          });
+        }
+      }
+
+      /* -------------------------------------------------------------------------
+         15. FILTERING, SORTING & RENDERING GALLERY CARDS
       ------------------------------------------------------------------------- */
       function getFilteredAndSortedBases() {
         const query = state.searchQuery.trim().toLowerCase();
@@ -2238,12 +2811,16 @@
           }
 
           if (query) {
+            const runnerNames = (base.defenseStats && Array.isArray(base.defenseStats.activePlayers))
+              ? base.defenseStats.activePlayers.map((p) => `${p.name} ${p.tag}`).join(' ')
+              : '';
             const searchable = [
               base.thLevel,
               base.creatorHandle,
               base.ccTroops,
               ...(base.tags || []),
               base.notes,
+              runnerNames,
               formatExactDate(base.postTimestamp),
             ].join(' ').toLowerCase();
             if (!searchable.includes(query)) return false;
@@ -2252,6 +2829,23 @@
         });
 
         return filtered.sort((a, b) => {
+          if (state.sortBy === 'best_defense') {
+            const aDefs = (a.defenseStats && a.defenseStats.totalDefenses) || 0;
+            const bDefs = (b.defenseStats && b.defenseStats.totalDefenses) || 0;
+            const aHas = aDefs > 0;
+            const bHas = bDefs > 0;
+            if (aHas !== bHas) return aHas ? -1 : 1;
+            if (aHas && bHas) {
+              const aStars = a.defenseStats.avgStarsAllowed || 0;
+              const bStars = b.defenseStats.avgStarsAllowed || 0;
+              if (aStars !== bStars) return aStars - bStars;
+              const aDest = a.defenseStats.avgDestruction || 0;
+              const bDest = b.defenseStats.avgDestruction || 0;
+              if (aDest !== bDest) return aDest - bDest;
+              return bDefs - aDefs;
+            }
+            return (Number(b.likes) || 0) - (Number(a.likes) || 0);
+          }
           if (state.sortBy === 'trending') {
             const popA = computePopularityMetrics(a.likes, a.postTimestamp).rawScore;
             const popB = computePopularityMetrics(b.likes, b.postTimestamp).rawScore;
@@ -2323,6 +2917,114 @@
         }
       }
 
+      function buildDefenseStripHtml(base) {
+        const ds = normalizeDefenseStats(base.defenseStats);
+        const players = ds.activePlayers || [];
+        const hasScheduled = players.some(isPlayerScheduled);
+        const allScheduled = players.length > 0 && players.every(isPlayerScheduled);
+        const isExpanded = state.expandedRunnersBaseIds.has(base.id);
+
+        // Active / Scheduled Runners Row
+        let runnersHtml = '';
+        if (players.length > 0) {
+          const first = players[0];
+          const extraCount = players.length - 1;
+          const summaryText = extraCount > 0
+            ? `Used by: ${first.name} +${extraCount} ${extraCount === 1 ? 'alt' : 'alts'}`
+            : `Used by: ${first.name}`;
+
+          const scheduledBadge = hasScheduled
+            ? `<span class="px-1.5 py-0.5 rounded bg-amber-500/15 border border-amber-500/35 text-amber-300 text-[10px] font-semibold whitespace-nowrap">⏳ Active Sun 11 PM CST</span>`
+            : '';
+
+          const expandedChips = isExpanded
+            ? `<div class="mt-1.5 flex flex-wrap gap-1">
+                ${players.map((p) => {
+                  const sched = isPlayerScheduled(p);
+                  return `
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium border ${
+                      sched
+                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-200'
+                        : 'bg-sky-500/10 border-sky-500/30 text-sky-200'
+                    }">
+                      <span>${sched ? '⏳ ' : ''}${escapeHtml(p.name)}</span>
+                      <button
+                        type="button"
+                        data-unassign-base="${escapeHtml(base.id)}"
+                        data-unassign-tag="${escapeHtml(p.tag)}"
+                        data-unassign-name="${escapeHtml(p.name)}"
+                        title="Unassign ${escapeHtml(p.name)}"
+                        class="unassign-runner-btn hover:text-rose-400 transition cursor-pointer ml-0.5"
+                      >&times;</button>
+                    </span>
+                  `;
+                }).join('')}
+              </div>`
+            : '';
+
+          runnersHtml = `
+            <div class="space-y-1">
+              <div class="flex items-center justify-between gap-1.5 flex-wrap">
+                <button
+                  type="button"
+                  data-toggle-runners="${escapeHtml(base.id)}"
+                  class="toggle-runners-btn inline-flex items-center gap-1 text-[11px] font-semibold text-sky-300 hover:text-sky-200 transition cursor-pointer min-w-0"
+                  title="Click to manage / unassign accounts"
+                >
+                  <i data-lucide="users" class="w-3 h-3 shrink-0"></i>
+                  <span class="truncate">${escapeHtml(summaryText)}</span>
+                  <i data-lucide="${isExpanded ? 'chevron-up' : 'chevron-down'}" class="w-3 h-3 opacity-70 shrink-0"></i>
+                </button>
+                ${scheduledBadge}
+              </div>
+              ${expandedChips}
+            </div>
+          `;
+        }
+
+        // Defense Telemetry Metrics Row
+        let metricsHtml = '';
+        if (ds.totalDefenses > 0) {
+          const starStyle = getAvgStarsColorClasses(ds.avgStarsAllowed);
+          const topBreaker = ds.topKillers && ds.topKillers.length > 0 ? ds.topKillers[0] : null;
+          metricsHtml = `
+            <div class="flex flex-wrap items-center gap-1.5 text-[10px]">
+              <span class="px-1.5 py-0.5 rounded-md border font-bold ${starStyle.badge}" title="${ds.totalDefenses} total defense(s) (${ds.rankedDefenses} Ranked)">
+                ${ds.avgStarsAllowed.toFixed(2)}★ avg
+              </span>
+              <span class="px-1.5 py-0.5 rounded-md bg-stonecard border border-borderline text-slate-200 font-semibold">
+                ${ds.avgDestruction.toFixed(1)}% dest
+              </span>
+              <span class="px-1.5 py-0.5 rounded-md bg-stonecard border border-borderline text-slate-300 font-medium">
+                ${ds.triplesAllowed} 3★ / ${ds.totalDefenses} def
+              </span>
+              ${topBreaker
+                ? `<span class="px-1.5 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/35 text-rose-300 font-semibold truncate max-w-[140px]" title="#1 Base Breaker: ${escapeHtml(topBreaker.name)} (${topBreaker.triples} triples)">
+                    💀 ${escapeHtml(topBreaker.name)}
+                  </span>`
+                : ''}
+            </div>
+          `;
+        } else {
+          const awaitingText = allScheduled
+            ? '⏳ Locked in for next Ranked week'
+            : 'Awaiting live defenses';
+          metricsHtml = `
+            <div class="text-[11px] ${allScheduled ? 'text-amber-300/90 font-medium' : 'text-slate-500 italic'} flex items-center gap-1.5">
+              <i data-lucide="${allScheduled ? 'lock' : 'radio'}" class="w-3 h-3 shrink-0"></i>
+              <span>${awaitingText}</span>
+            </div>
+          `;
+        }
+
+        return `
+          <div class="rounded-xl bg-obsidian/80 border border-borderline/70 px-2.5 py-2 space-y-1.5">
+            ${runnersHtml}
+            ${metricsHtml}
+          </div>
+        `;
+      }
+
       function renderGallery() {
         const grid = document.getElementById('baseGrid');
         const emptyState = document.getElementById('emptyState');
@@ -2344,6 +3046,10 @@
 
         document.getElementById('headerTotalBases').textContent = state.bases.length;
         document.getElementById('headerTotalCopies').textContent = state.bases.reduce((acc, b) => acc + (b.copies || 0), 0);
+        document.getElementById('headerTotalDefenses').textContent = state.bases.reduce(
+          (acc, b) => acc + ((b.defenseStats && b.defenseStats.totalDefenses) || 0),
+          0
+        );
 
         if (filteredBases.length === 0) {
           grid.innerHTML = '';
@@ -2363,7 +3069,6 @@
         grid.innerHTML = filteredBases.map((base) => {
           const primaryTag = (base.tags && base.tags[0]) || 'LEGEND';
           const secondaryTags = (base.tags || []).slice(1, 3);
-          const isCopied = state.copiedCardId === base.id;
           const hasMultiImages = Array.isArray(base.images) && base.images.length > 1;
           const activeImgIndex = hasMultiImages ? Math.max(0, base.images.indexOf(base.imageUrl)) : 0;
           const creatorClean = (base.creatorHandle || '@unknown').startsWith('@')
@@ -2378,13 +3083,13 @@
             ? `<span class="text-emerald-300 font-bold">+${formatCompactNumber(growth.dailyDelta)}/d</span>`
             : '';
 
-          return `
-            <article data-card-id="${escapeHtml(base.id)}" class="group rounded-2xl bg-stonecard border ${
-              isCopied ? 'border-emerald-400 ring-2 ring-emerald-400/30' : 'border-borderline hover:border-clashgold/60'
-            } overflow-hidden shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/50 transition-all duration-200 flex flex-col">
+          const defenseStripHtml = buildDefenseStripHtml(base);
 
-              <!-- CLICKABLE BASE THUMBNAIL AREA (1-CLICK COPY) -->
-              <div data-copy-base-id="${escapeHtml(base.id)}" role="button" tabindex="0" aria-label="Click to copy ${escapeHtml(base.thLevel)} base link from ${escapeHtml(creatorClean)}" class="base-image-trigger relative aspect-[16/10] bg-obsidian overflow-hidden cursor-pointer select-none">
+          return `
+            <article data-card-id="${escapeHtml(base.id)}" class="group rounded-2xl bg-stonecard border border-borderline hover:border-clashgold/60 overflow-hidden shadow-lg shadow-black/30 hover:shadow-xl hover:shadow-black/50 transition-all duration-200 flex flex-col">
+
+              <!-- CLICKABLE BASE THUMBNAIL AREA (OPENS ACCOUNT-SELECTION LAUNCH MODAL) -->
+              <div data-equip-base-id="${escapeHtml(base.id)}" role="button" tabindex="0" aria-label="Click to equip and open ${escapeHtml(base.thLevel)} base from ${escapeHtml(creatorClean)} in Clash of Clans" class="base-image-trigger relative aspect-[16/10] bg-obsidian overflow-hidden cursor-pointer select-none">
                 <img src="${escapeHtml(base.imageUrl)}" alt="${escapeHtml(base.thLevel)} Clash of Clans Base Layout" loading="lazy" onerror="this.src='https://placehold.co/800x500/151c28/f5b942?text=${encodeURIComponent(base.thLevel + ' Base Layout')}'" class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-300" />
                 <div class="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/75 via-black/30 to-transparent pointer-events-none"></div>
                 <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/85 via-black/40 to-transparent opacity-80 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"></div>
@@ -2408,15 +3113,15 @@
                   </button>
                 </div>
 
-                <!-- BOTTOM-LEFT: Multi-Image Switcher or Copy Hint -->
+                <!-- BOTTOM-LEFT: Multi-Image Switcher or Launch Hint -->
                 <div class="absolute bottom-2.5 left-3 flex items-center gap-1.5">
                   ${hasMultiImages
                     ? `<button type="button" data-cycle-img-id="${escapeHtml(base.id)}" title="Switch between Base Layout & Extra images" class="cycle-img-btn px-2 py-1 rounded-lg bg-obsidian/90 hover:bg-clashgold hover:text-obsidian border border-borderline text-[11px] font-semibold text-slate-200 inline-flex items-center gap-1 transition cursor-pointer">
                         <i data-lucide="images" class="w-3 h-3"></i>
                         <span>${activeImgIndex === 0 ? 'Layout' : 'Log/Extra'} ${activeImgIndex + 1}/${base.images.length}</span>
                       </button>`
-                    : `<span class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 inline-flex items-center gap-1 text-[11px] font-semibold text-clashgold drop-shadow pointer-events-none">
-                        <i data-lucide="copy" class="w-3 h-3"></i> Click to copy link
+                    : `<span class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-300 drop-shadow pointer-events-none">
+                        <i data-lucide="gamepad-2" class="w-3.5 h-3.5"></i> Tap to Equip &amp; Open in CoC
                       </span>`}
                 </div>
 
@@ -2424,17 +3129,6 @@
                 <button type="button" data-lightbox-id="${escapeHtml(base.id)}" title="Inspect Layout Full-Screen" class="lightbox-open-btn absolute bottom-2.5 right-3 p-2 rounded-lg bg-obsidian/90 hover:bg-clashgold hover:text-obsidian text-slate-200 border border-borderline opacity-90 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 shadow-lg cursor-pointer">
                   <i data-lucide="maximize-2" class="w-3.5 h-3.5"></i>
                 </button>
-
-                <!-- COPY FLASH OVERLAY -->
-                ${isCopied
-                  ? `<div class="animate-copy-flash absolute inset-0 bg-gradient-to-br from-emerald-950/90 via-obsidian/90 to-amber-950/90 backdrop-blur-[2px] flex flex-col items-center justify-center p-4 text-center pointer-events-none">
-                      <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border-2 border-emerald-400 text-emerald-300 flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/30">
-                        <i data-lucide="check" class="w-7 h-7 stroke-[2.75]"></i>
-                      </div>
-                      <span class="font-display font-bold text-lg tracking-wider text-clashgold drop-shadow">COPIED BASE LINK!</span>
-                      <span class="text-[11px] text-emerald-200 mt-0.5">Ready to paste in Clash of Clans</span>
-                    </div>`
-                  : ''}
               </div>
 
               <!-- COMPACT CARD FOOTER -->
@@ -2456,6 +3150,9 @@
                     <span class="text-slate-500">· ${escapeHtml(relAgeStr)}</span>
                   </span>
                 </div>
+
+                <!-- LIVE DEFENSE TELEMETRY STRIP -->
+                ${defenseStripHtml}
 
                 <!-- Tags & Time-Adjusted Popularity + 7-Day Tracked Growth -->
                 <div class="flex items-center justify-between gap-2 text-[11px]">
@@ -2506,7 +3203,7 @@
                   </div>
                 </div>
 
-                <!-- CC Troops, Copy Count & Edit/Delete -->
+                <!-- CC Troops, Equip Count & Edit/Delete -->
                 <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-borderline/60">
                   ${base.ccTroops
                     ? `<button type="button" data-copy-cc="${escapeHtml(base.ccTroops)}" title="Click to copy CC troop request" class="copy-cc-btn min-w-0 flex-1 text-left px-2.5 py-1 rounded-lg bg-obsidian hover:bg-stonehover border border-borderline text-[11px] text-slate-300 hover:text-clashgold truncate inline-flex items-center gap-1.5 transition cursor-pointer">
@@ -2516,7 +3213,7 @@
                     : `<span class="text-[11px] text-slate-500 italic truncate flex-1">No CC specified</span>`}
 
                   <div class="flex items-center gap-1 shrink-0">
-                    <span title="Times base link copied" class="px-1.5 text-[11px] font-medium text-slate-400 inline-flex items-center gap-0.5">
+                    <span title="Times equipped / opened" class="px-1.5 text-[11px] font-medium text-slate-400 inline-flex items-center gap-0.5">
                       <i data-lucide="copy-check" class="w-3 h-3 text-emerald-400/80"></i>
                       <span>${base.copies || 0}</span>
                     </span>
@@ -2538,11 +3235,39 @@
       }
 
       function bindGalleryCardEvents() {
+        // Clicking base image opens the Account-Selection Launch Modal
         document.querySelectorAll('.base-image-trigger').forEach((el) => {
-          const triggerCopy = async () => copyBaseLinkById(el.dataset.copyBaseId);
-          el.addEventListener('click', triggerCopy);
+          const triggerEquip = () => openEquipModal(el.dataset.equipBaseId);
+          el.addEventListener('click', triggerEquip);
           el.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); triggerCopy(); }
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); triggerEquip(); }
+          });
+        });
+
+        // Toggle runner chips for unassigning
+        document.querySelectorAll('.toggle-runners-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const id = btn.dataset.toggleRunners;
+            if (state.expandedRunnersBaseIds.has(id)) state.expandedRunnersBaseIds.delete(id);
+            else state.expandedRunnersBaseIds.add(id);
+            renderGallery();
+          });
+        });
+
+        // Unassign runner chip button
+        document.querySelectorAll('.unassign-runner-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const baseId = btn.dataset.unassignBase;
+            const tag = btn.dataset.unassignTag;
+            const name = btn.dataset.unassignName;
+            openConfirmModal({
+              title: 'Unassign Account?',
+              message: `Stop tracking live defenses for ${name} (${tag}) on this base?`,
+              confirmLabel: 'Unassign',
+              onConfirm: () => unassignPlayerFromBase(baseId, tag, name),
+            });
           });
         });
 
@@ -2646,39 +3371,8 @@
         });
       }
 
-      async function copyBaseLinkById(id) {
-        const base = state.bases.find((b) => b.id === id);
-        if (!base) return;
-
-        const copied = await copyTextToClipboard(base.baseLink);
-        if (!copied) {
-          showToast('Could not access clipboard. Open Edit to copy link manually.', 'error');
-          return;
-        }
-
-        // Optimistic UI update + flash
-        base.copies = (base.copies || 0) + 1;
-        saveLocalCache();
-
-        if (state.copiedCardTimer) clearTimeout(state.copiedCardTimer);
-        state.copiedCardId = id;
-        renderGallery();
-
-        state.copiedCardTimer = setTimeout(() => {
-          state.copiedCardId = null;
-          renderGallery();
-        }, 1650);
-
-        showToast(`Copied ${base.thLevel} base link (${base.creatorHandle})!`, 'gold');
-
-        // Persist incremented copy count to Google Sheets
-        try {
-          await updateBaseOnBackend(id, null, { incrementCopies: true });
-        } catch (_) {}
-      }
-
       /* -------------------------------------------------------------------------
-         14. EDIT MODAL LOGIC
+         16. EDIT MODAL LOGIC
       ------------------------------------------------------------------------- */
       function openEditModal(id) {
         const base = state.bases.find((b) => b.id === id);
@@ -2732,8 +3426,79 @@
       }
 
       /* -------------------------------------------------------------------------
-         15. FULL-SCREEN LIGHTBOX INSPECTOR LOGIC
+         17. FULL-SCREEN LIGHTBOX INSPECTOR LOGIC
       ------------------------------------------------------------------------- */
+      function renderLightboxDefenseBar(base) {
+        const bar = document.getElementById('lightboxDefenseBar');
+        const ds = normalizeDefenseStats(base.defenseStats);
+        const players = ds.activePlayers || [];
+        const allScheduled = players.length > 0 && players.every(isPlayerScheduled);
+
+        let metricsBlock = '';
+        if (ds.totalDefenses > 0) {
+          const starStyle = getAvgStarsColorClasses(ds.avgStarsAllowed);
+          const topBreaker = ds.topKillers && ds.topKillers.length > 0 ? ds.topKillers[0] : null;
+          metricsBlock = `
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 rounded-md border font-bold ${starStyle.badge}">${ds.avgStarsAllowed.toFixed(2)}★ Avg Allowed</span>
+              <span class="px-2 py-0.5 rounded-md bg-obsidian border border-borderline text-slate-200 font-semibold">${ds.avgDestruction.toFixed(1)}% Avg Dest</span>
+              <span class="px-2 py-0.5 rounded-md bg-obsidian border border-borderline text-slate-300">${ds.triplesAllowed} Triples / ${ds.totalDefenses} Defenses (${ds.rankedDefenses} Ranked)</span>
+              ${topBreaker
+                ? `<span class="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/35 text-rose-300 font-semibold">💀 #1 Breaker: ${escapeHtml(topBreaker.name)} (${topBreaker.triples} 3★)</span>`
+                : ''}
+            </div>
+          `;
+        } else {
+          metricsBlock = `
+            <div class="text-xs ${allScheduled ? 'text-amber-300 font-semibold' : 'text-slate-400 italic'}">
+              ${allScheduled ? '⏳ Locked in for next Ranked week (Active Sun 11 PM CST)' : 'Awaiting live defenses'}
+            </div>
+          `;
+        }
+
+        const runnersBlock = players.length > 0
+          ? `<div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-slate-400 font-semibold text-[11px]">Runners:</span>
+              ${players.map((p) => {
+                const sched = isPlayerScheduled(p);
+                return `
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium border ${
+                    sched
+                      ? 'bg-amber-500/15 border-amber-500/35 text-amber-200'
+                      : 'bg-sky-500/15 border-sky-500/35 text-sky-200'
+                  }">
+                    <span>${escapeHtml(p.name)}${sched ? ' · ⏳ Sun 11 PM CST' : ''}</span>
+                    <button
+                      type="button"
+                      data-lb-unassign-base="${escapeHtml(base.id)}"
+                      data-lb-unassign-tag="${escapeHtml(p.tag)}"
+                      data-lb-unassign-name="${escapeHtml(p.name)}"
+                      title="Unassign ${escapeHtml(p.name)}"
+                      class="lb-unassign-btn hover:text-rose-400 transition cursor-pointer ml-0.5"
+                    >&times;</button>
+                  </span>
+                `;
+              }).join('')}
+            </div>`
+          : `<span class="text-[11px] text-slate-500">No clanmates assigned yet</span>`;
+
+        bar.innerHTML = `${metricsBlock}${runnersBlock}`;
+
+        bar.querySelectorAll('.lb-unassign-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const baseId = btn.dataset.lbUnassignBase;
+            const tag = btn.dataset.lbUnassignTag;
+            const name = btn.dataset.lbUnassignName;
+            openConfirmModal({
+              title: 'Unassign Account?',
+              message: `Stop tracking live defenses for ${name} (${tag}) on this base?`,
+              confirmLabel: 'Unassign',
+              onConfirm: () => unassignPlayerFromBase(baseId, tag, name),
+            });
+          });
+        });
+      }
+
       function openLightbox(id) {
         const base = state.bases.find((b) => b.id === id);
         if (!base) return;
@@ -2795,7 +3560,6 @@
           creatorLink.classList.add('pointer-events-none', 'opacity-70');
         }
 
-        document.getElementById('btnLightboxOpenCoc').href = base.baseLink || '#';
         document.getElementById('lightboxDateText').textContent =
           `${formatExactDate(base.postTimestamp)} (${formatRelativeAge(base.postTimestamp)})`;
 
@@ -2814,6 +3578,8 @@
         } else {
           lbRefreshBtn.classList.add('hidden');
         }
+
+        renderLightboxDefenseBar(base);
 
         document.getElementById('lightboxCcText').textContent = base.ccTroops || 'None specified';
         document.getElementById('btnLightboxCopyCc').classList.toggle('hidden', !base.ccTroops);
@@ -2849,7 +3615,7 @@
       }
 
       /* -------------------------------------------------------------------------
-         16. CONFIRMATION MODAL & JSON BACKUP EXPORT / IMPORT
+         18. CONFIRMATION MODAL & JSON BACKUP EXPORT / IMPORT
       ------------------------------------------------------------------------- */
       function openConfirmModal({ title, message, confirmLabel = 'Confirm', onConfirm }) {
         document.getElementById('confirmModalTitle').textContent = title;
@@ -2863,7 +3629,7 @@
       function exportVaultJson() {
         const payload = {
           app: 'MollyMetrics-BaseVault',
-          version: 3,
+          version: 4,
           exportedAt: new Date().toISOString(),
           bases: state.bases,
         };
@@ -2921,16 +3687,44 @@
       }
 
       /* -------------------------------------------------------------------------
-         17. MASTER RENDER & EVENT LISTENERS
+         19. MASTER RENDER & EVENT LISTENERS
       ------------------------------------------------------------------------- */
       function renderAll() {
+        renderInsightsStrip();
         renderFilterPills();
         renderGallery();
       }
 
       function initEventListeners() {
+        // Collapsible Defense Killers & Top Builders Strip
+        document.getElementById('btnToggleInsights').addEventListener('click', () => {
+          state.insightsCollapsed = !state.insightsCollapsed;
+          localStorage.setItem(STORAGE_KEYS.INSIGHTS_COLLAPSED, String(state.insightsCollapsed));
+          renderInsightsStrip();
+        });
+
+        // Equip Base Launch Modal Listeners
+        document.getElementById('equipRosterSearch').addEventListener('input', (e) => {
+          state.equipRosterFilter = e.target.value;
+          renderEquipRosterList();
+        });
+        document.getElementById('btnConfirmEquipLaunch').addEventListener('click', handleEquipAndLaunch);
+        document.getElementById('btnOpenWithoutTagging').addEventListener('click', () => {
+          const base = state.bases.find((b) => b.id === state.equipModalBaseId);
+          document.getElementById('equipBaseModal').classList.add('hidden');
+          if (base && base.baseLink) {
+            window.open(base.baseLink, '_blank', 'noopener,noreferrer');
+          }
+        });
+        document.getElementById('btnCopyLinkFallback').addEventListener('click', async () => {
+          const base = state.bases.find((b) => b.id === state.equipModalBaseId);
+          if (base && base.baseLink && (await copyTextToClipboard(base.baseLink))) {
+            showToast('Copied base layout URL to clipboard.', 'success');
+          }
+        });
+
         // Cloud Refresh & API Settings
-        document.getElementById('btnRefreshCloud').addEventListener('click', () => loadBasesFromBackend(true));
+        document.getElementById('btnRefreshCloud').addEventListener('click', () => loadVaultAndRosterFromBackend(true));
         document.getElementById('btnOpenApiModal').addEventListener('click', () => {
           document.getElementById('apiUrlInput').value = getWebAppUrl();
           document.getElementById('apiModal').classList.remove('hidden');
@@ -2940,7 +3734,7 @@
           if (!val) return;
           localStorage.setItem('molly_web_app_url', val);
           document.getElementById('apiModal').classList.add('hidden');
-          loadBasesFromBackend(true);
+          loadVaultAndRosterFromBackend(true);
         });
         document.getElementById('btnResetApiUrl').addEventListener('click', () => {
           localStorage.removeItem('molly_web_app_url');
@@ -3146,8 +3940,9 @@
         document.getElementById('lightboxImage').addEventListener('click', toggleLightboxZoom);
         document.getElementById('btnLightboxPrev').addEventListener('click', () => stepLightboxBase(-1));
         document.getElementById('btnLightboxNext').addEventListener('click', () => stepLightboxBase(1));
-        document.getElementById('btnLightboxCopyLink').addEventListener('click', () => {
-          if (state.lightboxBaseId) copyBaseLinkById(state.lightboxBaseId);
+        document.getElementById('btnLightboxEquipBase').addEventListener('click', () => {
+          if (!state.lightboxBaseId) return;
+          openEquipModal(state.lightboxBaseId);
         });
         document.getElementById('btnLightboxEditLikes').addEventListener('click', () => {
           if (!state.lightboxBaseId) return;
@@ -3230,7 +4025,7 @@
             if (btn.dataset.modal) document.getElementById(btn.dataset.modal).classList.add('hidden');
           });
         });
-        ['multiBaseModal', 'manualModal', 'editModal', 'confirmModal', 'apiModal'].forEach((modalId) => {
+        ['equipBaseModal', 'multiBaseModal', 'manualModal', 'editModal', 'confirmModal', 'apiModal'].forEach((modalId) => {
           const overlay = document.getElementById(modalId);
           overlay.addEventListener('click', (e) => {
             if (e.target === overlay) overlay.classList.add('hidden');
@@ -3243,10 +4038,13 @@
 
         window.addEventListener('keydown', (e) => {
           if (e.key === 'Escape') {
-            ['lightboxModal', 'multiBaseModal', 'manualModal', 'editModal', 'confirmModal', 'apiModal'].forEach((id) => {
+            ['equipBaseModal', 'lightboxModal', 'multiBaseModal', 'manualModal', 'editModal', 'confirmModal', 'apiModal'].forEach((id) => {
               document.getElementById(id).classList.add('hidden');
             });
-          } else if (!document.getElementById('lightboxModal').classList.contains('hidden')) {
+          } else if (
+            !document.getElementById('lightboxModal').classList.contains('hidden') &&
+            document.getElementById('equipBaseModal').classList.contains('hidden')
+          ) {
             if (e.key === 'ArrowLeft') stepLightboxBase(-1);
             if (e.key === 'ArrowRight') stepLightboxBase(1);
           }
@@ -3254,14 +4052,14 @@
       }
 
       /* -------------------------------------------------------------------------
-         18. BOOTSTRAP APPLICATION
+         20. BOOTSTRAP APPLICATION
       ------------------------------------------------------------------------- */
       window.addEventListener('DOMContentLoaded', () => {
         loadLocalPreferences();
         initEventListeners();
         renderAll();
         lucide.createIcons();
-        loadBasesFromBackend(false);
+        loadVaultAndRosterFromBackend(false);
       });
     })();
   </script>
