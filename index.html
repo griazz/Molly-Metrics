@@ -1340,9 +1340,10 @@ window.addEventListener("DOMContentLoaded", () => {
   applyTheme(savedTheme);
   initDrawerSwipe();
 
-  const initialHash = window.location.hash.replace("#", "");
-  if (initialHash === "activity" || initialHash === "meta") {
-    switchTab(initialHash, document.querySelector(`.nav-item[data-tab="${initialHash}"]`));
+  const tabParam = new URLSearchParams(window.location.search).get("tab");
+  const initialTab = tabParam || window.location.hash.replace("#", "");
+  if (initialTab === "activity" || initialTab === "meta") {
+    switchTab(initialTab, document.querySelector(`.nav-item[data-tab="${initialTab}"]`));
   }
 
   loadDashboard();
