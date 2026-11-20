@@ -5,7 +5,7 @@
   <base target="_top" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" id="metaThemeColor" />
-  <title>Molly Metrics V9 — TH19 Clan Command</title>
+  <title>Molly Metrics V10 — TH19 Clan Command</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -167,6 +167,9 @@
       gap: 10px;
       margin-bottom: 16px;
     }
+    .kpi-grid.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
     .kpi-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -289,7 +292,6 @@
       position: relative;
     }
     .player-card:active { transform: scale(0.98); }
-    .player-card.ds-active { border-color: var(--green); }
 
     .card-top {
       display: flex;
@@ -401,16 +403,6 @@
       cursor: pointer;
     }
     .action-btn:active { transform: scale(0.97); }
-
-    .list-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .list-row:last-child { border-bottom: none; }
 
     /* ============================================================
        ACTIVITY & LOOT LEADERBOARD
@@ -772,15 +764,6 @@
       padding: 10px;
     }
 
-    .sync-btn-group {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
-    @media (max-width: 480px) {
-      .sync-btn-group { grid-template-columns: 1fr; }
-    }
     .btn-sync-primary {
       height: 46px;
       border-radius: 12px;
@@ -795,23 +778,9 @@
       justify-content: center;
       gap: 6px;
     }
-    .btn-sync-secondary {
-      height: 46px;
-      border-radius: 12px;
-      border: 1px solid var(--border-strong);
-      background: var(--bg-subtle);
-      color: var(--text);
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
 
     /* ============================================================
-       MODAL (MANUAL JSON PASTE & API SETTINGS)
+       MODAL (API SETTINGS)
     ============================================================ */
     .modal-overlay {
       position: fixed;
@@ -833,22 +802,9 @@
       padding: 18px;
       box-shadow: var(--shadow);
     }
-    .modal-textarea {
-      width: 100%;
-      height: 150px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-      color: var(--text);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
-      padding: 10px;
-      margin: 10px 0;
-      resize: vertical;
-    }
 
     /* ============================================================
-       BOTTOM NAVIGATION BAR (4 COLUMNS)
+       BOTTOM NAVIGATION BAR (3 COLUMNS)
     ============================================================ */
     .bottom-nav {
       position: fixed;
@@ -865,7 +821,7 @@
       max-width: 780px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       height: 64px;
     }
     .nav-item {
@@ -961,7 +917,7 @@
        TAB 1: ROSTER
   ============================================================ -->
   <section id="tab-roster" class="tab-pane active">
-    <div class="kpi-grid">
+    <div class="kpi-grid cols-2">
       <div class="kpi-card">
         <div class="kpi-label">Clan Avg</div>
         <div class="kpi-val" id="kpiAvg">–%</div>
@@ -971,11 +927,6 @@
         <div class="kpi-label">Active Roster</div>
         <div class="kpi-val" id="kpiMembers">–</div>
         <div class="kpi-sub">Clan members</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Deep Synced</div>
-        <div class="kpi-val" id="kpiDeep" style="color:var(--accent);">0</div>
-        <div class="kpi-sub">Village JSON linked</div>
       </div>
     </div>
 
@@ -987,10 +938,6 @@
           <option value="war">Sort: War Score</option>
           <option value="heroes">Sort: Heroes %</option>
         </select>
-      </div>
-      <div class="chip-row" id="filterChips">
-        <button class="chip active" data-filter="all" onclick="setFilter('all', this)">All Members</button>
-        <button class="chip" data-filter="deep" onclick="setFilter('deep', this)">◈ Deep Synced</button>
       </div>
     </div>
 
@@ -1053,24 +1000,10 @@
       </div>
     </div>
   </section>
-
-  <!-- ============================================================
-       TAB 3: DEEP SYNC HUB (TH19 VILLAGE JSON)
-  ============================================================ -->
-  <section id="tab-deepsync" class="tab-pane">
-    <div class="panel">
-      <div class="panel-title" style="margin-bottom:6px;">TH19 Village Deep Matrix</div>
-      <div style="font-size:13px;color:var(--text-sec);line-height:1.55;">
-        The official Supercell API tracks Heroes, Equipment, Pets, Troops, Spells, and Sieges—but hides <b>building levels and active builder timers</b>.
-        In Clash of Clans, go to <b>Settings → More Settings → Data Export → Copy</b>, then tap any player below to sync their live Builder Gantt Chart and SPT/LPT Upgrade Queue.
-      </div>
-    </div>
-    <div id="deepSyncDirectory"></div>
-  </section>
 </div>
 
 <!-- ============================================================
-     BOTTOM NAVIGATION (4 COLUMNS)
+     BOTTOM NAVIGATION (3 COLUMNS)
 ============================================================ -->
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
@@ -1079,9 +1012,6 @@
     </button>
     <button class="nav-item" data-tab="activity" onclick="switchTab('activity', this)">
       <span class="nav-ico">⚔️</span>Activity
-    </button>
-    <button class="nav-item" data-tab="deepsync" onclick="switchTab('deepsync', this)">
-      <span class="nav-ico">🔧</span>Deep Sync
     </button>
     <button class="nav-item" onclick="window.location.href='bases.html'">
       <span class="nav-ico">🏰</span>Bases
@@ -1108,26 +1038,6 @@
   </div>
   <div class="drawer-scroll" id="drawerBody"></div>
 </aside>
-
-<!-- ============================================================
-     MANUAL PASTE JSON MODAL (FALLBACK FOR MOBILE CLIPBOARD BLOCKS)
-============================================================ -->
-<div id="pasteModal" class="modal-overlay" onclick="if(event.target===this)closePasteModal()">
-  <div class="modal-box">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <strong style="font-size:16px;">Paste Village Export JSON</strong>
-      <button class="drawer-close-btn" style="min-width:78px;height:36px;" onclick="closePasteModal()">✕ Close</button>
-    </div>
-    <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
-      Paste the JSON copied from Clash of Clans (Settings → More Settings → Data Export) for <b id="pasteTargetTag"></b>:
-    </div>
-    <textarea id="pasteJsonInput" class="modal-textarea" placeholder='{"tag":"#...","buildings":[...]}'></textarea>
-    <div style="display:flex;gap:8px;justify-content:flex-end;">
-      <button class="action-btn" onclick="loadSampleTh19Json()">Load TH19 Sample</button>
-      <button class="btn-sync-primary" style="padding:0 18px;" onclick="submitPastedJson()">Sync Village</button>
-    </div>
-  </div>
-</div>
 
 <!-- ============================================================
      APPS SCRIPT ENDPOINT SETTINGS MODAL
@@ -1163,155 +1073,12 @@ function getWebAppUrl() {
 }
 
 /* ============================================================
-   TH19 ID DICTIONARY & MAX LEVELS (NOV 2026 UPDATE)
-============================================================ */
-const COC_ID_MAP = {
-  1000097: "Crafted Defense",
-  1000098: "Spiky Tower",
-  1000099: "Firecracker Tower",
-  1000100: "Guardian Shrine",
-  1000101: "Squad Barracks",
-  1000008: "Cannon",
-  1000009: "Archer Tower",
-  1000013: "Mortar",
-  1000012: "Air Defense",
-  1000011: "Wizard Tower",
-  1000028: "Air Sweeper",
-  1000019: "Hidden Tesla",
-  1000032: "Bomb Tower",
-  1000021: "X-Bow",
-  1000027: "Inferno Tower",
-  1000031: "Eagle Artillery",
-  1000067: "Scattershot",
-  1000015: "Builder's Hut",
-  1000072: "Spell Tower",
-  1000077: "Monolith",
-  1000089: "Firespitter",
-  1000010: "Wall",
-  1000084: "Multi-Archer Tower",
-  1000085: "Ricochet Cannon",
-  1000079: "Multi-Gear Tower",
-  12000000: "Bomb",
-  12000001: "Spring Trap",
-  12000002: "Giant Bomb",
-  12000005: "Air Bomb",
-  12000006: "Seeking Air Mine",
-  12000008: "Skeleton Trap",
-  12000016: "Tornado Trap",
-  12000020: "Giga Bomb",
-  1000004: "Gold Mine",
-  1000002: "Elixir Collector",
-  1000005: "Gold Storage",
-  1000003: "Elixir Storage",
-  1000023: "Dark Elixir Drill",
-  1000024: "Dark Elixir Storage",
-  1000014: "Clan Castle",
-  1000000: "Army Camp",
-  1000006: "Barracks",
-  1000026: "Dark Barracks",
-  1000007: "Laboratory",
-  1000020: "Spell Factory",
-  1000071: "Hero Hall",
-  1000029: "Dark Spell Factory",
-  1000070: "Blacksmith",
-  1000059: "Workshop",
-  1000068: "Pet House",
-  1000001: "Town Hall",
-  28000000: "Barbarian King",
-  28000001: "Archer Queen",
-  28000006: "Minion Prince",
-  28000002: "Grand Warden",
-  28000004: "Royal Champion",
-  28000007: "Dragon Duke",
-  4000051: "Wall Wrecker",
-  4000052: "Battle Blimp",
-  4000062: "Stone Slammer",
-  4000075: "Siege Barracks",
-  4000087: "Log Launcher",
-  4000091: "Flame Flinger",
-  4000092: "Battle Drill",
-  4000135: "Troop Launcher",
-  73000000: "L.A.S.S.I",
-  73000001: "Electro Owl",
-  73000002: "Mighty Yak",
-  73000003: "Unicorn",
-  73000004: "Phoenix",
-  73000007: "Poison Lizard",
-  73000008: "Diggy",
-  73000009: "Frosty",
-  73000010: "Spirit Fox",
-  73000011: "Angry Jelly",
-  73000016: "Sneezy",
-  73000017: "Greedy Raven",
-  4000000: "Barbarian", 4000001: "Archer", 4000002: "Goblin", 4000003: "Giant",
-  4000004: "Wall Breaker", 4000005: "Balloon", 4000006: "Wizard", 4000007: "Healer",
-  4000008: "Dragon", 4000009: "P.E.K.K.A", 4000010: "Minion", 4000011: "Hog Rider",
-  4000012: "Valkyrie", 4000013: "Golem", 4000015: "Witch", 4000017: "Lava Hound",
-  4000022: "Bowler", 4000023: "Baby Dragon", 4000024: "Miner", 4000053: "Yeti",
-  4000058: "Ice Golem", 4000059: "Electro Dragon", 4000065: "Dragon Rider",
-  4000082: "Headhunter", 4000095: "Electro Titan", 4000097: "Apprentice Warden",
-  4000110: "Root Rider", 4000123: "Druid", 4000132: "Thrower", 4000150: "Furnace",
-  26000000: "Lightning Spell", 26000001: "Healing Spell", 26000002: "Rage Spell",
-  26000003: "Jump Spell", 26000005: "Freeze Spell", 26000009: "Poison Spell",
-  26000010: "Earthquake Spell", 26000011: "Haste Spell", 26000016: "Clone Spell",
-  26000017: "Skeleton Spell", 26000028: "Bat Spell", 26000035: "Invisibility Spell",
-  26000053: "Recall Spell", 26000070: "Overgrowth Spell", 26000098: "Revive Spell",
-  26000109: "Ice Block Spell", 26000115: "Heroic Spell"
-};
-
-const COC_MAX_LEVELS = {
-  1000001: 19,
-  1000014: 15,
-  1000007: 17,
-  1000071: 13,
-  1000098: 2,
-  1000099: 2,
-  1000101: 12,
-  1000008: 23,
-  1000009: 23,
-  1000013: 17,
-  1000012: 17,
-  1000011: 18,
-  1000028: 7,
-  1000019: 18,
-  1000032: 14,
-  1000021: 14,
-  1000027: 12,
-  1000031: 7,
-  1000067: 7,
-  1000077: 5,
-  1000084: 5,
-  1000085: 5,
-  1000089: 4,
-  1000079: 4,
-  1000015: 7,
-  1000072: 3,
-  1000070: 10,
-  1000068: 12,
-  1000005: 18,
-  1000003: 18,
-  1000024: 13,
-  1000004: 17,
-  1000002: 17,
-  1000023: 11
-};
-
-function getEstimatedHours(name, level) {
-  if (name === "Spiky Tower" || name === "Firecracker Tower") return level === 1 ? 240 : 312;
-  if (name === "Town Hall") return 312;
-  if (name === "Clan Castle" || name === "Laboratory" || name === "Hero Hall") return 288;
-  return Math.min(336, Math.round(12 + Math.pow(level, 1.55) * 2.2));
-}
-
-/* ============================================================
    APPLICATION STATE
 ============================================================ */
 let state = {
   clanMeta: {},
   players: [],
   lastSyncTs: 0,
-  filter: "all",
-  queueMode: "spt",
   activeDrawerTag: null,
   activityTimeframe: "24h",
   activitySort: "combinedLoot"
@@ -1330,7 +1097,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initDrawerSwipe();
 
   const initialHash = window.location.hash.replace("#", "");
-  if (initialHash === "activity" || initialHash === "deepsync") {
+  if (initialHash === "activity") {
     switchTab(initialHash, document.querySelector(`.nav-item[data-tab="${initialHash}"]`));
   }
 
@@ -1340,7 +1107,6 @@ window.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeDrawer();
-    closePasteModal();
     closeApiModal();
   }
 });
@@ -1383,7 +1149,6 @@ async function loadDashboard() {
     renderKpis();
     applyFilters();
     renderActivityTab();
-    renderDeepSyncDirectory();
 
     if (state.activeDrawerTag) {
       const updated = state.players.find(p => p.tag === state.activeDrawerTag);
@@ -1446,23 +1211,14 @@ function renderKpis() {
   const list = state.players;
   const count = list.length;
   const avgPct = count ? list.reduce((s, p) => s + (parseFloat(p.percentage) || 0), 0) / count : 0;
-  const deepCount = list.filter(p => p.hasDeepSync).length;
 
   document.getElementById("kpiAvg").textContent = `${avgPct.toFixed(1)}%`;
   document.getElementById("kpiMembers").textContent = `${count}/50`;
-  document.getElementById("kpiDeep").textContent = `${deepCount}/${count}`;
 }
 
 /* ============================================================
    ROSTER FILTERING, SORTING & CARDS
 ============================================================ */
-function setFilter(filterKey, btnEl) {
-  state.filter = filterKey;
-  document.querySelectorAll("#filterChips .chip").forEach(c => c.classList.remove("active"));
-  if (btnEl) btnEl.classList.add("active");
-  applyFilters();
-}
-
 function parsePct(ratioStr) {
   if (!ratioStr || !ratioStr.includes("/")) return 0;
   const [c, m] = ratioStr.split("/").map(Number);
@@ -1474,10 +1230,7 @@ function applyFilters() {
   const sortBy = document.getElementById("sortSelect").value;
 
   let filtered = state.players.filter(p => {
-    const matchText = !q || p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q);
-    if (!matchText) return false;
-    if (state.filter === "deep")   return Boolean(p.hasDeepSync);
-    return true;
+    return !q || p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q);
   });
 
   filtered.sort((a, b) => {
@@ -1514,7 +1267,7 @@ function renderRosterGrid(players) {
     const roleLabel = p.role === "coLeader" ? "Co-Leader" : p.role === "admin" ? "Elder" : p.role;
 
     return `
-      <article class="player-card ${p.hasDeepSync ? "ds-active" : ""}" onclick="openDrawer('${escHtml(p.tag)}')">
+      <article class="player-card" onclick="openDrawer('${escHtml(p.tag)}')">
         <div class="card-top">
           <div>
             <div class="player-name">${escHtml(p.name)}</div>
@@ -1524,7 +1277,6 @@ function renderRosterGrid(players) {
 
         <div class="badge-row">
           <span class="mini-badge">TH${p.thLevel}</span>
-          ${p.hasDeepSync ? `<span class="mini-badge ds">◈ SYNCED</span>` : ""}
         </div>
 
         <div class="prog-block">
@@ -1654,33 +1406,6 @@ function renderActivityTab() {
           <div class="loot-line" style="margin-top:2px;">
             <span class="loot-dark">${formatCompactNum(st.lootDark)} DE</span>
           </div>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-/* ============================================================
-   DEEP SYNC DIRECTORY TAB
-============================================================ */
-function renderDeepSyncDirectory() {
-  const dirEl = document.getElementById("deepSyncDirectory");
-  const sorted = [...state.players].sort((a, b) => (b.hasDeepSync ? 1 : 0) - (a.hasDeepSync ? 1 : 0));
-
-  dirEl.innerHTML = sorted.map(p => {
-    const ds = p.deepSync;
-    return `
-      <div class="panel" style="padding:13px 15px;cursor:pointer;margin-bottom:10px;" onclick="openDrawer('${escHtml(p.tag)}')">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
-          <div>
-            <strong style="font-size:15px;">${escHtml(p.name)}</strong>
-            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
-              ${ds
-                ? `${ds.maxedBuildings}/${ds.totalBuildings} buildings maxed · ${ds.activeUpgrades.length} active builders · ${formatRelTime(ds.timestamp)}`
-                : "Tap to sync Village Export JSON"}
-            </div>
-          </div>
-          <span class="mini-badge ${ds ? "in" : "out"}">${ds ? `◈ ${ds.maxPct}% MAX` : "NOT SYNCED"}</span>
         </div>
       </div>
     `;
@@ -1990,60 +1715,6 @@ function renderDrawerContent(p) {
     `;
   }).join("");
 
-  let deepHtml = "";
-  if (p.hasDeepSync && p.deepSync) {
-    const ds = p.deepSync;
-    const ganttRows = (ds.activeUpgrades || []).length
-      ? ds.activeUpgrades.map(u => `
-          <div class="list-row">
-            <div>
-              <strong style="font-size:13px;">${escHtml(u.name)}</strong>
-              <div class="mono" style="font-size:11px;color:var(--text-muted);">Level ${u.level} → ${u.level + 1}</div>
-            </div>
-            <span class="mini-badge in">${formatHours(u.remainingHours)}</span>
-          </div>
-        `).join("")
-      : `<div style="font-size:12px;color:var(--text-muted);padding:6px 0;">All builders free!</div>`;
-
-    const queueItems = (ds.unmaxedBuildings || [])
-      .filter(b => b.name !== "Wall")
-      .map(b => ({ ...b, estHours: getEstimatedHours(b.name, b.level + 1) }))
-      .sort((a, b) => state.queueMode === "spt" ? a.estHours - b.estHours : b.estHours - a.estHours)
-      .slice(0, 8);
-
-    const queueRows = queueItems.length
-      ? queueItems.map((b, idx) => `
-          <div class="list-row">
-            <div>
-              <strong style="font-size:13px;">${idx + 1}. ${escHtml(b.name)}</strong>
-              <div class="mono" style="font-size:11px;color:var(--text-muted);">
-                Lvl ${b.level} → ${b.level + 1} (${b.levelsRemaining} to TH19 max)
-              </div>
-            </div>
-            <span class="mini-badge ds">${formatHours(b.estHours)}</span>
-          </div>
-        `).join("")
-      : `<div style="font-size:12px;color:var(--green);padding:6px 0;">Village buildings maxed!</div>`;
-
-    deepHtml = `
-      <div class="sec-label">TH19 Village Deep Matrix (${ds.maxPct}% Buildings Maxed)</div>
-      <div class="cat-box" style="margin-bottom:10px;">
-        <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Active Builders & Lab (${ds.activeUpgrades.length} running)</div>
-        ${ganttRows}
-      </div>
-      <div class="cat-box">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <strong style="font-size:12px;">Priority Upgrade Queue</strong>
-          <div style="display:flex;gap:5px;">
-            <button class="chip ${state.queueMode === "spt" ? "active" : ""}" onclick="switchQueueMode('spt')">⚡ Quick (SPT)</button>
-            <button class="chip ${state.queueMode === "lpt" ? "active" : ""}" onclick="switchQueueMode('lpt')">🔱 Heavy (LPT)</button>
-          </div>
-        </div>
-        ${queueRows}
-      </div>
-    `;
-  }
-
   const clockProfile   = computeHourlyAttackProfile(p);
   const clockHtml      = renderAttackClockSection(clockProfile);
   const rankedMetaHtml = renderRankedMetaSection(p);
@@ -2075,29 +1746,10 @@ function renderDrawerContent(p) {
 
     ${rankedMetaHtml}
 
-    ${deepHtml}
-
     ${battleLogHtml}
-
-    <div class="sec-label">Sync Village Export JSON</div>
-    <div style="font-size:12px;color:var(--text-muted);">
-      Copy your Village JSON from Clash of Clans (Settings → More Settings → Data Export) for <b>${escHtml(p.tag)}</b>:
-    </div>
-    <div class="sync-btn-group">
-      <button class="btn-sync-primary" onclick="clipboardSync('${escHtml(p.tag)}')">📋 1-Click Clipboard Sync</button>
-      <button class="btn-sync-secondary" onclick="openPasteModal('${escHtml(p.tag)}')">✍️ Paste JSON Manually</button>
-    </div>
   `;
 
   renderDrawerCharts(p, cats, clockProfile);
-}
-
-function switchQueueMode(mode) {
-  state.queueMode = mode;
-  if (state.activeDrawerTag) {
-    const p = state.players.find(x => x.tag === state.activeDrawerTag);
-    if (p) renderDrawerContent(p);
-  }
 }
 
 function renderDrawerCharts(p, cats, clockProfile) {
@@ -2234,168 +1886,6 @@ function renderDrawerCharts(p, cats, clockProfile) {
 }
 
 /* ============================================================
-   DEEP SYNC PARSER (CLIPBOARD + MANUAL PASTE)
-============================================================ */
-async function clipboardSync(playerTag) {
-  try {
-    const rawText = await navigator.clipboard.readText();
-    await processAndUploadVillageJson(playerTag, rawText);
-  } catch (err) {
-    showToast("Clipboard blocked by browser — opening manual paste box.");
-    openPasteModal(playerTag);
-  }
-}
-
-let pasteModalTag = "";
-function openPasteModal(tag) {
-  pasteModalTag = tag;
-  document.getElementById("pasteTargetTag").textContent = tag;
-  document.getElementById("pasteJsonInput").value = "";
-  document.getElementById("pasteModal").classList.add("open");
-}
-function closePasteModal() {
-  document.getElementById("pasteModal").classList.remove("open");
-}
-function loadSampleTh19Json() {
-  const sample = {
-    tag: pasteModalTag,
-    buildings: [
-      { data: 1000001, lvl: 19 },
-      { data: 1000098, lvl: 1, timer: 172800 },
-      { data: 1000099, lvl: 1, timer: 259200 },
-      { data: 1000014, lvl: 14 },
-      { data: 1000007, lvl: 16 },
-      { data: 1000021, lvl: 13 }
-    ],
-    heroes: [
-      { data: 28000000, lvl: 112, timer: 129600 },
-      { data: 28000007, lvl: 28 }
-    ]
-  };
-  document.getElementById("pasteJsonInput").value = JSON.stringify(sample, null, 2);
-}
-async function submitPastedJson() {
-  const raw = document.getElementById("pasteJsonInput").value.trim();
-  if (!raw) {
-    showToast("Paste your Village JSON first.");
-    return;
-  }
-  const ok = await processAndUploadVillageJson(pasteModalTag, raw);
-  if (ok) closePasteModal();
-}
-
-async function processAndUploadVillageJson(playerTag, rawText) {
-  let village;
-  try {
-    village = JSON.parse(rawText);
-  } catch (e) {
-    showToast("Invalid JSON format.");
-    return false;
-  }
-
-  const normalize = (t) => {
-    let s = String(t || "").trim().toUpperCase();
-    return s && !s.startsWith("#") ? "#" + s : s;
-  };
-
-  const jsonTag = normalize(village.tag || village.Tag);
-  if (jsonTag && jsonTag !== normalize(playerTag)) {
-    showToast(`Tag mismatch: JSON belongs to ${jsonTag}, expected ${playerTag}`);
-    return false;
-  }
-
-  const parsed = parseVillageJson(normalize(playerTag), village);
-
-  try {
-    await fetch(getWebAppUrl(), {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(parsed)
-    });
-  } catch (e) {
-    showToast("Network error sending Deep Sync to Apps Script.");
-    return false;
-  }
-
-  const idx = state.players.findIndex(p => normalize(p.tag) === normalize(playerTag));
-  if (idx > -1) {
-    state.players[idx].hasDeepSync = true;
-    state.players[idx].deepSync = parsed;
-    applyFilters();
-    renderDeepSyncDirectory();
-    renderKpis();
-    if (state.activeDrawerTag === state.players[idx].tag) {
-      renderDrawerContent(state.players[idx]);
-    }
-  }
-  showToast(`Deep Matrix synced (${parsed.activeUpgrades.length} active builders)!`);
-  return true;
-}
-
-function parseVillageJson(playerTag, village) {
-  const allEntities = [
-    ...(village.buildings || village.village_buildings || []),
-    ...(village.heroes || []),
-    ...(village.pets || []),
-    ...(village.troops || []),
-    ...(village.spells || [])
-  ];
-
-  const nowSec = Math.floor(Date.now() / 1000);
-  let activeUpgrades = [];
-  let unmaxedBuildings = [];
-  let totalBuildings = 0;
-  let maxedBuildings = 0;
-
-  allEntities.forEach(item => {
-    const dataId = item.data || item.data_id || item.dataId;
-    const level  = item.l || item.lvl || item.level || item.Level || 0;
-    let endTime  = item.upgrade_end_time || item.upgradeEndTime || null;
-    if (!endTime && item.timer) {
-      endTime = nowSec + Number(item.timer);
-    }
-
-    const name = COC_ID_MAP[dataId];
-    if (!name || name === "Wall") return;
-    if (dataId >= 12000000 && dataId < 13000000) return;
-
-    const isUpgrading = Boolean(endTime && endTime > nowSec);
-    if (isUpgrading) {
-      const remainingHours = Math.max(1, Math.round((endTime - nowSec) / 3600));
-      activeUpgrades.push({ name, level, endTime, remainingHours });
-    }
-
-    const maxLvl = COC_MAX_LEVELS[dataId];
-    if (maxLvl !== undefined) {
-      totalBuildings++;
-      if (level >= maxLvl) {
-        maxedBuildings++;
-      } else {
-        unmaxedBuildings.push({
-          name,
-          level,
-          maxLevel: maxLvl,
-          levelsRemaining: maxLvl - level,
-          isUpgrading
-        });
-      }
-    }
-  });
-
-  const maxPct = totalBuildings > 0 ? parseFloat(((maxedBuildings / totalBuildings) * 100).toFixed(1)) : 0;
-  return {
-    tag: playerTag,
-    timestamp: Date.now(),
-    totalBuildings,
-    maxedBuildings,
-    maxPct,
-    activeUpgrades,
-    unmaxedBuildings
-  };
-}
-
-/* ============================================================
    API SETTINGS MODAL & TABS
 ============================================================ */
 function openApiModal() {
@@ -2454,13 +1944,6 @@ function formatBattleType(type) {
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase();
 }
 
-function formatHours(hours) {
-  if (hours < 24) return `${Math.round(hours)}h`;
-  const d = Math.floor(hours / 24);
-  const h = Math.round(hours % 24);
-  return h > 0 ? `${d}d ${h}h` : `${d}d`;
-}
-
 function formatRelTime(ts) {
   if (!ts) return "never";
   const mins = Math.floor((Date.now() - Number(ts)) / 60000);
@@ -2482,4 +1965,3 @@ function showToast(msg) {
 </script>
 </body>
 </html>
-```[cite: 3]
