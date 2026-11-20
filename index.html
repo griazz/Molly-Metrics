@@ -1,1714 +1,1974 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" data-theme="dark">
 <head>
-<base target="_top">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
-<meta name="theme-color" content="#040508">
-<title>Molly Metrics V8</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<style>
-/* ─────────────────────────────────────────────
-   CSS VARIABLES
-───────────────────────────────────────────── */
-:root {
-  --bg:          #040508;
-  --bg-card:     rgba(8,10,20,0.95);
-  --cyan:        #00f0ff;
-  --cyan-glow:   rgba(0,240,255,0.2);
-  --purple:      #b400ff;
-  --purple-glow: rgba(180,0,255,0.15);
-  --green:       #00ff9d;
-  --green-glow:  rgba(0,255,157,0.2);
-  --red:         #ff2d55;
-  --gold:        #ffd60a;
-  --muted:       #3d4a5c;
-  --muted-light: #64748b;
-  --border:      rgba(0,240,255,0.15);
-  --border-soft: rgba(255,255,255,0.05);
-  --font-d: 'Orbitron', sans-serif;
-  --font-b: 'Rajdhani', sans-serif;
-  --font-m: 'Share Tech Mono', monospace;
-  --grade-s: #ffd60a;
-  --grade-a: #00f0ff;
-  --grade-b: #00ff9d;
-  --grade-c: #ff9f0a;
-  --grade-d: #ff2d55;
-  /* Deep Matrix palette */
-  --ds-green:      #00ff9d;
-  --ds-green-glow: rgba(0,255,157,0.25);
-  --ds-amber:      #ff9f0a;
-  --ds-amber-glow: rgba(255,159,10,0.2);
-  --ds-border:     rgba(0,255,157,0.28);
-}
+  <meta charset="UTF-8" />
+  <base target="_top" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" id="metaThemeColor" />
+  <title>Molly Metrics V9 — TH19 Clan Command</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       DESIGN TOKENS — HIGH-CONTRAST TACTICAL SLATE & DAYLIGHT MODE
+    ============================================================ */
+    :root, [data-theme="dark"] {
+      --bg:           #0f172a;
+      --bg-elevated:  #1e293b;
+      --bg-card:      #1e293b;
+      --bg-subtle:    #263449;
+      --bg-input:     #0f172a;
+      --text:         #f8fafc;
+      --text-sec:     #cbd5e1;
+      --text-muted:   #94a3b8;
+      --border:       #334155;
+      --border-strong:#475569;
+      --accent:       #38bdf8;
+      --accent-bg:    rgba(56, 189, 248, 0.14);
+      --green:        #10b981;
+      --green-bg:     rgba(16, 185, 129, 0.14);
+      --amber:        #f59e0b;
+      --amber-bg:     rgba(245, 158, 11, 0.15);
+      --red:          #f43f5e;
+      --red-bg:       rgba(244, 63, 94, 0.15);
+      --purple:       #a855f7;
+      --purple-bg:    rgba(168, 85, 247, 0.15);
+      --shadow:       0 8px 24px rgba(2, 6, 23, 0.45);
+      --nav-bg:       rgba(15, 23, 42, 0.96);
+    }
 
-/* ─────────────────────────────────────────────
-   RESET & BASE
-───────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
-html, body {
-  height: 100%; width: 100%; margin: 0; padding: 0;
-  overflow: hidden; position: fixed; inset: 0;
-  background: var(--bg); font-family: var(--font-b);
-  color: #fff; -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: transparent;
-}
-h1,h2,h3,h4,p { margin: 0; }
-::-webkit-scrollbar { width: 2px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,240,255,0.2); border-radius: 2px; }
+    [data-theme="light"] {
+      --bg:           #f1f5f9;
+      --bg-elevated:  #ffffff;
+      --bg-card:      #ffffff;
+      --bg-subtle:    #e2e8f0;
+      --bg-input:     #f8fafc;
+      --text:         #0f172a;
+      --text-sec:     #334155;
+      --text-muted:   #64748b;
+      --border:       #cbd5e1;
+      --border-strong:#94a3b8;
+      --accent:       #0284c7;
+      --accent-bg:    rgba(2, 132, 199, 0.12);
+      --green:        #059669;
+      --green-bg:     rgba(5, 150, 105, 0.12);
+      --amber:        #d97706;
+      --amber-bg:     rgba(217, 119, 6, 0.12);
+      --red:          #e11d48;
+      --red-bg:       rgba(225, 29, 72, 0.12);
+      --purple:       #7e22ce;
+      --purple-bg:    rgba(126, 34, 206, 0.12);
+      --shadow:       0 4px 16px rgba(15, 23, 42, 0.08);
+      --nav-bg:       rgba(255, 255, 255, 0.96);
+    }
 
-/* ─────────────────────────────────────────────
-   BACKGROUND SYSTEM
-───────────────────────────────────────────── */
-#bg-scene { position: fixed; inset: 0; z-index: -10; overflow: hidden; }
-#bg-img {
-  position: absolute; inset: 0;
-  background-image: url('https://i.imgur.com/lK3ctDR.jpeg');
-  background-size: cover; background-position: center;
-  filter: grayscale(100%) sepia(25%) hue-rotate(175deg) brightness(0.07) contrast(2);
-}
-#bg-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(0,240,255,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,240,255,0.035) 1px, transparent 1px);
-  background-size: 52px 52px;
-}
-#bg-lines {
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(
-    0deg, transparent, transparent 3px,
-    rgba(0,0,0,0.28) 3px, rgba(0,0,0,0.28) 4px
-  );
-  pointer-events: none;
-}
-.bg-orb {
-  position: absolute; border-radius: 50%;
-  filter: blur(90px); pointer-events: none;
-  animation: orbPulse 14s ease-in-out infinite;
-}
-.bg-orb-c { width: 500px; height: 500px; top: -200px; right: -150px; background: var(--cyan); opacity: 0.07; }
-.bg-orb-p { width: 380px; height: 380px; bottom: 40px; left: -120px; background: var(--purple); opacity: 0.07; animation-delay: -7s; }
-@keyframes orbPulse {
-  0%,100% { transform: scale(1) translate(0,0); }
-  50% { transform: scale(1.12) translate(18px,28px); }
-}
-#bg-corner-tl, #bg-corner-br {
-  position: absolute; width: 80px; height: 80px; pointer-events: none;
-}
-#bg-corner-tl {
-  top: 20px; left: 20px;
-  border-top: 1px solid rgba(0,240,255,0.25);
-  border-left: 1px solid rgba(0,240,255,0.25);
-}
-#bg-corner-br {
-  bottom: 96px; right: 20px;
-  border-bottom: 1px solid rgba(0,240,255,0.12);
-  border-right: 1px solid rgba(0,240,255,0.12);
-}
+    /* ============================================================
+       RESET & BASE LAYOUT
+    ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100dvh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
 
-/* ─────────────────────────────────────────────
-   LAYOUT
-───────────────────────────────────────────── */
-.main-scroll {
-  position: absolute; inset: 0; overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
-}
-.container {
-  padding: calc(24px + env(safe-area-inset-top, 0px)) 16px 16px;
-  max-width: 600px; margin: auto;
-}
+    .mono { font-family: 'JetBrains Mono', monospace; }
 
-/* ─────────────────────────────────────────────
-   HEADER
-───────────────────────────────────────────── */
-.header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 22px; padding-bottom: 14px;
-  border-bottom: 1px solid var(--border-soft);
-}
-.header-wordmark {
-  font-family: var(--font-d); font-size: 13px; font-weight: 700;
-  color: var(--cyan); letter-spacing: 4px;
-  text-shadow: 0 0 24px rgba(0,240,255,0.55);
-}
-.header-wordmark em { color: rgba(0,240,255,0.35); font-style: normal; }
-.header-build {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  letter-spacing: 2px; margin-top: 3px;
-}
-.header-live {
-  display: flex; align-items: center; gap: 6px;
-  font-family: var(--font-m); font-size: 8px; color: var(--muted-light);
-  letter-spacing: 1px;
-}
-.live-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
-  box-shadow: 0 0 6px var(--green); animation: blink 2s ease-in-out infinite;
-}
-@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .app-shell {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: calc(14px + env(safe-area-inset-top, 0px)) 16px calc(92px + env(safe-area-inset-bottom, 0px));
+    }
 
-/* ─────────────────────────────────────────────
-   GLOBAL STAT CARD
-───────────────────────────────────────────── */
-.global-card {
-  border: 1px solid rgba(0,240,255,0.18);
-  border-radius: 20px; padding: 24px 22px 20px;
-  margin-bottom: 20px; position: relative; overflow: hidden;
-  background: linear-gradient(140deg, rgba(0,240,255,0.04) 0%, rgba(180,0,255,0.03) 100%);
-  box-shadow: 0 0 48px rgba(0,240,255,0.04), inset 0 1px 0 rgba(0,240,255,0.08);
-}
-.global-card::before {
-  content: ''; position: absolute; top: 0; left: -120%;
-  width: 60%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0,240,255,0.025), transparent);
-  animation: sweep 5s ease-in-out infinite;
-}
-@keyframes sweep { 0% { left: -120%; } 100% { left: 200%; } }
-.global-tag {
-  font-family: var(--font-d); font-size: 7px; letter-spacing: 4px;
-  color: var(--muted); text-transform: uppercase; margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
-.global-tag::before {
-  content: ''; width: 5px; height: 5px; border-radius: 50%;
-  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
-}
-.global-num {
-  font-family: var(--font-d); font-size: 52px; font-weight: 900;
-  color: var(--cyan); line-height: 1; letter-spacing: -2px;
-  text-shadow: 0 0 40px rgba(0,240,255,0.5);
-}
-.global-num .unit { font-size: 22px; font-weight: 400; opacity: 0.5; }
-.global-meta {
-  display: flex; gap: 28px; margin-top: 16px; padding-top: 14px;
-  border-top: 1px solid var(--border-soft);
-}
-.meta-item { display: flex; flex-direction: column; gap: 4px; }
-.meta-label { font-family: var(--font-m); font-size: 7px; color: var(--muted); letter-spacing: 2px; }
-.meta-val { font-family: var(--font-m); font-size: 14px; font-weight: 700; }
-.meta-val.c { color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow); }
-.meta-val.g { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
-.meta-val.r { color: var(--red); }
+    /* ============================================================
+       TOP HEADER BAR
+    ============================================================ */
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .th19-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: var(--accent-bg);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      min-width: 40px;
+      height: 40px;
+      padding: 0 11px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: transform 0.12s, border-color 0.2s, background-color 0.2s;
+    }
+    .icon-btn:active { transform: scale(0.96); }
+    .icon-btn.primary {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+    .icon-btn.spinning .spin-ico {
+      display: inline-block;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-/* ─────────────────────────────────────────────
-   CONTROLS
-───────────────────────────────────────────── */
-.control-row {
-  display: flex; gap: 10px; margin-bottom: 18px; align-items: center;
-  background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 12px;
-  border: 1px solid var(--border-soft);
-}
-.control-row input {
-  flex: 1; background: none; border: none; outline: none;
-  color: #fff; font-family: var(--font-m); font-size: 11px;
-}
-.control-row input::placeholder { color: var(--muted); }
-.control-row select {
-  background: rgba(0,0,0,0.5); border: 1px solid var(--border-soft);
-  border-radius: 6px; color: var(--muted-light); font-family: var(--font-m);
-  font-size: 9px; padding: 4px 6px; outline: none;
-}
-.v-divider { width: 1px; height: 14px; background: var(--border-soft); }
+    /* ============================================================
+       KPI OVERVIEW STRIP
+    ============================================================ */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 520px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 14px;
+      box-shadow: var(--shadow);
+    }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .kpi-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+    .kpi-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
 
-/* ─────────────────────────────────────────────
-   ROSTER GRID
-───────────────────────────────────────────── */
-.glass-grid {
-  display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px; margin-bottom: 16px;
-}
-.glass-card {
-  background: var(--bg-card); border: 1px solid var(--border-soft);
-  border-radius: 14px; padding: 16px 10px 14px;
-  display: flex; flex-direction: column; align-items: center;
-  cursor: pointer; position: relative; overflow: hidden;
-  animation: fadeUp 0.4s ease both; transition: border-color 0.25s, box-shadow 0.25s;
-}
-.glass-card:active { transform: scale(0.96); }
-.glass-card::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 60%);
-  pointer-events: none;
-}
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
+    /* ============================================================
+       SEARCH, FILTERS & SORT BAR
+    ============================================================ */
+    .toolbar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .toolbar-top {
+      display: flex;
+      gap: 8px;
+    }
+    .search-input {
+      flex: 1;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text);
+      padding: 0 12px;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .sort-select {
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text);
+      padding: 0 10px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+    }
+    .chip-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+    .chip {
+      padding: 6px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-sec);
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--accent-bg);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
 
-/* ── VERIFIED (Deep Sync) card treatment ── */
-.glass-card.ds-verified {
-  border-color: var(--ds-border);
-  box-shadow: 0 0 18px rgba(0,255,157,0.06), inset 0 0 16px rgba(0,255,157,0.025);
-}
-.glass-card.ds-verified::before {
-  content: '';
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--ds-green), transparent);
-  box-shadow: 0 0 8px var(--ds-green-glow);
-}
+    /* ============================================================
+       ROSTER CARDS (2-COL MOBILE / 3-COL DESKTOP)
+    ============================================================ */
+    .roster-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (min-width: 680px) {
+      .roster-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .player-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow);
+      transition: transform 0.14s, border-color 0.2s;
+      position: relative;
+    }
+    .player-card:active { transform: scale(0.98); }
+    .player-card.ds-active { border-color: var(--green); }
 
-/* ── Deep Sync badge on roster card ── */
-.ds-pip {
-  position: absolute; top: 7px; left: 7px;
-  display: flex; align-items: center; gap: 3px;
-  background: rgba(0,255,157,0.12);
-  border: 1px solid rgba(0,255,157,0.35);
-  border-radius: 4px; padding: 1px 4px;
-  font-family: var(--font-m); font-size: 6px; letter-spacing: 1px;
-  color: var(--ds-green); text-shadow: 0 0 8px var(--ds-green);
-  animation: pipPulse 3s ease-in-out infinite;
-}
-.ds-pip-dot {
-  width: 4px; height: 4px; border-radius: 50%;
-  background: var(--ds-green); box-shadow: 0 0 6px var(--ds-green);
-}
-@keyframes pipPulse {
-  0%,100% { opacity: 1; } 60% { opacity: 0.55; }
-}
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .player-name {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+    .player-role {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      text-transform: capitalize;
+    }
+    .grade-pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 800;
+      min-width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .grade-S { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber); }
+    .grade-A { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent); }
+    .grade-B { background: var(--green-bg); color: var(--green); border: 1px solid var(--green); }
+    .grade-C { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple); }
+    .grade-D { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
 
-/* ── Grade badge ── */
-.g-badge {
-  position: absolute; top: 7px; right: 7px;
-  font-family: var(--font-d); font-size: 9px; font-weight: 900;
-  width: 20px; height: 20px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px solid;
-}
-.g-badge-lg {
-  width: 34px; height: 34px; font-size: 14px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  border: 1px solid; font-family: var(--font-d); font-weight: 900;
-}
-.g-S { color:var(--grade-s); border-color:rgba(255,214,10,0.4); background:rgba(255,214,10,0.08); box-shadow:0 0 10px rgba(255,214,10,0.3); }
-.g-A { color:var(--grade-a); border-color:rgba(0,240,255,0.4);  background:rgba(0,240,255,0.08);  box-shadow:0 0 10px rgba(0,240,255,0.3); }
-.g-B { color:var(--grade-b); border-color:rgba(0,255,157,0.4);  background:rgba(0,255,157,0.08);  box-shadow:0 0 10px rgba(0,255,157,0.3); }
-.g-C { color:var(--grade-c); border-color:rgba(255,159,10,0.4); background:rgba(255,159,10,0.08); box-shadow:0 0 10px rgba(255,159,10,0.2); }
-.g-D { color:var(--grade-d); border-color:rgba(255,45,85,0.4);  background:rgba(255,45,85,0.08);  box-shadow:0 0 10px rgba(255,45,85,0.2); }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .mini-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 5px;
+      background: var(--bg-subtle);
+      color: var(--text-sec);
+    }
+    .mini-badge.in  { background: var(--green-bg); color: var(--green); }
+    .mini-badge.out { background: var(--bg-subtle); color: var(--text-muted); }
+    .mini-badge.rush{ background: var(--red-bg); color: var(--red); }
+    .mini-badge.ds  { background: var(--accent-bg); color: var(--accent); }
 
-/* Progress ring */
-.ring-wrap { position: relative; width: 54px; height: 54px; margin-bottom: 10px; }
-.ring-svg { width: 54px; height: 54px; transform: rotate(-90deg); }
-.ring-track { fill: none; stroke: rgba(255,255,255,0.04); stroke-width: 3; }
-.ring-fill  { fill: none; stroke-width: 3; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
-.ring-label {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-m); font-size: 11px; font-weight: 700;
-}
-.glass-name {
-  font-family: var(--font-b); font-size: 12px; font-weight: 600;
-  text-align: center; line-height: 1.2; word-break: break-word;
-  max-width: 100%;
-}
-.glass-th {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  margin-top: 4px; letter-spacing: 1px;
-}
-.up-arr { color: var(--green); font-size: 7px; }
+    .prog-block {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    .prog-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 12px;
+    }
+    .prog-pct {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .prog-vel {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .bar-track {
+      width: 100%;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--bg-subtle);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.45s ease;
+    }
+    .card-foot {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
 
-/* ─────────────────────────────────────────────
-   SECTION TITLE
-───────────────────────────────────────────── */
-.sec-title {
-  font-family: var(--font-d); font-size: 10px; letter-spacing: 4px;
-  color: var(--muted); text-transform: uppercase;
-  margin-bottom: 16px; padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-soft);
-}
+    /* ============================================================
+       WAR COMMAND & ACTIVITY SECTIONS
+    ============================================================ */
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .panel-title {
+      font-size: 15px;
+      font-weight: 800;
+    }
+    .action-btn {
+      padding: 8px 12px;
+      border-radius: 9px;
+      border: 1px solid var(--accent);
+      background: var(--accent-bg);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .action-btn:active { transform: scale(0.97); }
 
-/* ─────────────────────────────────────────────
-   BOTTOM SHEET
-───────────────────────────────────────────── */
-.sheet-backdrop {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.65);
-  backdrop-filter: blur(4px); z-index: 1100;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.sheet-backdrop.active { opacity: 1; pointer-events: all; }
-.bottom-sheet {
-  position: fixed; bottom: 0; left: 0; right: 0;
-  max-width: 600px; margin: 0 auto;
-  background: linear-gradient(180deg, rgba(8,10,22,0.99) 0%, rgba(4,5,10,0.99) 100%);
-  border: 1px solid var(--border-soft);
-  border-top: 1px solid rgba(0,240,255,0.12);
-  border-bottom: none;
-  border-radius: 24px 24px 0 0;
-  z-index: 1200; padding: 0 0 calc(env(safe-area-inset-bottom,0px) + 20px);
-  transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
-  max-height: 91vh; display: flex; flex-direction: column;
-}
-.bottom-sheet.open { transform: translateY(0); }
-.sheet-handle {
-  width: 36px; height: 4px; border-radius: 2px;
-  background: rgba(255,255,255,0.12); margin: 12px auto 0;
-  flex-shrink: 0;
-}
-.close-btn {
-  position: absolute; top: 10px; right: 16px;
-  color: var(--muted); font-size: 18px; cursor: pointer; z-index: 10;
-  padding: 6px; line-height: 1;
-}
-#sheetBody {
-  overflow-y: auto; -webkit-overflow-scrolling: touch;
-  flex: 1; padding: 20px 18px 0;
-}
-.sheet-name {
-  font-family: var(--font-d); font-size: 18px; font-weight: 700;
-  color: #fff; letter-spacing: 1px; line-height: 1.2;
-}
-.sheet-sub {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 6px;
-  font-family: var(--font-m); font-size: 9px; color: var(--muted);
-  margin-top: 5px; letter-spacing: 1px;
-}
-.sheet-sub .sep { color: var(--muted); }
-.sheet-sub .accent { color: var(--cyan); }
-.sheet-sub .gain { color: var(--green); }
-.sh-sec {
-  font-family: var(--font-d); font-size: 7px; letter-spacing: 3px;
-  color: var(--muted); text-transform: uppercase;
-  margin: 22px 0 12px; padding-bottom: 6px;
-  border-bottom: 1px solid var(--border-soft);
-}
-.radar-wrap { position: relative; width: 100%; max-width: 240px; margin: 0 auto; }
-.chart-wrap { position: relative; height: 130px; }
+    .war-scoreboard {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .war-side { text-align: center; }
+    .war-clan-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .war-stars {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--amber);
+    }
+    .war-dest {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-sec);
+    }
+    .war-vs {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--bg-subtle);
+      color: var(--text-muted);
+    }
 
-/* Category bars */
-.cat-bars { display: flex; flex-direction: column; gap: 9px; }
-.cat-row  { display: flex; align-items: center; gap: 10px; }
-.cat-lbl  { font-family: var(--font-m); font-size: 8px; color: var(--muted); width: 42px; }
-.cat-track {
-  flex: 1; height: 4px; background: rgba(255,255,255,0.04);
-  border-radius: 2px; overflow: hidden;
-}
-.cat-fill { height: 100%; border-radius: 2px; transition: width 1s ease; }
-.cat-val  { font-family: var(--font-m); font-size: 8px; min-width: 76px; text-align: right; }
+    .list-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .list-row:last-child { border-bottom: none; }
+    .cutoff-line {
+      margin: 8px 0;
+      padding: 5px 10px;
+      border-radius: 7px;
+      background: var(--amber-bg);
+      color: var(--amber);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+    }
 
-/* Donations */
-.donations-val {
-  font-family: var(--font-d); font-size: 28px; font-weight: 700;
-  color: var(--purple); text-shadow: 0 0 20px rgba(180,0,255,0.4);
-}
-.donations-val span { font-family: var(--font-b); font-size: 12px; color: var(--muted); margin-left: 6px; font-weight: 400; }
+    /* ============================================================
+       ERGONOMIC MOBILE-FIRST PLAYER DETAIL DRAWER (100dvh)
+    ============================================================ */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.72);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .player-drawer {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      max-width: 780px;
+      margin: 0 auto;
+      height: 92dvh;
+      max-height: 92dvh;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border-strong);
+      border-radius: 22px 22px 0 0;
+      z-index: 1100;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 -12px 40px rgba(2, 6, 23, 0.6);
+    }
+    .player-drawer.open {
+      transform: translateY(0);
+    }
 
-/* ─────────────────────────────────────────────
-   DEEP SYNC PANEL STYLES
-───────────────────────────────────────────── */
+    .drawer-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border);
+      border-radius: 22px 22px 0 0;
+      padding: 10px 20px 14px 20px;
+      flex-shrink: 0;
+      touch-action: pan-y;
+    }
+    .drag-pill {
+      width: 44px;
+      height: 5px;
+      border-radius: 999px;
+      background: var(--border-strong);
+      margin: 0 auto 12px auto;
+    }
+    .drawer-head-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .drawer-close-btn {
+      min-width: 96px;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .drawer-close-btn:active {
+      transform: scale(0.95);
+      background: var(--red-bg);
+      color: var(--red);
+      border-color: var(--red);
+    }
 
-/* ── Section header for Deep Sync ── */
-.sh-sec-ds {
-  font-family: var(--font-d); font-size: 7px; letter-spacing: 3px;
-  color: var(--ds-green); text-transform: uppercase;
-  margin: 22px 0 12px; padding-bottom: 6px;
-  border-bottom: 1px solid rgba(0,255,157,0.15);
-  display: flex; align-items: center; gap: 8px;
-}
-.sh-sec-ds::before {
-  content: ''; width: 6px; height: 6px; border-radius: 50%;
-  background: var(--ds-green); box-shadow: 0 0 10px var(--ds-green);
-  animation: blink 2s ease-in-out infinite;
-}
+    .drawer-scroll {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 18px 20px calc(32px + env(safe-area-inset-bottom, 0px));
+    }
 
-/* ── Village Integrity Meter ── */
-.integrity-meter {
-  background: rgba(0,255,157,0.04);
-  border: 1px solid rgba(0,255,157,0.12);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 4px;
-  display: flex; align-items: center; gap: 16px;
-}
-.integrity-pct {
-  font-family: var(--font-d); font-size: 32px; font-weight: 900;
-  color: var(--ds-green); line-height: 1;
-  text-shadow: 0 0 24px rgba(0,255,157,0.5); flex-shrink: 0;
-}
-.integrity-pct .unit { font-size: 14px; opacity: 0.5; font-weight: 400; }
-.integrity-detail { flex: 1; }
-.integrity-row {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  letter-spacing: 1px; margin-bottom: 4px;
-}
-.integrity-row b { color: #fff; }
-.integrity-track {
-  height: 3px; background: rgba(255,255,255,0.05);
-  border-radius: 2px; overflow: hidden; margin-top: 6px;
-}
-.integrity-fill {
-  height: 100%; border-radius: 2px;
-  background: linear-gradient(90deg, var(--cyan), var(--ds-green));
-  box-shadow: 0 0 8px rgba(0,255,157,0.4);
-  transition: width 1.2s ease;
-}
+    .sec-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 20px 0 10px 0;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sec-label:first-child { margin-top: 0; }
 
-/* ── Gantt Chart ── */
-.gantt-container { display: flex; flex-direction: column; gap: 8px; }
-.gantt-hdr {
-  display: grid; grid-template-columns: 24px 1fr 72px;
-  gap: 10px; align-items: center;
-  font-family: var(--font-m); font-size: 7px; color: var(--muted);
-  letter-spacing: 1.5px; margin-bottom: 4px; padding-bottom: 6px;
-  border-bottom: 1px solid var(--border-soft);
-}
-.gantt-row {
-  display: grid; grid-template-columns: 24px 1fr 72px;
-  gap: 10px; align-items: center;
-}
-.gantt-icon {
-  font-size: 14px; text-align: center; filter: drop-shadow(0 0 4px var(--ds-amber));
-}
-.gantt-info { display: flex; flex-direction: column; gap: 5px; }
-.gantt-name {
-  font-family: var(--font-b); font-size: 12px; font-weight: 600; color: #fff;
-}
-.gantt-level {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted); letter-spacing: 1px;
-}
-.gantt-track {
-  height: 5px; background: rgba(255,255,255,0.05);
-  border-radius: 3px; overflow: hidden;
-}
-.gantt-bar {
-  height: 100%; border-radius: 3px;
-  transition: width 1.1s ease;
-}
-.gantt-time {
-  font-family: var(--font-m); font-size: 9px;
-  text-align: right; letter-spacing: 0.5px;
-}
-.gantt-done {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  text-align: center; padding: 8px 0;
-  border: 1px dashed rgba(255,255,255,0.06); border-radius: 8px;
-}
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    @media (min-width: 540px) {
+      .cat-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .cat-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
 
-/* ── SPT / LPT Queue ── */
-.queue-toggle {
-  display: flex; gap: 0; margin-bottom: 12px;
-  border: 1px solid var(--border-soft); border-radius: 8px; overflow: hidden;
-}
-.queue-tab {
-  flex: 1; padding: 8px 10px; cursor: pointer;
-  font-family: var(--font-m); font-size: 8px; letter-spacing: 1.5px;
-  text-align: center; color: var(--muted);
-  transition: background 0.2s, color 0.2s;
-}
-.queue-tab.active {
-  background: rgba(0,240,255,0.1); color: var(--cyan);
-  text-shadow: 0 0 8px rgba(0,240,255,0.5);
-}
-.queue-tab:first-child { border-right: 1px solid var(--border-soft); }
-.queue-desc {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  line-height: 1.6; margin-bottom: 12px; padding: 8px 10px;
-  background: rgba(255,255,255,0.02); border-radius: 6px;
-  border-left: 2px solid var(--cyan);
-}
-.queue-list { display: flex; flex-direction: column; gap: 6px; }
-.queue-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 12px; border-radius: 8px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(255,255,255,0.04);
-  transition: border-color 0.2s;
-}
-.queue-rank {
-  font-family: var(--font-d); font-size: 10px; font-weight: 700;
-  width: 18px; text-align: center;
-}
-.queue-rank.q1 { color: var(--gold); }
-.queue-rank.q2 { color: var(--muted-light); }
-.queue-rank.q3 { color: var(--ds-amber); }
-.queue-info { flex: 1; }
-.queue-name { font-family: var(--font-b); font-size: 13px; font-weight: 600; color: #fff; }
-.queue-meta { font-family: var(--font-m); font-size: 7.5px; color: var(--muted); margin-top: 2px; letter-spacing: 0.5px; }
-.queue-time {
-  font-family: var(--font-m); font-size: 10px; font-weight: 700;
-  text-align: right; min-width: 46px;
-}
-.queue-upgrading {
-  font-family: var(--font-m); font-size: 7px; letter-spacing: 1px;
-  color: var(--ds-amber); border: 1px solid rgba(255,159,10,0.3);
-  border-radius: 4px; padding: 2px 5px; margin-top: 3px; display: inline-block;
-}
-.queue-empty {
-  font-family: var(--font-m); font-size: 9px; color: var(--muted);
-  text-align: center; padding: 14px 0;
-}
+    .stat-pills {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    @media (min-width: 540px) {
+      .stat-pills { grid-template-columns: repeat(4, 1fr); }
+    }
+    .stat-pill {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
 
-/* ── 1-Click Clipboard Sync Button ── */
-.sync-section {
-  margin: 24px 0 0;
-  padding: 16px; border-radius: 14px;
-  border: 1px solid rgba(0,255,157,0.15);
-  background: linear-gradient(135deg, rgba(0,255,157,0.03) 0%, rgba(0,240,255,0.02) 100%);
-}
-.sync-title {
-  font-family: var(--font-d); font-size: 8px; letter-spacing: 3px;
-  color: var(--ds-green); margin-bottom: 8px;
-}
-.sync-hint {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  line-height: 1.6; margin-bottom: 12px;
-}
-.sync-hint b { color: var(--muted-light); }
-.sync-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  width: 100%; padding: 13px; border-radius: 10px; cursor: pointer;
-  background: linear-gradient(135deg, rgba(0,255,157,0.15), rgba(0,240,255,0.08));
-  border: 1px solid rgba(0,255,157,0.4);
-  color: var(--ds-green); font-family: var(--font-d); font-size: 10px;
-  font-weight: 700; letter-spacing: 2px;
-  text-shadow: 0 0 12px rgba(0,255,157,0.6);
-  box-shadow: 0 0 20px rgba(0,255,157,0.08);
-  transition: all 0.2s; user-select: none;
-}
-.sync-btn:active { transform: scale(0.97); box-shadow: 0 0 30px rgba(0,255,157,0.18); }
-.sync-btn.loading { opacity: 0.6; pointer-events: none; }
-.sync-btn .sync-icon { font-size: 16px; }
-.sync-no-ds {
-  padding: 18px 16px; border-radius: 14px;
-  border: 1px dashed rgba(0,255,157,0.12);
-  background: rgba(0,0,0,0.2);
-  text-align: center;
-}
-.sync-no-ds-icon { font-size: 28px; margin-bottom: 10px; }
-.sync-no-ds-title {
-  font-family: var(--font-d); font-size: 9px; letter-spacing: 3px;
-  color: var(--muted); margin-bottom: 6px;
-}
-.sync-no-ds-hint {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  line-height: 1.6; margin-bottom: 14px;
-}
+    .sync-btn-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 480px) {
+      .sync-btn-group { grid-template-columns: 1fr; }
+    }
+    .btn-sync-primary {
+      height: 46px;
+      border-radius: 12px;
+      border: none;
+      background: var(--green);
+      color: #062118;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-sync-secondary {
+      height: 46px;
+      border-radius: 12px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-subtle);
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
 
-/* ── Toast notification ── */
-#toast {
-  position: fixed; bottom: calc(100px + env(safe-area-inset-bottom, 0px));
-  left: 50%; transform: translateX(-50%) translateY(20px);
-  background: rgba(8,12,24,0.97); border-radius: 10px;
-  padding: 10px 16px; z-index: 9000;
-  font-family: var(--font-m); font-size: 9px; letter-spacing: 1px;
-  white-space: nowrap; border: 1px solid var(--border-soft);
-  opacity: 0; pointer-events: none;
-  transition: opacity 0.25s, transform 0.25s;
-}
-#toast.show {
-  opacity: 1; transform: translateX(-50%) translateY(0);
-}
-#toast.success { border-color: rgba(0,255,157,0.4); color: var(--ds-green); }
-#toast.error   { border-color: rgba(255,45,85,0.4);  color: var(--red); }
-#toast.info    { border-color: rgba(0,240,255,0.3);  color: var(--cyan); }
+    /* ============================================================
+       MODAL (MANUAL JSON PASTE & API SETTINGS)
+    ============================================================ */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.78);
+      z-index: 1500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      width: 100%;
+      max-width: 500px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .modal-textarea {
+      width: 100%;
+      height: 150px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      padding: 10px;
+      margin: 10px 0;
+      resize: vertical;
+    }
 
-/* ─────────────────────────────────────────────
-   HOF CARDS
-───────────────────────────────────────────── */
-.hof-card {
-  border: 1px solid var(--border-soft); border-radius: 14px;
-  padding: 16px; margin-bottom: 14px;
-  background: rgba(8,10,20,0.8);
-}
-.hof-hdr {
-  font-family: var(--font-d); font-size: 8px; letter-spacing: 3px;
-  color: var(--gold); text-transform: uppercase; margin-bottom: 12px;
-  text-shadow: 0 0 12px rgba(255,214,10,0.4);
-}
-.hof-row {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 0; border-bottom: 1px solid var(--border-soft);
-}
-.hof-row:last-child { border-bottom: none; }
-.hof-rank { font-size: 18px; width: 26px; text-align: center; }
-.hof-info { flex: 1; display: flex; align-items: center; gap: 8px; }
-.hof-name { font-family: var(--font-b); font-size: 14px; font-weight: 600; }
-.hof-th { font-family: var(--font-m); font-size: 8px; color: var(--muted); }
-.hof-val { font-family: var(--font-m); font-size: 12px; color: var(--cyan); min-width: 60px; text-align: right; }
+    /* ============================================================
+       BOTTOM NAVIGATION BAR
+    ============================================================ */
+    .bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 900;
+      background: var(--nav-bg);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    .bottom-nav-inner {
+      max-width: 780px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: 64px;
+    }
+    .nav-item {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .nav-item .nav-ico { font-size: 18px; }
+    .nav-item.active { color: var(--accent); }
 
-/* ─────────────────────────────────────────────
-   VELOCITY BOARD
-───────────────────────────────────────────── */
-.vel-intro {
-  border: 1px solid var(--border-soft);
-  border-radius: 12px; padding: 14px 16px; margin-bottom: 20px;
-  font-family: var(--font-m); font-size: 9px; color: var(--muted-light);
-  line-height: 1.7;
-}
-.vel-intro b { color: var(--green); }
-.vel-row {
-  display: flex; align-items: center; gap: 12px;
-  padding: 13px 0; border-bottom: 1px solid var(--border-soft);
-  transition: opacity 0.3s;
-}
-.vel-row:last-child { border-bottom: none; }
-.vel-rank-num {
-  font-family: var(--font-d); font-size: 12px; font-weight: 700;
-  width: 22px; text-align: center; color: var(--muted);
-}
-.vel-rank-num.top { color: var(--green); text-shadow: 0 0 10px var(--green-glow); }
-.vel-info { flex: 1; min-width: 0; }
-.vel-name { font-size: 14px; font-weight: 600; font-family: var(--font-b); }
-.vel-meta { font-family: var(--font-m); font-size: 8px; color: var(--muted); margin-top: 2px; }
-.vel-bar-col { display: flex; flex-direction: column; justify-content: center; width: 52px; }
-.vel-bar-trk { height: 3px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
-.vel-bar-fill { height: 100%; border-radius: 2px; background: var(--green); transition: width 1s ease; box-shadow: 0 0 6px var(--green-glow); }
-.vel-gain {
-  font-family: var(--font-m); font-size: 16px; font-weight: 700;
-  min-width: 52px; text-align: right; color: var(--green);
-  text-shadow: 0 0 12px rgba(0,255,157,0.4);
-}
-.vel-gain.zero { color: var(--muted); font-size: 12px; text-shadow: none; }
-.stag-divider {
-  font-family: var(--font-m); font-size: 7.5px; letter-spacing: 2.5px;
-  color: rgba(255,45,85,0.4); text-transform: uppercase; margin: 20px 0 8px;
-  display: flex; align-items: center; gap: 10px;
-}
-.stag-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,45,85,0.1); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
 
-/* ─────────────────────────────────────────────
-   BOTTOM NAV
-───────────────────────────────────────────── */
-.nav-wrapper {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
-  background: rgba(4,5,8,0.97); backdrop-filter: blur(24px);
-  border-top: 1px solid var(--border-soft);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  display: flex; justify-content: center;
-}
-.bottom-nav {
-  display: flex; width: 100%; max-width: 600px;
-  padding: 10px 20px; justify-content: space-evenly;
-}
-.nav-btn {
-  display: flex; flex-direction: column; align-items: center; gap: 5px;
-  color: var(--muted); font-family: var(--font-m); font-size: 7px;
-  text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
-  padding: 7px 20px; border-radius: 8px; position: relative;
-  transition: color 0.3s;
-}
-.nav-icon { font-size: 19px; transition: transform 0.3s, filter 0.3s; }
-.nav-btn.active { color: var(--cyan); }
-.nav-btn.active .nav-icon {
-  transform: translateY(-2px);
-  filter: drop-shadow(0 0 8px var(--cyan));
-}
-.nav-btn.active::after {
-  content: ''; position: absolute; bottom: -10px; left: 50%;
-  transform: translateX(-50%); width: 20px; height: 2px;
-  background: var(--cyan); border-radius: 1px; box-shadow: 0 0 8px var(--cyan);
-}
-
-/* ─────────────────────────────────────────────
-   TABS
-───────────────────────────────────────────── */
-.tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeUp 0.38s ease both; }
-
-/* ─────────────────────────────────────────────
-   LOADER
-───────────────────────────────────────────── */
-.loader-overlay {
-  position: fixed; inset: 0; background: rgba(4,5,8,0.97); z-index: 9999;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.loader-overlay.active { opacity: 1; pointer-events: all; }
-.loader-logo {
-  font-family: var(--font-d); font-size: 14px; font-weight: 700;
-  color: var(--cyan); letter-spacing: 5px; margin-bottom: 22px;
-  text-shadow: 0 0 24px rgba(0,240,255,0.5);
-}
-.loader-track { width: 140px; height: 2px; background: rgba(255,255,255,0.04); border-radius: 1px; }
-.loader-fill {
-  height: 100%; background: var(--cyan); border-radius: 1px; width: 0%;
-  animation: loadBar 1.8s ease-in-out infinite; box-shadow: 0 0 8px var(--cyan);
-}
-@keyframes loadBar { 0%{width:0%;opacity:1} 80%{width:100%;opacity:1} 100%{width:100%;opacity:0} }
-.loader-lbl {
-  font-family: var(--font-m); font-size: 8px; color: var(--muted);
-  letter-spacing: 2px; margin-top: 10px; animation: textCycle 4s ease-in-out infinite;
-}
-@keyframes textCycle { 0%,25%{opacity:1} 30%,70%{opacity:0.3} 75%,100%{opacity:1} }
-
-/* ─────────────────────────────────────────────
-   REFRESH BUTTON
-───────────────────────────────────────────── */
-.refresh-btn {
-  position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); right: 14px;
-  z-index: 900; background: rgba(0,0,0,0.65); border: 1px solid rgba(0,240,255,0.18);
-  border-radius: 50%; width: 34px; height: 34px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; font-size: 15px; color: var(--cyan);
-  transition: box-shadow 0.2s, border-color 0.2s;
-}
-.refresh-btn:hover { border-color: rgba(0,240,255,0.4); box-shadow: 0 0 14px rgba(0,240,255,0.2); }
-.refresh-btn.spinning { animation: spin 0.9s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ─────────────────────────────────────────────
-   EMPTY STATE
-───────────────────────────────────────────── */
-.empty {
-  text-align: center; font-family: var(--font-m); font-size: 10px;
-  color: var(--muted); padding: 44px 0; letter-spacing: 1px;
-}
-</style>
+    /* ============================================================
+       TOAST & ALERT BANNER
+    ============================================================ */
+    .banner {
+      background: var(--amber-bg);
+      border: 1px solid var(--amber);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%) translateY(16px);
+      background: var(--bg-elevated);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      max-width: 90vw;
+      text-align: center;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
 </head>
 <body>
 
-<!-- ░░ BACKGROUND ░░ -->
-<div id="bg-scene">
-  <div id="bg-img"></div>
-  <div id="bg-grid"></div>
-  <div id="bg-lines"></div>
-  <div class="bg-orb bg-orb-c"></div>
-  <div class="bg-orb bg-orb-p"></div>
-  <div id="bg-corner-tl"></div>
-  <div id="bg-corner-br"></div>
-</div>
-
-<!-- ░░ REFRESH ░░ -->
-<div class="refresh-btn" id="refreshBtn" onclick="hardRefresh()">↺</div>
-
-<!-- ░░ LOADER ░░ -->
-<div class="loader-overlay" id="loaderOverlay">
-  <div class="loader-logo">MOLLY METRICS</div>
-  <div class="loader-track"><div class="loader-fill"></div></div>
-  <div class="loader-lbl" id="loaderText">SYNCING MATRIX...</div>
-</div>
-
-<!-- ░░ TOAST ░░ -->
-<div id="toast"></div>
-
-<!-- ░░ MAIN ░░ -->
-<div class="main-scroll" id="mainScroll">
-  <div class="container">
-
-    <!-- ── ROSTER TAB ── -->
-    <div id="roster-tab" class="tab-content active">
-      <div class="header">
-        <div>
-          <div class="header-wordmark">MOLLY<em>_</em>METRICS</div>
-          <div class="header-build">V8.0 // DEEP MATRIX ENABLED</div>
-        </div>
-        <div class="header-live">
-          <div class="live-dot"></div>LIVE
-        </div>
+<div class="app-shell">
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div>
+      <div class="brand-title">
+        <span id="clanTitle">MOLLY METRICS</span>
+        <span class="th19-pill">TH19</span>
       </div>
+      <div class="brand-sub" id="syncSubtitle">Connecting to Clan Command...</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Light/Dark Theme">☀️</button>
+      <button class="icon-btn" onclick="openApiModal()" title="Apps Script Endpoint Settings">⚙️</button>
+      <button class="icon-btn primary" id="syncBtn" onclick="forceClanSync()" title="Fetch Latest Clan Data">
+        <span class="spin-ico">↻</span> Sync
+      </button>
+    </div>
+  </header>
 
-      <div class="global-card">
-        <div class="global-tag">Clan Progression Index</div>
-        <div class="global-num" id="gPct">–<span class="unit">%</span></div>
-        <div class="global-meta">
-          <div class="meta-item">
-            <div class="meta-label">30D VELOCITY</div>
-            <div class="meta-val g" id="gVelocity">+0.00%</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">OPERATORS</div>
-            <div class="meta-val c" id="gCount">–</div>
-          </div>
-          <div class="meta-item">
-            <div class="meta-label">DEEP SYNCED</div>
-            <div class="meta-val g" id="gDeepSync">–</div>
-          </div>
-        </div>
+  <!-- STATUS / ERROR BANNER -->
+  <div id="statusBanner" class="banner" style="display:none;">
+    <span id="statusBannerText"></span>
+    <button class="action-btn" onclick="forceClanSync()">Force Sync</button>
+  </div>
+
+  <!-- ============================================================
+       TAB 1: ROSTER
+  ============================================================ -->
+  <section id="tab-roster" class="tab-pane active">
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Clan Avg</div>
+        <div class="kpi-val" id="kpiAvg">–%</div>
+        <div class="kpi-sub">Weighted TH progress</div>
       </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Active Roster</div>
+        <div class="kpi-val" id="kpiMembers">–</div>
+        <div class="kpi-sub" id="kpiWarIn">– opted IN</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">30D Velocity</div>
+        <div class="kpi-val" id="kpiVelocity" style="color:var(--green);">+0.00%</div>
+        <div class="kpi-sub">Avg active gain</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Deep Synced</div>
+        <div class="kpi-val" id="kpiDeep" style="color:var(--accent);">0</div>
+        <div class="kpi-sub">Village JSON linked</div>
+      </div>
+    </div>
 
-      <div class="control-row" id="rosterControls" style="display:none;">
-        <input type="text" id="searchInput" placeholder="Search operators..." oninput="filterRoster()">
-        <div class="v-divider"></div>
-        <select id="sortSelect" onchange="filterRoster()">
-          <option value="comp">Overall %</option>
-          <option value="grade">Grade</option>
-          <option value="th">Town Hall</option>
-          <option value="vel">30D Velocity</option>
-          <option value="ds">Deep Sync ★</option>
+    <div class="toolbar">
+      <div class="toolbar-top">
+        <input type="search" id="searchInput" class="search-input" placeholder="Search player or #tag..." oninput="applyFilters()" />
+        <select id="sortSelect" class="sort-select" onchange="applyFilters()">
+          <option value="comp">Sort: Overall %</option>
+          <option value="war">Sort: War Score</option>
+          <option value="heroes">Sort: Heroes %</option>
+          <option value="vel">Sort: 30D Velocity</option>
+          <option value="don">Sort: Donations</option>
         </select>
       </div>
-
-      <div id="rosterContainer" class="glass-grid">
-        <div class="empty" style="grid-column:span 3;">INITIALIZING MATRIX...</div>
+      <div class="chip-row" id="filterChips">
+        <button class="chip active" data-filter="all" onclick="setFilter('all', this)">All Members</button>
+        <button class="chip" data-filter="warIn" onclick="setFilter('warIn', this)">⚔️ War IN</button>
+        <button class="chip" data-filter="th19" onclick="setFilter('th19', this)">🏛️ TH19</button>
+        <button class="chip" data-filter="rushed" onclick="setFilter('rushed', this)">⚠️ Rushed</button>
+        <button class="chip" data-filter="deep" onclick="setFilter('deep', this)">◈ Deep Synced</button>
       </div>
     </div>
 
-    <!-- ── TROPHY TAB ── -->
-    <div id="trophy-tab" class="tab-content">
-      <div class="sec-title">Hall of Fame</div>
-      <div id="hofContainer"><div class="empty">LOADING RECORDS...</div></div>
-    </div>
-
-    <!-- ── VELOCITY TAB ── -->
-    <div id="velocity-tab" class="tab-content">
-      <div class="sec-title">Velocity Board</div>
-      <div class="vel-intro">
-        <b>30-DAY PROGRESSION VELOCITY</b><br>
-        Ranks every operator by the raw percentage gained over the last 30 snapshot days.
-        The fastest climbers surface immediately — identify who's grinding vs. who has gone cold.
+    <div id="rosterGrid" class="roster-grid">
+      <div class="panel" style="grid-column:1/-1;text-align:center;color:var(--text-muted);">
+        Loading active clan roster...
       </div>
-      <div id="velocityContainer"><div class="empty">COMPUTING TRAJECTORIES...</div></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 2: WAR COMMAND
+  ============================================================ -->
+  <section id="tab-war" class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Live War Command</div>
+          <div style="font-size:12px;color:var(--text-muted);" id="warStateLabel">Checking war log...</div>
+        </div>
+        <button class="action-btn" onclick="copyMissedAttackPing()">📋 Copy Attack Ping</button>
+      </div>
+      <div id="liveWarContainer"></div>
     </div>
 
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">War Lineup Optimizer</div>
+          <div style="font-size:12px;color:var(--text-muted);">Ranked by War Readiness (TH19 + Heroes + Offense)</div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="chip active" id="btn15v15" onclick="setWarSize(15)">15v15</button>
+          <button class="chip" id="btn30v30" onclick="setWarSize(30)">30v30</button>
+          <button class="action-btn" onclick="copyWarLineup()">📋 Copy</button>
+        </div>
+      </div>
+      <div id="lineupContainer"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 3: VELOCITY & CLAN HEALTH
+  ============================================================ -->
+  <section id="tab-activity" class="tab-pane">
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">30-Day Progression Velocity</div>
+          <div style="font-size:12px;color:var(--text-muted);">Who is grinding vs. stalled over the last 30 days</div>
+        </div>
+        <button class="action-btn" onclick="copyInactiveReport()">📋 Copy Watchlist</button>
+      </div>
+      <div id="velocityList"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Donation & Activity Watchlist</div>
+          <div style="font-size:12px;color:var(--text-muted);">Flags low donations (&lt;200) or heavy leech ratios</div>
+        </div>
+      </div>
+      <div id="donationWatchlist"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TAB 4: DEEP SYNC HUB (TH19 VILLAGE JSON)
+  ============================================================ -->
+  <section id="tab-deepsync" class="tab-pane">
+    <div class="panel">
+      <div class="panel-title" style="margin-bottom:6px;">TH19 Village Deep Matrix</div>
+      <div style="font-size:13px;color:var(--text-sec);line-height:1.55;">
+        The official Supercell API tracks Heroes, Equipment, Pets, Troops, Spells, and Sieges—but hides <b>building levels and active builder timers</b>.
+        In Clash of Clans, go to <b>Settings → More Settings → Data Export → Copy</b>, then tap any player below to sync their live Builder Gantt Chart and SPT/LPT Upgrade Queue.
+      </div>
+    </div>
+    <div id="deepSyncDirectory"></div>
+  </section>
+</div>
+
+<!-- ============================================================
+     BOTTOM NAVIGATION
+============================================================ -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="nav-item active" data-tab="roster" onclick="switchTab('roster', this)">
+      <span class="nav-ico">🛡️</span>Roster
+    </button>
+    <button class="nav-item" data-tab="war" onclick="switchTab('war', this)">
+      <span class="nav-ico">⚔️</span>War
+    </button>
+    <button class="nav-item" data-tab="activity" onclick="switchTab('activity', this)">
+      <span class="nav-ico">⚡</span>Activity
+    </button>
+    <button class="nav-item" data-tab="deepsync" onclick="switchTab('deepsync', this)">
+      <span class="nav-ico">🔧</span>Deep Sync
+    </button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     ERGONOMIC PLAYER DETAIL DRAWER
+============================================================ -->
+<div id="drawerBackdrop" class="drawer-backdrop" onclick="closeDrawer()"></div>
+<aside id="playerDrawer" class="player-drawer" aria-hidden="true">
+  <div class="drawer-header" id="drawerHeader">
+    <div class="drag-pill"></div>
+    <div class="drawer-head-row">
+      <div style="min-width:0;">
+        <div id="drawerPlayerName" style="font-size:18px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Player</div>
+        <div id="drawerPlayerSub" class="mono" style="font-size:12px;color:var(--text-muted);margin-top:2px;">#TAG</div>
+      </div>
+      <button type="button" class="drawer-close-btn" onclick="closeDrawer()" aria-label="Close player details">
+        ✕ Close
+      </button>
+    </div>
+  </div>
+  <div class="drawer-scroll" id="drawerBody"></div>
+</aside>
+
+<!-- ============================================================
+     MANUAL PASTE JSON MODAL (FALLBACK FOR MOBILE CLIPBOARD BLOCKS)
+============================================================ -->
+<div id="pasteModal" class="modal-overlay" onclick="if(event.target===this)closePasteModal()">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <strong style="font-size:16px;">Paste Village Export JSON</strong>
+      <button class="drawer-close-btn" style="min-width:78px;height:36px;" onclick="closePasteModal()">✕ Close</button>
+    </div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
+      Paste the JSON copied from Clash of Clans (Settings → More Settings → Data Export) for <b id="pasteTargetTag"></b>:
+    </div>
+    <textarea id="pasteJsonInput" class="modal-textarea" placeholder='{"tag":"#...","buildings":[...]}'></textarea>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="action-btn" onclick="loadSampleTh19Json()">Load TH19 Sample</button>
+      <button class="btn-sync-primary" style="padding:0 18px;" onclick="submitPastedJson()">Sync Village</button>
+    </div>
   </div>
 </div>
 
-<!-- ░░ BOTTOM NAV ░░ -->
-<div class="nav-wrapper">
-  <div class="bottom-nav">
-    <div class="nav-btn active" onclick="switchTab('roster')">
-      <span class="nav-icon">🛡️</span>Roster
+<!-- ============================================================
+     APPS SCRIPT ENDPOINT SETTINGS MODAL
+============================================================ -->
+<div id="apiModal" class="modal-overlay" onclick="if(event.target===this)closeApiModal()">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <strong style="font-size:16px;">Apps Script Web App URL</strong>
+      <button class="drawer-close-btn" style="min-width:78px;height:36px;" onclick="closeApiModal()">✕ Close</button>
     </div>
-    <div class="nav-btn" onclick="switchTab('trophy')">
-      <span class="nav-icon">🏆</span>Trophy
+    <div style="font-size:12px;color:var(--text-muted);margin-top:6px;">
+      Deploy <b>Code.js</b> in Google Apps Script as a Web App (Execute as: <b>Me</b>, Access: <b>Anyone</b>) and paste the <code>/exec</code> URL below:
     </div>
-    <div class="nav-btn" onclick="switchTab('velocity')">
-      <span class="nav-icon">⚡</span>Velocity
+    <input type="url" id="apiUrlInput" class="search-input" style="width:100%;margin:12px 0;" placeholder="https://script.google.com/macros/s/.../exec" />
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="action-btn" onclick="resetApiUrl()">Reset Default</button>
+      <button class="btn-sync-primary" style="padding:0 18px;" onclick="saveApiUrl()">Save & Reload</button>
     </div>
   </div>
 </div>
 
-<!-- ░░ BOTTOM SHEET ░░ -->
-<div id="sheetBg" class="sheet-backdrop" onclick="closeSheet()"></div>
-<div id="playerSheet" class="bottom-sheet">
-  <div class="sheet-handle"></div>
-  <div class="close-btn" onclick="closeSheet()">✕</div>
-  <div id="sheetBody"></div>
-</div>
+<!-- TOAST -->
+<div id="toast" class="toast"></div>
 
-<!-- ░░ SCRIPT ░░ -->
 <script>
-/* ─────────────────────────────── CONFIG ─────────────────────────────── */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
+/* ============================================================
+   CONFIGURATION — REPLACE WITH YOUR DEPLOYED APPS SCRIPT URL
+============================================================ */
+const DEFAULT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
-/* ─────────────────────────────── COC ID DICTIONARY ─────────────────────
-   Extracted from SamBro2901/coc-upgrade-optimizer (mapping.json) +
-   pghant/cocMapping.json gist. Translates Supercell internal dataIds to
-   human-readable building names automatically — no manual mapping needed.
-────────────────────────────────────────────────────────────────────────── */
+function getWebAppUrl() {
+  return localStorage.getItem("molly_web_app_url") || DEFAULT_WEB_APP_URL;
+}
+
+/* ============================================================
+   TH19 ID DICTIONARY & MAX LEVELS (NOV 2026 UPDATE)
+============================================================ */
 const COC_ID_MAP = {
-  1000097:"Crafted Defense", 1000008:"Cannon",             1000009:"Archer Tower",
-  1000013:"Mortar",          1000012:"Air Defense",         1000011:"Wizard Tower",
-  1000028:"Air Sweeper",     1000019:"Hidden Tesla",        1000032:"Bomb Tower",
-  1000021:"X-Bow",           1000027:"Inferno Tower",       1000031:"Eagle Artillery",
-  1000067:"Scattershot",     1000015:"Builder's Hut",       1000072:"Spell Tower",
-  1000077:"Monolith",        1000089:"Firespitter",         1000010:"Wall",
-  1000084:"Multi-Archer Tower", 1000085:"Ricochet Cannon",  1000079:"Multi-Gear Tower",
-  12000000:"Bomb",           12000001:"Spring Trap",        12000002:"Giant Bomb",
-  12000005:"Air Bomb",       12000006:"Seeking Air Mine",   12000008:"Skeleton Trap",
-  12000016:"Tornado Trap",   12000020:"Giga Bomb",
-  1000004:"Gold Mine",       1000002:"Elixir Collector",    1000005:"Gold Storage",
-  1000003:"Elixir Storage",  1000023:"Dark Elixir Drill",   1000024:"Dark Elixir Storage",
-  1000014:"Clan Castle",     1000000:"Army Camp",           1000006:"Barracks",
-  1000026:"Dark Barracks",   1000007:"Laboratory",          1000020:"Spell Factory",
-  1000071:"Hero Hall",       1000029:"Dark Spell Factory",  1000070:"Blacksmith",
-  1000059:"Workshop",        1000068:"Pet House",           1000001:"Town Hall",
-  28000000:"Barbarian King", 28000001:"Archer Queen",       28000006:"Minion Prince",
-  28000002:"Grand Warden",   28000004:"Royal Champion",
-  4000051:"Wall Wrecker",    4000052:"Battle Blimp",        4000062:"Stone Slammer",
-  4000075:"Siege Barracks",  4000087:"Log Launcher",        4000091:"Flame Flinger",
-  4000092:"Battle Drill",    4000135:"Troop Launcher",
-  73000000:"L.A.S.S.I",     73000001:"Electro Owl",        73000002:"Mighty Yak",
-  73000003:"Unicorn",        73000004:"Phoenix",            73000007:"Poison Lizard",
-  73000008:"Diggy",          73000009:"Frosty",             73000010:"Spirit Fox",
-  73000011:"Angry Jelly",    73000016:"Sneezy",
-  4000000:"Barbarian",       4000001:"Archer",              4000002:"Goblin",
-  4000003:"Giant",           4000004:"Wall Breaker",        4000005:"Balloon",
-  4000006:"Wizard",          4000007:"Healer",              4000008:"Dragon",
-  4000009:"P.E.K.K.A",      4000010:"Minion",              4000011:"Hog Rider",
-  4000012:"Valkyrie",        4000013:"Golem",               4000015:"Witch",
-  4000017:"Lava Hound",      4000022:"Bowler",              4000023:"Baby Dragon",
-  4000024:"Miner",           4000053:"Yeti",                4000058:"Ice Golem",
-  4000059:"Electro Dragon",  4000065:"Dragon Rider",        4000082:"Headhunter",
-  4000095:"Electro Titan",   4000097:"Apprentice Warden",   4000110:"Root Rider",
-  4000123:"Druid",           4000132:"Thrower",             4000150:"Furnace",
-  26000000:"Lightning Spell",26000001:"Healing Spell",      26000002:"Rage Spell",
-  26000003:"Jump Spell",     26000005:"Freeze Spell",       26000009:"Poison Spell",
-  26000010:"Earthquake Spell",26000011:"Haste Spell",       26000016:"Clone Spell",
-  26000017:"Skeleton Spell", 26000028:"Bat Spell",          26000035:"Invisibility Spell",
-  26000053:"Recall Spell",   26000070:"Overgrowth Spell",   26000098:"Revive Spell",
-  26000109:"Ice Block Spell"
+  1000097: "Crafted Defense",
+  1000098: "Spiky Tower",
+  1000099: "Firecracker Tower",
+  1000100: "Guardian Shrine",
+  1000101: "Squad Barracks",
+  1000008: "Cannon",
+  1000009: "Archer Tower",
+  1000013: "Mortar",
+  1000012: "Air Defense",
+  1000011: "Wizard Tower",
+  1000028: "Air Sweeper",
+  1000019: "Hidden Tesla",
+  1000032: "Bomb Tower",
+  1000021: "X-Bow",
+  1000027: "Inferno Tower",
+  1000031: "Eagle Artillery",
+  1000067: "Scattershot",
+  1000015: "Builder's Hut",
+  1000072: "Spell Tower",
+  1000077: "Monolith",
+  1000089: "Firespitter",
+  1000010: "Wall",
+  1000084: "Multi-Archer Tower",
+  1000085: "Ricochet Cannon",
+  1000079: "Multi-Gear Tower",
+  12000000: "Bomb",
+  12000001: "Spring Trap",
+  12000002: "Giant Bomb",
+  12000005: "Air Bomb",
+  12000006: "Seeking Air Mine",
+  12000008: "Skeleton Trap",
+  12000016: "Tornado Trap",
+  12000020: "Giga Bomb",
+  1000004: "Gold Mine",
+  1000002: "Elixir Collector",
+  1000005: "Gold Storage",
+  1000003: "Elixir Storage",
+  1000023: "Dark Elixir Drill",
+  1000024: "Dark Elixir Storage",
+  1000014: "Clan Castle",
+  1000000: "Army Camp",
+  1000006: "Barracks",
+  1000026: "Dark Barracks",
+  1000007: "Laboratory",
+  1000020: "Spell Factory",
+  1000071: "Hero Hall",
+  1000029: "Dark Spell Factory",
+  1000070: "Blacksmith",
+  1000059: "Workshop",
+  1000068: "Pet House",
+  1000001: "Town Hall",
+  28000000: "Barbarian King",
+  28000001: "Archer Queen",
+  28000006: "Minion Prince",
+  28000002: "Grand Warden",
+  28000004: "Royal Champion",
+  28000007: "Dragon Duke",
+  4000051: "Wall Wrecker",
+  4000052: "Battle Blimp",
+  4000062: "Stone Slammer",
+  4000075: "Siege Barracks",
+  4000087: "Log Launcher",
+  4000091: "Flame Flinger",
+  4000092: "Battle Drill",
+  4000135: "Troop Launcher",
+  73000000: "L.A.S.S.I",
+  73000001: "Electro Owl",
+  73000002: "Mighty Yak",
+  73000003: "Unicorn",
+  73000004: "Phoenix",
+  73000007: "Poison Lizard",
+  73000008: "Diggy",
+  73000009: "Frosty",
+  73000010: "Spirit Fox",
+  73000011: "Angry Jelly",
+  73000016: "Sneezy",
+  73000017: "Greedy Raven",
+  4000000: "Barbarian", 4000001: "Archer", 4000002: "Goblin", 4000003: "Giant",
+  4000004: "Wall Breaker", 4000005: "Balloon", 4000006: "Wizard", 4000007: "Healer",
+  4000008: "Dragon", 4000009: "P.E.K.K.A", 4000010: "Minion", 4000011: "Hog Rider",
+  4000012: "Valkyrie", 4000013: "Golem", 4000015: "Witch", 4000017: "Lava Hound",
+  4000022: "Bowler", 4000023: "Baby Dragon", 4000024: "Miner", 4000053: "Yeti",
+  4000058: "Ice Golem", 4000059: "Electro Dragon", 4000065: "Dragon Rider",
+  4000082: "Headhunter", 4000095: "Electro Titan", 4000097: "Apprentice Warden",
+  4000110: "Root Rider", 4000123: "Druid", 4000132: "Thrower", 4000150: "Furnace",
+  26000000: "Lightning Spell", 26000001: "Healing Spell", 26000002: "Rage Spell",
+  26000003: "Jump Spell", 26000005: "Freeze Spell", 26000009: "Poison Spell",
+  26000010: "Earthquake Spell", 26000011: "Haste Spell", 26000016: "Clone Spell",
+  26000017: "Skeleton Spell", 26000028: "Bat Spell", 26000035: "Invisibility Spell",
+  26000053: "Recall Spell", 26000070: "Overgrowth Spell", 26000098: "Revive Spell",
+  26000109: "Ice Block Spell", 26000115: "Heroic Spell"
 };
 
-/* Max levels by dataId (TH16 approximations for un-maxed detection) */
 const COC_MAX_LEVELS = {
-  1000008:21, 1000009:22, 1000013:14, 1000012:14, 1000011:16,
-  1000019:14, 1000032:12, 1000021:11, 1000027:10, 1000031:6,
-  1000067:6,  1000077:3,  1000084:3,  1000085:3,  1000089:3,
-  1000079:3,  1000005:16, 1000003:16, 1000024:14, 1000004:18,
-  1000002:18, 1000023:9,  1000014:12, 1000001:16,
-  12000000:9, 12000001:6, 12000002:7, 12000005:8, 12000006:6,
-  12000008:4, 12000016:5
-};
-
-/* Upgrade time estimates in hours [indexed by level].
-   Inspired by SamBro's optimizer scheduling logic for SPT/LPT queues.
-   These power the Shortest/Longest Processing Time sort. */
-const UPGRADE_HOURS = {
-  "Cannon":          [0,2,4,8,12,18,24,36,48,60,72,84,96,108,120,144,168,192,216,240,288,312],
-  "Archer Tower":    [0,2,4,8,12,18,24,36,48,60,72,84,96,108,120,144,168,192,216,240,288,312,336],
-  "Mortar":          [0,4,8,12,18,24,36,48,72,96,120,144,168,192,216],
-  "Air Defense":     [0,4,8,12,18,24,36,48,72,96,120,144,168,192],
-  "Wizard Tower":    [0,6,12,18,24,36,48,72,96,120,144,168,192,216,240,264,288],
-  "Hidden Tesla":    [0,4,8,12,18,24,36,48,72,96,120,144,168,192],
-  "Bomb Tower":      [0,4,8,12,18,24,36,48,72,96,120,144],
-  "X-Bow":           [0,12,24,36,48,72,96,120,144,168,192,216],
-  "Inferno Tower":   [0,12,24,48,72,96,120,144,168,192,216,240],
-  "Eagle Artillery": [0,24,48,72,96,120,144],
-  "Scattershot":     [0,24,48,96,120,144,168],
-  "Monolith":        [0,96,168,240],
-  "Multi-Archer Tower":[0,48,120,192],
-  "Ricochet Cannon": [0,48,120,192],
-  "Firespitter":     [0,48,120,192],
-  "Multi-Gear Tower":[0,48,120,192],
-  "Gold Storage":    [0,2,4,6,8,12,18,24,36,48,60,72,84,96,108,120,144],
-  "Elixir Storage":  [0,2,4,6,8,12,18,24,36,48,60,72,84,96,108,120,144],
-  "Dark Elixir Storage":[0,4,8,12,18,24,36,48,72,96,120,144,168,192,216],
-  "Clan Castle":     [0,0,0,0,12,24,36,48,72,96,120,144,168],
-  "DEFAULT":         [0,4,8,12,18,24,36,48,72,96,120,144,168]
+  1000001: 19,
+  1000014: 15,
+  1000007: 17,
+  1000071: 13,
+  1000098: 2,
+  1000099: 2,
+  1000101: 12,
+  1000008: 23,
+  1000009: 23,
+  1000013: 17,
+  1000012: 17,
+  1000011: 18,
+  1000028: 7,
+  1000019: 18,
+  1000032: 14,
+  1000021: 14,
+  1000027: 12,
+  1000031: 7,
+  1000067: 7,
+  1000077: 5,
+  1000084: 5,
+  1000085: 5,
+  1000089: 4,
+  1000079: 4,
+  1000015: 7,
+  1000072: 3,
+  1000070: 10,
+  1000068: 12,
+  1000005: 18,
+  1000003: 18,
+  1000024: 13,
+  1000004: 17,
+  1000002: 17,
+  1000023: 11
 };
 
 function getEstimatedHours(name, level) {
-  const table = UPGRADE_HOURS[name] || UPGRADE_HOURS["DEFAULT"];
-  const idx = Math.min(level, table.length - 1);
-  return table[idx] || Math.round(4 * Math.pow(1.3, level));
+  if (name === "Spiky Tower" || name === "Firecracker Tower") return level === 1 ? 240 : 312;
+  if (name === "Town Hall") return 312;
+  if (name === "Clan Castle" || name === "Laboratory" || name === "Hero Hall") return 288;
+  return Math.min(336, Math.round(12 + Math.pow(level, 1.55) * 2.2));
 }
 
-/* Building type emoji lookup for Gantt rows */
-const BUILD_EMOJI = {
-  "Cannon":"💣","Archer Tower":"🏹","Mortar":"💥","Air Defense":"🎯",
-  "Wizard Tower":"🧙","X-Bow":"⚡","Inferno Tower":"🔥","Eagle Artillery":"🦅",
-  "Scattershot":"🌑","Monolith":"🗿","Multi-Archer Tower":"🏹","Hidden Tesla":"⚡",
-  "Bomb Tower":"💣","Ricochet Cannon":"💣","Firespitter":"🔥",
-  "Gold Storage":"💰","Elixir Storage":"💜","Dark Elixir Storage":"🖤",
-  "Clan Castle":"🏰","Town Hall":"🏛️","Laboratory":"🧪","Blacksmith":"⚒️",
-  "DEFAULT":"🏗️"
+/* ============================================================
+   APPLICATION STATE
+============================================================ */
+let state = {
+  clanMeta: {},
+  players: [],
+  currentWar: { state: "notInWar" },
+  lastSyncTs: 0,
+  filter: "all",
+  warSize: 15,
+  queueMode: "spt",
+  activeDrawerTag: null
 };
-function getBuildEmoji(n) { return BUILD_EMOJI[n] || BUILD_EMOJI["DEFAULT"]; }
 
-/* ─────────────────────────────── STATE ─────────────────────────────── */
-let globalPlayers = [];
-let hallOfFame    = {};
-let displayList   = [];
-let bsLineChart   = null;
-let bsRadarChart  = null;
-let currentQueueMode = 'spt'; // 'spt' | 'lpt'
+let radarChart = null;
+let trendChart = null;
 
-const GRADE_ORDER = { S:5, A:4, B:3, C:2, D:1, "N/A":0 };
-const GRADE_COLOR = { S:'#ffd60a', A:'#00f0ff', B:'#00ff9d', C:'#ff9f0a', D:'#ff2d55', 'N/A':'#3d4a5c' };
+/* ============================================================
+   INITIALIZATION & THEME
+============================================================ */
+window.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("molly_theme") || "dark";
+  applyTheme(savedTheme);
+  initDrawerSwipe();
+  loadDashboard();
+});
 
-const CATS = [
-  { key:'heroes',    label:'Heroes',    color:'#00f0ff' },
-  { key:'equipment', label:'Equip',     color:'#b400ff' },
-  { key:'pets',      label:'Pets',      color:'#00ff9d' },
-  { key:'troops',    label:'Troops',    color:'#ff9f0a' },
-  { key:'spells',    label:'Spells',    color:'#ff2d55' },
-];
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeDrawer();
+    closePasteModal();
+    closeApiModal();
+  }
+});
 
-/* ─────────────────────────────── INIT ─────────────────────────────── */
-window.addEventListener('DOMContentLoaded', () => fetchData());
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "dark";
+  applyTheme(current === "dark" ? "light" : "dark");
+}
 
-/* ─────────────────────────────── DATA ─────────────────────────────── */
-async function fetchData() {
-  setLoading(true);
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  localStorage.setItem("molly_theme", theme);
+  document.getElementById("themeBtn").textContent = theme === "dark" ? "☀️" : "🌙";
+  document.getElementById("metaThemeColor").setAttribute("content", theme === "dark" ? "#0f172a" : "#f1f5f9");
+}
+
+/* ============================================================
+   DATA FETCHING & SYNC
+============================================================ */
+async function loadDashboard() {
+  setSyncing(true);
+  hideBanner();
   try {
-    const res  = await fetch(`${WEB_APP_URL}?action=getDashboardData`);
+    const res = await fetch(`${getWebAppUrl()}?action=getDashboardData`);
     const data = await res.json();
-    if (data.players) {
-      globalPlayers = data.players;
-      hallOfFame    = data.hallOfFame || {};
-      updateGlobalStats();
-      document.getElementById('rosterControls').style.display = 'flex';
-      filterRoster();
-      renderHoF();
-      renderVelocityBoard();
+
+    if (data.error) {
+      showBanner(data.error);
     }
-  } catch(e) {
-    console.error('Fetch error:', e);
+
+    state.clanMeta   = data.clanMeta || {};
+    state.players    = Array.isArray(data.players) ? data.players : [];
+    state.currentWar = data.currentWar || { state: "notInWar" };
+    state.lastSyncTs = data.lastSyncTs || 0;
+
+    renderHeader();
+    renderKpis();
+    applyFilters();
+    renderWarTab();
+    renderActivityTab();
+    renderDeepSyncDirectory();
+
+    if (state.activeDrawerTag) {
+      const updated = state.players.find(p => p.tag === state.activeDrawerTag);
+      if (updated) renderDrawerContent(updated);
+    }
+  } catch (err) {
+    showBanner("Could not reach Apps Script backend. Check API settings or tap Force Sync.");
+    console.error(err);
+  } finally {
+    setSyncing(false);
   }
-  setLoading(false);
 }
 
-async function hardRefresh() {
-  setLoading(true);
+async function forceClanSync() {
+  setSyncing(true);
+  showToast("Syncing active clan members & live war data...");
   try {
-    await fetch(`${WEB_APP_URL}?action=clearCache`);
-    await fetchData();
-  } catch(e) { setLoading(false); }
-}
-
-function setLoading(on) {
-  document.getElementById('loaderOverlay').classList.toggle('active', on);
-  document.getElementById('refreshBtn').classList.toggle('spinning', on);
-}
-
-/* ─────────────────────────────── GLOBAL STATS ─────────────────────── */
-function updateGlobalStats() {
-  const n = globalPlayers.length || 1;
-  let totalPct = 0, gainers = 0, totalGain = 0, gainSamples = 0, deepCount = 0;
-
-  globalPlayers.forEach(p => {
-    totalPct += parseFloat(p.percentage) || 0;
-    const gain = computeVelocity(p);
-    if (gain > 0) { gainers++; totalGain += gain; gainSamples++; }
-    if (p.hasDeepSync) deepCount++;
-  });
-
-  const avg     = (totalPct / n).toFixed(1);
-  const avgGain = gainSamples > 0 ? (totalGain / gainSamples).toFixed(2) : '0.00';
-
-  animCounter('gPct', parseFloat(avg), '%');
-
-  const velEl = document.getElementById('gVelocity');
-  velEl.textContent = (avgGain >= 0 ? '+' : '') + avgGain + '%';
-  velEl.className   = 'meta-val ' + (avgGain >= 0 ? 'g' : 'r');
-
-  document.getElementById('gCount').textContent    = n;
-  document.getElementById('gDeepSync').textContent = deepCount;
-}
-
-function computeVelocity(p) {
-  if (p.historyPcts && p.historyPcts.length > 1) {
-    const first = parseFloat(p.historyPcts[0]) || 0;
-    const last  = parseFloat(p.historyPcts[p.historyPcts.length - 1]) || 0;
-    return parseFloat((last - first).toFixed(2));
+    const res = await fetch(`${getWebAppUrl()}?action=syncClanData`);
+    const out = await res.json();
+    if (out.error) {
+      showToast("Sync error: " + out.error);
+    } else {
+      showToast(`Synced ${out.summary?.syncedMembers || 0} active clan members!`);
+      await loadDashboard();
+    }
+  } catch (err) {
+    showToast("Sync request failed — verify Apps Script deployment.");
+  } finally {
+    setSyncing(false);
   }
-  return parseFloat(p.progression30d) || 0;
 }
 
-function animCounter(id, target, suffix) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  let start = null;
-  const duration = 1100;
-  const step = ts => {
-    if (!start) start = ts;
-    const p  = Math.min((ts - start) / duration, 1);
-    const e  = 1 - Math.pow(1 - p, 3);
-    el.innerHTML = `${(target * e).toFixed(1)}<span class="unit">${suffix}</span>`;
-    if (p < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
+function setSyncing(on) {
+  document.getElementById("syncBtn").classList.toggle("spinning", on);
 }
 
-/* ─────────────────────────────── TABS ─────────────────────────────── */
-function switchTab(tab) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById(`${tab}-tab`).classList.add('active');
-  document.querySelector(`.nav-btn[onclick="switchTab('${tab}')"]`).classList.add('active');
-  document.getElementById('mainScroll').scrollTop = 0;
+function showBanner(msg) {
+  const b = document.getElementById("statusBanner");
+  document.getElementById("statusBannerText").textContent = msg;
+  b.style.display = "flex";
+}
+function hideBanner() {
+  document.getElementById("statusBanner").style.display = "none";
 }
 
-/* ─────────────────────────────── ROSTER ────────────────────────────── */
-function filterRoster() {
-  const term = document.getElementById('searchInput').value.toLowerCase();
-  const sort = document.getElementById('sortSelect').value;
-
-  displayList = globalPlayers.filter(p => p.name.toLowerCase().includes(term));
-
-  displayList.sort((a, b) => {
-    if (sort === 'comp')  return (parseFloat(b.percentage)||0) - (parseFloat(a.percentage)||0);
-    if (sort === 'grade') return (GRADE_ORDER[b.grade]||0) - (GRADE_ORDER[a.grade]||0);
-    if (sort === 'th')    return (parseInt(b.thLevel)||0) - (parseInt(a.thLevel)||0);
-    if (sort === 'vel')   return computeVelocity(b) - computeVelocity(a);
-    if (sort === 'ds')    return (b.hasDeepSync ? 1 : 0) - (a.hasDeepSync ? 1 : 0);
-    return 0;
-  });
-
-  renderRoster();
+/* ============================================================
+   HEADER & KPI RENDERING
+============================================================ */
+function renderHeader() {
+  const name = state.clanMeta.name || "MOLLY METRICS";
+  const tag  = state.clanMeta.tag || "#YQP0GJ9";
+  document.getElementById("clanTitle").textContent = name.toUpperCase();
+  const syncAgo = state.lastSyncTs ? `Last sync ${formatRelTime(state.lastSyncTs)}` : "Awaiting initial sync";
+  document.getElementById("syncSubtitle").textContent = `${tag} · Active Roster Only · ${syncAgo}`;
 }
 
-function renderRoster() {
-  const container = document.getElementById('rosterContainer');
-  if (!displayList.length) {
-    container.innerHTML = `<div class="empty" style="grid-column:span 3;">No operators found.</div>`;
+function renderKpis() {
+  const list = state.players;
+  const count = list.length;
+  if (!count) {
+    document.getElementById("kpiAvg").textContent = "0%";
+    document.getElementById("kpiMembers").textContent = "0";
+    document.getElementById("kpiWarIn").textContent = "0 opted IN";
+    document.getElementById("kpiVelocity").textContent = "+0.00%";
+    document.getElementById("kpiDeep").textContent = "0";
     return;
   }
 
-  const CIRC = 2 * Math.PI * 19;
-  let html = '';
+  const avgPct = list.reduce((s, p) => s + (parseFloat(p.percentage) || 0), 0) / count;
+  const warIn  = list.filter(p => String(p.warPreference).toLowerCase() === "in").length;
+  const gainers = list.filter(p => (parseFloat(p.progression30d) || 0) > 0);
+  const avgVel = gainers.length
+    ? gainers.reduce((s, p) => s + parseFloat(p.progression30d), 0) / gainers.length
+    : 0;
+  const deepCount = list.filter(p => p.hasDeepSync).length;
 
-  displayList.forEach((p, i) => {
-    const realIdx  = globalPlayers.findIndex(gp => gp.tag === p.tag);
-    const pct      = Math.min(100, Math.max(0, parseFloat(p.percentage) || 0));
-    const offset   = CIRC - (pct / 100) * CIRC;
-    const gColor   = GRADE_COLOR[p.grade] || '#3d4a5c';
-    const gCls     = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
-    const vel      = computeVelocity(p);
-    const delayMs  = (i % 9) * 45;
-    const dsClass  = p.hasDeepSync ? 'ds-verified' : '';
-    const dsPip    = p.hasDeepSync
-      ? `<div class="ds-pip"><div class="ds-pip-dot"></div>DS</div>` : '';
+  document.getElementById("kpiAvg").textContent = `${avgPct.toFixed(1)}%`;
+  document.getElementById("kpiMembers").textContent = `${count}/50`;
+  document.getElementById("kpiWarIn").textContent = `${warIn} opted IN`;
+  document.getElementById("kpiVelocity").textContent = `${avgVel >= 0 ? "+" : ""}${avgVel.toFixed(2)}%`;
+  document.getElementById("kpiDeep").textContent = `${deepCount}/${count}`;
+}
 
-    html += `
-      <div class="glass-card ${dsClass}" onclick="openSheet(${realIdx})" style="animation-delay:${delayMs}ms">
-        ${gCls ? `<div class="g-badge ${gCls}">${p.grade}</div>` : ''}
-        ${dsPip}
-        <div class="ring-wrap">
-          <svg class="ring-svg" viewBox="0 0 48 48">
-            <circle class="ring-track" cx="24" cy="24" r="19"/>
-            <circle class="ring-fill"  cx="24" cy="24" r="19"
-              stroke="${gColor}"
-              stroke-dasharray="${CIRC.toFixed(2)}"
-              stroke-dashoffset="${offset.toFixed(2)}"
-              style="filter:drop-shadow(0 0 4px ${gColor}55)"/>
-          </svg>
-          <div class="ring-label" style="color:${gColor}">${Math.floor(pct)}%</div>
-        </div>
-        <div class="glass-name">${escHtml(p.name)}</div>
-        <div class="glass-th">TH${p.thLevel} ${vel > 0 ? '<span class="up-arr">▲</span>' : ''}</div>
-      </div>`;
+/* ============================================================
+   ROSTER FILTERING, SORTING & CARDS
+============================================================ */
+function setFilter(filterKey, btnEl) {
+  state.filter = filterKey;
+  document.querySelectorAll("#filterChips .chip").forEach(c => c.classList.remove("active"));
+  if (btnEl) btnEl.classList.add("active");
+  applyFilters();
+}
+
+function parsePct(ratioStr) {
+  if (!ratioStr || !ratioStr.includes("/")) return 0;
+  const [c, m] = ratioStr.split("/").map(Number);
+  return m > 0 ? (c / m) * 100 : 0;
+}
+
+function applyFilters() {
+  const q = document.getElementById("searchInput").value.trim().toLowerCase();
+  const sortBy = document.getElementById("sortSelect").value;
+
+  let filtered = state.players.filter(p => {
+    const matchText = !q || p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q);
+    if (!matchText) return false;
+    if (state.filter === "warIn")  return String(p.warPreference).toLowerCase() === "in";
+    if (state.filter === "th19")   return Number(p.thLevel) === 19;
+    if (state.filter === "rushed") return Boolean(p.isRushed);
+    if (state.filter === "deep")   return Boolean(p.hasDeepSync);
+    return true;
   });
 
-  container.innerHTML = html;
-}
-
-/* ─────────────────────────────── HOF ───────────────────────────────── */
-const HOF_ICONS = {
-  "Friend in Need":"🤝 Lifetime Donations",
-  "Conqueror":"⚔️ Attacks Won",
-  "Unbreakable":"🛡️ Defenses Won",
-  "Shattered and Scattered":"🎯 Scattershots Destroyed",
-  "Anti-Artillery":"🦅 Eagles Destroyed",
-  "Heroic Heist":"💧 Dark Elixir Looted"
-};
-
-function renderHoF() {
-  const container = document.getElementById('hofContainer');
-  if (!Object.keys(hallOfFame).length) {
-    container.innerHTML = `<div class="empty">Awaiting sync.</div>`; return;
-  }
-  const medals = ['🥇','🥈','🥉'];
-  let html = '';
-  for (const ach in hallOfFame) {
-    if (!hallOfFame[ach].length) continue;
-    html += `<div class="hof-card"><div class="hof-hdr">${HOF_ICONS[ach] || ach}</div>`;
-    hallOfFame[ach].forEach((p, idx) => {
-      html += `<div class="hof-row">
-        <div class="hof-rank">${medals[idx] || `#${idx+1}`}</div>
-        <div class="hof-info">
-          <span class="hof-name">${escHtml(p.name)}</span>
-          <span class="hof-th">TH${p.th}</span>
-        </div>
-        <div class="hof-val">${parseInt(p.value).toLocaleString()}</div>
-      </div>`;
-    });
-    html += `</div>`;
-  }
-  container.innerHTML = html;
-}
-
-/* ─────────────────────────────── VELOCITY ──────────────────────────── */
-function renderVelocityBoard() {
-  const container = document.getElementById('velocityContainer');
-  const ranked = globalPlayers
-    .map(p => ({ ...p, _gain: computeVelocity(p) }))
-    .sort((a, b) => b._gain - a._gain);
-
-  const maxGain  = Math.max(ranked[0]?._gain || 0, 0.01);
-  const active   = ranked.filter(p => p._gain > 0);
-  const stagnant = ranked.filter(p => p._gain <= 0);
-
-  let html = '';
-  active.forEach((p, i) => {
-    const barPct = (p._gain / maxGain) * 100;
-    const isTop  = i < 3;
-    html += `<div class="vel-row">
-      <div class="vel-rank-num ${isTop ? 'top' : ''}">${i + 1}</div>
-      <div class="vel-info">
-        <div class="vel-name">${escHtml(p.name)}${p.hasDeepSync ? ' <span style="font-size:9px;color:var(--ds-green);">◈</span>' : ''}</div>
-        <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% &nbsp;·&nbsp; Grade ${p.grade || 'N/A'}</div>
-      </div>
-      <div class="vel-bar-col">
-        <div class="vel-bar-trk"><div class="vel-bar-fill" style="width:${barPct.toFixed(1)}%"></div></div>
-      </div>
-      <div class="vel-gain">+${p._gain.toFixed(2)}%</div>
-    </div>`;
-  });
-  if (stagnant.length) {
-    html += `<div class="stag-divider">No movement detected</div>`;
-    stagnant.forEach(p => {
-      html += `<div class="vel-row" style="opacity:0.38;">
-        <div class="vel-rank-num">–</div>
-        <div class="vel-info">
-          <div class="vel-name">${escHtml(p.name)}</div>
-          <div class="vel-meta">TH${p.thLevel} &nbsp;·&nbsp; ${p.percentage}% overall</div>
-        </div>
-        <div class="vel-bar-col"></div>
-        <div class="vel-gain zero">${p._gain.toFixed(2)}%</div>
-      </div>`;
-    });
-  }
-  container.innerHTML = html || `<div class="empty">No velocity data.</div>`;
-}
-
-/* ─────────────────────────────── BOTTOM SHEET ──────────────────────── */
-function openSheet(index) {
-  const p      = globalPlayers[index];
-  const gColor = GRADE_COLOR[p.grade] || '#3d4a5c';
-  const gCls   = p.grade && p.grade !== 'N/A' ? `g-${p.grade}` : '';
-  const vel    = computeVelocity(p);
-
-  const catVals = CATS.map(c => {
-    const raw   = p[c.key] || "0/1";
-    const parts = raw.split('/');
-    if (parts.length === 2) {
-      const cur = parseFloat(parts[0]) || 0;
-      const max = parseFloat(parts[1]) || 1;
-      return Math.min(100, Math.max(0, max > 0 ? (cur / max) * 100 : 0));
-    }
+  filtered.sort((a, b) => {
+    if (sortBy === "comp")   return (parseFloat(b.percentage) || 0) - (parseFloat(a.percentage) || 0);
+    if (sortBy === "war")    return (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0);
+    if (sortBy === "heroes") return parsePct(b.heroes) - parsePct(a.heroes);
+    if (sortBy === "vel")    return (parseFloat(b.progression30d) || 0) - (parseFloat(a.progression30d) || 0);
+    if (sortBy === "don")    return (Number(b.donations) || 0) - (Number(a.donations) || 0);
     return 0;
   });
 
-  const barsHtml = CATS.map((c, i) => `
-    <div class="cat-row">
-      <div class="cat-lbl">${c.label}</div>
-      <div class="cat-track">
-        <div class="cat-fill" style="width:${catVals[i].toFixed(1)}%;background:${c.color};box-shadow:0 0 8px ${c.color}44;"></div>
-      </div>
-      <div class="cat-val" style="color:${c.color}">${p[c.key]} <span style="font-size:7px;color:var(--muted);margin-left:4px;">(${catVals[i].toFixed(0)}%)</span></div>
-    </div>`).join('');
+  renderRosterGrid(filtered);
+}
 
-  /* ── Build the Deep Sync section ── */
-  let deepSection = '';
+function renderRosterGrid(players) {
+  const grid = document.getElementById("rosterGrid");
+  if (!state.players.length) {
+    grid.innerHTML = `
+      <div class="panel" style="grid-column:1/-1;text-align:center;padding:24px 16px;">
+        <div style="font-size:16px;font-weight:800;margin-bottom:6px;">No Clan Snapshots Yet</div>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+          Pull your live active clan roster and TH19 progression from the Clash of Clans API.
+        </div>
+        <button class="btn-sync-primary" style="padding:0 20px;" onclick="forceClanSync()">↻ Run Initial Clan Sync</button>
+      </div>`;
+    return;
+  }
+  if (!players.length) {
+    grid.innerHTML = `<div class="panel" style="grid-column:1/-1;text-align:center;color:var(--text-muted);">No matching active clan members found.</div>`;
+    return;
+  }
+
+  grid.innerHTML = players.map(p => {
+    const pct = Math.min(100, Math.max(0, parseFloat(p.percentage) || 0));
+    const vel = parseFloat(p.progression30d) || 0;
+    const isWarIn = String(p.warPreference).toLowerCase() === "in";
+    const barColor = pct >= 85 ? "var(--green)" : pct >= 60 ? "var(--accent)" : "var(--amber)";
+    const roleLabel = p.role === "coLeader" ? "Co-Leader" : p.role === "admin" ? "Elder" : p.role;
+
+    return `
+      <article class="player-card ${p.hasDeepSync ? "ds-active" : ""}" onclick="openDrawer('${escHtml(p.tag)}')">
+        <div class="card-top">
+          <div>
+            <div class="player-name">${escHtml(p.name)}</div>
+            <div class="player-role">${escHtml(roleLabel)} · ${escHtml(p.tag)}</div>
+          </div>
+          <span class="grade-pill grade-${escHtml(p.grade || "C")}">${escHtml(p.grade || "C")}</span>
+        </div>
+
+        <div class="badge-row">
+          <span class="mini-badge">TH${p.thLevel}</span>
+          <span class="mini-badge ${isWarIn ? "in" : "out"}">${isWarIn ? "WAR IN" : "OUT"}</span>
+          ${p.isRushed ? `<span class="mini-badge rush">RUSHED</span>` : ""}
+          ${p.hasDeepSync ? `<span class="mini-badge ds">◈ SYNCED</span>` : ""}
+        </div>
+
+        <div class="prog-block">
+          <div class="prog-head">
+            <span class="prog-pct">${pct.toFixed(1)}%</span>
+            <span class="prog-vel" style="color:${vel > 0 ? "var(--green)" : "var(--text-muted)"};">
+              ${vel > 0 ? "+" + vel.toFixed(2) + "%" : "0.00%"} (30d)
+            </span>
+          </div>
+          <div class="bar-track">
+            <div class="bar-fill" style="width:${pct}%;background:${barColor};"></div>
+          </div>
+        </div>
+
+        <div class="card-foot mono">
+          <span>Heroes ${Math.round(parsePct(p.heroes))}%</span>
+          <span>Don: ${Number(p.donations || 0).toLocaleString()}</span>
+        </div>
+      </article>
+    `;
+  }).join("");
+}
+
+/* ============================================================
+   WAR COMMAND TAB
+============================================================ */
+function setWarSize(size) {
+  state.warSize = size;
+  document.getElementById("btn15v15").classList.toggle("active", size === 15);
+  document.getElementById("btn30v30").classList.toggle("active", size === 30);
+  renderWarTab();
+}
+
+function renderWarTab() {
+  const war = state.currentWar || { state: "notInWar" };
+  const labelEl = document.getElementById("warStateLabel");
+  const container = document.getElementById("liveWarContainer");
+
+  if (!war || war.state === "notInWar" || war.state === "error") {
+    labelEl.textContent = "Status: Not Currently in War";
+    container.innerHTML = `<div style="font-size:13px;color:var(--text-muted);padding:8px 0;">
+      No active war detected right now. Use the <b>War Lineup Optimizer</b> below to prepare your next ${state.warSize}v${state.warSize} roster.
+    </div>`;
+  } else {
+    const stateText = war.state === "inWar" ? "⚔️ BATTLE DAY LIVE" : war.state === "preparation" ? "🛡️ PREPARATION DAY" : "🏁 WAR ENDED";
+    labelEl.textContent = `${stateText} · ${war.teamSize}v${war.teamSize} · ${war.clan.attacksUsed}/${war.clan.totalAttacks} Attacks Used`;
+
+    const missing = (war.members || []).filter(m => m.attacksLeft > 0);
+    const membersHtml = (war.members || []).map(m => `
+      <div class="list-row">
+        <div>
+          <strong style="font-size:14px;">#${m.mapPosition} ${escHtml(m.name)}</strong>
+          <div style="font-size:11px;color:var(--text-muted);">TH${m.townhallLevel} · ${m.starsEarned}★ earned</div>
+        </div>
+        <span class="mini-badge ${m.attacksLeft === 0 ? "in" : "rush"}">
+          ${m.attacksLeft === 0 ? "✓ DONE" : `${m.attacksLeft} LEFT`}
+        </span>
+      </div>
+    `).join("");
+
+    container.innerHTML = `
+      <div class="war-scoreboard">
+        <div class="war-side">
+          <div class="war-clan-name">${escHtml(war.clan.name)}</div>
+          <div class="war-stars">${war.clan.stars}★</div>
+          <div class="war-dest">${Number(war.clan.destructionPercentage).toFixed(1)}%</div>
+        </div>
+        <div class="war-vs">VS</div>
+        <div class="war-side">
+          <div class="war-clan-name">${escHtml(war.opponent.name)}</div>
+          <div class="war-stars">${war.opponent.stars}★</div>
+          <div class="war-dest">${Number(war.opponent.destructionPercentage).toFixed(1)}%</div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:700;margin-bottom:6px;color:${missing.length ? "var(--amber)" : "var(--green)"};">
+        ${missing.length ? `⚠️ ${missing.length} members still have attacks remaining:` : "✅ All war attacks completed!"}
+      </div>
+      <div>${membersHtml}</div>
+    `;
+  }
+
+  const optedIn = state.players
+    .filter(p => String(p.warPreference).toLowerCase() === "in")
+    .sort((a, b) => (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0));
+
+  const lineupEl = document.getElementById("lineupContainer");
+  if (!optedIn.length) {
+    lineupEl.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">No players currently opted IN for war.</div>`;
+    return;
+  }
+
+  let html = "";
+  optedIn.forEach((p, idx) => {
+    if (idx === state.warSize) {
+      html += `<div class="cutoff-line">▲ TOP ${state.warSize} STARTER CUTOFF — BENCH BELOW ▼</div>`;
+    }
+    html += `
+      <div class="list-row" style="cursor:pointer;" onclick="openDrawer('${escHtml(p.tag)}')">
+        <div>
+          <strong style="font-size:14px;">${idx + 1}. ${escHtml(p.name)}</strong>
+          <div style="font-size:11px;color:var(--text-muted);">
+            TH${p.thLevel} · Heroes ${Math.round(parsePct(p.heroes))}% · Overall ${parseFloat(p.percentage).toFixed(1)}%
+            ${p.isRushed ? " · ⚠️ Rushed" : ""}
+          </div>
+        </div>
+        <span class="mini-badge ds">WAR ${p.warScore}</span>
+      </div>
+    `;
+  });
+  lineupEl.innerHTML = html;
+}
+
+function copyMissedAttackPing() {
+  const war = state.currentWar;
+  if (!war || !war.members || war.state === "notInWar") {
+    showToast("No active war right now.");
+    return;
+  }
+  const missing = war.members.filter(m => m.attacksLeft > 0);
+  if (!missing.length) {
+    showToast("Everyone has already used their attacks!");
+    return;
+  }
+  const lines = missing.map(m => `• #${m.mapPosition} ${m.name} (${m.attacksLeft} attack${m.attacksLeft > 1 ? "s" : ""} left)`);
+  const msg = `⚔️ **WAR ATTACK REMINDER (${war.clan.name} vs ${war.opponent.name})**\n` + lines.join("\n");
+  copyText(msg, "Copied missed-attack ping to clipboard!");
+}
+
+function copyWarLineup() {
+  const optedIn = state.players
+    .filter(p => String(p.warPreference).toLowerCase() === "in")
+    .sort((a, b) => (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0))
+    .slice(0, state.warSize);
+
+  const lines = optedIn.map((p, i) => `${i + 1}. ${p.name} (TH${p.thLevel} · War Score ${p.warScore})`);
+  const msg = `🛡️ **RECOMMENDED ${state.warSize}v${state.warSize} WAR LINEUP**\n` + lines.join("\n");
+  copyText(msg, `Copied ${optedIn.length}-player war lineup!`);
+}
+
+/* ============================================================
+   ACTIVITY & CLAN HEALTH TAB
+============================================================ */
+function renderActivityTab() {
+  const ranked = [...state.players].sort((a, b) => (parseFloat(b.progression30d) || 0) - (parseFloat(a.progression30d) || 0));
+  const velEl = document.getElementById("velocityList");
+
+  velEl.innerHTML = ranked.map((p, i) => {
+    const gain = parseFloat(p.progression30d) || 0;
+    return `
+      <div class="list-row" style="cursor:pointer;" onclick="openDrawer('${escHtml(p.tag)}')">
+        <div>
+          <strong style="font-size:14px;">${i + 1}. ${escHtml(p.name)}</strong>
+          <div style="font-size:11px;color:var(--text-muted);">TH${p.thLevel} · ${parseFloat(p.percentage).toFixed(1)}% overall · ${p.attackWins || 0} season wins</div>
+        </div>
+        <span class="mini-badge ${gain > 0 ? "in" : "out"}">${gain > 0 ? "+" + gain.toFixed(2) + "%" : "0.00% STALLED"}</span>
+      </div>
+    `;
+  }).join("");
+
+  const flagged = state.players.filter(p => {
+    const gain = parseFloat(p.progression30d) || 0;
+    const don = Number(p.donations) || 0;
+    const rec = Number(p.donationsReceived) || 0;
+    return gain <= 0 || (don < 200 && rec > 600);
+  });
+
+  const watchEl = document.getElementById("donationWatchlist");
+  if (!flagged.length) {
+    watchEl.innerHTML = `<div style="font-size:13px;color:var(--green);">All active clan members are progressing and donating well!</div>`;
+    return;
+  }
+
+  watchEl.innerHTML = flagged.map(p => {
+    const gain = parseFloat(p.progression30d) || 0;
+    const don = Number(p.donations) || 0;
+    const rec = Number(p.donationsReceived) || 0;
+    const reasons = [];
+    if (gain <= 0) reasons.push("0% 30d progress");
+    if (don < 200 && rec > 600) reasons.push(`Ratio ${don}/${rec}`);
+    return `
+      <div class="list-row" style="cursor:pointer;" onclick="openDrawer('${escHtml(p.tag)}')">
+        <div>
+          <strong style="font-size:14px;">${escHtml(p.name)}</strong>
+          <div style="font-size:11px;color:var(--text-muted);">Donated: ${don.toLocaleString()} · Received: ${rec.toLocaleString()}</div>
+        </div>
+        <span class="mini-badge rush">${reasons.join(" · ")}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function copyInactiveReport() {
+  const stalled = state.players.filter(p => (parseFloat(p.progression30d) || 0) <= 0);
+  const lines = stalled.map(p => `• ${p.name} (TH${p.thLevel} · Donated ${p.donations || 0} / Rec ${p.donationsReceived || 0})`);
+  const msg = `📋 **CLAN ACTIVITY & STAGNANT WATCHLIST (${stalled.length})**\n` + (lines.length ? lines.join("\n") : "None!");
+  copyText(msg, "Copied clan activity watchlist!");
+}
+
+/* ============================================================
+   DEEP SYNC DIRECTORY TAB
+============================================================ */
+function renderDeepSyncDirectory() {
+  const dirEl = document.getElementById("deepSyncDirectory");
+  const sorted = [...state.players].sort((a, b) => (b.hasDeepSync ? 1 : 0) - (a.hasDeepSync ? 1 : 0));
+
+  dirEl.innerHTML = sorted.map(p => {
+    const ds = p.deepSync;
+    return `
+      <div class="panel" style="padding:13px 15px;cursor:pointer;margin-bottom:10px;" onclick="openDrawer('${escHtml(p.tag)}')">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <strong style="font-size:15px;">${escHtml(p.name)}</strong>
+            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">
+              ${ds
+                ? `${ds.maxedBuildings}/${ds.totalBuildings} buildings maxed · ${ds.activeUpgrades.length} active builders · ${formatRelTime(ds.timestamp)}`
+                : "Tap to sync Village Export JSON"}
+            </div>
+          </div>
+          <span class="mini-badge ${ds ? "in" : "out"}">${ds ? `◈ ${ds.maxPct}% MAX` : "NOT SYNCED"}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ============================================================
+   PLAYER DETAIL DRAWER + SWIPE-DOWN GESTURE
+============================================================ */
+function openDrawer(tag) {
+  const player = state.players.find(p => p.tag === tag);
+  if (!player) return;
+
+  state.activeDrawerTag = tag;
+  document.getElementById("drawerPlayerName").textContent = player.name;
+  document.getElementById("drawerPlayerSub").textContent = `${player.tag} · TH${player.thLevel} · Grade ${player.grade} · War Score ${player.warScore}`;
+  renderDrawerContent(player);
+
+  document.getElementById("drawerBackdrop").classList.add("open");
+  const drawer = document.getElementById("playerDrawer");
+  drawer.style.transform = "";
+  drawer.classList.add("open");
+  drawer.setAttribute("aria-hidden", "false");
+}
+
+function closeDrawer() {
+  state.activeDrawerTag = null;
+  document.getElementById("drawerBackdrop").classList.remove("open");
+  const drawer = document.getElementById("playerDrawer");
+  drawer.classList.remove("open");
+  drawer.style.transform = "";
+  drawer.setAttribute("aria-hidden", "true");
+}
+
+function initDrawerSwipe() {
+  const header = document.getElementById("drawerHeader");
+  const drawer = document.getElementById("playerDrawer");
+  let startY = 0;
+  let deltaY = 0;
+
+  header.addEventListener("touchstart", (e) => {
+    startY = e.touches[0].clientY;
+    deltaY = 0;
+    drawer.style.transition = "none";
+  }, { passive: true });
+
+  header.addEventListener("touchmove", (e) => {
+    deltaY = Math.max(0, e.touches[0].clientY - startY);
+    drawer.style.transform = `translateY(${deltaY}px)`;
+  }, { passive: true });
+
+  header.addEventListener("touchend", () => {
+    drawer.style.transition = "";
+    if (deltaY > 95) {
+      closeDrawer();
+    } else {
+      drawer.style.transform = "";
+    }
+  });
+}
+
+function renderDrawerContent(p) {
+  const cats = [
+    { label: "Heroes",    val: p.heroes,    color: "var(--accent)" },
+    { label: "Equipment", val: p.equipment, color: "var(--purple)" },
+    { label: "Pets",      val: p.pets,      color: "var(--green)"  },
+    { label: "Troops",    val: p.troops,    color: "var(--amber)"  },
+    { label: "Spells",    val: p.spells,    color: "var(--red)"    },
+    { label: "Sieges",    val: p.sieges,    color: "var(--accent)" }
+  ];
+
+  const catHtml = cats.map(c => {
+    const pct = parsePct(c.val);
+    return `
+      <div class="cat-box">
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;">
+          <span>${c.label}</span>
+          <span class="mono" style="color:${c.color};">${Math.round(pct)}%</span>
+        </div>
+        <div class="bar-track" style="margin-bottom:4px;">
+          <div class="bar-fill" style="width:${pct.toFixed(1)}%;background:${c.color};"></div>
+        </div>
+        <div class="mono" style="font-size:11px;color:var(--text-muted);">${escHtml(c.val || "0/0")}</div>
+      </div>
+    `;
+  }).join("");
+
+  let deepHtml = "";
   if (p.hasDeepSync && p.deepSync) {
     const ds = p.deepSync;
-    const maxPct = parseFloat(ds.maxPct) || 0;
-    deepSection = `
-      <div class="sh-sec-ds">DEEP MATRIX INTEL</div>
+    const ganttRows = (ds.activeUpgrades || []).length
+      ? ds.activeUpgrades.map(u => `
+          <div class="list-row">
+            <div>
+              <strong style="font-size:13px;">${escHtml(u.name)}</strong>
+              <div class="mono" style="font-size:11px;color:var(--text-muted);">Level ${u.level} → ${u.level + 1}</div>
+            </div>
+            <span class="mini-badge in">${formatHours(u.remainingHours)}</span>
+          </div>
+        `).join("")
+      : `<div style="font-size:12px;color:var(--text-muted);padding:6px 0;">All builders free!</div>`;
 
-      <!-- Village Integrity Meter -->
-      <div class="integrity-meter">
-        <div class="integrity-pct">${maxPct.toFixed(1)}<span class="unit">%</span></div>
-        <div class="integrity-detail">
-          <div class="integrity-row">
-            <b>${ds.maxedBuildings}</b> / ${ds.totalBuildings} buildings maxed
+    const queueItems = (ds.unmaxedBuildings || [])
+      .filter(b => b.name !== "Wall")
+      .map(b => ({ ...b, estHours: getEstimatedHours(b.name, b.level + 1) }))
+      .sort((a, b) => state.queueMode === "spt" ? a.estHours - b.estHours : b.estHours - a.estHours)
+      .slice(0, 8);
+
+    const queueRows = queueItems.length
+      ? queueItems.map((b, idx) => `
+          <div class="list-row">
+            <div>
+              <strong style="font-size:13px;">${idx + 1}. ${escHtml(b.name)}</strong>
+              <div class="mono" style="font-size:11px;color:var(--text-muted);">
+                Lvl ${b.level} → ${b.level + 1} (${b.levelsRemaining} to TH19 max)
+              </div>
+            </div>
+            <span class="mini-badge ds">${formatHours(b.estHours)}</span>
           </div>
-          <div class="integrity-row">
-            <b>${ds.activeUpgrades.length}</b> builder${ds.activeUpgrades.length !== 1 ? 's' : ''} active
-            &nbsp;·&nbsp; last sync ${formatRelTime(ds.timestamp)}
-          </div>
-          <div class="integrity-track">
-            <div class="integrity-fill" style="width:${Math.min(100,maxPct).toFixed(1)}%"></div>
-          </div>
-        </div>
+        `).join("")
+      : `<div style="font-size:12px;color:var(--green);padding:6px 0;">Village buildings maxed!</div>`;
+
+    deepHtml = `
+      <div class="sec-label">TH19 Village Deep Matrix (${ds.maxPct}% Buildings Maxed)</div>
+      <div class="cat-box" style="margin-bottom:10px;">
+        <div style="font-size:12px;font-weight:700;margin-bottom:6px;">Active Builders & Lab (${ds.activeUpgrades.length} running)</div>
+        ${ganttRows}
       </div>
-
-      <!-- Builder Gantt Chart -->
-      <div class="sh-sec-ds">BUILDER COMMAND CENTER</div>
-      ${renderGanttHtml(ds.activeUpgrades)}
-
-      <!-- SPT / LPT Queue -->
-      <div class="sh-sec-ds">UPGRADE INTELLIGENCE</div>
-      ${renderQueueHtml(ds.unmaxedBuildings, p.tag)}
-    `;
-  } else {
-    deepSection = `
-      <div class="sh-sec">DEEP MATRIX</div>
-      <div class="sync-no-ds">
-        <div class="sync-no-ds-icon">🔒</div>
-        <div class="sync-no-ds-title">NO DEEP SYNC RECORDED</div>
-        <div class="sync-no-ds-hint">
-          Export your village data from the CoC game, copy the JSON to your clipboard,
-          then tap the button below to inject it into the Deep Matrix.
+      <div class="cat-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:12px;">Priority Upgrade Queue</strong>
+          <div style="display:flex;gap:5px;">
+            <button class="chip ${state.queueMode === "spt" ? "active" : ""}" onclick="switchQueueMode('spt')">⚡ Quick (SPT)</button>
+            <button class="chip ${state.queueMode === "lpt" ? "active" : ""}" onclick="switchQueueMode('lpt')">🔱 Heavy (LPT)</button>
+          </div>
         </div>
+        ${queueRows}
       </div>
     `;
   }
 
-  /* ── Sync Button (always present at bottom) ── */
-  const syncSection = `
-    <div class="sync-section">
-      <div class="sync-title">⬡ DEEP SYNC ${p.hasDeepSync ? '— UPDATE DATA' : '— ACTIVATE'}</div>
-      <div class="sync-hint">
-        Copy your <b>Village Data JSON</b> to clipboard, then tap. The JSON tag
-        must match this player's tag (<b>${escHtml(p.tag)}</b>).
+  document.getElementById("drawerBody").innerHTML = `
+    <div class="sec-label">TH19 Progression Breakdown</div>
+    <div class="cat-grid">${catHtml}</div>
+
+    <div class="sec-label">Season & War Telemetry</div>
+    <div class="stat-pills">
+      <div class="stat-pill">
+        <div class="kpi-label">War Stars</div>
+        <div class="mono" style="font-size:16px;font-weight:700;">${Number(p.warStars || 0).toLocaleString()}</div>
       </div>
-      <div class="sync-btn" id="syncBtn_${escHtml(p.tag)}" onclick="clipboardSync('${escHtml(p.tag)}')">
-        <span class="sync-icon">📋</span>
-        1-CLICK CLIPBOARD SYNC
+      <div class="stat-pill">
+        <div class="kpi-label">Donated / Rec</div>
+        <div class="mono" style="font-size:14px;font-weight:700;">${Number(p.donations || 0).toLocaleString()} / ${Number(p.donationsReceived || 0).toLocaleString()}</div>
+      </div>
+      <div class="stat-pill">
+        <div class="kpi-label">Attack Wins</div>
+        <div class="mono" style="font-size:16px;font-weight:700;">${Number(p.attackWins || 0).toLocaleString()}</div>
+      </div>
+      <div class="stat-pill">
+        <div class="kpi-label">30D Gain</div>
+        <div class="mono" style="font-size:16px;font-weight:700;color:var(--green);">+${parseFloat(p.progression30d || 0).toFixed(2)}%</div>
       </div>
     </div>
-    <div style="height:16px;"></div>
+
+    <div class="sec-label">Balance Radar & 30-Day Trajectory</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="cat-box" style="height:210px;"><canvas id="radarCanvas"></canvas></div>
+      <div class="cat-box" style="height:210px;"><canvas id="trendCanvas"></canvas></div>
+    </div>
+
+    ${deepHtml}
+
+    <div class="sec-label">Sync Village Export JSON</div>
+    <div style="font-size:12px;color:var(--text-muted);">
+      Copy your Village JSON from Clash of Clans (Settings → More Settings → Data Export) for <b>${escHtml(p.tag)}</b>:
+    </div>
+    <div class="sync-btn-group">
+      <button class="btn-sync-primary" onclick="clipboardSync('${escHtml(p.tag)}')">📋 1-Click Clipboard Sync</button>
+      <button class="btn-sync-secondary" onclick="openPasteModal('${escHtml(p.tag)}')">✍️ Paste JSON Manually</button>
+    </div>
   `;
 
-  document.getElementById('sheetBody').innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
-      <div>
-        <div class="sheet-name">${escHtml(p.name)}</div>
-        <div class="sheet-sub">
-          <span>TH${p.thLevel}</span>
-          <span class="sep">·</span>
-          <span class="accent">${parseFloat(p.percentage).toFixed(1)}% OVERALL</span>
-          <span class="sep">·</span>
-          <span class="gain">${vel >= 0 ? '+' : ''}${vel.toFixed(2)}% (30d)</span>
-          ${p.hasDeepSync ? '<span style="color:var(--ds-green);letter-spacing:1px;">· ◈ VERIFIED</span>' : ''}
-        </div>
-      </div>
-      ${gCls ? `<div class="g-badge g-badge-lg ${gCls}">${p.grade}</div>` : ''}
-    </div>
+  renderDrawerCharts(p, cats);
+}
 
-    <div class="sh-sec">Combat Radar</div>
-    <div class="radar-wrap"><canvas id="radarCanvas"></canvas></div>
+function switchQueueMode(mode) {
+  state.queueMode = mode;
+  if (state.activeDrawerTag) {
+    const p = state.players.find(x => x.tag === state.activeDrawerTag);
+    if (p) renderDrawerContent(p);
+  }
+}
 
-    <div class="sh-sec">Category Breakdown</div>
-    <div class="cat-bars">${barsHtml}</div>
+function renderDrawerCharts(p, cats) {
+  if (radarChart) { radarChart.destroy(); radarChart = null; }
+  if (trendChart) { trendChart.destroy(); trendChart = null; }
 
-    <div class="sh-sec">Troop Donations</div>
-    <div class="donations-val">
-      ${(parseInt(p.donations) || 0).toLocaleString()}
-      <span>troops donated</span>
-    </div>
+  const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
+  const gridColor = isDark ? "rgba(148,163,184,0.16)" : "rgba(15,23,42,0.12)";
+  const tickColor = isDark ? "#94a3b8" : "#475569";
 
-    <div class="sh-sec">30-Day Trajectory</div>
-    <div class="chart-wrap"><canvas id="lineCanvas"></canvas></div>
-
-    ${deepSection}
-    ${syncSection}
-  `;
-
-  document.getElementById('playerSheet').classList.add('open');
-  document.getElementById('sheetBg').classList.add('active');
-
-  if (bsLineChart)  { bsLineChart.destroy();  bsLineChart  = null; }
-  if (bsRadarChart) { bsRadarChart.destroy(); bsRadarChart = null; }
-
-  Chart.defaults.color       = '#3d4a5c';
-  Chart.defaults.font.family = "'Share Tech Mono', monospace";
-
-  const rCtx = document.getElementById('radarCanvas').getContext('2d');
-  bsRadarChart = new Chart(rCtx, {
-    type: 'radar',
+  const rCtx = document.getElementById("radarCanvas").getContext("2d");
+  radarChart = new Chart(rCtx, {
+    type: "radar",
     data: {
-      labels: CATS.map(c => c.label),
+      labels: cats.map(c => c.label),
       datasets: [{
-        data: catVals,
-        backgroundColor: 'rgba(0,240,255,0.06)',
-        borderColor: '#00f0ff', borderWidth: 1.5,
-        pointBackgroundColor: CATS.map(c => c.color),
-        pointRadius: 4, pointHoverRadius: 6,
+        data: cats.map(c => parsePct(c.val)),
+        backgroundColor: "rgba(56, 189, 248, 0.18)",
+        borderColor: "#38bdf8",
+        borderWidth: 2,
+        pointBackgroundColor: "#38bdf8"
       }]
     },
     options: {
-      responsive: true, maintainAspectRatio: true,
+      responsive: true,
+      maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
         r: {
-          min: 0, max: 100,
-          grid:        { color: 'rgba(255,255,255,0.05)' },
-          angleLines:  { color: 'rgba(255,255,255,0.05)' },
-          pointLabels: { color: '#64748b', font: { size: 9, family:"'Share Tech Mono',monospace" } },
-          ticks:       { display: false, stepSize: 25 },
+          min: 0,
+          max: 100,
+          ticks: { display: false },
+          grid: { color: gridColor },
+          angleLines: { color: gridColor },
+          pointLabels: { color: tickColor, font: { size: 10, weight: "600" } }
         }
-      },
-      animation: { duration: 800 }
-    }
-  });
-
-  if (p.historyDates && p.historyDates.length > 0) {
-    const lCtx = document.getElementById('lineCanvas').getContext('2d');
-    const grad = lCtx.createLinearGradient(0, 0, 0, 170);
-    grad.addColorStop(0, 'rgba(0,240,255,0.28)');
-    grad.addColorStop(1, 'rgba(0,240,255,0.00)');
-    bsLineChart = new Chart(lCtx, {
-      type: 'line',
-      data: {
-        labels: p.historyDates,
-        datasets: [{
-          data: p.historyPcts,
-          borderColor: '#00f0ff', backgroundColor: grad,
-          borderWidth: 1.5, fill: true, tension: 0.4,
-          pointBackgroundColor: '#00f0ff', pointRadius: 2.5, pointHoverRadius: 5,
-        }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { font: { size: 8 }, maxRotation: 0, maxTicksLimit: 6 } },
-          y: { grid: { color: 'rgba(255,255,255,0.04)' }, border: { display: false }, ticks: { font: { size: 8 } } }
-        },
-        animation: { duration: 700 }
       }
-    });
-  }
-
-  /* Animate Gantt bars after render */
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.gantt-bar[data-w]').forEach(el => {
-      el.style.width = el.dataset.w;
-    });
-    document.querySelectorAll('.integrity-fill[data-w]').forEach(el => {
-      el.style.width = el.dataset.w;
-    });
-  });
-}
-
-function closeSheet() {
-  document.getElementById('playerSheet').classList.remove('open');
-  document.getElementById('sheetBg').classList.remove('active');
-  if (bsLineChart)  { bsLineChart.destroy();  bsLineChart  = null; }
-  if (bsRadarChart) { bsRadarChart.destroy(); bsRadarChart = null; }
-}
-
-/* ─────────────────────────────── GANTT CHART ───────────────────────
-   Builder Command Center: shows active upgrades as a timeline.
-   Bar fill = remaining time relative to longest active upgrade.
-   Color gradient: green (nearly done) → amber (just started).
-────────────────────────────────────────────────────────────────────── */
-function renderGanttHtml(activeUpgrades) {
-  if (!activeUpgrades || activeUpgrades.length === 0) {
-    return `<div class="gantt-done">🏗️ &nbsp; All builders are free — ready to upgrade!</div>`;
-  }
-
-  const maxRemaining = Math.max(...activeUpgrades.map(u => u.remainingHours || 0), 1);
-
-  let rows = '';
-  activeUpgrades.forEach((u, i) => {
-    const remaining = u.remainingHours || 0;
-    const pct = Math.min(100, (remaining / maxRemaining) * 100);
-
-    // Color: interpolate green→amber→red based on remaining time
-    // <48h = green, 48-168h = amber, >168h = red-ish
-    let barColor;
-    if (remaining <= 48) {
-      barColor = 'linear-gradient(90deg,#00ff9d,#00f0ff)';
-    } else if (remaining <= 168) {
-      barColor = 'linear-gradient(90deg,#ff9f0a,#ffd60a)';
-    } else {
-      barColor = 'linear-gradient(90deg,#ff2d55,#b400ff)';
     }
-
-    const emoji = getBuildEmoji(u.name);
-    const timeLabel = formatHours(remaining);
-
-    rows += `
-      <div class="gantt-row">
-        <div class="gantt-icon">${emoji}</div>
-        <div class="gantt-info">
-          <div class="gantt-name">${escHtml(u.name)}</div>
-          <div class="gantt-level">LVL ${u.level} → ${u.level + 1}</div>
-          <div class="gantt-track">
-            <div class="gantt-bar" data-w="${pct.toFixed(1)}%" style="width:0%;background:${barColor};box-shadow:0 0 6px rgba(0,255,157,0.3);"></div>
-          </div>
-        </div>
-        <div class="gantt-time" style="color:${remaining<=48?'var(--ds-green)':remaining<=168?'var(--ds-amber)':'var(--red)'}">${timeLabel}</div>
-      </div>`;
   });
 
-  return `
-    <div class="gantt-container">
-      <div class="gantt-hdr">
-        <span></span><span>BUILDING / LEVEL</span><span style="text-align:right;">REMAINING</span>
-      </div>
-      ${rows}
-    </div>`;
-}
-
-/* ─────────────────────────────── SPT / LPT QUEUES ─────────────────
-   SPT — Shortest Processing Time: upgrade quick wins first.
-         Clears queue, maintains momentum, maximizes completion count.
-   LPT — Longest Processing Time: tackle biggest upgrades first.
-         Maximizes long-term defensive/offensive value per builder.
-   Inspired by SamBro2901/coc-upgrade-optimizer scheduling logic.
-────────────────────────────────────────────────────────────────────── */
-function renderQueueHtml(unmaxedBuildings, playerTag) {
-  if (!unmaxedBuildings || unmaxedBuildings.length === 0) {
-    return `<div class="queue-empty">Village fully maxed — legendary status! 🏆</div>`;
-  }
-
-  // Attach estimated upgrade time for next level to each building
-  const withTimes = unmaxedBuildings
-    .filter(b => !b.name.includes('Wall')) // Skip walls
-    .map(b => ({
-      ...b,
-      estimatedHours: getEstimatedHours(b.name, b.level + 1)
-    }));
-
-  if (withTimes.length === 0) {
-    return `<div class="queue-empty">No upgradeable buildings detected.</div>`;
-  }
-
-  const spt = [...withTimes].sort((a, b) => a.estimatedHours - b.estimatedHours);
-  const lpt = [...withTimes].sort((a, b) => b.estimatedHours - a.estimatedHours);
-
-  // Store for tab switching
-  window._dsQueues = window._dsQueues || {};
-  window._dsQueues[playerTag] = { spt, lpt };
-
-  return buildQueueToggleHtml(playerTag, spt, lpt);
-}
-
-function buildQueueToggleHtml(playerTag, spt, lpt) {
-  const list    = currentQueueMode === 'spt' ? spt : lpt;
-  const top     = list.slice(0, 7);
-  const desc    = currentQueueMode === 'spt'
-    ? '⚡ SPT: Shortest first — maximize completed upgrades. Ideal for active builders who want rapid turnover.'
-    : '🔱 LPT: Longest first — prioritize high-value upgrades. Best when you upgrade infrequently and want maximum impact.';
-
-  const colorMap = ['q1','q2','q3','','','',''];
-
-  const items = top.map((b, i) => {
-    const rankCls = colorMap[i] || '';
-    const rankStr = i === 0 ? '01' : i === 1 ? '02' : i === 2 ? '03' : `0${i+1}`;
-    const timeStr = formatHours(b.estimatedHours);
-    const maxColor = b.levelsRemaining <= 2 ? 'var(--ds-green)' : b.levelsRemaining <= 5 ? 'var(--ds-amber)' : 'var(--muted-light)';
-    const upgradingTag = b.isUpgrading ? `<div class="queue-upgrading">▲ UPGRADING NOW</div>` : '';
-    return `
-      <div class="queue-item">
-        <div class="queue-rank ${rankCls}">${rankStr}</div>
-        <div class="queue-info">
-          <div class="queue-name">${escHtml(b.name)}</div>
-          <div class="queue-meta">
-            LVL ${b.level} → ${b.level+1} &nbsp;·&nbsp;
-            <span style="color:${maxColor}">${b.levelsRemaining} to max</span>
-          </div>
-          ${upgradingTag}
-        </div>
-        <div class="queue-time" style="color:${currentQueueMode==='spt'?'var(--cyan)':'var(--purple)'}">
-          ${timeStr}
-        </div>
-      </div>`;
-  }).join('');
-
-  return `
-    <div class="queue-toggle">
-      <div class="queue-tab ${currentQueueMode==='spt'?'active':''}"
-           onclick="switchQueueMode('spt','${escHtml(playerTag)}')">
-        ⚡ SPT &nbsp; Quick Wins
-      </div>
-      <div class="queue-tab ${currentQueueMode==='lpt'?'active':''}"
-           onclick="switchQueueMode('lpt','${escHtml(playerTag)}')">
-        🔱 LPT &nbsp; Power Chain
-      </div>
-    </div>
-    <div class="queue-desc">${desc}</div>
-    <div class="queue-list" id="queueList_${escHtml(playerTag)}">${items}</div>`;
-}
-
-function switchQueueMode(mode, playerTag) {
-  currentQueueMode = mode;
-  const queues = window._dsQueues?.[playerTag];
-  if (!queues) return;
-
-  const { spt, lpt } = queues;
-  const list = mode === 'spt' ? spt : lpt;
-  const top  = list.slice(0, 7);
-  const desc = mode === 'spt'
-    ? '⚡ SPT: Shortest first — maximize completed upgrades. Ideal for active builders who want rapid turnover.'
-    : '🔱 LPT: Longest first — prioritize high-value upgrades. Best when you upgrade infrequently and want maximum impact.';
-
-  // Update toggle styling
-  document.querySelectorAll('.queue-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.queue-tab').forEach(t => {
-    if (t.textContent.includes(mode.toUpperCase())) t.classList.add('active');
+  const tCtx = document.getElementById("trendCanvas").getContext("2d");
+  trendChart = new Chart(tCtx, {
+    type: "line",
+    data: {
+      labels: p.historyDates && p.historyDates.length ? p.historyDates : ["Now"],
+      datasets: [{
+        data: p.historyPcts && p.historyPcts.length ? p.historyPcts : [parseFloat(p.percentage) || 0],
+        borderColor: "#10b981",
+        backgroundColor: "rgba(16, 185, 129, 0.16)",
+        fill: true,
+        tension: 0.35,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 10 } } },
+        y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
+      }
+    }
   });
-  document.querySelector('.queue-desc').textContent = desc;
-
-  const colorMap = ['q1','q2','q3','','','',''];
-  const container = document.getElementById(`queueList_${playerTag}`);
-  if (!container) return;
-
-  container.innerHTML = top.map((b, i) => {
-    const rankCls  = colorMap[i] || '';
-    const rankStr  = `0${i+1}`;
-    const timeStr  = formatHours(b.estimatedHours);
-    const maxColor = b.levelsRemaining <= 2 ? 'var(--ds-green)' : b.levelsRemaining <= 5 ? 'var(--ds-amber)' : 'var(--muted-light)';
-    const upgTag   = b.isUpgrading ? `<div class="queue-upgrading">▲ UPGRADING NOW</div>` : '';
-    return `<div class="queue-item">
-      <div class="queue-rank ${rankCls}">${rankStr}</div>
-      <div class="queue-info">
-        <div class="queue-name">${escHtml(b.name)}</div>
-        <div class="queue-meta">LVL ${b.level} → ${b.level+1} &nbsp;·&nbsp; <span style="color:${maxColor}">${b.levelsRemaining} to max</span></div>
-        ${upgTag}
-      </div>
-      <div class="queue-time" style="color:${mode==='spt'?'var(--cyan)':'var(--purple)'}">${timeStr}</div>
-    </div>`;
-  }).join('');
 }
 
-/* ─────────────────────────────── CLIPBOARD SYNC ────────────────────
-   1-Click Deep Sync flow:
-   1. Read clipboard via navigator.clipboard.readText()
-   2. Parse JSON, verify "tag" field matches current player
-   3. Client-side parse using COC_ID_MAP to build processed payload
-   4. POST processed data to GAS doPost endpoint
-   5. Update local player state, re-render sheet section
-────────────────────────────────────────────────────────────────────── */
+/* ============================================================
+   DEEP SYNC PARSER (CLIPBOARD + MANUAL PASTE)
+============================================================ */
 async function clipboardSync(playerTag) {
-  const btn = document.getElementById(`syncBtn_${playerTag}`);
-  if (btn) {
-    btn.classList.add('loading');
-    btn.innerHTML = `<span class="sync-icon">⏳</span> READING CLIPBOARD...`;
+  try {
+    const rawText = await navigator.clipboard.readText();
+    await processAndUploadVillageJson(playerTag, rawText);
+  } catch (err) {
+    showToast("Clipboard blocked by browser — opening manual paste box.");
+    openPasteModal(playerTag);
   }
+}
+
+let pasteModalTag = "";
+function openPasteModal(tag) {
+  pasteModalTag = tag;
+  document.getElementById("pasteTargetTag").textContent = tag;
+  document.getElementById("pasteJsonInput").value = "";
+  document.getElementById("pasteModal").classList.add("open");
+}
+function closePasteModal() {
+  document.getElementById("pasteModal").classList.remove("open");
+}
+function loadSampleTh19Json() {
+  const sample = {
+    tag: pasteModalTag,
+    buildings: [
+      { data: 1000001, lvl: 19 },
+      { data: 1000098, lvl: 1, timer: 172800 },
+      { data: 1000099, lvl: 1, timer: 259200 },
+      { data: 1000014, lvl: 14 },
+      { data: 1000007, lvl: 16 },
+      { data: 1000021, lvl: 13 }
+    ],
+    heroes: [
+      { data: 28000000, lvl: 112, timer: 129600 },
+      { data: 28000007, lvl: 28 }
+    ]
+  };
+  document.getElementById("pasteJsonInput").value = JSON.stringify(sample, null, 2);
+}
+async function submitPastedJson() {
+  const raw = document.getElementById("pasteJsonInput").value.trim();
+  if (!raw) {
+    showToast("Paste your Village JSON first.");
+    return;
+  }
+  const ok = await processAndUploadVillageJson(pasteModalTag, raw);
+  if (ok) closePasteModal();
+}
+
+async function processAndUploadVillageJson(playerTag, rawText) {
+  let village;
+  try {
+    village = JSON.parse(rawText);
+  } catch (e) {
+    showToast("Invalid JSON format.");
+    return false;
+  }
+
+  const normalize = (t) => {
+    let s = String(t || "").trim().toUpperCase();
+    return s && !s.startsWith("#") ? "#" + s : s;
+  };
+
+  const jsonTag = normalize(village.tag || village.Tag);
+  if (jsonTag && jsonTag !== normalize(playerTag)) {
+    showToast(`Tag mismatch: JSON belongs to ${jsonTag}, expected ${playerTag}`);
+    return false;
+  }
+
+  const parsed = parseVillageJson(normalize(playerTag), village);
 
   try {
-    // 1. Read clipboard
-    let text;
-    try {
-      text = await navigator.clipboard.readText();
-    } catch(err) {
-      showToast('⚠️ Clipboard permission denied. Please allow clipboard access.', 'error');
-      if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
-      return;
-    }
-
-    // 2. Parse JSON
-    let village;
-    try {
-      village = JSON.parse(text);
-    } catch(e) {
-      showToast('⚠️ Clipboard does not contain valid JSON', 'error');
-      if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
-      return;
-    }
-
-    // 3. Verify tag
-    const jsonTag = village.tag || village.Tag || '';
-    if (jsonTag !== playerTag) {
-      showToast(
-        jsonTag
-          ? `⚠️ Tag mismatch — JSON is for ${jsonTag}`
-          : '⚠️ No "tag" field found in JSON',
-        'error'
-      );
-      if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
-      return;
-    }
-
-    // 4. Client-side parse using COC_ID_MAP
-    if (btn) btn.innerHTML = `<span class="sync-icon">⚙️</span> PARSING VILLAGE...`;
-    const processed = parseVillageJson(playerTag, village);
-
-    // 5. POST to GAS backend
-    if (btn) btn.innerHTML = `<span class="sync-icon">📡</span> TRANSMITTING...`;
-    await postDeepSync(processed);
-
-    // 6. Update local state immediately (optimistic)
-    const playerIdx = globalPlayers.findIndex(p => p.tag === playerTag);
-    if (playerIdx > -1) {
-      globalPlayers[playerIdx].hasDeepSync = true;
-      globalPlayers[playerIdx].deepSync    = processed;
-      // Re-open sheet to reflect new data
-      openSheet(playerIdx);
-      // Re-render roster badge
-      renderRoster();
-    }
-
-    showToast(`✓ Deep Matrix synced — ${processed.activeUpgrades.length} builders active`, 'success');
-
-  } catch(err) {
-    console.error('Sync error:', err);
-    showToast('⚠️ Sync failed: ' + err.message, 'error');
-    if (btn) { btn.classList.remove('loading'); btn.innerHTML = `<span class="sync-icon">📋</span> 1-CLICK CLIPBOARD SYNC`; }
+    await fetch(getWebAppUrl(), {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(parsed)
+    });
+  } catch (e) {
+    showToast("Network error sending Deep Sync to Apps Script.");
+    return false;
   }
+
+  const idx = state.players.findIndex(p => normalize(p.tag) === normalize(playerTag));
+  if (idx > -1) {
+    state.players[idx].hasDeepSync = true;
+    state.players[idx].deepSync = parsed;
+    applyFilters();
+    renderDeepSyncDirectory();
+    renderKpis();
+    if (state.activeDrawerTag === state.players[idx].tag) {
+      renderDrawerContent(state.players[idx]);
+    }
+  }
+  showToast(`Deep Matrix synced (${parsed.activeUpgrades.length} active builders)!`);
+  return true;
 }
 
-/* Parse the raw village JSON into the processed payload the backend expects */
 function parseVillageJson(playerTag, village) {
-  // 1. MERGE ARRAYS: The older JSON splits data. We merge them so heroes, 
-  // pets, and lab upgrades appear in the Gantt chart.
   const allEntities = [
     ...(village.buildings || village.village_buildings || []),
     ...(village.heroes || []),
@@ -1718,46 +1978,39 @@ function parseVillageJson(playerTag, village) {
   ];
 
   const nowSec = Math.floor(Date.now() / 1000);
-
-  let activeUpgrades   = [];
+  let activeUpgrades = [];
   let unmaxedBuildings = [];
-  let totalBuildings   = 0;
-  let maxedBuildings   = 0;
+  let totalBuildings = 0;
+  let maxedBuildings = 0;
 
-  allEntities.forEach(b => {
-    const dataId  = b.data || b.data_id || b.dataId;
-    // 2. FIX LEVEL PARSING: Added `b.lvl` support
-    const level   = b.l || b.level || b.Level || b.lvl || 0;
-    
-    // 3. FIX TIMER PARSING: Added `b.timer` support (converts seconds remaining to a timestamp)
-    let endTime   = b.upgrade_end_time || b.upgradeEndTime || null;
-    if (!endTime && b.timer) {
-      endTime = nowSec + b.timer;
+  allEntities.forEach(item => {
+    const dataId = item.data || item.data_id || item.dataId;
+    const level  = item.l || item.lvl || item.level || item.Level || 0;
+    let endTime  = item.upgrade_end_time || item.upgradeEndTime || null;
+    if (!endTime && item.timer) {
+      endTime = nowSec + Number(item.timer);
     }
 
-    const name = COC_ID_MAP[dataId] || null;
+    const name = COC_ID_MAP[dataId];
+    if (!name || name === "Wall") return;
+    if (dataId >= 12000000 && dataId < 13000000) return;
 
-    if (!name) return;                          // Unknown ID — skip
-    if (name === 'Wall') return;                // Skip walls (they don't use builder time)
-    if (dataId >= 12000000 && dataId < 13000000) return; // Skip traps (no builder needed)
-
-    const maxLvl = COC_MAX_LEVELS[dataId];
-    const isUpgrading = !!(endTime && endTime > nowSec);
-
-    // Active builder/lab detection for the Gantt Chart
+    const isUpgrading = Boolean(endTime && endTime > nowSec);
     if (isUpgrading) {
-      const remainingHours = Math.max(0, Math.round((endTime - nowSec) / 3600));
+      const remainingHours = Math.max(1, Math.round((endTime - nowSec) / 3600));
       activeUpgrades.push({ name, level, endTime, remainingHours });
     }
 
-    // 4. INTEGRITY SKEW PREVENTION: Only calculate integrity % for known buildings with a max level.
+    const maxLvl = COC_MAX_LEVELS[dataId];
     if (maxLvl !== undefined) {
       totalBuildings++;
       if (level >= maxLvl) {
         maxedBuildings++;
       } else {
         unmaxedBuildings.push({
-          name, level, maxLevel: maxLvl,
+          name,
+          level,
+          maxLevel: maxLvl,
           levelsRemaining: maxLvl - level,
           isUpgrading
         });
@@ -1765,59 +2018,59 @@ function parseVillageJson(playerTag, village) {
     }
   });
 
-  const maxPct = totalBuildings > 0
-    ? ((maxedBuildings / totalBuildings) * 100).toFixed(1) : 0;
-
+  const maxPct = totalBuildings > 0 ? parseFloat(((maxedBuildings / totalBuildings) * 100).toFixed(1)) : 0;
   return {
     tag: playerTag,
     timestamp: Date.now(),
     totalBuildings,
     maxedBuildings,
-    maxPct: parseFloat(maxPct),
+    maxPct,
     activeUpgrades,
-    unmaxedBuildings: unmaxedBuildings.sort((a, b) => a.levelsRemaining - b.levelsRemaining)
+    unmaxedBuildings
   };
 }
 
-/* POST processed village data to GAS doPost endpoint */
-async function postDeepSync(payload) {
-  try {
-    // GAS Web Apps accept POST from fetch; use no-cors as fallback if CORS preflight fails
-    const res = await fetch(WEB_APP_URL, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify(payload)
-    });
-    if (res.ok) {
-      const data = await res.json().catch(() => ({}));
-      if (data.error) throw new Error(data.error);
-    }
-    // If no-cors, res.type === 'opaque' — we trust the GAS backend processed it
-  } catch(e) {
-    // Try no-cors fallback (silently fires, no response body readable)
-    try {
-      await fetch(WEB_APP_URL, {
-        method:  'POST',
-        mode:    'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify(payload)
-      });
-    } catch(e2) {
-      throw new Error('Network error — check GAS deployment settings.');
-    }
-  }
+/* ============================================================
+   API SETTINGS MODAL & TABS
+============================================================ */
+function openApiModal() {
+  document.getElementById("apiUrlInput").value = getWebAppUrl();
+  document.getElementById("apiModal").classList.add("open");
+}
+function closeApiModal() {
+  document.getElementById("apiModal").classList.remove("open");
+}
+function saveApiUrl() {
+  const val = document.getElementById("apiUrlInput").value.trim();
+  if (!val) return;
+  localStorage.setItem("molly_web_app_url", val);
+  closeApiModal();
+  loadDashboard();
+}
+function resetApiUrl() {
+  localStorage.removeItem("molly_web_app_url");
+  document.getElementById("apiUrlInput").value = DEFAULT_WEB_APP_URL;
+  showToast("Reset to default Web App URL.");
 }
 
-/* ─────────────────────────────── UTILS ─────────────────────────────── */
+function switchTab(tabKey, btnEl) {
+  document.querySelectorAll(".tab-pane").forEach(el => el.classList.remove("active"));
+  document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
+  document.getElementById(`tab-${tabKey}`).classList.add("active");
+  if (btnEl) btnEl.classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ============================================================
+   UTILITIES
+============================================================ */
 function escHtml(str) {
-  if (!str) return '';
-  const d = document.createElement('div');
-  d.appendChild(document.createTextNode(String(str)));
+  const d = document.createElement("div");
+  d.textContent = str == null ? "" : String(str);
   return d.innerHTML;
 }
 
 function formatHours(hours) {
-  if (hours < 1) return '< 1h';
   if (hours < 24) return `${Math.round(hours)}h`;
   const d = Math.floor(hours / 24);
   const h = Math.round(hours % 24);
@@ -1825,22 +2078,31 @@ function formatHours(hours) {
 }
 
 function formatRelTime(ts) {
-  if (!ts) return 'unknown';
-  const diff = Date.now() - Number(ts);
-  const min  = Math.floor(diff / 60000);
-  if (min < 60)  return `${min}m ago`;
-  const hr = Math.floor(min / 60);
-  if (hr < 24)   return `${hr}h ago`;
-  return `${Math.floor(hr / 24)}d ago`;
+  if (!ts) return "never";
+  const mins = Math.floor((Date.now() - Number(ts)) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+async function copyText(text, successMsg) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast(successMsg);
+  } catch (e) {
+    showToast("Could not copy automatically.");
+  }
 }
 
 let toastTimer = null;
-function showToast(msg, type = 'info') {
-  const el = document.getElementById('toast');
-  el.textContent  = msg;
-  el.className    = `show ${type}`;
+function showToast(msg) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.add("show");
   if (toastTimer) clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = type; }, 3200);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 3000);
 }
 </script>
 </body>
