@@ -72,6 +72,8 @@
       margin: 0;
       padding: 0;
       min-height: 100dvh;
+      max-width: 100vw;
+      overflow-x: hidden;
       background: var(--bg);
       color: var(--text);
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -796,6 +798,8 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 14px;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     .clock-header {
       display: flex;
@@ -808,8 +812,10 @@
     .clock-canvas-wrap {
       position: relative;
       height: 255px;
-      max-width: 310px;
+      width: 100%;
+      max-width: min(310px, 100%);
       margin: 0 auto;
+      overflow: hidden;
     }
 
     .ranked-group-title {
@@ -878,6 +884,8 @@
       border-radius: 12px;
       padding: 11px 12px;
       margin-bottom: 8px;
+      max-width: 100%;
+      overflow-x: hidden;
     }
     .battle-card:last-child { margin-bottom: 0; }
     .battle-top {
@@ -950,7 +958,9 @@
       left: 0;
       right: 0;
       bottom: 0;
-      max-width: 780px;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
       margin: 0 auto;
       height: 92dvh;
       max-height: 92dvh;
@@ -963,6 +973,9 @@
       transform: translateY(100%);
       transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
       box-shadow: 0 -12px 40px rgba(2, 6, 23, 0.6);
+    }
+    @media (min-width: 781px) {
+      .player-drawer { max-width: 780px; }
     }
     .player-drawer.open {
       transform: translateY(0);
@@ -1018,6 +1031,8 @@
 
     .drawer-scroll {
       flex: 1;
+      max-width: 100%;
+      overflow-x: hidden;
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       padding: 18px 20px calc(32px + env(safe-area-inset-bottom, 0px));
@@ -1048,6 +1063,8 @@
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 10px 12px;
+      max-width: 100%;
+      overflow-x: hidden;
     }
 
     .stat-pills {
@@ -1475,7 +1492,6 @@ let state = {
 };
 
 let radarChart = null;
-let trendChart = null;
 let attackClockChart = null;
 
 /* ============================================================
@@ -1625,7 +1641,7 @@ async function loadDashboard() {
   setSyncing(true);
   hideBanner();
   try {
-    const res = await fetch(`${getWebAppUrl()}?action=getDashboardData`);
+    const res = await fetch(`${getWebAppUrl()}?action=getDashboardData&_t=${Date.now()}`);
     const data = await res.json();
 
     if (data.error) {
@@ -1660,14 +1676,18 @@ async function forceClanSync() {
   setSyncing(true);
   showToast("Syncing active clan members & battle logs...");
   try {
-    const res = await fetch(`${getWebAppUrl()}?action=syncClanData`);
+    const res = await fetch(`${getWebAppUrl()}?action=syncClanData&_t=${Date.now()}`);
     const out = await res.json();
     if (out.error) {
       showToast("Sync error: " + out.error);
     } else {
       const members = out.summary?.syncedMembers || 0;
       const battles = out.summary?.newBattlesLogged || 0;
-      showToast(`Synced ${members} members (+${battles} new battles)!`);
+      const dbg = out.summary?.debugBattleSync;
+      const diagSuffix = dbg
+        ? ` (${dbg.totalBattlesParsed} parsed · Off ${dbg.officialOkCount} / CK ${dbg.clashKingOkCount})`
+        : "";
+      showToast(`Synced ${members} members · +${battles} new battles${diagSuffix}`);
       await loadDashboard();
     }
   } catch (err) {
@@ -1685,7 +1705,7 @@ async function refreshGlobalMeta() {
   }
   showToast("Fetching Top 100 Global Ranked profiles & battle logs...");
   try {
-    const res = await fetch(`${getWebAppUrl()}?action=syncGlobalMeta`);
+    const res = await fetch(`${getWebAppUrl()}?action=syncGlobalMeta&_t=${Date.now()}`);
     const out = await res.json();
     if (out.error) {
       showToast("Meta sync error: " + out.error);
@@ -2451,7 +2471,6 @@ function openDrawer(tag) {
 function closeDrawer() {
   state.activeDrawerTag = null;
   if (radarChart) { radarChart.destroy(); radarChart = null; }
-  if (trendChart) { trendChart.destroy(); trendChart = null; }
   if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
 
   document.getElementById("drawerBackdrop").classList.remove("open");
@@ -2905,10 +2924,9 @@ function renderDrawerContent(p) {
       </div>
     </div>
 
-    <div class="sec-label">Balance Radar &amp; 30-Day Trajectory</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="cat-box" style="height:210px;"><canvas id="radarCanvas"></canvas></div>
-      <div class="cat-box" style="height:210px;"><canvas id="trendCanvas"></canvas></div>
+    <div class="sec-label">Progression Balance Radar</div>
+    <div class="cat-box" style="width:100%;max-width:100%;height:230px;overflow:hidden;">
+      <canvas id="radarCanvas"></canvas>
     </div>
 
     ${clockHtml}
@@ -2923,7 +2941,6 @@ function renderDrawerContent(p) {
 
 function renderDrawerCharts(p, cats, clockProfile) {
   if (radarChart) { radarChart.destroy(); radarChart = null; }
-  if (trendChart) { trendChart.destroy(); trendChart = null; }
   if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
 
   if (typeof Chart === "undefined") return;
@@ -2959,33 +2976,6 @@ function renderDrawerCharts(p, cats, clockProfile) {
             angleLines: { color: gridColor },
             pointLabels: { color: tickColor, font: { size: 10, weight: "600" } }
           }
-        }
-      }
-    });
-  }
-
-  const trendEl = document.getElementById("trendCanvas");
-  if (trendEl) {
-    trendChart = new Chart(trendEl.getContext("2d"), {
-      type: "line",
-      data: {
-        labels: p.historyDates && p.historyDates.length ? p.historyDates : ["Now"],
-        datasets: [{
-          data: p.historyPcts && p.historyPcts.length ? p.historyPcts : [parseFloat(p.percentage) || 0],
-          borderColor: "#10b981",
-          backgroundColor: "rgba(16, 185, 129, 0.16)",
-          fill: true,
-          tension: 0.35,
-          borderWidth: 2
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { grid: { display: false }, ticks: { color: tickColor, font: { size: 10 } } },
-          y: { grid: { color: gridColor }, ticks: { color: tickColor, font: { size: 10 } } }
         }
       }
     });
