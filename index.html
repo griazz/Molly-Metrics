@@ -5,7 +5,7 @@
   <base target="_top" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" id="metaThemeColor" />
-  <title>Molly Metrics V10 — TH19 Clan Command</title>
+  <title>Molly Metrics V11 — TH19 Clan Command & Global Meta</title>
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -152,7 +152,8 @@
       border-color: var(--accent);
       font-weight: 700;
     }
-    .icon-btn.spinning .spin-ico {
+    .icon-btn.spinning .spin-ico,
+    .action-btn.spinning .spin-ico {
       display: inline-block;
       animation: spin 0.8s linear infinite;
     }
@@ -401,8 +402,213 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
     .action-btn:active { transform: scale(0.97); }
+    .action-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    /* ============================================================
+       GLOBAL RANKED META TAB
+    ============================================================ */
+    .meta-header-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .meta-header-info {
+      min-width: 0;
+      flex: 1;
+    }
+    .meta-header-title {
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .meta-header-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .archetype-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 580px) {
+      .archetype-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .archetype-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 12px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .archetype-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .archetype-name {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.3;
+    }
+    .archetype-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .archetype-metrics {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      padding-top: 6px;
+      border-top: 1px solid var(--border);
+    }
+
+    .hero-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 580px) {
+      .hero-meta-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .hero-meta-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 12px 13px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .hero-meta-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hero-meta-name {
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero-sublabel {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .pet-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    @media (min-width: 580px) {
+      .pet-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .pet-meta-item {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 11px;
+    }
+
+    /* ============================================================
+       PRIORITY META UPGRADES (PLAYER DRAWER)
+    ============================================================ */
+    .upgrade-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .upgrade-row {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .upgrade-left {
+      min-width: 0;
+      flex: 1;
+    }
+    .upgrade-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .upgrade-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .upgrade-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+    .upgrade-right {
+      text-align: right;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .upgrade-lvl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--amber);
+      white-space: nowrap;
+    }
+    .upgrade-maxed-box {
+      background: var(--green-bg);
+      border: 1px solid var(--green);
+      color: var(--green);
+      border-radius: 12px;
+      padding: 14px 16px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
 
     /* ============================================================
        ACTIVITY & LOOT LEADERBOARD
@@ -804,7 +1010,7 @@
     }
 
     /* ============================================================
-       BOTTOM NAVIGATION BAR (3 COLUMNS)
+       BOTTOM NAVIGATION BAR (4 COLUMNS)
     ============================================================ */
     .bottom-nav {
       position: fixed;
@@ -821,7 +1027,7 @@
       max-width: 780px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       height: 64px;
     }
     .nav-item {
@@ -832,6 +1038,7 @@
       font-size: 11px;
       font-weight: 700;
       cursor: pointer;
+      text-decoration: none;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -1000,10 +1207,34 @@
       </div>
     </div>
   </section>
+
+  <!-- ============================================================
+       TAB 3: TOP 100 GLOBAL RANKED META
+  ============================================================ -->
+  <section id="tab-meta" class="tab-pane">
+    <div class="meta-header-bar">
+      <div class="meta-header-info">
+        <div class="meta-header-title">
+          <span>🌐 Top 100 Global Ranked Meta</span>
+          <span class="th19-pill" id="metaTargetThBadge">TH19</span>
+        </div>
+        <div class="meta-header-sub" id="metaSyncSub">Awaiting Global Meta snapshot...</div>
+      </div>
+      <button class="action-btn" id="refreshMetaBtn" onclick="refreshGlobalMeta()">
+        <span class="spin-ico">↻</span> Refresh Meta
+      </button>
+    </div>
+
+    <div id="metaContent">
+      <div class="panel" style="text-align:center;padding:24px 16px;color:var(--text-muted);font-size:13px;">
+        Loading Top 100 Global Ranked Meta...
+      </div>
+    </div>
+  </section>
 </div>
 
 <!-- ============================================================
-     BOTTOM NAVIGATION (3 COLUMNS)
+     BOTTOM NAVIGATION (4 COLUMNS)
 ============================================================ -->
 <nav class="bottom-nav">
   <div class="bottom-nav-inner">
@@ -1013,9 +1244,12 @@
     <button class="nav-item" data-tab="activity" onclick="switchTab('activity', this)">
       <span class="nav-ico">⚔️</span>Activity
     </button>
-    <button class="nav-item" onclick="window.location.href='bases.html'">
-      <span class="nav-ico">🏰</span>Bases
+    <button class="nav-item" data-tab="meta" onclick="switchTab('meta', this)">
+      <span class="nav-ico">🌐</span>Meta
     </button>
+    <a class="nav-item" href="bases.html">
+      <span class="nav-ico">🏰</span>Bases
+    </a>
   </div>
 </nav>
 
@@ -1068,6 +1302,15 @@
 ============================================================ */
 const DEFAULT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw7ZpPJfVNu8afK61gVbKpFgk1XEh5kJmaZWryJ1oA83uu9Ujy4LnJou1yyg3i_hLFB/exec";
 
+const HERO_ORDER = [
+  "Barbarian King",
+  "Archer Queen",
+  "Minion Prince",
+  "Grand Warden",
+  "Royal Champion",
+  "Dragon Duke"
+];
+
 function getWebAppUrl() {
   return localStorage.getItem("molly_web_app_url") || DEFAULT_WEB_APP_URL;
 }
@@ -1078,6 +1321,7 @@ function getWebAppUrl() {
 let state = {
   clanMeta: {},
   players: [],
+  globalMeta: null,
   lastSyncTs: 0,
   activeDrawerTag: null,
   activityTimeframe: "24h",
@@ -1097,7 +1341,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initDrawerSwipe();
 
   const initialHash = window.location.hash.replace("#", "");
-  if (initialHash === "activity") {
+  if (initialHash === "activity" || initialHash === "meta") {
     switchTab(initialHash, document.querySelector(`.nav-item[data-tab="${initialHash}"]`));
   }
 
@@ -1143,12 +1387,14 @@ async function loadDashboard() {
 
     state.clanMeta   = data.clanMeta || {};
     state.players    = Array.isArray(data.players) ? data.players : [];
+    state.globalMeta = data.globalMeta || null;
     state.lastSyncTs = data.lastSyncTs || 0;
 
     renderHeader();
     renderKpis();
     applyFilters();
     renderActivityTab();
+    renderMetaTab();
 
     if (state.activeDrawerTag) {
       const updated = state.players.find(p => p.tag === state.activeDrawerTag);
@@ -1180,6 +1426,35 @@ async function forceClanSync() {
     showToast("Sync request failed — verify Apps Script deployment.");
   } finally {
     setSyncing(false);
+  }
+}
+
+async function refreshGlobalMeta() {
+  const btn = document.getElementById("refreshMetaBtn");
+  if (btn) {
+    btn.classList.add("spinning");
+    btn.disabled = true;
+  }
+  showToast("Fetching Top 100 Global Ranked profiles & battle logs...");
+  try {
+    const res = await fetch(`${getWebAppUrl()}?action=syncGlobalMeta`);
+    const out = await res.json();
+    if (out.error) {
+      showToast("Meta sync error: " + out.error);
+    } else {
+      state.globalMeta = out.globalMeta || null;
+      const analyzed = state.globalMeta?.rankedAttacksAnalyzed || 0;
+      showToast(`Global Meta updated (${analyzed.toLocaleString()} Ranked attacks analyzed)!`);
+      await loadDashboard();
+    }
+  } catch (err) {
+    showToast("Global Meta sync failed — verify Apps Script deployment.");
+    console.error(err);
+  } finally {
+    if (btn) {
+      btn.classList.remove("spinning");
+      btn.disabled = false;
+    }
   }
 }
 
@@ -1413,6 +1688,269 @@ function renderActivityTab() {
 }
 
 /* ============================================================
+   GLOBAL RANKED META TAB RENDERING
+============================================================ */
+function renderMetaTab() {
+  const meta = state.globalMeta;
+  const subEl = document.getElementById("metaSyncSub");
+  const thBadge = document.getElementById("metaTargetThBadge");
+  const contentEl = document.getElementById("metaContent");
+
+  if (!meta || !meta.updatedAt) {
+    if (thBadge) thBadge.textContent = "TH19";
+    if (subEl) subEl.textContent = "No Global Meta snapshot cached yet";
+    if (contentEl) {
+      contentEl.innerHTML = `
+        <div class="panel" style="text-align:center;padding:28px 18px;">
+          <div style="font-size:16px;font-weight:800;margin-bottom:6px;">Top 100 Global Ranked Meta Not Synced</div>
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+            Scan the Top 100 global players to uncover the strongest TH19 Ranked army combos, Hero Equipment loadouts, Pets, and personalized upgrade priorities.
+          </div>
+          <button class="btn-sync-primary" style="padding:0 20px;" onclick="refreshGlobalMeta()">↻ Sync Global Meta Now</button>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  const thTier = meta.targetTH || 19;
+  const attacksAnalyzed = Number(meta.rankedAttacksAnalyzed || 0);
+  const sampleSize = Number(meta.sampleSize || 0);
+  const avgThreeStar = Number(meta.avgThreeStarRate || 0);
+  const avgDest = Number(meta.avgDestruction || 0);
+
+  if (thBadge) thBadge.textContent = `TH${thTier}`;
+  if (subEl) {
+    subEl.textContent = `Synced ${formatRelTime(meta.updatedAt)} · ${sampleSize} Top TH${thTier} players · ${attacksAnalyzed.toLocaleString()} Ranked attacks analyzed`;
+  }
+
+  // 1. KPI Summary Strip
+  const kpiHtml = `
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Ranked Hits</div>
+        <div class="kpi-val" style="color:var(--accent);">${attacksAnalyzed.toLocaleString()}</div>
+        <div class="kpi-sub">${sampleSize} Top TH${thTier} players</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Global 3★ Rate</div>
+        <div class="kpi-val" style="color:var(--green);">${avgThreeStar.toFixed(1)}%</div>
+        <div class="kpi-sub">Across Ranked hits</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Avg Destr.</div>
+        <div class="kpi-val" style="color:var(--amber);">${avgDest.toFixed(1)}%</div>
+        <div class="kpi-sub">Top 100 benchmark</div>
+      </div>
+    </div>
+  `;
+
+  // 2. Top Meta Army Archetypes
+  const archetypes = Array.isArray(meta.topArchetypes) ? meta.topArchetypes : [];
+  const archetypesHtml = archetypes.length
+    ? `
+      <div class="archetype-grid">
+        ${archetypes.map((a, idx) => {
+          const usage = Number(a.usageRate || 0);
+          const winRate = Number(a.threeStarRate || 0);
+          const winClass = winRate >= 65 ? "in" : winRate >= 45 ? "amb" : "out";
+          const troops = Array.isArray(a.troops) ? a.troops : [];
+          const spells = Array.isArray(a.spells) ? a.spells : [];
+          return `
+            <div class="archetype-card">
+              <div class="archetype-top">
+                <div class="archetype-name">#${idx + 1} ${escHtml(a.name)}</div>
+                <span class="mini-badge ${winClass}">${winRate.toFixed(0)}% 3★</span>
+              </div>
+              <div class="archetype-pills">
+                ${troops.map(t => `<span class="mini-badge ds">${escHtml(t)}</span>`).join("")}
+                ${spells.map(s => `<span class="mini-badge purp">${escHtml(s.replace(/\s*Spell$/i, ""))}</span>`).join("")}
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" style="width:${Math.min(100, Math.max(4, usage))}%;background:var(--accent);"></div>
+              </div>
+              <div class="archetype-metrics mono">
+                <span style="color:var(--text-sec);font-weight:700;">${usage.toFixed(1)}% Meta Share</span>
+                <span style="color:var(--text-muted);">${Number(a.count || 0)} hits · ${Number(a.avgDestruction || 0).toFixed(0)}% avg</span>
+              </div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `
+    : `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:12px;">No Ranked army archetypes recorded yet.</div>`;
+
+  // 3. Hero Equipment & Pet Meta Grid (Grouped by Hero)
+  const topEquipment = (meta.topEquipment && typeof meta.topEquipment === "object") ? meta.topEquipment : {};
+  const topPets = Array.isArray(meta.topPets) ? meta.topPets : [];
+
+  const petsByHero = {};
+  let hasHeroPairedPets = false;
+  topPets.forEach(pet => {
+    if (pet && pet.topHero) {
+      hasHeroPairedPets = true;
+      if (!petsByHero[pet.topHero]) petsByHero[pet.topHero] = [];
+      petsByHero[pet.topHero].push(pet);
+    }
+  });
+
+  const allHeroes = Array.from(new Set(HERO_ORDER.concat(Object.keys(topEquipment))));
+  const heroCardsHtml = allHeroes.map(heroName => {
+    const eqList = Array.isArray(topEquipment[heroName]) ? topEquipment[heroName] : [];
+    const heroPets = Array.isArray(petsByHero[heroName]) ? petsByHero[heroName] : [];
+    if (!eqList.length && !heroPets.length) return "";
+
+    const eqBarsHtml = eqList.length
+      ? eqList.slice(0, 4).map(eq => {
+          const pct = Math.min(100, Math.max(0, Number(eq.usageRate || 0)));
+          return `
+            <div class="pill-bar-row">
+              <div class="pill-bar-head">
+                <span class="pill-bar-name">${escHtml(eq.name)}</span>
+                <span class="mono" style="font-size:11px;font-weight:700;color:var(--purple);">${pct.toFixed(0)}%</span>
+              </div>
+              <div class="pill-track" style="height:7px;">
+                <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--purple);"></div>
+              </div>
+            </div>
+          `;
+        }).join("")
+      : `<div style="font-size:11px;color:var(--text-muted);">No equipment data</div>`;
+
+    const petBarsHtml = heroPets.length
+      ? `
+        <div style="margin-top:4px;padding-top:8px;border-top:1px solid var(--border);">
+          <div class="hero-sublabel">Top Paired Pets</div>
+          ${heroPets.slice(0, 2).map(pt => {
+            const pct = Math.min(100, Math.max(0, Number(pt.usageRate || 0)));
+            return `
+              <div class="pill-bar-row">
+                <div class="pill-bar-head">
+                  <span class="pill-bar-name">${escHtml(pt.name)}</span>
+                  <span class="mono" style="font-size:11px;font-weight:700;color:var(--green);">${pct.toFixed(0)}%</span>
+                </div>
+                <div class="pill-track" style="height:7px;">
+                  <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--green);"></div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `
+      : "";
+
+    return `
+      <div class="hero-meta-card">
+        <div class="hero-meta-head">
+          <div class="hero-meta-name">${escHtml(heroName)}</div>
+          <span class="mini-badge purp">TOP EQUIP</span>
+        </div>
+        <div>${eqBarsHtml}</div>
+        ${petBarsHtml}
+      </div>
+    `;
+  }).filter(Boolean).join("");
+
+  const globalPetsBlock = topPets.length
+    ? `
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);">
+        <div class="ranked-group-title" style="margin-top:0;">${hasHeroPairedPets ? "All Top Hero Pets (Global Usage)" : "Top Hero Pets (Global Usage)"}</div>
+        <div class="pet-grid">
+          ${topPets.slice(0, 8).map(pt => {
+            const pct = Math.min(100, Math.max(0, Number(pt.usageRate || 0)));
+            const heroTag = pt.topHero ? `<span class="mini-badge ds">${escHtml(pt.topHero.split(" ").pop())}</span>` : "";
+            return `
+              <div class="pet-meta-item">
+                <div class="pill-bar-head">
+                  <div class="pill-bar-name">
+                    <span>${escHtml(pt.name)}</span>
+                    ${heroTag}
+                  </div>
+                  <span class="mono" style="font-size:11px;font-weight:700;color:var(--green);">${pct.toFixed(0)}%</span>
+                </div>
+                <div class="pill-track" style="height:7px;">
+                  <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:var(--green);"></div>
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `
+    : "";
+
+  // 4. Top Ranked Troops, Spells & Sieges
+  const renderMetaUnitBars = (items, barColor, emptyMsg) => {
+    if (!Array.isArray(items) || !items.length) {
+      return `<div style="font-size:12px;color:var(--text-muted);padding:4px 0;">${escHtml(emptyMsg)}</div>`;
+    }
+    return items.map(u => {
+      const pct = Math.min(100, Math.max(0, Number(u.usageRate || 0)));
+      const threeStar = Number(u.threeStarRate || 0);
+      const avgCnt = Number(u.avgCount || 0);
+      const winClass = threeStar >= 65 ? "in" : threeStar >= 45 ? "amb" : "out";
+
+      return `
+        <div class="pill-bar-row">
+          <div class="pill-bar-head">
+            <div class="pill-bar-name">
+              <span>${escHtml(u.name)}</span>
+              ${avgCnt > 0 ? `<span class="mono" style="font-size:10px;color:var(--text-muted);">avg ${avgCnt.toFixed(1)}×</span>` : ""}
+            </div>
+            <div class="pill-bar-metrics">
+              <span class="mono" style="font-size:11px;font-weight:700;color:var(--text-sec);">${pct.toFixed(1)}%</span>
+              <span class="mini-badge ${winClass}">${threeStar.toFixed(0)}% 3★</span>
+            </div>
+          </div>
+          <div class="pill-track">
+            <div class="pill-fill" style="width:${Math.max(4, pct)}%;background:${barColor};"></div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  };
+
+  contentEl.innerHTML = `
+    ${kpiHtml}
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Top Meta Army Archetypes</div>
+        <span class="mini-badge ds">RANKED ONLY</span>
+      </div>
+      ${archetypesHtml}
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Hero Equipment & Pet Meta</div>
+        <span class="mini-badge purp">TOP 100 LOADOUTS</span>
+      </div>
+      <div class="hero-meta-grid">
+        ${heroCardsHtml || `<div style="color:var(--text-muted);font-size:12px;">No hero equipment data available.</div>`}
+      </div>
+      ${globalPetsBlock}
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div class="panel-title">Top Ranked Troops, Spells & Sieges</div>
+        <span class="mini-badge in">USAGE & 3★ RATE</span>
+      </div>
+
+      <div class="ranked-group-title">Top Troops</div>
+      ${renderMetaUnitBars((meta.topTroops || []).slice(0, 12), "var(--accent)", "No troop usage data available.")}
+
+      <div class="ranked-group-title" style="margin-top:16px;">Top Spells</div>
+      ${renderMetaUnitBars((meta.topSpells || []).slice(0, 10), "var(--purple)", "No spell usage data available.")}
+
+      <div class="ranked-group-title" style="margin-top:16px;">Top Siege Machines</div>
+      ${renderMetaUnitBars((meta.topSieges || []).slice(0, 6), "var(--amber)", "No siege machine usage data available.")}
+    </div>
+  `;
+}
+
+/* ============================================================
    PLAYER DETAIL DRAWER + SWIPE-DOWN GESTURE
 ============================================================ */
 function openDrawer(tag) {
@@ -1469,6 +2007,74 @@ function initDrawerSwipe() {
       drawer.style.transform = "";
     }
   });
+}
+
+/* ============================================================
+   PERSONALIZED PRIORITY META UPGRADES (PLAYER DRAWER)
+============================================================ */
+function getUpgradeCategoryBadge(cat) {
+  const c = String(cat || "").toLowerCase();
+  if (c === "equipment") return { label: "Equipment", cls: "purp" };
+  if (c === "pet")       return { label: "Pet",       cls: "in"   };
+  if (c === "troop")     return { label: "Troop",     cls: "amb"  };
+  if (c === "spell")     return { label: "Spell",     cls: "def"  };
+  if (c === "siege")     return { label: "Siege",     cls: "ds"   };
+  return { label: cat || "Unit", cls: "" };
+}
+
+function renderMetaUpgradesSection(p) {
+  if (!state.globalMeta || !state.globalMeta.updatedAt) {
+    return `
+      <div class="sec-label">Priority Meta Upgrades</div>
+      <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">
+        Sync the <b>Meta</b> tab to unlock personalized Top 100 upgrade recommendations.
+      </div>
+    `;
+  }
+
+  const rawUpgrades = Array.isArray(p.metaUpgrades) ? p.metaUpgrades.slice() : [];
+  rawUpgrades.sort((a, b) => (Number(b.metaUsageRate || 0) - Number(a.metaUsageRate || 0)));
+
+  if (!rawUpgrades.length) {
+    return `
+      <div class="sec-label">Priority Meta Upgrades</div>
+      <div class="upgrade-maxed-box">
+        <span>✅</span>
+        <span>All Top Meta Items Maxed!</span>
+      </div>
+    `;
+  }
+
+  const rowsHtml = rawUpgrades.map(u => {
+    const badge = getUpgradeCategoryBadge(u.category);
+    const usagePct = Math.round(Number(u.metaUsageRate || 0));
+    const curLvl = Number(u.currentLevel || 0);
+    const maxLvl = Number(u.maxLevel || 0);
+    const heroSuffix = u.hero ? ` · ${escHtml(u.hero)}` : "";
+
+    return `
+      <div class="upgrade-row">
+        <div class="upgrade-left">
+          <div class="upgrade-title-row">
+            <span class="upgrade-name">${escHtml(u.name)}</span>
+            <span class="mini-badge ${badge.cls}">${escHtml(badge.label)}</span>
+          </div>
+          <div class="upgrade-sub">
+            Used by <strong style="color:var(--text);">${usagePct}%</strong> of Top 100${heroSuffix}
+          </div>
+        </div>
+        <div class="upgrade-right">
+          <span class="upgrade-lvl">Lvl ${curLvl} → ${maxLvl}</span>
+          <span class="mini-badge ds">${usagePct}% Meta</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="sec-label">Priority Meta Upgrades (Top ${rawUpgrades.length} Impact)</div>
+    <div class="upgrade-list">${rowsHtml}</div>
+  `;
 }
 
 /* ============================================================
@@ -1715,14 +2321,17 @@ function renderDrawerContent(p) {
     `;
   }).join("");
 
-  const clockProfile   = computeHourlyAttackProfile(p);
-  const clockHtml      = renderAttackClockSection(clockProfile);
-  const rankedMetaHtml = renderRankedMetaSection(p);
-  const battleLogHtml  = renderBattleLogSection(p);
+  const metaUpgradesHtml = renderMetaUpgradesSection(p);
+  const clockProfile     = computeHourlyAttackProfile(p);
+  const clockHtml        = renderAttackClockSection(clockProfile);
+  const rankedMetaHtml   = renderRankedMetaSection(p);
+  const battleLogHtml    = renderBattleLogSection(p);
 
   document.getElementById("drawerBody").innerHTML = `
     <div class="sec-label">TH19 Progression Breakdown</div>
     <div class="cat-grid">${catHtml}</div>
+
+    ${metaUpgradesHtml}
 
     <div class="sec-label">Season & War Telemetry</div>
     <div class="stat-pills">
@@ -1911,7 +2520,8 @@ function resetApiUrl() {
 function switchTab(tabKey, btnEl) {
   document.querySelectorAll(".tab-pane").forEach(el => el.classList.remove("active"));
   document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
-  document.getElementById(`tab-${tabKey}`).classList.add("active");
+  const pane = document.getElementById(`tab-${tabKey}`);
+  if (pane) pane.classList.add("active");
   if (btnEl) btnEl.classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
