@@ -1615,6 +1615,106 @@ function classifyUnitClient(unit) {
   return "troop";
 }
 
+function buildFullArmyLinkFromUnits(army) {
+  if (!Array.isArray(army) || !army.length) return "";
+
+  const getShortId = (name) => {
+    const entry = lookupStaticUnit(name);
+    if (!entry || entry.id === null || entry.id === undefined || entry.id === "") return "";
+    const numId = Number(entry.id);
+    return String(!isNaN(numId) && numId >= 1000000 ? numId % 1000000 : entry.id);
+  };
+
+  const heroes = [];
+  const loosePets = [];
+  const unitCountsById = new Map();
+  const spellCountsById = new Map();
+
+  let lastHero = null;
+
+  army.forEach(u => {
+    if (!u || !u.name) return;
+    const cat = classifyUnitClient(u);
+    const cnt = Math.max(1, Math.round(Number(u.count || 1) || 1));
+
+    if (cat === "hero") {
+      const petName = u.pet
+        ? (typeof u.pet === "string" ? u.pet.trim() : String(u.pet.name || "").trim())
+        : "";
+      const eqArr = Array.isArray(u.equipment)
+        ? u.equipment.map(eq => (typeof eq === "string" ? eq.trim() : String((eq && eq.name) || "").trim())).filter(Boolean)
+        : [];
+      const heroObj = { name: String(u.name).trim(), pet: petName, equipment: eqArr };
+      heroes.push(heroObj);
+      lastHero = heroObj;
+    } else if (cat === "pet") {
+      const petName = String(u.name).trim();
+      if (lastHero && !lastHero.pet) {
+        lastHero.pet = petName;
+      } else {
+        loosePets.push(petName);
+      }
+      lastHero = null;
+    } else if (cat === "troop" || cat === "siege") {
+      lastHero = null;
+      const idStr = getShortId(u.name);
+      if (idStr) {
+        unitCountsById.set(idStr, (unitCountsById.get(idStr) || 0) + cnt);
+      }
+    } else if (cat === "spell") {
+      lastHero = null;
+      const idStr = getShortId(u.name);
+      if (idStr) {
+        spellCountsById.set(idStr, (spellCountsById.get(idStr) || 0) + cnt);
+      }
+    }
+  });
+
+  // Pair any remaining standalone pets with heroes that don't have a pet yet
+  if (loosePets.length) {
+    let petIdx = 0;
+    for (let i = 0; i < heroes.length && petIdx < loosePets.length; i++) {
+      if (!heroes[i].pet) {
+        heroes[i].pet = loosePets[petIdx++];
+      }
+    }
+  }
+
+  const heroTokens = [];
+  heroes.forEach(h => {
+    const heroId = getShortId(h.name);
+    if (!heroId) return;
+    let tok = heroId;
+    if (h.pet) {
+      const petId = getShortId(h.pet);
+      if (petId) tok += "p" + petId;
+    }
+    if (h.equipment.length) {
+      const eqIds = h.equipment.map(getShortId).filter(Boolean);
+      if (eqIds.length) tok += "e" + eqIds.join("_");
+    }
+    heroTokens.push(tok);
+  });
+
+  const troopParts = [];
+  unitCountsById.forEach((cnt, idStr) => {
+    troopParts.push(`${cnt}x${idStr}`);
+  });
+
+  const spellParts = [];
+  spellCountsById.forEach((cnt, idStr) => {
+    spellParts.push(`${cnt}x${idStr}`);
+  });
+
+  if (!heroTokens.length && !troopParts.length && !spellParts.length) return "";
+
+  let armyParam = "";
+  if (heroTokens.length) armyParam += "h" + heroTokens.join("-");
+  if (troopParts.length) armyParam += "u" + troopParts.join("-");
+  if (spellParts.length) armyParam += "s" + spellParts.join("-");
+  return `https://link.clashofclans.com/en?action=CopyArmy&army=${encodeURIComponent(armyParam)}`;
+}
+
 // Prefer the exact share code Supercell recorded (includes heroes, pets, equipment); fall back to a rebuilt link
 function buildExactArmyLink(battle) {
   if (battle && battle.armyCode) {
@@ -2492,11 +2592,35 @@ function renderMetaTab() {
           const winClass = winRate >= 65 ? "in" : winRate >= 45 ? "amb" : "out";
           const troops = Array.isArray(a.troops) ? a.troops : [];
           const spells = Array.isArray(a.spells) ? a.spells : [];
+          const sampleArmyCode = String(a.sampleArmyCode || "").trim();
+          const sampleArmy = Array.isArray(a.sampleArmy) ? a.sampleArmy : [];
 
-          const copyUrl = buildCocArmyLink(
-            troops.map(t => ({ name: t, count: avgTroopCountMap[String(t).trim().toLowerCase()] || 1 })),
-            spells.map(s => ({ name: s, count: avgSpellCountMap[String(s).trim().toLowerCase()] || 1 }))
-          );
+          const sampleSieges = [];
+          const seenSieges = new Set();
+          sampleArmy.forEach(u => {
+            if (!u || !u.name) return;
+            if (classifyUnitClient(u) === "siege") {
+              const sName = String(u.name).trim();
+              const sKey = sName.toLowerCase();
+              if (sName && !seenSieges.has(sKey)) {
+                seenSieges.add(sKey);
+                sampleSieges.push(sName);
+              }
+            }
+          });
+
+          let copyUrl = "";
+          if (sampleArmyCode) {
+            copyUrl = `https://link.clashofclans.com/en?action=CopyArmy&army=${encodeURIComponent(sampleArmyCode)}`;
+          } else if (sampleArmy.length > 0) {
+            copyUrl = buildFullArmyLinkFromUnits(sampleArmy);
+          }
+          if (!copyUrl) {
+            copyUrl = buildCocArmyLink(
+              troops.map(t => ({ name: t, count: avgTroopCountMap[String(t).trim().toLowerCase()] || 1 })),
+              spells.map(s => ({ name: s, count: avgSpellCountMap[String(s).trim().toLowerCase()] || 1 }))
+            );
+          }
 
           return `
             <div class="archetype-card">
@@ -2507,6 +2631,7 @@ function renderMetaTab() {
               <div class="archetype-pills">
                 ${troops.map(t => `<span class="mini-badge ds">${renderUnitIcon(t, 18)}${escHtml(t)}</span>`).join("")}
                 ${spells.map(s => `<span class="mini-badge purp">${renderUnitIcon(s, 18)}${escHtml(s.replace(/\s*Spell$/i, ""))}</span>`).join("")}
+                ${sampleSieges.map(sg => `<span class="mini-badge amb">${renderUnitIcon(sg, 18)}${escHtml(sg)}</span>`).join("")}
               </div>
               <div class="bar-track">
                 <div class="bar-fill" style="width:${Math.min(100, Math.max(4, usage))}%;background:var(--accent);"></div>
