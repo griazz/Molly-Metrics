@@ -1783,7 +1783,7 @@ const STORAGE_KEYS = {
 };
 
 const STANDARD_THS = ["All", "TH19", "TH18", "TH17", "TH16"];
-const STANDARD_CATS = ["All", "Legend", "Ranked", "War", "Anti-Bowler", "Tested", "Favorites"];
+const STANDARD_CATS = ["All", "Legend", "L1", "Ranked", "War", "Pro / ESL", "Tested", "Untested", "Progress", "Anti-Bowler", "Anti-LaLo", "Rage/Poison", "Auto-X", "Favorites"];
 
 /* ============================================================
    APPLICATION STATE
@@ -2685,16 +2685,23 @@ function extractCcTroops(text) {
 function extractArchetypeTags(text) {
   const hay = String(text || "");
   const rules = [
-    { tag: "Ranked", rx: /\branked\b/i },
-    { tag: "Legend", rx: /\b(?:legend|legends|ll|l1)\b/i },
-    { tag: "War", rx: /\b(?:war|cwl)\b/i },
-    { tag: "Tested", rx: /\b(?:tested|unburnt)\b/i },
+    { tag: "Progress",    rx: /\bprogr?ess(?:\s+base)?\b/i },
+    { tag: "L1",          rx: /\b(?:l\s*[123]|legend\s*1)\b/i },
+    { tag: "Legend",      rx: /\b(?:legend|legends|ll|l\s*[123])\b/i },
+    { tag: "Ranked",      rx: /\b(?:ranked|all\s+ranks|any\s+league)\b/i },
+    { tag: "War",         rx: /\b(?:war|cwl)\b/i },
+    { tag: "Pro / ESL",   rx: /\b(?:esl|world\s*championship|worlds|tribe\s*gaming|pod\s*gear)\b/i },
+    { tag: "Tested",      rx: /\b(?:tested|unburnt|no\s+triples)\b/i },
+    { tag: "Untested",    rx: /\b(?:untested|fresh\s+custom)\b/i },
     { tag: "Anti-Bowler", rx: /\banti[\s-]?bowler\b/i },
-    { tag: "Anti-3", rx: /\banti[\s-]?3\b/i }
+    { tag: "Anti-LaLo",   rx: /\blalo\b/i },
+    { tag: "Rage/Poison", rx: /\brage[\s\/-]?poison\b/i }
   ];
   const tags = [];
-  rules.forEach(r => { if (r.rx.test(hay) && !tags.includes(r.tag)) tags.push(r.tag); });
-  return tags.length > 0 ? tags : ["Legend"];
+  rules.forEach(r => {
+    if (r.rx.test(hay) && !tags.includes(r.tag)) tags.push(r.tag);
+  });
+  return tags;
 }
 
 function parsePostTimestamp(createdAt, epochSec) {
@@ -3322,7 +3329,10 @@ function renderGallery() {
 
           <div class="tags-pop-row">
             <div class="tags-list">
-              ${tags.map(t => `<span class="mini-badge">${escHtml(t)}</span>`).join("")}
+              ${tags.map(t => {
+                const badgeCls = t === "Progress" ? " def" : t === "Untested" ? " amb" : t === "Tested" ? " in" : "";
+                return `<span class="mini-badge${badgeCls}">${escHtml(t)}</span>`;
+              }).join("")}
             </div>
             <span class="mini-badge def" title="X Likes">❤️ ${formatCompactNum(base.likes)}</span>
           </div>
