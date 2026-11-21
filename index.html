@@ -541,6 +541,227 @@
       flex-wrap: wrap;
     }
 
+    /* ============================================================
+       CLASHKING-STYLE EXPANDABLE ARCHETYPE CARDS
+    ============================================================ */
+    .ck-arch-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .ck-arch-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      transition: border-color 0.15s ease;
+    }
+    .ck-arch-card[open] { border-color: var(--border-strong); }
+    .ck-arch-sum {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 13px;
+      cursor: pointer;
+      list-style: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ck-arch-sum::-webkit-details-marker { display: none; }
+    .ck-arch-sum::marker { content: ""; }
+    .ck-arch-left {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      min-width: 0;
+      flex: 1;
+    }
+    .ck-arch-lrow {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .ck-rank {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text-muted);
+      min-width: 22px;
+    }
+    .ck-core-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .ck-arch-title {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.3;
+      overflow-wrap: anywhere;
+    }
+    .ck-arch-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ck-arch-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+    }
+    .ck-stat-line {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .ck-stat-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .ck-stat-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+    }
+    .ck-star { font-weight: 700; }
+    .ck-star.in  { color: var(--green); }
+    .ck-star.amb { color: var(--amber); }
+    .ck-star.out { color: var(--text-muted); }
+    .ck-chev {
+      font-size: 20px;
+      line-height: 1;
+      color: var(--text-muted);
+      transition: transform 0.22s ease;
+    }
+    .ck-arch-card[open] .ck-chev { transform: rotate(180deg); }
+
+    .ck-arch-body {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 13px;
+      border-top: 1px solid var(--border);
+    }
+    .ck-arch-card[open] > .ck-arch-body { animation: ck-reveal 0.24s ease-out; }
+    @keyframes ck-reveal {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ck-arch-card[open] > .ck-arch-body { animation: none; }
+      .ck-chev { transition: none; }
+    }
+
+    .ck-ico {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      box-sizing: border-box;
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-weight: 800;
+    }
+    .ck-ico .unit-icon {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 0;
+    }
+
+    .ck-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .ck-copy-btn {
+      padding: 9px 18px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+    .ck-arch-meta {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .ck-cohort-box {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .ck-cohort-row {
+      display: grid;
+      grid-template-columns: 62px 1fr 74px;
+      align-items: center;
+      gap: 9px;
+      font-size: 11px;
+    }
+    .ck-cohort-lbl { font-weight: 700; color: var(--text-sec); }
+    .ck-cohort-pct { text-align: right; font-weight: 800; color: var(--text); }
+    .ck-cohort-pct.dim { color: var(--text-muted); font-weight: 600; }
+
+    .ck-section { display: flex; flex-direction: column; gap: 7px; }
+    .ck-section-label {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .ck-heroes {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px 8px;
+    }
+    .ck-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+    }
+    .ck-hero-portrait { position: relative; width: 48px; height: 48px; }
+    .ck-pet-badge {
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      display: inline-flex;
+      line-height: 0;
+    }
+    .ck-hero-eq {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-height: 22px;
+    }
+    .ck-unit-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 12px;
+    }
+    .ck-unit {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .ck-unit-count {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-sec);
+    }
+
     .hero-meta-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -2481,6 +2702,216 @@ function drawCohortComparisonCharts() {
   }
 }
 
+/* ============================================================
+   ARCHETYPE VISUAL LOADOUT DECODER (ClashKing-style expandable cards)
+============================================================ */
+let ckRevCache = { src: null, lk: null };
+
+// Reverse short-ID -> unit lookup, grouped by share-code namespace (IDs repeat across groups)
+function getArchetypeReverseLookup() {
+  const src = state.staticDataMap;
+  if (ckRevCache.src === src && ckRevCache.lk) return ckRevCache.lk;
+  const lk = { unit: {}, spell: {}, pet: {}, hero: {}, equipment: {} };
+  Object.keys(src || {}).forEach(name => {
+    const entry = src[name];
+    if (!entry || entry.id === null || entry.id === undefined || entry.id === "") return;
+    const numId = Number(entry.id);
+    if (isNaN(numId)) return;
+    const shortId = numId >= 1000000 ? numId % 1000000 : entry.id;
+    const cat = String(entry.category || "").toLowerCase();
+    const isSiege = cat === "siege" || SIEGE_NAMES_SET.has(String(name).trim().toLowerCase());
+    if (cat === "troop" || cat === "siege") {
+      if (lk.unit[shortId] === undefined) lk.unit[shortId] = { name: name, siege: isSiege };
+    } else if (cat === "spell") {
+      if (lk.spell[shortId] === undefined) lk.spell[shortId] = name;
+    } else if (cat === "pet") {
+      if (lk.pet[shortId] === undefined) lk.pet[shortId] = name;
+    } else if (cat === "hero") {
+      if (lk.hero[shortId] === undefined) lk.hero[shortId] = name;
+    } else if (cat === "equipment") {
+      if (lk.equipment[shortId] === undefined) lk.equipment[shortId] = name;
+    }
+  });
+  ckRevCache = { src: src, lk: lk };
+  return lk;
+}
+
+function parseArchetypeVisualLoadout(archetype) {
+  const out = { heroes: [], troops: [], sieges: [], spells: [], cc: [] };
+  if (!archetype || typeof archetype !== "object") return out;
+
+  const addCount = (list, name, count) => {
+    const clean = String(name || "").trim();
+    if (!clean) return;
+    const key = clean.toLowerCase();
+    const existing = list.find(x => x.name.toLowerCase() === key);
+    const n = Math.max(1, Math.round(Number(count) || 1));
+    if (existing) existing.count += n; else list.push({ name: clean, count: n });
+  };
+
+  const code = String(archetype.sampleArmyCode || "").trim();
+  if (code) {
+    const lk = getArchetypeReverseLookup();
+    const re = /([husid])([^husid]*)/g;
+    let m;
+    while ((m = re.exec(code)) !== null) {
+      const sec = m[1];
+      const body = m[2];
+      if (!body) continue;
+
+      body.split("-").forEach(tok => {
+        if (sec === "h") {
+          const hm = tok.match(/^(\d+)(.*)$/);
+          if (!hm) return;
+          const heroName = lk.hero[Number(hm[1])];
+          if (!heroName) return;
+          let pet = "";
+          const equipment = [];
+          const partRe = /([a-z])(\d+(?:_\d+)*)/g;
+          let pm;
+          while ((pm = partRe.exec(hm[2])) !== null) {
+            if (pm[1] === "p") {
+              pet = lk.pet[Number(pm[2])] || pet;
+            } else if (pm[1] === "e") {
+              pm[2].split("_").forEach(eid => {
+                const en = lk.equipment[Number(eid)];
+                if (en) equipment.push(en);
+              });
+            }
+          }
+          out.heroes.push({ name: heroName, pet: pet, equipment: equipment });
+          return;
+        }
+
+        const um = tok.match(/^(\d+)x(\d+)$/);
+        if (!um) return;
+        const count = Number(um[1]) || 1;
+        const id = Number(um[2]);
+
+        if (sec === "u" || sec === "i") {
+          const u = lk.unit[id];
+          if (!u) return;
+          if (u.siege) addCount(out.sieges, u.name, count);
+          else if (sec === "u") addCount(out.troops, u.name, count);
+          else addCount(out.cc, u.name, count);
+        } else if (sec === "s") {
+          const sp = lk.spell[id];
+          if (sp) addCount(out.spells, sp, count);
+        } else if (sec === "d") {
+          const sp = lk.spell[id];
+          if (sp) addCount(out.cc, sp, count);
+        }
+      });
+    }
+  }
+
+  // Fallback: rebuild from the stored sample army when the share code is missing or could not be decoded
+  const parsedAny = out.heroes.length || out.troops.length || out.sieges.length || out.spells.length || out.cc.length;
+  if (!parsedAny) {
+    const army = Array.isArray(archetype.sampleArmy) ? archetype.sampleArmy : [];
+    const loosePets = [];
+    let lastHero = null;
+    army.forEach(u => {
+      if (!u || !u.name) return;
+      const name = String(u.name).trim();
+      const cat = classifyUnitClient(u);
+      const cnt = Math.max(1, Math.round(Number(u.count || 1) || 1));
+      if (cat === "hero") {
+        const pet = u.pet ? (typeof u.pet === "string" ? u.pet.trim() : String(u.pet.name || "").trim()) : "";
+        const equipment = Array.isArray(u.equipment)
+          ? u.equipment.map(eq => (typeof eq === "string" ? eq.trim() : String((eq && eq.name) || "").trim())).filter(Boolean)
+          : [];
+        lastHero = { name: name, pet: pet, equipment: equipment };
+        out.heroes.push(lastHero);
+      } else if (cat === "pet") {
+        if (lastHero && !lastHero.pet) lastHero.pet = name; else loosePets.push(name);
+        lastHero = null;
+      } else {
+        lastHero = null;
+        if (cat === "siege") addCount(out.sieges, name, cnt);
+        else if (cat === "spell") addCount(out.spells, name, cnt);
+        else if (cat === "troop") addCount(out.troops, name, cnt);
+      }
+    });
+    let petIdx = 0;
+    out.heroes.forEach(h => {
+      if (!h.pet && petIdx < loosePets.length) h.pet = loosePets[petIdx++];
+    });
+  }
+
+  // Clan Castle names recorded by the backend (used when the code carried no CC sections)
+  if (!out.cc.length) {
+    const ccNames = Array.isArray(archetype.sampleCC) ? archetype.sampleCC : [];
+    ccNames.forEach(raw => {
+      const name = String(raw || "").trim();
+      if (!name) return;
+      if (classifyUnitClient({ name: name }) === "siege") {
+        if (!out.sieges.some(x => x.name.toLowerCase() === name.toLowerCase())) addCount(out.sieges, name, 1);
+      } else {
+        addCount(out.cc, name, 1);
+      }
+    });
+  }
+
+  return out;
+}
+
+// Rounded portrait with a lettered placeholder behind it (stays tidy if an icon URL is missing or fails)
+function ckIcon(name, px) {
+  const entry = lookupStaticUnit(name);
+  const label = String(name || "").trim();
+  const img = entry && entry.iconUrl
+    ? `<img class="unit-icon" src="${escHtml(entry.iconUrl)}" alt="${escHtml(label)}" loading="lazy" onerror="this.style.display='none'" />`
+    : "";
+  return `<span class="ck-ico" title="${escHtml(label)}" style="width:${px}px;height:${px}px;border-radius:${Math.round(px * 0.26)}px;font-size:${Math.round(px * 0.42)}px;">${escHtml(label.charAt(0).toUpperCase())}${img}</span>`;
+}
+
+function ckUnitSection(label, items) {
+  if (!Array.isArray(items) || !items.length) return "";
+  return `
+    <div class="ck-section">
+      <div class="ck-section-label">${escHtml(label)}</div>
+      <div class="ck-unit-row">
+        ${items.map(u => `<span class="ck-unit">${ckIcon(u.name, 36)}<span class="ck-unit-count mono">×${Number(u.count || 1)}</span></span>`).join("")}
+      </div>
+    </div>
+  `;
+}
+
+// Finds the same archetype (same troops + spells) in another cohort's top list
+function findArchetypeInCohort(cohortMeta, archetype) {
+  const list = cohortMeta && Array.isArray(cohortMeta.topArchetypes) ? cohortMeta.topArchetypes : null;
+  if (!list) return { hasData: false, hit: null };
+  const norm = arr => (Array.isArray(arr) ? arr : [])
+    .map(x => String(x).trim().toLowerCase().replace(/\s+spell$/, ""))
+    .sort()
+    .join("|");
+  const key = norm(archetype.troops) + "||" + norm(archetype.spells);
+  const hit = list.find(x => x && (norm(x.troops) + "||" + norm(x.spells)) === key) || null;
+  return { hasData: true, hit: hit };
+}
+
+function ckCohortRow(label, color, res) {
+  let pctText = "No data";
+  let width = 0;
+  let dim = true;
+  if (res.hasData && res.hit) {
+    const pct = Math.min(100, Math.max(0, Number(res.hit.usageRate || 0)));
+    pctText = pct.toFixed(1) + "%";
+    width = Math.max(3, pct);
+    dim = false;
+  } else if (res.hasData) {
+    pctText = "Not in top 8";
+  }
+  return `
+    <div class="ck-cohort-row">
+      <span class="ck-cohort-lbl">${escHtml(label)}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${color};"></div></div>
+      <span class="ck-cohort-pct mono ${dim ? "dim" : ""}">${pctText}</span>
+    </div>
+  `;
+}
+
 function renderMetaTab() {
   destroyMetaCharts();
   const activeMeta = state.globalMeta?.cohorts?.[state.metaCohort] || state.globalMeta || {};
@@ -2581,11 +3012,13 @@ function renderMetaTab() {
     </div>
   `;
 
-  // 2. Top Meta Army Archetypes (with Real Icons & One-Tap Copy Army Links)
+  // 2. Top Meta Army Archetypes (ClashKing-style expandable accordion cards)
   const archetypes = Array.isArray(activeMeta.topArchetypes) ? activeMeta.topArchetypes : [];
+  const cohortTop100 = state.globalMeta?.cohorts?.top100 || null;
+  const cohortClan = state.globalMeta?.cohorts?.clan || null;
   const archetypesHtml = archetypes.length
     ? `
-      <div class="archetype-grid">
+      <div class="ck-arch-list">
         ${archetypes.map((a, idx) => {
           const usage = Number(a.usageRate || 0);
           const winRate = Number(a.threeStarRate || 0);
@@ -2595,19 +3028,13 @@ function renderMetaTab() {
           const sampleArmyCode = String(a.sampleArmyCode || "").trim();
           const sampleArmy = Array.isArray(a.sampleArmy) ? a.sampleArmy : [];
 
-          const sampleSieges = [];
-          const seenSieges = new Set();
-          sampleArmy.forEach(u => {
-            if (!u || !u.name) return;
-            if (classifyUnitClient(u) === "siege") {
-              const sName = String(u.name).trim();
-              const sKey = sName.toLowerCase();
-              if (sName && !seenSieges.has(sKey)) {
-                seenSieges.add(sKey);
-                sampleSieges.push(sName);
-              }
-            }
-          });
+          // Clean core-troop title (works even for older cached snapshots with verbose names)
+          const coreTroops = troops.length
+            ? troops
+            : String(a.name || "").split("(")[0].split("·")[0].split("+").map(x => x.trim()).filter(Boolean);
+          const title = coreTroops.length ? coreTroops.join(" + ") : String(a.name || "Unknown Army");
+
+          const loadout = parseArchetypeVisualLoadout(a);
 
           let copyUrl = "";
           if (sampleArmyCode) {
@@ -2622,28 +3049,71 @@ function renderMetaTab() {
             );
           }
 
-          return `
-            <div class="archetype-card">
-              <div class="archetype-top">
-                <div class="archetype-name">#${idx + 1} ${escHtml(a.name)}</div>
-                <span class="mini-badge ${winClass}">${winRate.toFixed(0)}% 3★</span>
-              </div>
-              <div class="archetype-pills">
-                ${troops.map(t => `<span class="mini-badge ds">${renderUnitIcon(t, 18)}${escHtml(t)}</span>`).join("")}
-                ${spells.map(s => `<span class="mini-badge purp">${renderUnitIcon(s, 18)}${escHtml(s.replace(/\s*Spell$/i, ""))}</span>`).join("")}
-                ${sampleSieges.map(sg => `<span class="mini-badge amb">${renderUnitIcon(sg, 18)}${escHtml(sg)}</span>`).join("")}
-              </div>
-              <div class="bar-track">
-                <div class="bar-fill" style="width:${Math.min(100, Math.max(4, usage))}%;background:var(--accent);"></div>
-              </div>
-              <div class="archetype-metrics mono">
-                <div>
-                  <span style="color:var(--text-sec);font-weight:700;">${usage.toFixed(1)}% Share</span>
-                  <span style="color:var(--text-muted);"> · ${Number(a.count || 0)} hits · ${Number(a.avgDestruction || 0).toFixed(0)}%</span>
+          const heroesHtml = loadout.heroes.length
+            ? `
+              <div class="ck-section">
+                <div class="ck-section-label">Heroes</div>
+                <div class="ck-heroes">
+                  ${loadout.heroes.map(h => `
+                    <div class="ck-hero">
+                      <div class="ck-hero-portrait">
+                        ${ckIcon(h.name, 48)}
+                        ${h.pet ? `<span class="ck-pet-badge">${ckIcon(h.pet, 22)}</span>` : ""}
+                      </div>
+                      <div class="ck-hero-eq">
+                        ${(Array.isArray(h.equipment) ? h.equipment : []).slice(0, 2).map(eq => ckIcon(eq, 22)).join("")}
+                      </div>
+                    </div>
+                  `).join("")}
                 </div>
-                ${copyUrl ? `<a class="copy-army-btn" href="${escHtml(copyUrl)}" target="_blank" rel="noopener noreferrer">⚔️ Copy Army</a>` : ""}
               </div>
-            </div>
+            `
+            : "";
+
+          const showCohorts = Boolean(cohortTop100 || cohortClan);
+          const cohortHtml = showCohorts
+            ? `
+              <div class="ck-section">
+                <div class="ck-section-label">Usage across cohorts</div>
+                <div class="ck-cohort-box">
+                  ${ckCohortRow("Top 100", "var(--accent)", findArchetypeInCohort(cohortTop100, a))}
+                  ${ckCohortRow("Our Clan", "var(--green)", findArchetypeInCohort(cohortClan, a))}
+                </div>
+              </div>
+            `
+            : "";
+
+          return `
+            <details class="ck-arch-card"${idx === 0 ? " open" : ""}>
+              <summary class="ck-arch-sum">
+                <div class="ck-arch-left">
+                  <div class="ck-arch-lrow">
+                    <span class="ck-rank mono">#${idx + 1}</span>
+                    <div class="ck-core-icons">${coreTroops.slice(0, 3).map(t => ckIcon(t, 36)).join("")}</div>
+                  </div>
+                  <div class="ck-arch-title">${escHtml(title)}</div>
+                </div>
+                <div class="ck-arch-right">
+                  <div class="ck-arch-stats">
+                    <div class="ck-stat-line"><span class="ck-stat-lbl">Usage</span><span class="ck-stat-val mono">${usage.toFixed(1)}%</span></div>
+                    <div class="ck-stat-line ck-star mono ${winClass}">★★★ ${winRate.toFixed(1)}%</div>
+                  </div>
+                  <span class="ck-chev" aria-hidden="true">⌄</span>
+                </div>
+              </summary>
+              <div class="ck-arch-body">
+                <div class="ck-action-bar">
+                  ${copyUrl ? `<a class="copy-army-btn ck-copy-btn" href="${escHtml(copyUrl)}" target="_blank" rel="noopener noreferrer">⚔️ Copy Army</a>` : "<span></span>"}
+                  <span class="ck-arch-meta mono">${Number(a.count || 0)} hits · ${Number(a.avgDestruction || 0).toFixed(0)}% avg destr.</span>
+                </div>
+                ${cohortHtml}
+                ${heroesHtml}
+                ${ckUnitSection("Troops", loadout.troops)}
+                ${ckUnitSection("Spells", loadout.spells)}
+                ${ckUnitSection("Clan Castle", loadout.cc)}
+                ${ckUnitSection("Siege Machines", loadout.sieges)}
+              </div>
+            </details>
           `;
         }).join("")}
       </div>
