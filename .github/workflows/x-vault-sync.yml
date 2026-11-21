@@ -1,1 +1,20 @@
+name: Daily X Base Vault Sync
 
+on:
+  schedule:
+    - cron: "0 14 * * *" # Runs daily at 14:00 UTC (8:00 AM CST)
+  workflow_dispatch:      # Adds a manual "Run workflow" button in GitHub
+
+jobs:
+  sync-bases:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Fetch Watchlist & Push to Base Vault
+        env:
+          APPS_SCRIPT_URL: ${{ secrets.APPS_SCRIPT_URL }}
+          X_FEED_SOURCE: ${{ secrets.X_FEED_SOURCE }}
+        run: node scripts/sync_x_watchlist.mjs
