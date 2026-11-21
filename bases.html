@@ -1905,9 +1905,41 @@ function normalizeDefenseStats(raw) {
     avgStarsAllowed: Number(ds.avgStarsAllowed) || 0,
     avgDestruction:  Number(ds.avgDestruction) || 0,
     triplesAllowed:  Number(ds.triplesAllowed) || 0,
+    expectedStarsAllowed: Number(ds.expectedStarsAllowed) || 0,
+    adjustedStarsDelta: Number.isFinite(Number(ds.adjustedStarsDelta)) ? Number(ds.adjustedStarsDelta) : null,
+    adjustedDestDelta: Number.isFinite(Number(ds.adjustedDestDelta)) ? Number(ds.adjustedDestDelta) : null,
+    defenseRating: Number.isFinite(Number(ds.defenseRating)) ? Number(ds.defenseRating) : null,
     activePlayers:   Array.isArray(ds.activePlayers) ? ds.activePlayers : [],
     topKillers:      Array.isArray(ds.topKillers) ? ds.topKillers : []
   };
+}
+
+// Signed stars delta text, e.g. "-0.42★" / "+0.05★" (near-zero values never render as "-0.00")
+function formatAdjustedDeltaText(delta) {
+  const v = Math.abs(delta) < 0.005 ? 0 : delta;
+  return `${v >= 0 ? "+" : ""}${v.toFixed(2)}★`;
+}
+
+// Badge for League + Account-Adjusted performance vs expected stars allowed.
+// Green (.in) <= -0.15 · Amber (.amb) between · Red (.def) > +0.15. Returns "" when there is nothing to show.
+function getAdjustedDeltaBadge(ds) {
+  if (!ds || !(ds.totalDefenses > 0) || ds.adjustedStarsDelta === null || ds.adjustedStarsDelta === undefined) return "";
+  const delta = ds.adjustedStarsDelta;
+  const cls = delta <= -0.15 ? "in" : (delta > 0.15 ? "def" : "amb");
+  const rating = (ds.defenseRating !== null && ds.defenseRating !== undefined) ? ds.defenseRating : "—";
+  const title = `Raw: ${Number(ds.avgStarsAllowed || 0).toFixed(2)}★ vs Expected: ${Number(ds.expectedStarsAllowed || 0).toFixed(2)}★ (League + Account baseline) · Defense Rating: ${rating}/100`;
+  return `<span class="mini-badge ${cls}" title="${escHtml(title)}">${formatAdjustedDeltaText(delta)} vs exp</span>`;
+}
+
+// Compact variant for Top Builders (backend sends adjustedStarsDelta + defenseRating per builder)
+function getBuilderDeltaBadge(b) {
+  if (!b || !(b.totalDefenses > 0)) return "";
+  const delta = Number(b.adjustedStarsDelta);
+  if (b.adjustedStarsDelta === null || b.adjustedStarsDelta === undefined || !Number.isFinite(delta)) return "";
+  const cls = delta <= -0.15 ? "in" : (delta > 0.15 ? "def" : "amb");
+  const rating = Number.isFinite(Number(b.defenseRating)) && b.defenseRating !== null ? Number(b.defenseRating) : "—";
+  const title = `Raw: ${Number(b.avgStarsAllowed || 0).toFixed(2)}★ · ${formatAdjustedDeltaText(delta)} vs League + Account expected · Defense Rating: ${rating}/100`;
+  return `<span class="mini-badge ${cls}" title="${escHtml(title)}">${formatAdjustedDeltaText(delta)}</span>`;
 }
 
 function normalizeBaseLinksClient(rawLinks, fallbackUrl, fallbackCanon) {
@@ -2282,6 +2314,7 @@ function goToLaunchStep1() {
         <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
           ${hasDefs
             ? `<span class="mini-badge ${starCls}">${ds.avgStarsAllowed.toFixed(2)}★ avg</span>
+               ${getAdjustedDeltaBadge(ds)}
                <span class="mini-badge">${ds.avgDestruction.toFixed(1)}% dest</span>
                <span class="mini-badge">${ds.totalDefenses} def</span>`
             : `<span class="mini-badge out">Untested yet</span>`}
@@ -3118,7 +3151,7 @@ function renderInsightsPanel() {
             </div>
             <div class="insight-right mono">
               ${hasDefs
-                ? `<span class="mini-badge ${getStarBadgeClass(b.avgStarsAllowed)}">${b.avgStarsAllowed.toFixed(2)}★ (${b.totalDefenses})</span>`
+                ? `<span class="mini-badge ${getStarBadgeClass(b.avgStarsAllowed)}">${b.avgStarsAllowed.toFixed(2)}★ (${b.totalDefenses})</span>${getBuilderDeltaBadge(b)}`
                 : `<span class="mini-badge out">No defs</span>`}
               <span style="color:var(--text-muted);">❤️${formatCompactNum(b.totalLikes)}</span>
             </div>
@@ -3190,6 +3223,12 @@ function getFilteredAndSortedBases() {
       const bDefs = b.defenseStats.totalDefenses || 0;
       if ((aDefs > 0) !== (bDefs > 0)) return aDefs > 0 ? -1 : 1;
       if (aDefs > 0 && bDefs > 0) {
+        const aDelta = a.defenseStats.adjustedStarsDelta;
+        const bDelta = b.defenseStats.adjustedStarsDelta;
+        const aHasDelta = aDelta !== null && aDelta !== undefined;
+        const bHasDelta = bDelta !== null && bDelta !== undefined;
+        if (aHasDelta !== bHasDelta) return aHasDelta ? -1 : 1;
+        if (aHasDelta && bHasDelta && aDelta !== bDelta) return aDelta - bDelta;
         if (a.defenseStats.avgStarsAllowed !== b.defenseStats.avgStarsAllowed) {
           return a.defenseStats.avgStarsAllowed - b.defenseStats.avgStarsAllowed;
         }
@@ -3252,6 +3291,7 @@ function buildDefenseStripHtml(base) {
     metricsHtml = `
       <div class="metrics-row">
         <span class="mini-badge ${getStarBadgeClass(ds.avgStarsAllowed)}">${ds.avgStarsAllowed.toFixed(2)}★ avg</span>
+        ${getAdjustedDeltaBadge(ds)}
         <span class="mini-badge">${ds.avgDestruction.toFixed(1)}% dest</span>
         <span class="mini-badge">${ds.triplesAllowed} 3★ / ${ds.totalDefenses} def</span>
         ${topBreaker ? `<span class="mini-badge def">💀 ${escHtml(topBreaker.name)}</span>` : ""}
@@ -3581,9 +3621,11 @@ function openLightbox(baseId) {
   document.getElementById("lbDate").textContent = formatExactDate(b.postTimestamp);
   document.getElementById("lbCcText").textContent = b.ccTroops || "None specified";
 
-  const ds = b.defenseStats;
+  const ds = normalizeDefenseStats(b.defenseStats);
+  const lbAdjText = (ds.adjustedStarsDelta !== null ? ` · ${formatAdjustedDeltaText(ds.adjustedStarsDelta)} vs exp` : "")
+    + (ds.defenseRating !== null ? ` · Rating ${ds.defenseRating}/100` : "");
   document.getElementById("lbStatsText").textContent = ds.totalDefenses > 0
-    ? `${ds.avgStarsAllowed.toFixed(2)}★ avg · ${ds.avgDestruction.toFixed(1)}% · ${ds.totalDefenses} def`
+    ? `${ds.avgStarsAllowed.toFixed(2)}★ avg${lbAdjText} · ${ds.avgDestruction.toFixed(1)}% · ${ds.totalDefenses} def`
     : `❤️ ${formatCompactNum(b.likes)} likes`;
 
   const pillsEl = document.getElementById("lbImagePills");
