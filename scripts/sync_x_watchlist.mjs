@@ -31,24 +31,34 @@ function getBuildersForRun(list) {
   return slice;
 }
 
-// 1. Discover recent post IDs via your Google Apps Script backend
+// 1. Discover recent Clash base post IDs via public search index (bypasses X syndication 429s)
 async function getRecentStatusIds(handle) {
-  try {
-    const url = `${APPS_SCRIPT_URL}?action=getBuilderTimeline&handle=${encodeURIComponent(handle)}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      console.warn(`Apps Script HTTP ${res.status} for @${handle}`);
-      return [];
-    }
-    const data = await res.json();
-    if (data.status && data.status !== 200) {
-      console.warn(`Timeline fetch failed for @${handle}: HTTP ${data.status}`);
-    }
-    return Array.isArray(data.ids) ? data.ids : [];
-  } catch (err) {
-    console.warn(`Error fetching timeline for @${handle}: ${err.message}`);
-    return [];
+  const query = encodeURIComponent(`site:x.com/${handle}/status "link.clashofclans.com"`);
+  const urls = [
+    `https://www.bing.com/search?q=${query}&format=rss`,
+    `https://html.duckduckgo.com/html/?q=${query}`
+  ];
+
+  const ids = new Set();
+  for (const searchUrl of urls) {
+    try {
+      const res = await fetch(searchUrl, {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          "Accept-Language": "en-US,en;q=0.9"
+        }
+      });
+      if (!res.ok) continue;
+      const body = await res.text();
+      const rx = new RegExp(`(?:x\\.com|twitter\\.com)\\/${handle}\\/status\\/(\\d+)`, "gi");
+      for (const m of body.matchAll(rx)) {
+        ids.add(m[1]);
+      }
+      if (ids.size > 0) break;
+    } catch {}
   }
+
+  return Array.from(ids).slice(0, 8);
 }
 
 // 2. Fetch full post data via fxtwitter
