@@ -2673,10 +2673,40 @@ function extractTownHallFromLinkOrText(baseLink, fallbackText = "") {
 
 function extractCcTroops(text) {
   if (!text) return "";
-  for (const line of String(text).split(/\r?\n/)) {
-    const m = line.match(/^\s*(?:cc|clan\s*castle)(?:\s*[:\-–—]\s*|\s+)(.+)$/i);
+  const lines = String(text).split(/\r?\n/);
+
+  for (const rawLine of lines) {
+    const line = rawLine
+      .replace(/^[\s\p{Extended_Pictographic}\uFE0F\u200D•\-–—|>]+/gu, "")
+      .trim();
+    if (!line) continue;
+
+    let m = line.match(
+      /^(?:cc(?:\s*(?:troops|comp(?:osition)?))?|clan\s*castle)\s*(?:[:\-–—=：]\s*|\s+)(.+)$/i
+    );
+
+    if (!m && /^🏰/.test(rawLine.trim())) {
+      m = [null, line];
+    }
+
+    if (!m) {
+      const paren = line.match(/\(([^()]{3,60})\)/);
+      if (paren && /\b(?:ig|ice|furnace|witch|witches|hh|head\s*hunter|hound|lava|gob|goblin|arch|archer|loon|balloon|dragon|super|valk|minion|titan|yeti|druid)\b/i.test(paren[1])) {
+        m = [null, paren[1]];
+      }
+    }
+
     if (m && m[1]) {
-      return m[1].replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, "").replace(/\s+/g, " ").trim();
+      const cleaned = m[1]
+        .replace(/https?:\/\/\S+/gi, "")
+        .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "")
+        .replace(/^[:\-–—=：\s]+|[:\-–—=：\s]+$/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+
+      if (cleaned && cleaned.length <= 80 && !/^link\b/i.test(cleaned)) {
+        return cleaned;
+      }
     }
   }
   return "";
