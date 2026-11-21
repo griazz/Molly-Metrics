@@ -178,11 +178,24 @@ function extractCcTroops(text) {
 }
 
 function extractTags(text) {
+  const hay = String(text || "");
+  const rules = [
+    { tag: "Progress",    rx: /\bprogr?ess(?:\s+base)?\b/i },
+    { tag: "L1",          rx: /\b(?:l\s*[123]|legend\s*1)\b/i },
+    { tag: "Legend",      rx: /\b(?:legend|legends|ll|l\s*[123])\b/i },
+    { tag: "Ranked",      rx: /\b(?:ranked|all\s+ranks|any\s+league)\b/i },
+    { tag: "War",         rx: /\b(?:war|cwl)\b/i },
+    { tag: "Pro / ESL",   rx: /\b(?:esl|world\s*championship|worlds|tribe\s*gaming|pod\s*gear)\b/i },
+    { tag: "Tested",      rx: /\b(?:tested|unburnt|no\s+triples)\b/i },
+    { tag: "Untested",    rx: /\b(?:untested|fresh\s+custom)\b/i },
+    { tag: "Anti-Bowler", rx: /\banti[\s-]?bowler\b/i },
+    { tag: "Anti-LaLo",   rx: /\blalo\b/i },
+    { tag: "Rage/Poison", rx: /\brage[\s\/-]?poison\b/i }
+  ];
   const tags = ["Auto-X"];
-  if (/\branked\b/i.test(text)) tags.push("Ranked");
-  if (/\b(?:legend|legends|ll)\b/i.test(text)) tags.push("Legend");
-  if (/\b(?:war|cwl)\b/i.test(text)) tags.push("War");
-  if (tags.length === 1) tags.push("Legend");
+  for (const r of rules) {
+    if (r.rx.test(hay) && !tags.includes(r.tag)) tags.push(r.tag);
+  }
   return tags;
 }
 
