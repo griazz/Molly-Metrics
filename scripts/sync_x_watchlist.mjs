@@ -1,9 +1,6 @@
 import fs from "node:fs";
 
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
-const X_FEED_SOURCE =
-  process.env.X_FEED_SOURCE ||
-  "https://syndication.twitter.com/srv/timeline-profile/screen-name/{handle}";
 const BATCH_MODE = (process.env.BATCH_MODE || "auto").toLowerCase();
 
 if (!APPS_SCRIPT_URL) {
@@ -18,7 +15,6 @@ const allBuilders = Array.isArray(config.builders) ? config.builders : [];
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-// Select which slice of the 60 builders to process on this run
 function getBuildersForRun(list) {
   if (BATCH_MODE === "all") {
     console.log(`Running ALL ${list.length} builders.`);
@@ -35,34 +31,27 @@ function getBuildersForRun(list) {
   return slice;
 }
 
-// 1. Discover recent post IDs for a builder handle
+// 1. Discover recent post IDs via your Google Apps Script backend
 async function getRecentStatusIds(handle) {
-  const feedUrl = X_FEED_SOURCE.replace("{handle}", encodeURIComponent(handle));
   try {
-    const res = await fetch(feedUrl, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; MollyMetricsBot/1.0)",
-        Accept: "text/html,application/xml,application/json"
-      }
-    });
+    const url = `${APPS_SCRIPT_URL}?action=getBuilderTimeline&handle=${encodeURIComponent(handle)}`;
+    const res = await fetch(url);
     if (!res.ok) {
-      console.warn(`Timeline fetch failed for @${handle}: HTTP ${res.status}`);
+      console.warn(`Apps Script HTTP ${res.status} for @${handle}`);
       return [];
     }
-    const body = await res.text();
-    const matches = body.matchAll(/(?:x\.com|twitter\.com)\/[^\/?#\s"'<>]+\/status\/(\d+)/gi);
-    const ids = new Set();
-    for (const m of matches) {
-      ids.add(m[1]);
+    const data = await res.json();
+    if (data.status && data.status !== 200) {
+      console.warn(`Timeline fetch failed for @${handle}: HTTP ${data.status}`);
     }
-    return Array.from(ids).slice(0, 8); // Inspect the 8 most recent posts per builder
+    return Array.isArray(data.ids) ? data.ids : [];
   } catch (err) {
-    console.warn(`Network error fetching timeline for @${handle}: ${err.message}`);
+    console.warn(`Error fetching timeline for @${handle}: ${err.message}`);
     return [];
   }
 }
 
-// 2. Fetch full post data via fxtwitter (same endpoint used by bases.html & Code.js)
+// 2. Fetch full post data via fxtwitter
 async function fetchTweet(handle, statusId) {
   try {
     const res = await fetch(
@@ -160,7 +149,6 @@ async function main() {
       const likes = Number(tweet.likes || 0);
       const thNum = baseLinks[0] ? extractThNumber(baseLinks[0].url, tweet.text || "") : 0;
 
-      // Filter: requires Clash base link, at least 1 screenshot, minimum likes, and target TH
       if (!baseLinks.length || !images.length || likes < minLikes || `TH${thNum}` !== requiredTh) {
         skipped++;
         continue;
@@ -200,7 +188,6 @@ async function main() {
       else if (result.status === "duplicate_blocked") duplicates++;
     }
 
-    // Pause 3 seconds between builders to avoid rate-limiting
     await sleep(3000);
   }
 
