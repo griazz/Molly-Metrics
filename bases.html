@@ -2192,7 +2192,7 @@ async function updateBaseOnBackend(id, updates, extraFlags = {}, keepalive = fal
     saveLocalCache();
     return updated;
   }
-  return null;
+  throw new Error((res && res.error) || "Backend did not return updated base — redeploy Apps Script Web App.");
 }
 
 async function deleteBaseOnBackend(id) {
@@ -3327,6 +3327,7 @@ function renderGallery() {
             <span class="mini-badge def" title="X Likes">❤️ ${formatCompactNum(base.likes)}</span>
           </div>
 
+          ${base.notes ? `<div style="font-size:11px;color:var(--text-sec);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(base.notes)}</div>` : ""}
           <div class="card-footer-row">
             ${base.ccTroops
               ? `<button type="button" class="cc-btn" title="Copy CC request" onclick="copyCc('${escHtml(base.ccTroops)}')">🛡️ ${escHtml(base.ccTroops)}</button>`
@@ -3678,6 +3679,11 @@ function bindStaticEvents() {
     const tags = document.getElementById("editTags").value.split(",").map(s => s.trim()).filter(Boolean);
     const rawCreator = document.getElementById("editCreator").value.trim();
 
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalLabel = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Saving...";
+
     try {
       await updateBaseOnBackend(id, {
         thLevel: document.getElementById("editTh").value.trim().toUpperCase() || target.thLevel,
@@ -3694,6 +3700,9 @@ function bindStaticEvents() {
       showToast("Saved changes to Google Sheets!");
     } catch (err) {
       showToast("Update failed: " + err.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalLabel;
     }
   });
 
