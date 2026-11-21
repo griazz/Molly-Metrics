@@ -93,14 +93,6 @@
     /* ============================================================
        UNIT ICONS & COPY ARMY BUTTON
     ============================================================ */
-    .unit-icon {
-      display: inline-block;
-      object-fit: contain;
-      vertical-align: middle;
-      flex-shrink: 0;
-      border-radius: 4px;
-    }
-
     .copy-army-btn {
       display: inline-flex;
       align-items: center;
@@ -1257,86 +1249,6 @@ function lookupStaticUnit(unitName) {
   return null;
 }
 
-// Multi-source icon resolver: static-data iconUrl first, then ClashKing CDN paths, then coc.guide mirror paths
-function getUnitIconCandidates(unitName) {
-  const name = String(unitName || "").trim();
-  if (!name) return [];
-  const entry = lookupStaticUnit(name);
-
-  let category = String((entry && entry.category) || "").toLowerCase();
-  if (!category) {
-    try { category = classifyUnitClient({ name: name }); } catch (e) { category = "troop"; }
-  }
-
-  const folderMap = {
-    troop: "troops", spell: "spells", siege: "siege-machines",
-    hero: "heroes", pet: "pets", equipment: "equipment"
-  };
-  const guideFolderMap = {
-    troop: "troop", siege: "troop", spell: "spell",
-    hero: "hero", pet: "pet", equipment: "gear"
-  };
-  const folder = folderMap[category] || "troops";
-  const guideFolder = guideFolderMap[category] || "troop";
-
-  const slugDash = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-  let snakeBase = name;
-  if (category === "spell") snakeBase = snakeBase.replace(/\s+spell$/i, "");
-  const snakeName = snakeBase.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
-
-  const out = [];
-  const seen = new Set();
-  const add = (url) => {
-    if (!url || typeof url !== "string") return;
-    // "|" is the data-fallbacks delimiter, so keep it out of any candidate URL
-    const clean = url.trim().replace(/\|/g, "%7C");
-    if (!clean || seen.has(clean)) return;
-    seen.add(clean);
-    out.push(clean);
-  };
-
-  // 1. Static-data icon
-  if (entry && entry.iconUrl) add(entry.iconUrl);
-
-  // 2. ClashKing CDN
-  if (entry && entry.id !== null && entry.id !== undefined && entry.id !== "") {
-    add("https://assets.clashk.ing/icons/" + entry.id + ".png");
-  }
-  add("https://assets.clashk.ing/" + folder + "/" + encodeURIComponent(name) + ".png");
-  if (slugDash) add("https://assets.clashk.ing/" + folder + "/" + slugDash + ".png");
-
-  // 3. coc.guide static asset mirror
-  if (snakeName) add("https://coc.guide/static/imgs/" + guideFolder + "/" + snakeName + ".png");
-
-  return out;
-}
-
-// Advances an <img> to its next candidate URL; hides it only after every candidate has failed
-window.handleUnitIconError = function (img) {
-  if (!img) return;
-  const remaining = String(img.getAttribute("data-fallbacks") || "").split("|").filter(Boolean);
-  if (remaining.length) {
-    const next = remaining.shift();
-    img.setAttribute("data-fallbacks", remaining.join("|"));
-    img.src = next;
-  } else {
-    img.style.display = "none";
-  }
-};
-
-function buildUnitIconImgTag(unitName, attrs) {
-  const candidates = getUnitIconCandidates(unitName);
-  if (!candidates.length) return "";
-  const first = candidates[0];
-  const rest = candidates.slice(1).join("|");
-  return `<img class="unit-icon" src="${escHtml(first)}" data-fallbacks="${escHtml(rest)}" alt="${escHtml(unitName)}" loading="lazy" ${attrs || ""} onerror="handleUnitIconError(this)" />`;
-}
-
-function renderUnitIcon(unitName, size = 24) {
-  const px = Math.max(12, Number(size) || 24);
-  return buildUnitIconImgTag(unitName, `width="${px}" height="${px}" style="width:${px}px;height:${px}px;"`);
-}
-
 function buildCocArmyLink(troopsList, spellsList) {
   const toEncodedPairs = (list) => {
     if (!Array.isArray(list) || !list.length) return [];
@@ -1952,7 +1864,6 @@ function renderMetaUpgradesSection(p) {
       <div class="upgrade-row">
         <div class="upgrade-left">
           <div class="upgrade-title-row">
-            ${renderUnitIcon(u.name, 22)}
             <span class="upgrade-name">${escHtml(u.name)}</span>
             <span class="mini-badge ${badge.cls}">${escHtml(badge.label)}</span>
           </div>
@@ -2134,7 +2045,6 @@ function renderRankedMetaSection(p, normalizedLogs) {
         <div class="pill-bar-row">
           <div class="pill-bar-head">
             <div class="pill-bar-name">
-              ${renderUnitIcon(u.name, 20)}
               <span>${escHtml(u.name)}</span>
               ${typeTag}
               <span class="mono" style="font-size:10px;color:var(--text-muted);">(${Number(u.totalCount || 0).toLocaleString()}×)</span>
@@ -2192,11 +2102,10 @@ function renderLastArmySection(p, normalizedLogs) {
     if (groups[cat]) groups[cat].push(u);
   });
 
-  const pill = (u, cls) => `<span class="mini-badge ${cls || ""}">${renderUnitIcon(u.name, 18)}${u.count > 1 ? `${u.count}× ` : ""}${escHtml(String(u.name).replace(/\s*Spell$/i, ""))}</span>`;
+  const pill = (u, cls) => `<span class="mini-badge ${cls || ""}">${u.count > 1 ? `${u.count}× ` : ""}${escHtml(String(u.name).replace(/\s*Spell$/i, ""))}</span>`;
   const heroPill = (u) => {
     const eq = Array.isArray(u.equipment) ? u.equipment : [];
-    const eqIcons = eq.map(e => renderUnitIcon(e, 14)).join("");
-    return `<span class="mini-badge purp">${renderUnitIcon(u.name, 18)}${escHtml(u.name)}${eqIcons ? ` ${eqIcons}` : ""}</span>`;
+    return `<span class="mini-badge purp">${escHtml(u.name)}${eq.length ? ` · ${eq.map(escHtml).join(", ")}` : ""}</span>`;
   };
   const row = (label, items, render) => items.length
     ? `<div style="margin-top:8px;"><div class="hero-sublabel">${label}</div><div class="army-pills">${items.map(render).join("")}</div></div>`
@@ -2254,7 +2163,7 @@ function renderBattleLogSection(p, normalizedLogs) {
           <summary>▸ Army Used (${army.length} unit types)</summary>
           <div class="army-pills">
             ${army.map(u => `
-              <span class="mini-badge">${renderUnitIcon(u.name, 16)}${u.count > 1 ? `${u.count}× ` : ""}${escHtml(u.name)}${u.level ? ` L${u.level}` : ""}</span>
+              <span class="mini-badge">${u.count > 1 ? `${u.count}× ` : ""}${escHtml(u.name)}${u.level ? ` L${u.level}` : ""}</span>
             `).join("")}
           </div>
         </details>
