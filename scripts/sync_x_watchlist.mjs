@@ -35,7 +35,6 @@ function getBuildersForRun(list) {
 async function getRecentStatusIds(handle) {
   const ids = new Set();
 
-  // Primary: FxTwitter v2 profile media timeline (JSON)
   try {
     const apiRes = await fetch(
       `https://api.fxtwitter.com/2/profile/${encodeURIComponent(handle)}/media`
@@ -49,14 +48,9 @@ async function getRecentStatusIds(handle) {
       for (const m of rawStr.matchAll(/\/status\/(\d{15,22})/g)) {
         ids.add(m[1]);
       }
-    } else {
-      console.warn(`  @${handle}: FxTwitter v2 media HTTP ${apiRes.status}`);
     }
-  } catch (err) {
-    console.warn(`  @${handle}: FxTwitter v2 error: ${err.message}`);
-  }
+  } catch {}
 
-  // Fallback: FxTwitter official media-only RSS feed
   if (ids.size === 0) {
     try {
       const rssRes = await fetch(
@@ -89,38 +83,9 @@ async function fetchTweet(handle, statusId) {
   }
 }
 
-// 3. Check thread/conversation if the main post has images but puts the Clash link in a reply
-async function fetchThreadClashLinks(statusId, handle) {
-  try {
-    const res = await fetch(`https://api.fxtwitter.com/2/thread/${encodeURIComponent(statusId)}`);
-    if (!res.ok) return { links: [], extraText: "" };
-    const data = await res.json();
-    const rawStr = JSON.stringify(data);
-    const urls = rawStr.match(/https?:\/\/(?:www\.)?link\.clashofclans\.com\/[^\s<>"')\]\\\}]+/gi) || [];
-    const seen = new Set();
-    const links = [];
-    for (const raw of urls) {
-      const clean = raw.replace(/[.,;!?]+$/, "");
-      const canon = extractCanonicalId(clean);
-      if (!seen.has(canon)) {
-        seen.add(canon);
-        links.push({
-          id: `link_${links.length + 1}`,
-          label: `Base #${links.length + 1}`,
-          url: clean,
-          canonicalId: canon
-        });
-      }
-    }
-    return { links, extraText: rawStr };
-  } catch {
-    return { links: [], extraText: "" };
-  }
-}
-
 function extractCanonicalId(url) {
   const m = String(url).match(/[?&]id=([^&#\s]+)/i);
-  if (!m) return url.trim();
+  if (!m) return "";
   try {
     return decodeURIComponent(m[1]).trim();
   } catch {
@@ -128,7 +93,21 @@ function extractCanonicalId(url) {
   }
 }
 
-function extractClashLinks(tweet) {
+// Strict validator: must be a Clash OpenLayout link whose decoded `id=` starts with the required TH (e.g. "TH19:")
+function isMatchingThLayoutUrl(rawUrl, targetTh) {
+  let decoded = String(rawUrl || "").trim();
+  try {
+    decoded = decodeURIComponent(decoded);
+  } catch {}
+  if (!/link\.clashofclans\.com/i.test(decoded)) return false;
+  if (!/[?&]action=OpenLayout(?:&|$)/i.test(decoded)) return false;
+
+  const idMatch = decoded.match(/[?&]id=([^&#\s]+)/i);
+  if (!idMatch) return false;
+  return idMatch[1].toUpperCase().startsWith(`${targetTh}:`);
+}
+
+function extractValidLayoutLinksFromTweet(tweet, targetTh) {
   const chunks = [tweet.text || ""];
   for (const f of tweet.raw_text?.facets || []) {
     if (f.replacement) chunks.push(f.replacement);
@@ -141,8 +120,9 @@ function extractClashLinks(tweet) {
   const links = [];
   for (const raw of rawMatches) {
     const clean = raw.replace(/[.,;!?]+$/, "");
+    if (!isMatchingThLayoutUrl(clean, targetTh)) continue;
     const canon = extractCanonicalId(clean);
-    if (!seen.has(canon)) {
+    if (canon && !seen.has(canon)) {
       seen.add(canon);
       links.push({
         id: `link_${links.length + 1}`,
@@ -155,13 +135,38 @@ function extractClashLinks(tweet) {
   return links;
 }
 
-function extractThNumber(primaryUrl, text) {
-  let decoded = primaryUrl;
+// 3. Only check self-replies by the SAME builder handle (ignores comments from other users)
+async function fetchAuthorSelfReplyLinks(statusId, handle, targetTh) {
   try {
-    decoded = decodeURIComponent(primaryUrl);
-  } catch {}
-  const m = `${decoded} ${text}`.match(/\bTH\s*(\d{1,2})\b/i);
-  return m ? parseInt(m[1], 10) : 19;
+    const res = await fetch(`https://api.fxtwitter.com/2/thread/${encodeURIComponent(statusId)}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    const replies = Array.isArray(data?.replies)
+      ? data.replies
+      : Array.isArray(data?.thread)
+      ? data.thread
+      : [];
+
+    const lowerHandle = handle.toLowerCase();
+    const seen = new Set();
+    const links = [];
+
+    for (const item of replies) {
+      const tw = item?.tweet || item;
+      const author = String(tw?.author?.screen_name || "").toLowerCase();
+      if (author && author !== lowerHandle) continue;
+
+      for (const link of extractValidLayoutLinksFromTweet(tw, targetTh)) {
+        if (!seen.has(link.canonicalId)) {
+          seen.add(link.canonicalId);
+          links.push({ ...link, id: `link_${links.length + 1}`, label: `Base #${links.length + 1}` });
+        }
+      }
+    }
+    return links;
+  } catch {
+    return [];
+  }
 }
 
 function extractCcTroops(text) {
@@ -183,6 +188,7 @@ function extractTags(text) {
 
 async function main() {
   const todaysBuilders = getBuildersForRun(allBuilders);
+  const thNumber = parseInt(requiredTh.replace(/\D/g, ""), 10) || 19;
   let saved = 0;
   let duplicates = 0;
   let skipped = 0;
@@ -197,30 +203,28 @@ async function main() {
       const tweet = await fetchTweet(handle, id);
       if (!tweet) continue;
 
-      let baseLinks = extractClashLinks(tweet);
       const images = (tweet.media?.photos || []).map((p) => p.url).filter(Boolean);
-      let combinedText = tweet.text || "";
-
-      // If tweet has screenshots & enough likes, check thread replies for the Clash base link
       const likes = Number(tweet.likes || 0);
-      if (baseLinks.length === 0 && images.length > 0 && likes >= minLikes) {
-        const threadData = await fetchThreadClashLinks(id, handle);
-        if (threadData.links.length > 0) {
-          baseLinks = threadData.links;
-        }
-      }
-
-      const thNum = baseLinks[0] ? extractThNumber(baseLinks[0].url, combinedText) : 0;
-
-      if (!baseLinks.length || !images.length || likes < minLikes || `TH${thNum}` !== requiredTh) {
+      if (!images.length || likes < minLikes) {
         skipped++;
         continue;
       }
 
+      let baseLinks = extractValidLayoutLinksFromTweet(tweet, requiredTh);
+      if (baseLinks.length === 0) {
+        baseLinks = await fetchAuthorSelfReplyLinks(id, handle, requiredTh);
+      }
+
+      if (!baseLinks.length) {
+        skipped++;
+        continue;
+      }
+
+      const combinedText = tweet.text || "";
       const payload = {
         action: "saveBase",
         base: {
-          thLevel: thNum,
+          thLevel: thNumber,
           baseLink: baseLinks[0].url,
           canonicalId: baseLinks[0].canonicalId,
           baseLinks,
