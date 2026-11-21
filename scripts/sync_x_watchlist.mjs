@@ -1,6 +1,6 @@
 import fs from "node:fs";
 
-const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
+const APPS_SCRIPT_URL = (process.env.APPS_SCRIPT_URL || "").trim().replace(/^["']|["']$/g, "");
 const BATCH_MODE = (process.env.BATCH_MODE || "auto").toLowerCase();
 
 if (!APPS_SCRIPT_URL) {
@@ -31,34 +31,44 @@ function getBuildersForRun(list) {
   return slice;
 }
 
-// 1. Discover recent Clash base post IDs via public search index (bypasses X syndication 429s)
+// 1. Discover recent status IDs for a builder across multiple search indexes
 async function getRecentStatusIds(handle) {
-  const query = encodeURIComponent(`site:x.com/${handle}/status "link.clashofclans.com"`);
-  const urls = [
-    `https://www.bing.com/search?q=${query}&format=rss`,
-    `https://html.duckduckgo.com/html/?q=${query}`
+  const q1 = encodeURIComponent(`site:x.com/${handle}/status`);
+  const q2 = encodeURIComponent(`"x.com/${handle}/status/"`);
+  const endpoints = [
+    { name: "BingRSS", url: `https://www.bing.com/search?q=${q1}&format=rss` },
+    { name: "Yahoo", url: `https://search.yahoo.com/search?p=${q2}` },
+    { name: "DDG", url: `https://html.duckduckgo.com/html/?q=${q2}` }
   ];
 
   const ids = new Set();
-  for (const searchUrl of urls) {
+  const rx = new RegExp(`(?:x\\.com|twitter\\.com)(?:%2F|\\/)${handle}(?:%2F|\\/)status(?:%2F|\\/)(\\d+)`, "gi");
+
+  for (const ep of endpoints) {
     try {
-      const res = await fetch(searchUrl, {
+      const res = await fetch(ep.url, {
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
           "Accept-Language": "en-US,en;q=0.9"
         }
       });
       if (!res.ok) continue;
       const body = await res.text();
-      const rx = new RegExp(`(?:x\\.com|twitter\\.com)\\/${handle}\\/status\\/(\\d+)`, "gi");
       for (const m of body.matchAll(rx)) {
         ids.add(m[1]);
       }
-      if (ids.size > 0) break;
+      if (ids.size > 0) {
+        console.log(`  @${handle}: found ${ids.size} post(s) via ${ep.name}`);
+        break;
+      }
     } catch {}
   }
 
-  return Array.from(ids).slice(0, 8);
+  if (ids.size === 0) {
+    console.log(`  @${handle}: 0 indexed posts found`);
+  }
+  return Array.from(ids).slice(0, 10);
 }
 
 // 2. Fetch full post data via fxtwitter
@@ -151,13 +161,28 @@ async function main() {
     const statusIds = await getRecentStatusIds(handle);
 
     for (const id of statusIds) {
-      const tweet = await fetchTweet(handle, id);
+      let tweet = await fetchTweet(handle, id);
       if (!tweet) continue;
 
-      const baseLinks = extractClashLinks(tweet);
-      const images = (tweet.media?.photos || []).map((p) => p.url).filter(Boolean);
+      let baseLinks = extractClashLinks(tweet);
+      let images = (tweet.media?.photos || []).map((p) => p.url).filter(Boolean);
+      let combinedText = tweet.text || "";
+
+      // If this status is a reply containing the base link, grab the screenshot & likes from the parent tweet
+      if (baseLinks.length > 0 && images.length === 0 && tweet.replying_to_status) {
+        const parent = await fetchTweet(tweet.replying_to || handle, tweet.replying_to_status);
+        if (parent) {
+          images = (parent.media?.photos || []).map((p) => p.url).filter(Boolean);
+          combinedText = `${parent.text || ""}\n${combinedText}`;
+          tweet = {
+            ...parent,
+            text: combinedText
+          };
+        }
+      }
+
       const likes = Number(tweet.likes || 0);
-      const thNum = baseLinks[0] ? extractThNumber(baseLinks[0].url, tweet.text || "") : 0;
+      const thNum = baseLinks[0] ? extractThNumber(baseLinks[0].url, combinedText) : 0;
 
       if (!baseLinks.length || !images.length || likes < minLikes || `TH${thNum}` !== requiredTh) {
         skipped++;
@@ -179,9 +204,9 @@ async function main() {
             ? Number(tweet.created_timestamp) * 1000
             : Date.now(),
           likes,
-          ccTroops: extractCcTroops(tweet.text),
-          tags: extractTags(tweet.text || ""),
-          notes: (tweet.text || "").slice(0, 140),
+          ccTroops: extractCcTroops(combinedText),
+          tags: extractTags(combinedText),
+          notes: combinedText.slice(0, 140),
           copies: 0
         }
       };
@@ -192,7 +217,7 @@ async function main() {
         body: JSON.stringify(payload)
       });
       const result = await saveRes.json();
-      console.log(`@${handle}/${id} -> ${result.status || result.error}`);
+      console.log(`  -> @${handle}/${id}: ${result.status || result.error}`);
 
       if (result.status === "success") saved++;
       else if (result.status === "duplicate_blocked") duplicates++;
