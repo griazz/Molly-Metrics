@@ -1,50 +1,89 @@
 import fs from "node:fs";
 
 const APPS_SCRIPT_URL = process.env.APPS_SCRIPT_URL;
-// Example X_FEED_SOURCE: "https://rsshub.app/twitter/user/{handle}" or any RSS/Atom feed URL template
-const X_FEED_SOURCE = process.env.X_FEED_SOURCE || "";
+const X_FEED_SOURCE =
+  process.env.X_FEED_SOURCE ||
+  "https://syndication.twitter.com/srv/timeline-profile/screen-name/{handle}";
+const BATCH_MODE = (process.env.BATCH_MODE || "auto").toLowerCase();
 
 if (!APPS_SCRIPT_URL) {
-  console.error("Missing APPS_SCRIPT_URL secret.");
+  console.error("Missing APPS_SCRIPT_URL secret in GitHub repository settings.");
   process.exit(1);
 }
 
 const config = JSON.parse(fs.readFileSync("scripts/watchlist.json", "utf8"));
 const minLikes = Number(config.minLikes ?? 25);
 const requiredTh = String(config.requiredTh || "TH19").toUpperCase();
-const builders = Array.isArray(config.builders) ? config.builders : [];
+const allBuilders = Array.isArray(config.builders) ? config.builders : [];
 
-// 1. Pull recent tweet IDs for a builder handle from your RSS/feed bridge
-async function getRecentStatusIds(handle) {
-  if (!X_FEED_SOURCE) {
-    console.warn("No X_FEED_SOURCE set — skipping feed lookup.");
-    return [];
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Select which slice of the 60 builders to process on this run
+function getBuildersForRun(list) {
+  if (BATCH_MODE === "all") {
+    console.log(`Running ALL ${list.length} builders.`);
+    return list;
   }
-  const feedUrl = X_FEED_SOURCE.replace("{handle}", encodeURIComponent(handle));
-  const res = await fetch(feedUrl, { headers: { "User-Agent": "MollyMetricsBot/1.0" } });
-  if (!res.ok) {
-    console.warn(`Feed fetch failed for @${handle}: HTTP ${res.status}`);
-    return [];
-  }
-  const xml = await res.text();
-  const matches = xml.matchAll(/(?:x\.com|twitter\.com)\/[^\/?#\s"'<>]+\/status\/(\d+)/gi);
-  const ids = new Set();
-  for (const m of matches) ids.add(m[1]);
-  return Array.from(ids).slice(0, 10); // Check the 10 most recent posts per builder
+  const batchIndex = ["0", "1", "2", "3"].includes(BATCH_MODE)
+    ? Number(BATCH_MODE)
+    : Math.floor(new Date().getUTCHours() / 6);
+
+  const batchSize = Math.ceil(list.length / 4);
+  const start = batchIndex * batchSize;
+  const slice = list.slice(start, start + batchSize);
+  console.log(`Running Batch ${batchIndex + 1}/4 (${slice.length} of ${list.length} builders).`);
+  return slice;
 }
 
-// 2. Fetch full tweet details via fxtwitter (same endpoint used in bases.html & Code.js)
+// 1. Discover recent post IDs for a builder handle
+async function getRecentStatusIds(handle) {
+  const feedUrl = X_FEED_SOURCE.replace("{handle}", encodeURIComponent(handle));
+  try {
+    const res = await fetch(feedUrl, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; MollyMetricsBot/1.0)",
+        Accept: "text/html,application/xml,application/json"
+      }
+    });
+    if (!res.ok) {
+      console.warn(`Timeline fetch failed for @${handle}: HTTP ${res.status}`);
+      return [];
+    }
+    const body = await res.text();
+    const matches = body.matchAll(/(?:x\.com|twitter\.com)\/[^\/?#\s"'<>]+\/status\/(\d+)/gi);
+    const ids = new Set();
+    for (const m of matches) {
+      ids.add(m[1]);
+    }
+    return Array.from(ids).slice(0, 8); // Inspect the 8 most recent posts per builder
+  } catch (err) {
+    console.warn(`Network error fetching timeline for @${handle}: ${err.message}`);
+    return [];
+  }
+}
+
+// 2. Fetch full post data via fxtwitter (same endpoint used by bases.html & Code.js)
 async function fetchTweet(handle, statusId) {
-  const res = await fetch(`https://api.fxtwitter.com/${encodeURIComponent(handle)}/status/${statusId}`);
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data?.tweet || null;
+  try {
+    const res = await fetch(
+      `https://api.fxtwitter.com/${encodeURIComponent(handle)}/status/${encodeURIComponent(statusId)}`
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data?.tweet || null;
+  } catch {
+    return null;
+  }
 }
 
 function extractCanonicalId(url) {
   const m = String(url).match(/[?&]id=([^&#\s]+)/i);
   if (!m) return url.trim();
-  try { return decodeURIComponent(m[1]).trim(); } catch { return m[1].trim(); }
+  try {
+    return decodeURIComponent(m[1]).trim();
+  } catch {
+    return m[1].trim();
+  }
 }
 
 function extractClashLinks(tweet) {
@@ -53,7 +92,9 @@ function extractClashLinks(tweet) {
     if (f.replacement) chunks.push(f.replacement);
     if (f.original?.startsWith("http")) chunks.push(f.original);
   }
-  const rawMatches = chunks.join("\n").match(/https?:\/\/(?:www\.)?link\.clashofclans\.com\/[^\s<>"')\]\}]+/gi) || [];
+  const rawMatches =
+    chunks.join("\n").match(/https?:\/\/(?:www\.)?link\.clashofclans\.com\/[^\s<>"')\]\}]+/gi) || [];
+
   const seen = new Set();
   const links = [];
   for (const raw of rawMatches) {
@@ -74,7 +115,9 @@ function extractClashLinks(tweet) {
 
 function extractThNumber(primaryUrl, text) {
   let decoded = primaryUrl;
-  try { decoded = decodeURIComponent(primaryUrl); } catch {}
+  try {
+    decoded = decodeURIComponent(primaryUrl);
+  } catch {}
   const m = `${decoded} ${text}`.match(/\bTH\s*(\d{1,2})\b/i);
   return m ? parseInt(m[1], 10) : 19;
 }
@@ -97,10 +140,15 @@ function extractTags(text) {
 }
 
 async function main() {
-  let saved = 0, skipped = 0;
+  const todaysBuilders = getBuildersForRun(allBuilders);
+  let saved = 0;
+  let duplicates = 0;
+  let skipped = 0;
 
-  for (const rawHandle of builders) {
-    const handle = rawHandle.replace(/^@/, "");
+  for (const rawHandle of todaysBuilders) {
+    const handle = String(rawHandle).trim().replace(/^@/, "");
+    if (!handle) continue;
+
     const statusIds = await getRecentStatusIds(handle);
 
     for (const id of statusIds) {
@@ -108,11 +156,11 @@ async function main() {
       if (!tweet) continue;
 
       const baseLinks = extractClashLinks(tweet);
-      const images = (tweet.media?.photos || []).map(p => p.url).filter(Boolean);
+      const images = (tweet.media?.photos || []).map((p) => p.url).filter(Boolean);
       const likes = Number(tweet.likes || 0);
       const thNum = baseLinks[0] ? extractThNumber(baseLinks[0].url, tweet.text || "") : 0;
 
-      // Filter: must have a Clash base link, at least 1 screenshot, enough likes, and matching TH
+      // Filter: requires Clash base link, at least 1 screenshot, minimum likes, and target TH
       if (!baseLinks.length || !images.length || likes < minLikes || `TH${thNum}` !== requiredTh) {
         skipped++;
         continue;
@@ -129,7 +177,9 @@ async function main() {
           images,
           creatorHandle: `@${tweet.author?.screen_name || handle}`,
           postUrl: tweet.url || `https://x.com/${handle}/status/${id}`,
-          postTimestamp: tweet.created_timestamp ? Number(tweet.created_timestamp) * 1000 : Date.now(),
+          postTimestamp: tweet.created_timestamp
+            ? Number(tweet.created_timestamp) * 1000
+            : Date.now(),
           likes,
           ccTroops: extractCcTroops(tweet.text),
           tags: extractTags(tweet.text || ""),
@@ -145,14 +195,19 @@ async function main() {
       });
       const result = await saveRes.json();
       console.log(`@${handle}/${id} -> ${result.status || result.error}`);
+
       if (result.status === "success") saved++;
+      else if (result.status === "duplicate_blocked") duplicates++;
     }
+
+    // Pause 3 seconds between builders to avoid rate-limiting
+    await sleep(3000);
   }
 
-  console.log(`Done. Saved: ${saved}, Skipped: ${skipped}`);
+  console.log(`Batch complete. Saved: ${saved}, Duplicates blocked: ${duplicates}, Skipped: ${skipped}`);
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });
