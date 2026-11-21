@@ -3103,7 +3103,8 @@ function renderMetaTab() {
           const coreTroops = troops.length
             ? troops
             : String(a.name || "").split("(")[0].split("·")[0].split("+").map(x => x.trim()).filter(Boolean);
-          const title = coreTroops.length ? coreTroops.join(" + ") : String(a.name || "Unknown Army");
+          const cleanBackendName = String(a.name || "").split("(")[0].split("·")[0].trim();
+          const title = cleanBackendName || (coreTroops.length ? coreTroops.join(" + ") : "Unknown Army");
 
           const loadout = parseArchetypeVisualLoadout(a);
 
