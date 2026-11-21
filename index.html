@@ -671,6 +671,7 @@
       color: var(--text-muted);
       font-weight: 800;
     }
+    .ck-ico.ck-loaded .ck-ico-fb { visibility: hidden; }
     .ck-ico .unit-icon {
       position: absolute;
       inset: 0;
@@ -1782,11 +1783,84 @@ function lookupStaticUnit(unitName) {
   return null;
 }
 
+// Multi-source icon resolver: static-data iconUrl first, then ClashKing CDN paths, then coc.guide mirror paths
+function getUnitIconCandidates(unitName) {
+  const name = String(unitName || "").trim();
+  if (!name) return [];
+  const entry = lookupStaticUnit(name);
+
+  let category = String((entry && entry.category) || "").toLowerCase();
+  if (!category) {
+    try { category = classifyUnitClient({ name: name }); } catch (e) { category = "troop"; }
+  }
+
+  const folderMap = {
+    troop: "troops", spell: "spells", siege: "siege-machines",
+    hero: "heroes", pet: "pets", equipment: "equipment"
+  };
+  const guideFolderMap = {
+    troop: "troop", siege: "troop", spell: "spell",
+    hero: "hero", pet: "pet", equipment: "gear"
+  };
+  const folder = folderMap[category] || "troops";
+  const guideFolder = guideFolderMap[category] || "troop";
+
+  const slugDash = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  let snakeBase = name;
+  if (category === "spell") snakeBase = snakeBase.replace(/\s+spell$/i, "");
+  const snakeName = snakeBase.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+
+  const out = [];
+  const seen = new Set();
+  const add = (url) => {
+    if (!url || typeof url !== "string") return;
+    // "|" is the data-fallbacks delimiter, so keep it out of any candidate URL
+    const clean = url.trim().replace(/\|/g, "%7C");
+    if (!clean || seen.has(clean)) return;
+    seen.add(clean);
+    out.push(clean);
+  };
+
+  // 1. Static-data icon
+  if (entry && entry.iconUrl) add(entry.iconUrl);
+
+  // 2. ClashKing CDN
+  if (entry && entry.id !== null && entry.id !== undefined && entry.id !== "") {
+    add("https://assets.clashk.ing/icons/" + entry.id + ".png");
+  }
+  add("https://assets.clashk.ing/" + folder + "/" + encodeURIComponent(name) + ".png");
+  if (slugDash) add("https://assets.clashk.ing/" + folder + "/" + slugDash + ".png");
+
+  // 3. coc.guide static asset mirror
+  if (snakeName) add("https://coc.guide/static/imgs/" + guideFolder + "/" + snakeName + ".png");
+
+  return out;
+}
+
+// Advances an <img> to its next candidate URL; hides it only after every candidate has failed
+window.handleUnitIconError = function (img) {
+  if (!img) return;
+  const remaining = String(img.getAttribute("data-fallbacks") || "").split("|").filter(Boolean);
+  if (remaining.length) {
+    const next = remaining.shift();
+    img.setAttribute("data-fallbacks", remaining.join("|"));
+    img.src = next;
+  } else {
+    img.style.display = "none";
+  }
+};
+
+function buildUnitIconImgTag(unitName, attrs) {
+  const candidates = getUnitIconCandidates(unitName);
+  if (!candidates.length) return "";
+  const first = candidates[0];
+  const rest = candidates.slice(1).join("|");
+  return `<img class="unit-icon" src="${escHtml(first)}" data-fallbacks="${escHtml(rest)}" alt="${escHtml(unitName)}" loading="lazy" ${attrs || ""} onerror="handleUnitIconError(this)" />`;
+}
+
 function renderUnitIcon(unitName, size = 24) {
-  const entry = lookupStaticUnit(unitName);
-  if (!entry || !entry.iconUrl) return "";
   const px = Math.max(12, Number(size) || 24);
-  return `<img class="unit-icon" src="${escHtml(entry.iconUrl)}" alt="${escHtml(unitName)}" width="${px}" height="${px}" style="width:${px}px;height:${px}px;" loading="lazy" onerror="this.style.display='none'" />`;
+  return buildUnitIconImgTag(unitName, `width="${px}" height="${px}" style="width:${px}px;height:${px}px;"`);
 }
 
 function buildCocArmyLink(troopsList, spellsList) {
@@ -2858,12 +2932,9 @@ function parseArchetypeVisualLoadout(archetype) {
 
 // Rounded portrait with a lettered placeholder behind it (stays tidy if an icon URL is missing or fails)
 function ckIcon(name, px) {
-  const entry = lookupStaticUnit(name);
   const label = String(name || "").trim();
-  const img = entry && entry.iconUrl
-    ? `<img class="unit-icon" src="${escHtml(entry.iconUrl)}" alt="${escHtml(label)}" loading="lazy" onerror="this.style.display='none'" />`
-    : "";
-  return `<span class="ck-ico" title="${escHtml(label)}" style="width:${px}px;height:${px}px;border-radius:${Math.round(px * 0.26)}px;font-size:${Math.round(px * 0.42)}px;">${escHtml(label.charAt(0).toUpperCase())}${img}</span>`;
+  const img = buildUnitIconImgTag(label, `onload="this.parentNode.classList.add('ck-loaded')"`);
+  return `<span class="ck-ico" title="${escHtml(label)}" style="width:${px}px;height:${px}px;border-radius:${Math.round(px * 0.26)}px;font-size:${Math.round(px * 0.42)}px;"><span class="ck-ico-fb">${escHtml(label.charAt(0).toUpperCase())}</span>${img}</span>`;
 }
 
 function ckUnitSection(label, items) {
