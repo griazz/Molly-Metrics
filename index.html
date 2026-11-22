@@ -289,9 +289,11 @@
     .toolbar-top {
       display: flex;
       gap: 8px;
+      min-width: 0;
     }
     .search-input {
-      flex: 1;
+      flex: 1 1 140px;
+      min-width: 0;
       height: 40px;
       border-radius: 10px;
       border: 1px solid var(--border);
@@ -303,6 +305,10 @@
     }
     .search-input:focus { border-color: var(--accent); }
     .sort-select {
+      flex: 0 1 auto;
+      min-width: 0;
+      max-width: 48%;
+      text-overflow: ellipsis;
       height: 40px;
       border-radius: 10px;
       border: 1px solid var(--border);
@@ -677,6 +683,55 @@
       overflow: hidden;
     }
 
+    /* Playstyle badge, Clan MVP strip, Clan viz grid */
+    .playstyle-badge { display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .mvp-section { margin-bottom: 14px; }
+    .mvp-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .mvp-strip::-webkit-scrollbar { display: none; }
+    .mvp-card {
+      flex: 0 0 150px;
+      min-width: 0;
+      text-align: left;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 11px;
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .mvp-card:active { transform: scale(0.98); }
+    .mvp-card.empty { cursor: default; opacity: 0.6; }
+    .mvp-title { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); white-space: nowrap; }
+    .mvp-name { font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .mvp-stat { font-size: 11px; color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .clan-viz-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 12px 0 4px 0;
+    }
+    @media (max-width: 640px) { .clan-viz-grid { grid-template-columns: minmax(0, 1fr); } }
+    .clan-viz-grid .clock-card { min-width: 0; }
+    .clan-viz-grid .clock-canvas-wrap { max-width: min(300px, 100%); }
+    .clock-pill-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .clock-nav-btn {
+      width: 26px; height: 24px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text); font-size: 12px; cursor: pointer; padding: 0;
+    }
+    .clock-who { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .clock-who .mini-badge { cursor: pointer; }
+
     .ranked-group-title {
       font-size: 11px;
       font-weight: 800;
@@ -926,6 +981,28 @@
       overflow-x: hidden;
     }
 
+    .cat-click { cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+    .cat-click:active { transform: scale(0.98); }
+    .cat-click.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .cat-detail { margin-top: 10px; }
+    .cat-detail:empty { display: none; }
+    .cmp-track { position: relative; height: 8px; border-radius: 99px; background: var(--bg-subtle); margin: 12px 0 6px 0; }
+    .cmp-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 99px; }
+    .cmp-marker { position: absolute; top: -4px; bottom: -4px; width: 3px; border-radius: 2px; transform: translateX(-50%); }
+    .cmp-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 10px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .rem-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 0; border-top: 1px solid var(--border); font-size: 12px; }
+    .rem-row:first-of-type { border-top: none; }
+    .rem-name { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rem-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .loadout-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .loadout-card { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+    .loadout-hero { font-size: 12px; font-weight: 800; }
+    .loadout-combo { font-size: 12px; color: var(--text); line-height: 1.35; word-break: break-word; }
+    .streak-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+    .streak-pill { background: var(--bg-input); border: 1px solid var(--border); border-radius: 10px; padding: 8px 9px; min-width: 0; }
+    .streak-val { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .streak-sub { font-size: 10px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
     .stat-pills {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1126,6 +1203,7 @@
     </div>
 
     <div id="myAccountsSection"></div>
+    <div id="clanMvpsSection"></div>
 
     <!-- COLLAPSIBLE CLAN COMMAND & META PANEL -->
     <section class="panel" id="metaPanel">
@@ -1133,9 +1211,9 @@
         <button id="btnToggleMeta" class="panel-toggle-btn" type="button" aria-expanded="false" onclick="toggleMetaPanel()">
           <div style="min-width:0;">
             <div class="panel-title">
-              <span>⚔️ Ranked Meta &amp; Top Armies</span>
+              <span>⚔️ Clan Command, Clock &amp; Meta</span>
             </div>
-            <div class="panel-sub" id="metaPanelSub">Top 5 Ranked attack archetypes</div>
+            <div class="panel-sub" id="metaPanelSub">Clan attack clock, balance radar &amp; top Ranked armies</div>
           </div>
           <span id="metaChevron" class="mono" style="font-size:12px;color:var(--text-muted);flex-shrink:0;">▼</span>
         </button>
@@ -1309,6 +1387,9 @@ let state = {
 
 let radarChart = null;
 let attackClockChart = null;
+let clanClockChart = null;
+let clanRadarChart = null;
+let clanClockHour = null; // selected hour on the Clan Attack Clock (null = peak hour)
 
 /* ============================================================
    STATIC GAME DATA HELPERS (ICONS + ONE-TAP COPY ARMY LINKS)
@@ -1521,6 +1602,7 @@ window.addEventListener("DOMContentLoaded", () => {
   applyTheme(savedTheme);
   initDrawerSwipe();
   renderMyAccountsStrip();
+  renderClanMvps();
   renderMetaPanel();
 
   loadDashboard();
@@ -1547,6 +1629,7 @@ function applyTheme(theme) {
   localStorage.setItem("molly_theme", theme);
   document.getElementById("themeBtn").textContent = theme === "dark" ? "☀️" : "🌙";
   document.getElementById("metaThemeColor").setAttribute("content", theme === "dark" ? "#0f172a" : "#f1f5f9");
+  if (typeof renderMetaPanel === "function" && state && Array.isArray(state.players) && state.players.length) renderMetaPanel();
 }
 
 /* ============================================================
@@ -1574,6 +1657,7 @@ async function loadDashboard() {
     renderHeader();
     renderKpis();
     renderMyAccountsStrip();
+    renderClanMvps();
     renderMetaPanel();
     applyFilters();
 
@@ -1840,6 +1924,105 @@ function rosterFilterMatches(p, filterId) {
   }
 }
 
+// ============================================================
+// PLAYSTYLE TITLES — Time Persona + Combat Persona (2-part badge)
+// ============================================================
+function getPlayerPlaystyle(p) {
+  const prof = computeHourlyAttackProfile(p);
+  let timeLabel = "Casual", timeEmoji = "😴";
+  if (prof.totalAttacks >= 3) {
+    const h = prof.peakHour;
+    if (h >= 23 || h <= 4)      { timeLabel = "Night Owl";         timeEmoji = "🌙"; }
+    else if (h >= 5 && h <= 9)  { timeLabel = "Early Bird";        timeEmoji = "🌅"; }
+    else if (h >= 10 && h <= 15){ timeLabel = "Midday Raider";     timeEmoji = "☀️"; }
+    else                        { timeLabel = "Prime-Time Raider"; timeEmoji = "🌆"; }
+  }
+
+  const ra = p.rankedAnalytics || {};
+  const rankedTotal = Number(ra.totalRankedAttacks || 0);
+  const base = getEquippedBaseStats(p);
+  const loot7d = Number(p.activityStats && p.activityStats["7d"] && p.activityStats["7d"].all
+    ? p.activityStats["7d"].all.combinedLoot : 0) || 0;
+  const topTroop = Array.isArray(ra.topTroops) && ra.topTroops[0] && ra.topTroops[0].name
+    ? String(ra.topTroops[0].name).trim() : "";
+
+  let combat;
+  if (rankedTotal >= 5 && Number(ra.threeStarRate) >= 65) combat = "3★ Surgeon";
+  else if (base.rating !== null && base.rating >= 65)     combat = "Iron Wall";
+  else if (loot7d >= 40000000)                            combat = "Loot Goblin";
+  else if (topTroop)                                      combat = /^dragon( rider)?$/i.test(topTroop) ? "Hydra Main" : topTroop + " Main";
+  else                                                    combat = "Contender";
+
+  return { time: timeLabel, emoji: timeEmoji, combat: combat, label: `${timeEmoji} ${timeLabel} · ${combat}` };
+}
+
+function playstyleBadgeHtml(p) {
+  const ps = getPlayerPlaystyle(p);
+  return `<span class="mini-badge amb playstyle-badge" title="${escHtml(ps.time + " · " + ps.combat)}">${escHtml(ps.label)}</span>`;
+}
+
+// ============================================================
+// WEEKLY CLAN MVPs STRIP
+// ============================================================
+function renderClanMvps() {
+  const host = document.getElementById("clanMvpsSection");
+  if (!host) return;
+  if (!state.players.length) { host.innerHTML = ""; return; }
+
+  const pick = (items, better) => items.reduce((best, it) => (!best || better(it, best) ? it : best), null);
+  const enriched = state.players.map(p => ({
+    p: p,
+    ra: p.rankedAnalytics || {},
+    loot7d: Number(p.activityStats && p.activityStats["7d"] && p.activityStats["7d"].all
+      ? p.activityStats["7d"].all.combinedLoot : 0) || 0,
+    hits7d: getPlayerActivity(p).hits7d,
+    base: getEquippedBaseStats(p)
+  }));
+
+  const assassin = pick(
+    enriched.filter(e => Number(e.ra.totalRankedAttacks || 0) >= 5),
+    (a, b) => (Number(a.ra.threeStarRate) || 0) > (Number(b.ra.threeStarRate) || 0)
+  );
+  const goblin = pick(enriched.filter(e => e.loot7d > 0), (a, b) => a.loot7d > b.loot7d);
+
+  // Unbreakable: best Defense Rating on an active Vault base; falls back to lowest stars allowed (>= 3 defenses)
+  const baseCands = enriched.filter(e => e.base.kind === "active" && e.base.defs >= 3);
+  const rated = baseCands.filter(e => e.base.rating !== null);
+  let wall = null;
+  if (rated.length) {
+    wall = pick(rated, (a, b) => a.base.rating > b.base.rating ||
+      (a.base.rating === b.base.rating && (a.base.stars !== null && (b.base.stars === null || a.base.stars < b.base.stars))));
+  } else {
+    wall = pick(baseCands.filter(e => e.base.stars !== null), (a, b) => a.base.stars < b.base.stars);
+  }
+  const active = pick(enriched.filter(e => e.hits7d > 0), (a, b) => a.hits7d > b.hits7d);
+
+  const card = (icon, title, e, stat) => e
+    ? `<button type="button" class="mvp-card" onclick="openDrawer('${escHtml(e.p.tag)}')">
+         <span class="mvp-title">${icon} ${escHtml(title)}</span>
+         <span class="mvp-name">${escHtml(e.p.name)}</span>
+         <span class="mvp-stat">${escHtml(stat)}</span>
+       </button>`
+    : `<div class="mvp-card empty">
+         <span class="mvp-title">${icon} ${escHtml(title)}</span>
+         <span class="mvp-name">—</span>
+         <span class="mvp-stat">No data yet</span>
+       </div>`;
+
+  host.innerHTML = `
+    <div class="mvp-section">
+      <div class="myacc-title">Clan Superlatives</div>
+      <div class="mvp-strip">
+        ${card("🏆", "Ranked Assassin", assassin, assassin ? `${(Number(assassin.ra.threeStarRate) || 0).toFixed(1)}% 3★ · ${assassin.ra.totalRankedAttacks} atks` : "")}
+        ${card("💰", "Loot Goblin", goblin, goblin ? `${formatCompactNum(goblin.loot7d)} / 7d` : "")}
+        ${card("🛡️", "Unbreakable", wall, wall ? (wall.base.rating !== null
+          ? `Rating ${Math.round(wall.base.rating)}/100 · ${wall.base.defs} def`
+          : `${wall.base.stars.toFixed(2)}★ allowed · ${wall.base.defs} def`) : "")}
+        ${card("🔥", "Most Active", active, active ? `${active.hits7d} attacks / 7d` : "")}
+      </div>
+    </div>`;
+}
+
 function renderRosterChips() {
   const row = document.getElementById("rosterChipRow");
   if (!row) return;
@@ -1983,6 +2166,8 @@ function renderRosterGrid(players) {
           <span class="mini-badge ds">War ${warScore}</span>
         </div>
 
+        <div class="badge-row">${playstyleBadgeHtml(p)}</div>
+
         <div class="badge-row">${basePill}</div>
 
         <div class="prog-block">
@@ -2014,8 +2199,10 @@ function openDrawer(tag) {
   if (!player) return;
 
   state.activeDrawerTag = tag;
+  state.drawerCat = null;
   document.getElementById("drawerPlayerName").textContent = player.name;
-  document.getElementById("drawerPlayerSub").textContent = `${player.tag} · TH${player.thLevel} · War Score ${player.warScore}`;
+  document.getElementById("drawerPlayerSub").innerHTML =
+    `${escHtml(`${player.tag} · TH${player.thLevel} · War Score ${player.warScore}`)} ${playstyleBadgeHtml(player)}`;
   renderDrawerContent(player);
 
   document.getElementById("drawerBackdrop").classList.add("open");
@@ -2027,6 +2214,7 @@ function openDrawer(tag) {
 
 function closeDrawer() {
   state.activeDrawerTag = null;
+  state.drawerCat = null;
   if (radarChart) { radarChart.destroy(); radarChart = null; }
   if (attackClockChart) { attackClockChart.destroy(); attackClockChart = null; }
 
@@ -2081,22 +2269,26 @@ function renderMetaUpgradesSection(p) {
   const hasMeta = Boolean(state.globalMeta && (state.globalMeta.updatedAt || state.globalMeta.cohorts));
   if (!hasMeta) {
     return `
-      <div class="sec-label">Priority Meta Upgrades</div>
+      <div class="sec-label">Priority Equipment Upgrades</div>
       <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">
-        Sync the <b>Meta</b> tab to unlock personalized Top 100 upgrade recommendations.
+        Tap ↻ Refresh Global Meta in the Clan Command panel above to unlock equipment upgrade priorities.
       </div>
     `;
   }
 
-  const rawUpgrades = Array.isArray(p.metaUpgrades) ? p.metaUpgrades.slice() : [];
-  rawUpgrades.sort((a, b) => (Number(b.metaUsageRate || 0) - Number(a.metaUsageRate || 0)));
+  const rawUpgrades = (Array.isArray(p.metaUpgrades) ? p.metaUpgrades : [])
+    .filter(u => String(u.category || "").toLowerCase() === "equipment");
+  rawUpgrades.sort((a, b) => {
+    if (Boolean(a.inPlayerRankedLoadout) !== Boolean(b.inPlayerRankedLoadout)) return a.inPlayerRankedLoadout ? -1 : 1;
+    return Number(b.metaUsageRate || 0) - Number(a.metaUsageRate || 0);
+  });
 
   if (!rawUpgrades.length) {
     return `
-      <div class="sec-label">Priority Meta Upgrades</div>
+      <div class="sec-label">Priority Equipment Upgrades</div>
       <div class="upgrade-maxed-box">
         <span>✅</span>
-        <span>All Top Meta Items Maxed!</span>
+        <span>All Top Meta Equipment Maxed!</span>
       </div>
     `;
   }
@@ -2125,6 +2317,7 @@ function renderMetaUpgradesSection(p) {
           <div class="upgrade-title-row">
             <span class="upgrade-name">${escHtml(u.name)}</span>
             <span class="mini-badge ${badge.cls}">${escHtml(badge.label)}</span>
+            ${u.inPlayerRankedLoadout ? `<span class="mini-badge amb">★ Your Gear</span>` : ""}
           </div>
           <div class="upgrade-sub">${subText}</div>
         </div>
@@ -2137,7 +2330,7 @@ function renderMetaUpgradesSection(p) {
   }).join("");
 
   return `
-    <div class="sec-label">Priority Meta Upgrades (Top ${rawUpgrades.length} Impact)</div>
+    <div class="sec-label">Priority Equipment Upgrades</div>
     <div class="upgrade-list">${rowsHtml}</div>
   `;
 }
@@ -2468,8 +2661,50 @@ function renderBattleLogSection(p, normalizedLogs) {
     `;
   }).join("");
 
+  // Personal streaks & records (from the logged battles)
+  const attacks = logs.filter(b => b.attack);
+  const defenses = logs.filter(b => !b.attack);
+  let curStreak = 0;
+  for (let i = 0; i < attacks.length; i++) {
+    if ((Number(attacks[i].stars) || 0) >= 3) curStreak++; else break;
+  }
+  let bestStreak = 0, run = 0;
+  for (let i = attacks.length - 1; i >= 0; i--) {
+    if ((Number(attacks[i].stars) || 0) >= 3) { run++; if (run > bestStreak) bestStreak = run; } else run = 0;
+  }
+  let bestHaul = null;
+  attacks.forEach(b => {
+    const v = (Number(b.lootGold) || 0) + (Number(b.lootElixir) || 0) + (Number(b.lootDark) || 0) * 100;
+    if (!bestHaul || v > bestHaul.v) bestHaul = { v: v, b: b };
+  });
+  let bestHold = null;
+  defenses.forEach(b => {
+    const st = Number(b.stars) || 0, de = Number(b.destruction) || 0;
+    if (!bestHold || st < bestHold.st || (st === bestHold.st && de < bestHold.de)) bestHold = { st: st, de: de, b: b };
+  });
+
+  const streakHtml = `
+    <div class="streak-strip">
+      <div class="streak-pill">
+        <div class="kpi-label">3★ Streak</div>
+        <div class="streak-val" style="color:var(--green);">🔥 ${curStreak}</div>
+        <div class="streak-sub">Best in log: ${bestStreak}</div>
+      </div>
+      <div class="streak-pill">
+        <div class="kpi-label">Best Loot Haul</div>
+        <div class="streak-val" style="color:var(--amber);">${bestHaul && bestHaul.v > 0 ? "💰 " + formatCompactNum(bestHaul.v) : "–"}</div>
+        <div class="streak-sub">${bestHaul && bestHaul.v > 0 ? "vs " + escHtml(bestHaul.b.opponentName || "Unknown") : "No loot logged"}</div>
+      </div>
+      <div class="streak-pill">
+        <div class="kpi-label">Best Defense Hold</div>
+        <div class="streak-val" style="color:var(--accent);">${bestHold ? "🛡️ " + bestHold.st + "★ · " + Math.round(bestHold.de) + "%" : "–"}</div>
+        <div class="streak-sub">${bestHold ? "DEF vs " + escHtml(bestHold.b.opponentName || "Unknown") : "No defenses logged"}</div>
+      </div>
+    </div>`;
+
   return `
     <div class="sec-label">Recent Battle Log (${logs.length})</div>
+    ${streakHtml}
     <div>${cardsHtml}</div>
   `;
 }
@@ -2565,7 +2800,7 @@ function renderMetaPanel() {
       : "Top 5 Ranked attack archetypes";
   }
 
-  if (!state.metaPanelOpen) return; // collapsed: skip building the list
+  if (!state.metaPanelOpen) { destroyClanCharts(); return; } // collapsed: skip building the list
 
   const archs = (cohort && Array.isArray(cohort.topArchetypes)) ? cohort.topArchetypes.slice(0, 5) : [];
   const refreshBtn = `
@@ -2606,13 +2841,257 @@ function renderMetaPanel() {
     }).join("");
   }
 
+  destroyClanCharts();
   body.innerHTML = `
+    <div class="clan-viz-grid">
+      <div class="clock-card">
+        <div class="sec-label" style="margin-top:0;">Clan 24-Hour Attack Clock</div>
+        <div id="clanClockBody"></div>
+      </div>
+      <div class="clock-card">
+        <div class="sec-label" style="margin-top:0;">Clan Progression Balance</div>
+        <div id="clanRadarBody"></div>
+      </div>
+    </div>
     <div class="meta-toolbar">
       <span style="font-size:11px;color:var(--text-muted);">Top ${archs.length || 5} by pick rate</span>
       ${refreshBtn}
     </div>
     ${listHtml}
   `;
+  renderClanClock();
+  renderClanRadar();
+}
+
+// ============================================================
+// CLAN ATTACK CLOCK + PROGRESSION BALANCE RADAR
+// ============================================================
+function destroyClanCharts() {
+  if (clanClockChart) { clanClockChart.destroy(); clanClockChart = null; }
+  if (clanRadarChart) { clanRadarChart.destroy(); clanRadarChart = null; }
+}
+
+function cssVarColor(name, fallback) {
+  try {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return v || fallback;
+  } catch (e) { return fallback; }
+}
+
+function computeClanClockData() {
+  const counts = new Array(24).fill(0);
+  const perHour = Array.from({ length: 24 }, () => ({}));
+  let total = 0;
+  state.players.forEach(p => {
+    const stamps = Array.isArray(p.attackTimestamps30d) ? p.attackTimestamps30d.map(parseBattleTimeMs).filter(Boolean) : [];
+    stamps.forEach(ts => {
+      const d = new Date(Number(ts));
+      if (isNaN(d.getTime())) return;
+      const h = d.getHours();
+      counts[h] += 1;
+      total += 1;
+      perHour[h][p.tag] = (perHour[h][p.tag] || 0) + 1;
+    });
+  });
+  let peakHour = 0;
+  for (let h = 1; h < 24; h++) if (counts[h] > counts[peakHour]) peakHour = h;
+  return { counts, perHour, total, peakHour, peakCount: counts[peakHour] };
+}
+
+function clanClockColors(counts, selected, isDark) {
+  const maxVal = Math.max(1, ...counts);
+  const bg = counts.map((cnt, h) => {
+    if (h === selected) return isDark ? "rgba(251, 191, 36, 0.85)" : "rgba(217, 119, 6, 0.85)";
+    if (cnt === 0) return isDark ? "rgba(51, 65, 85, 0.22)" : "rgba(203, 213, 225, 0.35)";
+    const r = cnt / maxVal;
+    if (r >= 0.85) return isDark ? "rgba(16, 185, 129, 0.82)" : "rgba(5, 150, 105, 0.82)";
+    if (r >= 0.5)  return isDark ? "rgba(56, 189, 248, 0.68)" : "rgba(2, 132, 199, 0.68)";
+    return isDark ? "rgba(56, 189, 248, 0.34)" : "rgba(2, 132, 199, 0.34)";
+  });
+  return bg;
+}
+
+function renderClanClockPill(data) {
+  const host = document.getElementById("clanClockPill");
+  if (!host) return;
+  const h = clanClockHour === null ? data.peakHour : clanClockHour;
+  const cnt = data.counts[h];
+  const who = Object.keys(data.perHour[h])
+    .map(tag => ({ tag: tag, n: data.perHour[h][tag], p: state.players.find(x => x.tag === tag) }))
+    .filter(x => x.p)
+    .sort((a, b) => b.n - a.n)
+    .slice(0, 5);
+  const isPeak = h === data.peakHour;
+  host.innerHTML = `
+    <div class="clock-pill-row">
+      <button type="button" class="clock-nav-btn" onclick="stepClanClockHour(-1)" aria-label="Previous hour">‹</button>
+      <span class="mini-badge ${isPeak ? "in" : "amb"}">🕒 ${isPeak ? "Peak: " : ""}${escHtml(formatHourWindow12h(h))}</span>
+      <button type="button" class="clock-nav-btn" onclick="stepClanClockHour(1)" aria-label="Next hour">›</button>
+      <span class="mono" style="font-size:11px;color:var(--text-muted);">${cnt} ${cnt === 1 ? "attack" : "attacks"}</span>
+    </div>
+    <div class="clock-who">
+      ${who.length
+        ? who.map(x => `<span class="mini-badge" onclick="openDrawer('${escHtml(x.tag)}')">${escHtml(x.p.name)} · ${x.n}</span>`).join("")
+        : `<span style="font-size:11px;color:var(--text-muted);">Nobody attacks in this hour — tap another slice.</span>`}
+    </div>`;
+}
+
+function selectClanClockHour(h, data) {
+  clanClockHour = ((h % 24) + 24) % 24;
+  const d = data || computeClanClockData();
+  if (clanClockChart) {
+    const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
+    clanClockChart.data.datasets[0].backgroundColor = clanClockColors(d.counts, clanClockHour, isDark);
+    clanClockChart.update();
+  }
+  renderClanClockPill(d);
+}
+
+function stepClanClockHour(delta) {
+  const d = computeClanClockData();
+  const cur = clanClockHour === null ? d.peakHour : clanClockHour;
+  selectClanClockHour(cur + delta, d);
+}
+
+function renderClanClock() {
+  const host = document.getElementById("clanClockBody");
+  if (!host) return;
+  const data = computeClanClockData();
+  if (data.total === 0) {
+    host.innerHTML = `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 8px;">No attacks logged in the last 30 days yet. Sync battle logs to map clan raiding hours.</div>`;
+    return;
+  }
+  host.innerHTML = `
+    <div class="mono" style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">${data.total} attacks · 30 days · local time · tap a slice</div>
+    <div class="clock-canvas-wrap"><canvas id="clanClockCanvas"></canvas></div>
+    <div id="clanClockPill"></div>`;
+
+  const sel = clanClockHour === null ? data.peakHour : clanClockHour;
+  renderClanClockPill(data);
+  if (typeof Chart === "undefined") return;
+
+  const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
+  const gridColor = isDark ? "rgba(148,163,184,0.16)" : "rgba(15,23,42,0.12)";
+  const tickColor = isDark ? "#94a3b8" : "#475569";
+  const el = document.getElementById("clanClockCanvas");
+  if (!el) return;
+
+  clanClockChart = new Chart(el.getContext("2d"), {
+    type: "polarArea",
+    data: {
+      labels: Array.from({ length: 24 }, (_, h) => String(h).padStart(2, "0")),
+      datasets: [{
+        data: data.counts,
+        backgroundColor: clanClockColors(data.counts, sel, isDark),
+        borderColor: isDark ? "rgba(71, 85, 105, 0.45)" : "rgba(148, 163, 184, 0.55)",
+        borderWidth: 1.25
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      startAngle: -0.5 * Math.PI,
+      onClick: (evt, _els, chart) => {
+        const hits = chart.getElementsAtEventForMode(evt, "nearest", { intersect: true }, true);
+        if (hits && hits.length) selectClanClockHour(hits[0].index);
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: () => "",
+            label: (ctx) => `Hour ${String(ctx.dataIndex).padStart(2, "0")}:00 — ${ctx.raw || 0} ${ctx.raw === 1 ? "attack" : "attacks"}`
+          }
+        }
+      },
+      scales: {
+        r: {
+          beginAtZero: true,
+          ticks: { display: false },
+          grid: { color: gridColor, circular: true },
+          angleLines: { display: true, color: gridColor },
+          pointLabels: {
+            display: true,
+            centerPointLabels: true,
+            color: tickColor,
+            font: { size: 9, weight: "700", family: "'JetBrains Mono', monospace" },
+            callback: (val, index) => (index % 3 === 0 ? `${val}h` : "")
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderClanRadar() {
+  const host = document.getElementById("clanRadarBody");
+  if (!host) return;
+  const keys = [["Heroes", "heroes"], ["Equipment", "equipment"], ["Pets", "pets"], ["Troops", "troops"], ["Spells", "spells"], ["Sieges", "sieges"]];
+  const avgOf = (list) => keys.map(([, k]) => list.length
+    ? list.reduce((sum, p) => sum + parsePct(p[k]), 0) / list.length : 0);
+
+  const all = state.players;
+  const th19 = all.filter(p => Number(p.thLevel) === 19);
+  if (!all.length) {
+    host.innerHTML = `<div style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 8px;">No roster data yet.</div>`;
+    return;
+  }
+  host.innerHTML = `
+    <div class="mono" style="font-size:11px;color:var(--text-muted);margin-bottom:6px;">TH19 cohort (${th19.length}) vs full clan (${all.length})</div>
+    <div class="clock-canvas-wrap"><canvas id="clanRadarCanvas"></canvas></div>`;
+  if (typeof Chart === "undefined") return;
+
+  const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
+  const gridColor = isDark ? "rgba(148,163,184,0.16)" : "rgba(15,23,42,0.12)";
+  const tickColor = isDark ? "#94a3b8" : "#475569";
+  const accent = cssVarColor("--accent", "#38bdf8");
+  const purple = cssVarColor("--purple", "#a855f7");
+  const el = document.getElementById("clanRadarCanvas");
+  if (!el) return;
+
+  const datasets = [];
+  if (th19.length) {
+    datasets.push({
+      label: "TH19 Cohort Avg",
+      data: avgOf(th19),
+      borderColor: accent,
+      backgroundColor: accent + "2e",
+      pointBackgroundColor: accent,
+      borderWidth: 2
+    });
+  }
+  datasets.push({
+    label: "Full Clan Avg",
+    data: avgOf(all),
+    borderColor: purple,
+    backgroundColor: purple + "1f",
+    pointBackgroundColor: purple,
+    borderWidth: 2,
+    borderDash: [6, 4]
+  });
+
+  clanRadarChart = new Chart(el.getContext("2d"), {
+    type: "radar",
+    data: { labels: keys.map(k => k[0]), datasets: datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: "bottom", labels: { color: tickColor, boxWidth: 12, font: { size: 10, weight: "600" } } },
+        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${Math.round(ctx.raw)}%` } }
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: 100,
+          ticks: { display: false },
+          grid: { color: gridColor },
+          angleLines: { color: gridColor },
+          pointLabels: { color: tickColor, font: { size: 10, weight: "600" } }
+        }
+      }
+    }
+  });
 }
 
 function renderMyAccountsStrip() {
@@ -2702,6 +3181,120 @@ function togglePinAccount(tag) {
   renderMyAccountsStrip();
 }
 
+/* ============================================================
+   SIGNATURE RANKED HERO LOADOUTS
+============================================================ */
+function renderRankedHeroLoadoutSection(p) {
+  const lo = (p.rankedHeroLoadout && typeof p.rankedHeroLoadout === "object") ? p.rankedHeroLoadout : {};
+  const heroes = HERO_ORDER.filter(h => lo[h] && lo[h].combo);
+
+  if (!heroes.length) {
+    return `
+      <div class="sec-label">Signature Ranked Hero Loadouts</div>
+      <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">
+        No Ranked hero equipment logged yet. Loadouts appear after Ranked attacks are synced.
+      </div>`;
+  }
+
+  const cards = heroes.map(h => {
+    const e = lo[h];
+    return `
+      <div class="cat-box loadout-card">
+        <div class="loadout-hero">${escHtml(h)}</div>
+        <div class="loadout-combo">${escHtml(e.combo)}</div>
+        <div class="badge-row">
+          <span class="mini-badge ds">${Math.round(Number(e.usageRate) || 0)}% pick</span>
+          <span class="mini-badge in">${Math.round(Number(e.threeStarRate) || 0)}% 3★</span>
+        </div>
+      </div>`;
+  }).join("");
+
+  return `
+    <div class="sec-label">Signature Ranked Hero Loadouts</div>
+    <div class="loadout-grid">${cards}</div>`;
+}
+
+/* ============================================================
+   INTERACTIVE PROGRESSION CATEGORY DETAIL
+============================================================ */
+const DRAWER_CATEGORIES = [
+  { label: "Heroes",    key: "heroes",    cat: "hero",      color: "var(--accent)" },
+  { label: "Equipment", key: "equipment", cat: "equipment", color: "var(--purple)" },
+  { label: "Pets",      key: "pets",      cat: "pet",       color: "var(--green)"  },
+  { label: "Troops",    key: "troops",    cat: "troop",     color: "var(--amber)"  },
+  { label: "Spells",    key: "spells",    cat: "spell",     color: "var(--red)"    },
+  { label: "Sieges",    key: "sieges",    cat: "siege",     color: "var(--accent)" }
+];
+
+function renderCategoryDetail(p, label) {
+  const spec = DRAWER_CATEGORIES.find(c => c.label === label);
+  if (!spec) return "";
+
+  const myPct = parsePct(p[spec.key]);
+  const pcts = state.players.map(x => parsePct(x[spec.key]));
+  const total = pcts.length || 1;
+  const rank = 1 + pcts.filter(v => v > myPct + 1e-9).length;
+  const avg = pcts.reduce((a, b) => a + b, 0) / total;
+
+  const compareHtml = `
+    <div style="font-size:13px;font-weight:800;">
+      #${rank} of ${total} <span style="color:var(--text-muted);font-weight:600;">· ${myPct.toFixed(1)}% vs. ${avg.toFixed(1)}% Clan Avg</span>
+    </div>
+    <div class="cmp-track">
+      <div class="cmp-fill" style="width:${Math.min(100, myPct).toFixed(1)}%;background:${spec.color};opacity:0.35;"></div>
+      <div class="cmp-marker" style="left:${Math.min(100, myPct).toFixed(1)}%;background:${spec.color};"></div>
+      <div class="cmp-marker" style="left:${Math.min(100, avg).toFixed(1)}%;background:var(--purple);"></div>
+    </div>
+    <div class="cmp-legend">
+      <span style="color:${spec.color};">▍You ${myPct.toFixed(1)}%</span>
+      <span style="color:var(--purple);">▍Clan Avg ${avg.toFixed(1)}%</span>
+    </div>`;
+
+  const items = (Array.isArray(p.nonMaxedItems) ? p.nonMaxedItems : [])
+    .filter(it => it && it.c === spec.cat && Number(it.m) > 0 && Number(it.l) < Number(it.m))
+    .sort((a, b) => (Number(b.l) / Number(b.m)) - (Number(a.l) / Number(a.m)));
+
+  let remainingHtml;
+  if (items.length) {
+    remainingHtml = items.map(it => {
+      const left = Number(it.m) - Number(it.l);
+      return `
+        <div class="rem-row">
+          <span class="rem-name">${escHtml(it.n)}</span>
+          <span class="rem-right">
+            ${left === 1 ? `<span class="mini-badge in">1 LVL LEFT</span>` : ""}
+            <span class="mono" style="color:var(--text-muted);">Lvl ${Number(it.l)} → ${Number(it.m)}</span>
+          </span>
+        </div>`;
+    }).join("");
+  } else if (myPct >= 99.99) {
+    remainingHtml = `<div class="upgrade-maxed-box"><span>✅</span><span>Category Maxed!</span></div>`;
+  } else {
+    // Item-level detail isn't synced for this category (e.g. Heroes) — fall back to the ratio
+    const m = String(p[spec.key] || "0/0").split("/").map(Number);
+    const left = Math.max(0, (m[1] || 0) - (m[0] || 0));
+    remainingHtml = `<div style="font-size:12px;color:var(--text-muted);">Per-item levels aren't synced for ${escHtml(spec.label)} yet · ${left} total level${left === 1 ? "" : "s"} remaining.</div>`;
+  }
+
+  return `
+    <div class="cat-box">
+      <div class="sec-label" style="margin-top:0;">${escHtml(spec.label)} · Clan Rank</div>
+      ${compareHtml}
+      <div class="sec-label">Remaining Upgrades (Highest → Lowest Level)</div>
+      ${remainingHtml}
+    </div>`;
+}
+
+function selectDrawerCategory(label) {
+  state.drawerCat = state.drawerCat === label ? null : label;
+  document.querySelectorAll("#drawerBody .cat-click").forEach(el => {
+    el.classList.toggle("selected", el.getAttribute("data-cat") === state.drawerCat);
+  });
+  const host = document.getElementById("catDetailPanel");
+  const player = state.players.find(x => x.tag === state.activeDrawerTag);
+  if (host) host.innerHTML = (state.drawerCat && player) ? renderCategoryDetail(player, state.drawerCat) : "";
+}
+
 function renderEquippedBaseSection(p) {
   const v = findVaultBaseForPlayer(p.tag);
 
@@ -2781,7 +3374,8 @@ function renderDrawerContent(p) {
   const catHtml = cats.map(c => {
     const pct = parsePct(c.val);
     return `
-      <div class="cat-box">
+      <div class="cat-box cat-click${state.drawerCat === c.label ? " selected" : ""}" data-cat="${c.label}" role="button" tabindex="0"
+           onclick="selectDrawerCategory('${c.label}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectDrawerCategory('${c.label}');}">
         <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:5px;">
           <span>${c.label}</span>
           <span class="mono" style="color:${c.color};">${Math.round(pct)}%</span>
@@ -2807,8 +3401,11 @@ function renderDrawerContent(p) {
 
     <div class="sec-label">TH19 Progression Breakdown</div>
     <div class="cat-grid">${catHtml}</div>
+    <div id="catDetailPanel" class="cat-detail">${state.drawerCat ? renderCategoryDetail(p, state.drawerCat) : ""}</div>
 
     ${renderEquippedBaseSection(p)}
+
+    ${renderRankedHeroLoadoutSection(p)}
 
     ${metaUpgradesHtml}
 
@@ -2824,8 +3421,8 @@ function renderDrawerContent(p) {
       </div>
     </div>
 
-    <div class="sec-label">Progression Balance Radar</div>
-    <div class="cat-box" style="width:100%;max-width:100%;height:230px;overflow:hidden;">
+    <div class="sec-label">Progression Balance Radar · You vs. Clan Avg</div>
+    <div class="cat-box" style="width:100%;max-width:100%;height:260px;overflow:hidden;">
       <canvas id="radarCanvas"></canvas>
     </div>
 
@@ -2858,17 +3455,35 @@ function renderDrawerCharts(p, cats, clockProfile) {
       data: {
         labels: cats.map(c => c.label),
         datasets: [{
+          label: "You",
+          order: 0,
           data: cats.map(c => parsePct(c.val)),
           backgroundColor: "rgba(56, 189, 248, 0.18)",
           borderColor: "#38bdf8",
           borderWidth: 2,
           pointBackgroundColor: "#38bdf8"
+        }, {
+          label: "Clan Avg",
+          order: 1,
+          data: cats.map(c => {
+            const k = String(c.label).toLowerCase();
+            const list = state.players;
+            return list.length ? list.reduce((sum, pl) => sum + parsePct(pl[k]), 0) / list.length : 0;
+          }),
+          backgroundColor: "rgba(168, 85, 247, 0.08)",
+          borderColor: "#a855f7",
+          borderWidth: 1.5,
+          borderDash: [4, 4],
+          pointRadius: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
+        plugins: {
+          legend: { display: true, position: "bottom", labels: { color: tickColor, boxWidth: 12, font: { size: 10, weight: "600" } } },
+          tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${Math.round(ctx.raw)}%` } }
+        },
         scales: {
           r: {
             min: 0,
