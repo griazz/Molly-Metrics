@@ -317,25 +317,38 @@
       display: flex;
       gap: 6px;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100%;
       padding-bottom: 2px;
-      flex-wrap: wrap;
+      scrollbar-width: none;
     }
+    .chip-row::-webkit-scrollbar { display: none; }
     .chip {
       padding: 6px 11px;
       border-radius: 999px;
       border: 1px solid var(--border);
       background: var(--bg-input);
       color: var(--text-sec);
+      font-family: inherit;
       font-size: 12px;
       font-weight: 600;
       white-space: nowrap;
       cursor: pointer;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
       transition: background-color 0.15s, border-color 0.15s, color 0.15s;
     }
     .chip.active {
       background: var(--accent-bg);
       border-color: var(--accent);
       color: var(--accent);
+    }
+    .chip-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      opacity: 0.8;
     }
 
     /* ============================================================
@@ -1066,8 +1079,12 @@
           <option value="comp">Sort: Overall %</option>
           <option value="war">Sort: War Score</option>
           <option value="heroes">Sort: Heroes %</option>
+          <option value="activity7d">Sort: 7d Activity</option>
+          <option value="ranked3">Sort: Ranked 3★ %</option>
+          <option value="defrating">Sort: Defense Rating</option>
         </select>
       </div>
+      <div id="rosterChipRow" class="chip-row"></div>
     </div>
 
     <div id="rosterGrid" class="roster-grid">
@@ -1212,7 +1229,8 @@ let state = {
   lastSyncTs: 0,
   bases: [],
   myAccounts: loadMyAccounts(),
-  activeDrawerTag: null
+  activeDrawerTag: null,
+  rosterFilter: "all"
 };
 
 let radarChart = null;
@@ -1676,18 +1694,147 @@ function parsePct(ratioStr) {
   return m > 0 ? (c / m) * 100 : 0;
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const ROSTER_FILTERS = [
+  { id: "all",        label: "All" },
+  { id: "th19",       label: "TH19" },
+  { id: "warready",   label: "War Ready (85%+)" },
+  { id: "novault",    label: "No Vault Base" },
+  { id: "inactive",   label: "Inactive (5d+)" },
+  { id: "leadership", label: "Leadership" },
+  { id: "metamaxed",  label: "Meta Maxed" }
+];
+
+// 7-day hit count + days since last attack, from the 30-day attack timestamps
+function getPlayerActivity(p) {
+  const now = Date.now();
+  const stamps = Array.isArray(p.attackTimestamps30d)
+    ? p.attackTimestamps30d.map(parseBattleTimeMs).filter(Boolean)
+    : [];
+  let hits7d = 0;
+  let last = 0;
+  stamps.forEach(t => {
+    if (t >= now - 7 * DAY_MS) hits7d++;
+    if (t > last) last = t;
+  });
+  const daysSinceLast = last > 0 ? Math.max(0, Math.floor((now - last) / DAY_MS)) : Infinity;
+  return { hits7d: hits7d, daysSinceLast: daysSinceLast };
+}
+
+// Equipped Vault base performance for a player (own telemetry preferred, base-wide as fallback)
+function getEquippedBaseStats(p) {
+  const v = findVaultBaseForPlayer(p.tag);
+  if (v.kind !== "active") return { kind: v.kind, stars: null, defs: 0, rating: null };
+
+  const ds = (v.base && v.base.defenseStats) || {};
+  const entry = v.entry || null;
+  const ownDefs = entry ? Number(entry.playerDefenses) : NaN;
+  const ownStars = entry ? Number(entry.playerAvgStars) : NaN;
+  const hasOwn = Number.isFinite(ownDefs) && ownDefs > 0 && Number.isFinite(ownStars) && entry.playerAvgStars !== null;
+
+  const baseDefs = Number(ds.totalDefenses) || 0;
+  const baseStars = (ds.avgStarsAllowed !== null && ds.avgStarsAllowed !== undefined && Number.isFinite(Number(ds.avgStarsAllowed)) && baseDefs > 0)
+    ? Number(ds.avgStarsAllowed) : null;
+  const rating = (ds.defenseRating !== null && ds.defenseRating !== undefined && Number.isFinite(Number(ds.defenseRating)))
+    ? Number(ds.defenseRating) : null;
+
+  return {
+    kind: "active",
+    stars: hasOwn ? ownStars : baseStars,
+    defs: hasOwn ? ownDefs : baseDefs,
+    rating: rating
+  };
+}
+
+function getBaseStarBadgeClass(stars) {
+  if (stars < 1.8) return "in";
+  if (stars <= 2.3) return "amb";
+  return "def";
+}
+
+function rosterFilterMatches(p, filterId) {
+  switch (filterId) {
+    case "th19":       return Number(p.thLevel) === 19;
+    case "warready":   return (parseFloat(p.warScore) || 0) >= 85;
+    case "novault":    return findVaultBaseForPlayer(p.tag).kind === "none";
+    case "inactive":   return getPlayerActivity(p).daysSinceLast >= 5;
+    case "leadership": return p.role === "leader" || p.role === "coLeader";
+    case "metamaxed":  return !p.metaUpgrades || p.metaUpgrades.length === 0;
+    default:           return true;
+  }
+}
+
+function renderRosterChips() {
+  const row = document.getElementById("rosterChipRow");
+  if (!row) return;
+  if (!state.players.length) {
+    row.style.display = "none";
+    row.innerHTML = "";
+    return;
+  }
+  row.style.display = "flex";
+  row.innerHTML = ROSTER_FILTERS.map(f => {
+    const cnt = f.id === "all" ? state.players.length : state.players.filter(p => rosterFilterMatches(p, f.id)).length;
+    const active = state.rosterFilter === f.id;
+    return `
+      <button type="button" class="chip ${active ? "active" : ""}" onclick="setRosterFilter('${f.id}')">
+        <span>${escHtml(f.label)}</span>
+        <span class="chip-count">${cnt}</span>
+      </button>
+    `;
+  }).join("");
+}
+
+function setRosterFilter(id) {
+  state.rosterFilter = id;
+  applyFilters();
+}
+
 function applyFilters() {
   const q = document.getElementById("searchInput").value.trim().toLowerCase();
   const sortBy = document.getElementById("sortSelect").value;
 
+  renderRosterChips();
+
   let filtered = state.players.filter(p => {
-    return !q || p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q);
+    if (q && !(p.name.toLowerCase().includes(q) || p.tag.toLowerCase().includes(q))) return false;
+    return rosterFilterMatches(p, state.rosterFilter);
   });
+
+  // Precompute per-player metrics once for sorting
+  const metrics = new Map();
+  if (sortBy === "activity7d" || sortBy === "defrating") {
+    filtered.forEach(p => {
+      metrics.set(p, { act: getPlayerActivity(p), base: getEquippedBaseStats(p) });
+    });
+  }
 
   filtered.sort((a, b) => {
     if (sortBy === "comp")   return (parseFloat(b.percentage) || 0) - (parseFloat(a.percentage) || 0);
     if (sortBy === "war")    return (parseFloat(b.warScore) || 0) - (parseFloat(a.warScore) || 0);
     if (sortBy === "heroes") return parsePct(b.heroes) - parsePct(a.heroes);
+    if (sortBy === "activity7d") {
+      const ma = metrics.get(a), mb = metrics.get(b);
+      if (mb.act.hits7d !== ma.act.hits7d) return mb.act.hits7d - ma.act.hits7d;
+      return ma.act.daysSinceLast - mb.act.daysSinceLast || 0;
+    }
+    if (sortBy === "ranked3") {
+      const ra = a.rankedAnalytics || {}, rb = b.rankedAnalytics || {};
+      const aHas = Number(ra.totalRankedAttacks || 0) > 0;
+      const bHas = Number(rb.totalRankedAttacks || 0) > 0;
+      if (aHas !== bHas) return aHas ? -1 : 1;
+      return (Number(rb.threeStarRate) || 0) - (Number(ra.threeStarRate) || 0);
+    }
+    if (sortBy === "defrating") {
+      // Tier 1: equipped base has a Defense Rating (higher first) · Tier 2: only stars allowed (lowest first) · Tier 3: no data
+      const ba = metrics.get(a).base, bb = metrics.get(b).base;
+      const tier = x => x.rating !== null ? 0 : (x.stars !== null ? 1 : 2);
+      const ta = tier(ba), tb = tier(bb);
+      if (ta !== tb) return ta - tb;
+      if (ta === 0 && ba.rating !== bb.rating) return bb.rating - ba.rating;
+      if (ta <= 1 && ba.stars !== null && bb.stars !== null && ba.stars !== bb.stars) return ba.stars - bb.stars;
+      return 0;
+    }
     return 0;
   });
 
@@ -1717,6 +1864,34 @@ function renderRosterGrid(players) {
     const barColor = pct >= 85 ? "var(--green)" : pct >= 60 ? "var(--accent)" : "var(--amber)";
     const roleLabel = p.role === "coLeader" ? "Co-Leader" : p.role === "admin" ? "Elder" : p.role;
 
+    const league = String(p.league || "").trim();
+    const warScore = Math.round(parseFloat(p.warScore) || 0);
+
+    // Equipped Vault base pill
+    const v = findVaultBaseForPlayer(p.tag);
+    let basePill;
+    if (v.kind === "active") {
+      const eb = getEquippedBaseStats(p);
+      basePill = eb.stars !== null
+        ? `<span class="mini-badge ${getBaseStarBadgeClass(eb.stars)}">🏰 ${eb.stars.toFixed(2)}★ (${eb.defs} def)</span>`
+        : `<span class="mini-badge ds">🏰 –★ (${eb.defs} def)</span>`;
+    } else if (v.kind === "scheduled") {
+      basePill = `<span class="mini-badge amb">⏳ Base Sun 11 PM</span>`;
+    } else {
+      basePill = `<span class="mini-badge out">No Vault Base</span>`;
+    }
+
+    // Footer: Ranked 3★ rate + 7-day activity pulse
+    const ra = p.rankedAnalytics || {};
+    const hasRanked = Number(ra.totalRankedAttacks || 0) > 0;
+    const act = getPlayerActivity(p);
+    let pulse;
+    if (act.daysSinceLast >= 5) {
+      pulse = `<span class="mini-badge def">Idle ${Number.isFinite(act.daysSinceLast) ? act.daysSinceLast + "d" : "30d+"}</span>`;
+    } else {
+      pulse = `<span>⚔️ ${act.hits7d}/7d</span>`;
+    }
+
     return `
       <article class="player-card" onclick="openDrawer('${escHtml(p.tag)}')">
         <div class="card-top">
@@ -1728,7 +1903,11 @@ function renderRosterGrid(players) {
 
         <div class="badge-row">
           <span class="mini-badge">TH${p.thLevel}</span>
+          ${league ? `<span class="mini-badge purp">${escHtml(league)}</span>` : ""}
+          <span class="mini-badge ds">War ${warScore}</span>
         </div>
+
+        <div class="badge-row">${basePill}</div>
 
         <div class="prog-block">
           <div class="prog-head">
@@ -1741,6 +1920,10 @@ function renderRosterGrid(players) {
 
         <div class="card-foot mono">
           <span>Heroes ${Math.round(parsePct(p.heroes))}%</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+            ${hasRanked ? `<span>${Number(ra.threeStarRate) || 0}% 3★</span>` : ""}
+            ${pulse}
+          </span>
         </div>
       </article>
     `;
@@ -2242,7 +2425,7 @@ function findVaultBaseForPlayer(tag) {
       const untilMs = parseEffectiveMs(until);
       if (until !== null && until !== undefined && until !== "" && (untilMs === null || untilMs <= now)) continue;
       if (from && from > now) { scheduled = true; continue; }
-      return { kind: "active", base };
+      return { kind: "active", base, entry: isObj ? e : null };
     }
     const pending = [].concat(ds.scheduledPlayers || [], ds.pendingPlayers || []);
     if (pending.some(e => normalizeTag(e && typeof e === "object" ? (e.tag || e.playerTag || "") : e) === target)) scheduled = true;
@@ -2275,7 +2458,15 @@ function renderMyAccountsStrip() {
     let basePill;
     if (v.kind === "active") {
       const b = v.base;
-      basePill = `<span class="mini-badge ds">🏰 ${escHtml(b.avgStarsAllowed != null ? b.avgStarsAllowed : "–")}★ (${Number(b.totalDefenses || 0)} def)</span>`;
+      const ds = (b && b.defenseStats) || {};
+      const entry = v.entry || null;
+      const ownDefs = entry ? Number(entry.playerDefenses) : NaN;
+      const hasOwn = Number.isFinite(ownDefs) && ownDefs > 0 && entry.playerAvgStars !== null && entry.playerAvgStars !== undefined;
+      const starsVal = hasOwn ? Number(entry.playerAvgStars) : ds.avgStarsAllowed;
+      const defsVal  = hasOwn ? ownDefs : Number(ds.totalDefenses || 0);
+      const starsTxt = (starsVal !== null && starsVal !== undefined && Number.isFinite(Number(starsVal)) && defsVal > 0)
+        ? Number(starsVal).toFixed(2) : "–";
+      basePill = `<span class="mini-badge ds">🏰 ${starsTxt}★ (${defsVal} def)</span>`;
     } else if (v.kind === "scheduled") {
       basePill = `<span class="mini-badge purp">⏳ Scheduled Sun 11 PM</span>`;
     } else {
