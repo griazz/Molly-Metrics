@@ -417,11 +417,11 @@
     ============================================================ */
     .roster-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
     }
     @media (min-width: 680px) {
-      .roster-grid { grid-template-columns: repeat(3, 1fr); }
+      .roster-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     .player-card {
       background: var(--bg-card);
@@ -435,8 +435,17 @@
       box-shadow: var(--shadow);
       transition: transform 0.14s, border-color 0.2s;
       position: relative;
+      min-width: 0;
+      overflow: hidden;
     }
     .player-card:active { transform: scale(0.98); }
+    .player-card .badge-row .mini-badge {
+      display: block; /* block so text-overflow ellipsis works (inline-flex ignores it) */
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
     .card-top {
       display: flex;
