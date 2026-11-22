@@ -351,6 +351,61 @@
       opacity: 0.8;
     }
 
+    /* Collapsible Clan Command & Meta panel (modeled on bases.html insights panel) */
+    .panel-toggle-btn {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-family: inherit;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .panel-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .meta-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .meta-head .panel-toggle-btn { flex: 1; min-width: 200px; width: auto; }
+    .meta-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 12px 0 10px 0;
+    }
+    .meta-arch {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .meta-arch-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .meta-arch-name {
+      font-size: 13px;
+      font-weight: 700;
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
     /* ============================================================
        ROSTER CARDS (2-COL MOBILE / 3-COL DESKTOP)
     ============================================================ */
@@ -1072,6 +1127,23 @@
 
     <div id="myAccountsSection"></div>
 
+    <!-- COLLAPSIBLE CLAN COMMAND & META PANEL -->
+    <section class="panel" id="metaPanel">
+      <div class="meta-head">
+        <button id="btnToggleMeta" class="panel-toggle-btn" type="button" aria-expanded="false" onclick="toggleMetaPanel()">
+          <div style="min-width:0;">
+            <div class="panel-title">
+              <span>⚔️ Ranked Meta &amp; Top Armies</span>
+            </div>
+            <div class="panel-sub" id="metaPanelSub">Top 5 Ranked attack archetypes</div>
+          </div>
+          <span id="metaChevron" class="mono" style="font-size:12px;color:var(--text-muted);flex-shrink:0;">▼</span>
+        </button>
+        <div class="chip-row" id="metaCohortToggle" role="group" aria-label="Meta cohort"></div>
+      </div>
+      <div id="metaPanelBody" style="display:none;"></div>
+    </section>
+
     <div class="toolbar">
       <div class="toolbar-top">
         <input type="search" id="searchInput" class="search-input" placeholder="Search player or #tag..." oninput="debouncedFilter()" />
@@ -1230,7 +1302,9 @@ let state = {
   bases: [],
   myAccounts: loadMyAccounts(),
   activeDrawerTag: null,
-  rosterFilter: "all"
+  rosterFilter: "all",
+  metaPanelOpen: (function () { try { return localStorage.getItem("molly_meta_panel_open") === "true"; } catch (e) { return false; } })(),
+  metaCohort: (function () { try { return localStorage.getItem("molly_meta_cohort") === "clan" ? "clan" : "top100"; } catch (e) { return "top100"; } })()
 };
 
 let radarChart = null;
@@ -1447,6 +1521,7 @@ window.addEventListener("DOMContentLoaded", () => {
   applyTheme(savedTheme);
   initDrawerSwipe();
   renderMyAccountsStrip();
+  renderMetaPanel();
 
   loadDashboard();
 });
@@ -1499,6 +1574,7 @@ async function loadDashboard() {
     renderHeader();
     renderKpis();
     renderMyAccountsStrip();
+    renderMetaPanel();
     applyFilters();
 
     if (state.activeDrawerTag) {
@@ -1539,11 +1615,11 @@ async function forceClanSync() {
 }
 
 async function refreshGlobalMeta() {
-  const btn = document.getElementById("refreshMetaBtn");
-  if (btn) {
+  const metaBtns = Array.from(document.querySelectorAll("#refreshMetaBtn, #refreshMetaBtnPanel"));
+  metaBtns.forEach(btn => {
     btn.classList.add("spinning");
     btn.disabled = true;
-  }
+  });
   showToast("Fetching Top 100 Global Ranked profiles & battle logs...");
   try {
     const res = await fetch(`${getWebAppUrl()}?action=syncGlobalMeta&_t=${Date.now()}`);
@@ -1562,10 +1638,10 @@ async function refreshGlobalMeta() {
     showToast("Global Meta sync failed — verify Apps Script deployment.");
     console.error(err);
   } finally {
-    if (btn) {
+    Array.from(document.querySelectorAll("#refreshMetaBtn, #refreshMetaBtnPanel")).forEach(btn => {
       btn.classList.remove("spinning");
       btn.disabled = false;
-    }
+    });
   }
 }
 
@@ -2407,11 +2483,11 @@ function parseEffectiveMs(v) {
   return ms || null;
 }
 
-// Returns { kind: "active", base } | { kind: "scheduled" } | { kind: "none" }
+// Returns { kind: "active", base, entry } | { kind: "scheduled", base, entry } | { kind: "none" }
 function findVaultBaseForPlayer(tag) {
   const now = Date.now();
   const target = normalizeTag(tag);
-  let scheduled = false;
+  let scheduledHit = null;
   for (const base of (Array.isArray(state.bases) ? state.bases : [])) {
     const ds = base && base.defenseStats;
     if (!ds) continue;
@@ -2424,13 +2500,119 @@ function findVaultBaseForPlayer(tag) {
       const from  = isObj ? parseEffectiveMs(e.effectiveFrom) : null;
       const untilMs = parseEffectiveMs(until);
       if (until !== null && until !== undefined && until !== "" && (untilMs === null || untilMs <= now)) continue;
-      if (from && from > now) { scheduled = true; continue; }
+      if (from && from > now) { if (!scheduledHit) scheduledHit = { base, entry: isObj ? e : null }; continue; }
       return { kind: "active", base, entry: isObj ? e : null };
     }
     const pending = [].concat(ds.scheduledPlayers || [], ds.pendingPlayers || []);
-    if (pending.some(e => normalizeTag(e && typeof e === "object" ? (e.tag || e.playerTag || "") : e) === target)) scheduled = true;
+    if (pending.some(e => normalizeTag(e && typeof e === "object" ? (e.tag || e.playerTag || "") : e) === target)) {
+      if (!scheduledHit) scheduledHit = { base, entry: null };
+    }
   }
-  return scheduled ? { kind: "scheduled" } : { kind: "none" };
+  return scheduledHit ? { kind: "scheduled", base: scheduledHit.base, entry: scheduledHit.entry } : { kind: "none" };
+}
+
+/* ============================================================
+   CLAN COMMAND & META PANEL (Top 100 Global / Our Clan archetypes)
+============================================================ */
+function buildArchetypeCopyUrl(arch) {
+  const code = String((arch && arch.sampleArmyCode) || "").trim();
+  if (code) {
+    return /^https?:\/\//i.test(code)
+      ? code
+      : `https://link.clashofclans.com/en?action=CopyArmy&army=${encodeURIComponent(code)}`;
+  }
+  return buildCocArmyLink(arch && arch.troops, arch && arch.spells);
+}
+
+function setMetaCohort(which) {
+  state.metaCohort = which === "clan" ? "clan" : "top100";
+  try { localStorage.setItem("molly_meta_cohort", state.metaCohort); } catch (e) {}
+  renderMetaPanel();
+}
+
+function toggleMetaPanel() {
+  state.metaPanelOpen = !state.metaPanelOpen;
+  try { localStorage.setItem("molly_meta_panel_open", String(state.metaPanelOpen)); } catch (e) {}
+  renderMetaPanel();
+}
+
+function renderMetaPanel() {
+  const body = document.getElementById("metaPanelBody");
+  if (!body) return;
+  const chev = document.getElementById("metaChevron");
+  const btn  = document.getElementById("btnToggleMeta");
+
+  body.style.display = state.metaPanelOpen ? "block" : "none";
+  if (chev) chev.textContent = state.metaPanelOpen ? "▲" : "▼";
+  if (btn) btn.setAttribute("aria-expanded", String(state.metaPanelOpen));
+
+  const cohorts = (state.globalMeta && state.globalMeta.cohorts) || {};
+  const which = state.metaCohort === "clan" ? "clan" : "top100";
+  const cohort = cohorts[which] || null;
+
+  const toggle = document.getElementById("metaCohortToggle");
+  if (toggle) {
+    toggle.innerHTML = [["top100", "Top 100 Global"], ["clan", "Our Clan"]].map(([id, label]) => `
+      <button type="button" class="chip ${which === id ? "active" : ""}" onclick="setMetaCohort('${id}')">${label}</button>
+    `).join("");
+  }
+
+  const sub = document.getElementById("metaPanelSub");
+  if (sub) {
+    const analyzed = cohort && Number(cohort.rankedAttacksAnalyzed || 0);
+    sub.textContent = analyzed
+      ? `${which === "clan" ? "Our Clan" : "Top 100 Global"} · ${analyzed.toLocaleString()} Ranked attacks analyzed`
+      : "Top 5 Ranked attack archetypes";
+  }
+
+  if (!state.metaPanelOpen) return; // collapsed: skip building the list
+
+  const archs = (cohort && Array.isArray(cohort.topArchetypes)) ? cohort.topArchetypes.slice(0, 5) : [];
+  const refreshBtn = `
+    <button type="button" class="action-btn" style="padding:6px 10px;font-size:11px;" id="refreshMetaBtnPanel" onclick="refreshGlobalMeta()">
+      <span class="spin-ico">↻</span> Refresh Global Meta
+    </button>`;
+
+  let listHtml;
+  if (!archs.length) {
+    listHtml = `<div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">
+      ${which === "clan"
+        ? "No Ranked attack archetypes logged for our clan yet."
+        : "No Top 100 meta cached yet — tap Refresh Global Meta."}
+    </div>`;
+  } else {
+    listHtml = archs.map((arch, i) => {
+      const usage = Number(arch.usageRate) || 0;
+      const three = Number(arch.threeStarRate) || 0;
+      const dest  = Number(arch.avgDestruction) || 0;
+      const diffs = Array.isArray(arch.differentiators) ? arch.differentiators : [];
+      const copyUrl = buildArchetypeCopyUrl(arch);
+      return `
+        <div class="cat-box meta-arch">
+          <div class="meta-arch-top">
+            <div style="display:flex;align-items:center;gap:7px;min-width:0;">
+              <span class="mini-badge amb">${i + 1}</span>
+              <span class="meta-arch-name">${escHtml(arch.name || "Unknown Army")}</span>
+            </div>
+            ${copyUrl ? `<a class="copy-army-btn" href="${escHtml(copyUrl)}" target="_blank" rel="noopener noreferrer">⚔️ Copy Army</a>` : ""}
+          </div>
+          <div class="badge-row">
+            <span class="mini-badge ds">${usage.toFixed(1)}% pick</span>
+            <span class="mini-badge in">${three.toFixed(1)}% 3★</span>
+            <span class="mini-badge">${dest.toFixed(1)}% dest</span>
+            ${diffs.map(d => `<span class="mini-badge purp">${escHtml(d)}</span>`).join("")}
+          </div>
+        </div>`;
+    }).join("");
+  }
+
+  body.innerHTML = `
+    <div class="meta-toolbar">
+      <span style="font-size:11px;color:var(--text-muted);">Top ${archs.length || 5} by pick rate</span>
+      ${refreshBtn}
+    </div>
+    ${listHtml}
+  `;
 }
 
 function renderMyAccountsStrip() {
@@ -2520,6 +2702,72 @@ function togglePinAccount(tag) {
   renderMyAccountsStrip();
 }
 
+function renderEquippedBaseSection(p) {
+  const v = findVaultBaseForPlayer(p.tag);
+
+  if (v.kind === "none" || !v.base) {
+    return `
+      <div class="sec-label">Equipped Vault Base</div>
+      <div class="cat-box" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:12px;color:var(--text-muted);">Not tracking a Vault base yet — assign one to see live defense results.</span>
+        <a class="copy-army-btn" href="bases.html?assignTag=${encodeURIComponent(p.tag)}">+ Assign Vault Base</a>
+      </div>
+    `;
+  }
+
+  const b = v.base;
+  const ds = b.defenseStats || {};
+  const entry = v.entry || null;
+  const isScheduled = v.kind === "scheduled";
+  const thumb = b.imageUrl || (Array.isArray(b.images) && b.images[0]) || "";
+  const thTxt = /^\d+$/.test(String(b.thLevel)) ? `TH${b.thLevel}` : String(b.thLevel || "TH?");
+  const creator = String(b.creatorHandle || "").trim();
+  const creatorTxt = creator ? (creator.startsWith("@") ? creator : "@" + creator) : "Unknown creator";
+
+  const totalDefs = Number(ds.totalDefenses) || 0;
+  const avgStars = Number(ds.avgStarsAllowed) || 0;
+  const hasDelta = totalDefs > 0 && ds.adjustedStarsDelta !== null && ds.adjustedStarsDelta !== undefined && Number.isFinite(Number(ds.adjustedStarsDelta));
+  const delta = hasDelta ? Number(ds.adjustedStarsDelta) : 0;
+  const deltaCls = delta <= -0.15 ? "in" : (delta > 0.15 ? "def" : "amb");
+  const deltaTxt = `${Math.abs(delta) < 0.005 ? "+0.00" : (delta >= 0 ? "+" : "") + delta.toFixed(2)}★ vs exp`;
+  const hasRating = totalDefs > 0 && ds.defenseRating !== null && ds.defenseRating !== undefined && Number.isFinite(Number(ds.defenseRating));
+
+  const ownDefs = entry ? Number(entry.playerDefenses) : NaN;
+  const hasOwn = Number.isFinite(ownDefs) && ownDefs > 0 && entry.playerAvgStars !== null && entry.playerAvgStars !== undefined;
+
+  const statsHtml = totalDefs > 0
+    ? `
+      <span class="mini-badge ${getBaseStarBadgeClass(avgStars)}">${avgStars.toFixed(2)}★ avg</span>
+      ${hasDelta ? `<span class="mini-badge ${deltaCls}">${deltaTxt}</span>` : ""}
+      ${hasRating ? `<span class="mini-badge ds">Rating ${Math.round(Number(ds.defenseRating))}/100</span>` : ""}
+      <span class="mini-badge">${totalDefs} def</span>
+      ${hasOwn ? `<span class="mini-badge purp">You: ${Number(entry.playerAvgStars).toFixed(2)}★ (${ownDefs} def)</span>` : ""}
+    `
+    : `<span class="mini-badge out">No defenses logged yet</span>`;
+
+  return `
+    <div class="sec-label">Equipped Vault Base</div>
+    <div class="cat-box">
+      <div style="display:flex;gap:10px;align-items:center;">
+        ${thumb
+          ? `<img src="${escHtml(thumb)}" alt="Equipped base" loading="lazy" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--border);flex-shrink:0;" />`
+          : `<div style="width:72px;height:72px;border-radius:10px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">🏰</div>`}
+        <div style="min-width:0;display:flex;flex-direction:column;gap:6px;">
+          <div class="badge-row">
+            <span class="mini-badge ds">${escHtml(thTxt)}</span>
+            <span class="mini-badge ${isScheduled ? "amb" : "in"}">${isScheduled ? "⏳ Scheduled Sun 11 PM" : "Active"}</span>
+          </div>
+          <div style="font-size:12px;font-weight:700;overflow-wrap:anywhere;">${escHtml(creatorTxt)}</div>
+        </div>
+      </div>
+      <div class="badge-row" style="margin-top:10px;">${statsHtml}</div>
+      <div style="margin-top:10px;">
+        <a class="copy-army-btn" href="bases.html?baseId=${encodeURIComponent(b.id)}">Inspect in Bases →</a>
+      </div>
+    </div>
+  `;
+}
+
 function renderDrawerContent(p) {
   const cats = [
     { label: "Heroes",    val: p.heroes,    color: "var(--accent)" },
@@ -2559,6 +2807,8 @@ function renderDrawerContent(p) {
 
     <div class="sec-label">TH19 Progression Breakdown</div>
     <div class="cat-grid">${catHtml}</div>
+
+    ${renderEquippedBaseSection(p)}
 
     ${metaUpgradesHtml}
 
