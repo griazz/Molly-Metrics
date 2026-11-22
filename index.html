@@ -733,6 +733,12 @@
     @media (max-width: 640px) { .clan-viz-grid { grid-template-columns: minmax(0, 1fr); } }
     .clan-viz-grid .clock-card { min-width: 0; }
     .clan-viz-grid .clock-canvas-wrap { max-width: min(300px, 100%); }
+    .clan-stats-stack { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 4px 0; }
+    .clan-stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+    @media (max-width: 900px) { .clan-stats-grid { grid-template-columns: minmax(0, 1fr); } }
+    .clan-stats-stack .clock-card { min-width: 0; }
+    .stats-chart-wrap { position: relative; width: 100%; height: 220px; }
+    .stats-chart-wrap.tall { height: 260px; }
     .clock-pill-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
     .clock-nav-btn {
       width: 26px; height: 24px; border-radius: 6px; border: 1px solid var(--border);
@@ -1214,15 +1220,31 @@
     <div id="myAccountsSection"></div>
     <div id="clanMvpsSection"></div>
 
+    <!-- CLAN PULSE & ANALYTICS PANEL -->
+    <section class="panel" id="clanPulsePanel">
+      <div class="meta-head">
+        <button id="btnToggleClanPulse" class="panel-toggle-btn" type="button" aria-expanded="false" onclick="toggleClanPulsePanel()">
+          <div style="min-width:0;">
+            <div class="panel-title">
+              <span>📊 Clan Pulse &amp; Analytics</span>
+            </div>
+            <div class="panel-sub">Clan attack clock, progression radar &amp; lifetime attack trends</div>
+          </div>
+          <span id="clanPulseChevron" class="mono" style="font-size:12px;color:var(--text-muted);flex-shrink:0;">▼</span>
+        </button>
+      </div>
+      <div id="clanPulsePanelBody" style="display:none;"></div>
+    </section>
+
     <!-- COLLAPSIBLE CLAN COMMAND & META PANEL -->
     <section class="panel" id="metaPanel">
       <div class="meta-head">
         <button id="btnToggleMeta" class="panel-toggle-btn" type="button" aria-expanded="false" onclick="toggleMetaPanel()">
           <div style="min-width:0;">
             <div class="panel-title">
-              <span>⚔️ Clan Command, Clock &amp; Meta</span>
+              <span>⚔️ Ranked Meta &amp; Top Armies</span>
             </div>
-            <div class="panel-sub" id="metaPanelSub">Clan attack clock, balance radar &amp; top Ranked armies</div>
+            <div class="panel-sub" id="metaPanelSub">Top 5 Ranked attack archetypes</div>
           </div>
           <span id="metaChevron" class="mono" style="font-size:12px;color:var(--text-muted);flex-shrink:0;">▼</span>
         </button>
@@ -1390,6 +1412,8 @@ let state = {
   myAccounts: loadMyAccounts(),
   activeDrawerTag: null,
   rosterFilter: "all",
+  clanHistory: [],
+  clanPulseOpen: (function () { try { return localStorage.getItem("molly_clan_pulse_open") === "true"; } catch (e) { return false; } })(),
   metaPanelOpen: (function () { try { return localStorage.getItem("molly_meta_panel_open") === "true"; } catch (e) { return false; } })(),
   metaCohort: (function () { try { return localStorage.getItem("molly_meta_cohort") === "clan" ? "clan" : "top100"; } catch (e) { return "top100"; } })()
 };
@@ -1397,6 +1421,10 @@ let state = {
 let radarChart = null;
 let attackClockChart = null;
 let clanClockChart = null;
+let clanCumulativeChart = null;
+let clanDowChart = null;
+let clanMonthChart = null;
+let clanYearChart = null;
 let clanRadarChart = null;
 let clanClockHour = null; // selected hour on the Clan Attack Clock (null = peak hour)
 
@@ -1612,6 +1640,7 @@ window.addEventListener("DOMContentLoaded", () => {
   initDrawerSwipe();
   renderMyAccountsStrip();
   renderClanMvps();
+  renderClanPulsePanel();
   renderMetaPanel();
 
   loadDashboard();
@@ -1639,6 +1668,7 @@ function applyTheme(theme) {
   document.getElementById("themeBtn").textContent = theme === "dark" ? "☀️" : "🌙";
   document.getElementById("metaThemeColor").setAttribute("content", theme === "dark" ? "#0f172a" : "#f1f5f9");
   if (typeof renderMetaPanel === "function" && state && Array.isArray(state.players) && state.players.length) renderMetaPanel();
+  if (typeof renderClanPulsePanel === "function" && state && Array.isArray(state.players) && state.players.length) renderClanPulsePanel();
 }
 
 /* ============================================================
@@ -1660,6 +1690,7 @@ async function loadDashboard() {
     state.bases = Array.isArray(data.bases) ? data.bases : [];
     state.myAccounts = loadMyAccounts();
     state.globalMeta = data.globalMeta || null;
+    state.clanHistory = Array.isArray(data.clanHistory) ? data.clanHistory : [];
     state.lastSyncTs = data.lastSyncTs || 0;
     setStaticDataMap(data.staticDataMap || {});
 
@@ -1667,6 +1698,7 @@ async function loadDashboard() {
     renderKpis();
     renderMyAccountsStrip();
     renderClanMvps();
+    renderClanPulsePanel();
     renderMetaPanel();
     applyFilters();
 
@@ -2174,8 +2206,6 @@ function renderRosterGrid(players) {
           ${league ? `<span class="mini-badge purp">${escHtml(league)}</span>` : ""}
           <span class="mini-badge ds">War ${warScore}</span>
         </div>
-
-        <div class="badge-row">${playstyleBadgeHtml(p)}</div>
 
         <div class="badge-row">${basePill}</div>
 
@@ -2809,7 +2839,7 @@ function renderMetaPanel() {
       : "Top 5 Ranked attack archetypes";
   }
 
-  if (!state.metaPanelOpen) { destroyClanCharts(); return; } // collapsed: skip building the list
+  if (!state.metaPanelOpen) return; // collapsed: skip building the list
 
   const archs = (cohort && Array.isArray(cohort.topArchetypes)) ? cohort.topArchetypes.slice(0, 5) : [];
   const refreshBtn = `
@@ -2850,7 +2880,34 @@ function renderMetaPanel() {
     }).join("");
   }
 
+  body.innerHTML = `
+    <div class="meta-toolbar">
+      <span style="font-size:11px;color:var(--text-muted);">Top ${archs.length || 5} by pick rate</span>
+      ${refreshBtn}
+    </div>
+    ${listHtml}
+  `;
+}
+
+function toggleClanPulsePanel() {
+  state.clanPulseOpen = !state.clanPulseOpen;
+  try { localStorage.setItem("molly_clan_pulse_open", String(state.clanPulseOpen)); } catch (e) {}
+  renderClanPulsePanel();
+}
+
+function renderClanPulsePanel() {
+  const body = document.getElementById("clanPulsePanelBody");
+  if (!body) return;
+  const chev = document.getElementById("clanPulseChevron");
+  const btn  = document.getElementById("btnToggleClanPulse");
+
+  body.style.display = state.clanPulseOpen ? "block" : "none";
+  if (chev) chev.textContent = state.clanPulseOpen ? "▲" : "▼";
+  if (btn) btn.setAttribute("aria-expanded", String(state.clanPulseOpen));
+
   destroyClanCharts();
+  if (!state.clanPulseOpen) return; // collapsed: skip building charts
+
   body.innerHTML = `
     <div class="clan-viz-grid">
       <div class="clock-card">
@@ -2862,14 +2919,11 @@ function renderMetaPanel() {
         <div id="clanRadarBody"></div>
       </div>
     </div>
-    <div class="meta-toolbar">
-      <span style="font-size:11px;color:var(--text-muted);">Top ${archs.length || 5} by pick rate</span>
-      ${refreshBtn}
-    </div>
-    ${listHtml}
+    <div id="clanStatsFmCharts"></div>
   `;
   renderClanClock();
   renderClanRadar();
+  renderClanStatsFm();
 }
 
 // ============================================================
@@ -2878,6 +2932,10 @@ function renderMetaPanel() {
 function destroyClanCharts() {
   if (clanClockChart) { clanClockChart.destroy(); clanClockChart = null; }
   if (clanRadarChart) { clanRadarChart.destroy(); clanRadarChart = null; }
+  if (clanCumulativeChart) { clanCumulativeChart.destroy(); clanCumulativeChart = null; }
+  if (clanDowChart) { clanDowChart.destroy(); clanDowChart = null; }
+  if (clanMonthChart) { clanMonthChart.destroy(); clanMonthChart = null; }
+  if (clanYearChart) { clanYearChart.destroy(); clanYearChart = null; }
 }
 
 function cssVarColor(name, fallback) {
@@ -3101,6 +3159,237 @@ function renderClanRadar() {
       }
     }
   });
+}
+
+// ============================================================
+// STATS.FM-STYLE CLAN TREND CHARTS
+// ============================================================
+const barValueLabelsPlugin = {
+  id: "barValueLabels",
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const opts = (chart.options.plugins && chart.options.plugins.barValueLabels) || {};
+    ctx.save();
+    ctx.font = "700 11px 'JetBrains Mono', monospace";
+    ctx.fillStyle = opts.color || "#94a3b8";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    chart.data.datasets.forEach((ds, di) => {
+      const meta = chart.getDatasetMeta(di);
+      if (meta.hidden) return;
+      meta.data.forEach((bar, i) => {
+        const v = Math.round(Number(ds.data[i]) || 0);
+        ctx.fillText(String(v), bar.x, bar.y - 6);
+      });
+    });
+    ctx.restore();
+  }
+};
+
+// History dates are bucketed in Texas time (America/Chicago, CST/CDT) to match the backend's clanHistory keys.
+const CLAN_HISTORY_TZ = "America/Chicago";
+const clanHistoryDateFmt = new Intl.DateTimeFormat("en-CA", { timeZone: CLAN_HISTORY_TZ, year: "numeric", month: "2-digit", day: "2-digit" });
+function clanHistoryDateKey(dt) {
+  const parts = {};
+  clanHistoryDateFmt.formatToParts(dt).forEach(p => { parts[p.type] = p.value; });
+  return parts.year + "-" + parts.month + "-" + parts.day;
+}
+
+// Daily series [{ d: "yyyy-MM-dd", atks, stars }] oldest -> newest.
+// Uses lifetime clanHistory, or falls back to players' 30-day attack timestamps.
+function getClanDailySeries() {
+  const hist = Array.isArray(state.clanHistory) ? state.clanHistory : [];
+  const rows = hist
+    .filter(r => r && /^\d{4}-\d{2}-\d{2}$/.test(String(r.date)))
+    .map(r => ({ d: String(r.date), atks: Number(r.atks) || 0, stars: Number(r.stars) || 0 }));
+  if (rows.length) return rows.sort((a, b) => a.d < b.d ? -1 : a.d > b.d ? 1 : 0);
+
+  const byDay = {};
+  (state.players || []).forEach(p => {
+    const stamps = Array.isArray(p.attackTimestamps30d) ? p.attackTimestamps30d.map(parseBattleTimeMs).filter(Boolean) : [];
+    stamps.forEach(ts => {
+      const dt = new Date(Number(ts));
+      if (isNaN(dt.getTime())) return;
+      const d = clanHistoryDateKey(dt);
+      byDay[d] = (byDay[d] || 0) + 1;
+    });
+  });
+  return Object.keys(byDay).sort().map(d => ({ d: d, atks: byDay[d], stars: 0 }));
+}
+
+function ymdToUtcMs(d) {
+  const p = String(d).split("-");
+  return Date.UTC(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+}
+
+const STATSFM_MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+function renderClanStatsFm() {
+  const host = document.getElementById("clanStatsFmCharts");
+  if (!host) return;
+  const series = getClanDailySeries();
+  if (!series.length) {
+    host.innerHTML = `<div class="clock-card" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 8px;">No attack history yet. Sync battle logs to build lifetime clan trends.</div>`;
+    return;
+  }
+
+  host.innerHTML = `
+    <div class="clan-stats-stack">
+      <div class="clock-card">
+        <div class="sec-label" style="margin-top:0;">Cumulative</div>
+        <div class="stats-chart-wrap tall"><canvas id="clanCumulativeCanvas"></canvas></div>
+      </div>
+      <div class="clan-stats-grid">
+        <div class="clock-card">
+          <div class="sec-label" style="margin-top:0;">Attacks by Day of the Week</div>
+          <div class="stats-chart-wrap"><canvas id="clanDowCanvas"></canvas></div>
+        </div>
+        <div class="clock-card">
+          <div class="sec-label" style="margin-top:0;">Attacks by Month</div>
+          <div class="stats-chart-wrap"><canvas id="clanMonthCanvas"></canvas></div>
+        </div>
+        <div class="clock-card">
+          <div class="sec-label" style="margin-top:0;">Attacks by Year</div>
+          <div class="stats-chart-wrap"><canvas id="clanYearCanvas"></canvas></div>
+        </div>
+      </div>
+    </div>`;
+  if (typeof Chart === "undefined") return;
+
+  const isDark = (document.documentElement.getAttribute("data-theme") || "dark") === "dark";
+  const tickColor = isDark ? "#94a3b8" : "#475569";
+  const gridColor = isDark ? "rgba(148,163,184,0.16)" : "rgba(15,23,42,0.12)";
+  const green = isDark ? "#10b981" : "#059669";
+  const blue = "#38bdf8";
+  const monoFont = { family: "'JetBrains Mono', monospace", size: 10, weight: "600" };
+
+  // ---------- Chart 1: cumulative attacks & stars (gap days filled with 0) ----------
+  const firstMs = ymdToUtcMs(series[0].d);
+  const lastMs = ymdToUtcMs(series[series.length - 1].d);
+  const spanDays = Math.round((lastMs - firstMs) / 86400000) + 1;
+  const lookup = {};
+  series.forEach(r => { lookup[r.d] = r; });
+  const fullDates = [], cumAtks = [], cumStars = [];
+  let runA = 0, runS = 0;
+  for (let i = 0; i < spanDays; i++) {
+    const dt = new Date(firstMs + i * 86400000);
+    const key = dt.getUTCFullYear() + "-" + String(dt.getUTCMonth() + 1).padStart(2, "0") + "-" + String(dt.getUTCDate()).padStart(2, "0");
+    const r = lookup[key];
+    if (r) { runA += r.atks; runS += r.stars; }
+    fullDates.push(key);
+    cumAtks.push(runA);
+    cumStars.push(runS);
+  }
+  const fmtLabel = (key) => {
+    const p = key.split("-");
+    const mon = STATSFM_MONTHS[Number(p[1]) - 1];
+    if (spanDays <= 60) return mon + " " + Number(p[2]);
+    if (spanDays <= 730) return mon + " " + p[0];
+    return p[0];
+  };
+  const xLabels = fullDates.map(fmtLabel);
+  const hasStars = runS > 0;
+
+  const cumDatasets = [{
+    label: "Cumulative Attacks",
+    data: cumAtks,
+    borderColor: "#10b981",
+    backgroundColor: "#10b981",
+    tension: 0.35, pointRadius: 0, borderWidth: 2.5
+  }];
+  if (hasStars) {
+    cumDatasets.push({
+      label: "Cumulative Stars",
+      data: cumStars,
+      borderColor: blue,
+      backgroundColor: blue,
+      tension: 0.35, pointRadius: 0, borderWidth: 2.5
+    });
+  }
+  const cumEl = document.getElementById("clanCumulativeCanvas");
+  if (cumEl) {
+    clanCumulativeChart = new Chart(cumEl.getContext("2d"), {
+      type: "line",
+      data: { labels: xLabels, datasets: cumDatasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { display: true, position: "bottom", labels: { color: tickColor, boxWidth: 12, font: { size: 10, weight: "600" } } },
+          tooltip: {
+            callbacks: {
+              title: (items) => items.length ? fullDates[items[0].dataIndex] : "",
+              label: (ctx) => `${ctx.dataset.label}: ${Number(ctx.raw).toLocaleString()}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              color: tickColor,
+              font: monoFont,
+              maxRotation: 0,
+              autoSkip: spanDays <= 60,
+              maxTicksLimit: 8,
+              callback: function (val, idx) {
+                const cur = xLabels[idx];
+                if (spanDays <= 60) return cur;
+                return (idx === 0 || xLabels[idx - 1] !== cur) ? cur : "";
+              }
+            }
+          },
+          y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor, font: monoFont, maxTicksLimit: 5 } }
+        }
+      }
+    });
+  }
+
+  // ---------- Charts 2-4: aggregated attack counts ----------
+  const dow = new Array(7).fill(0);
+  const month = new Array(12).fill(0);
+  const yearMap = {};
+  series.forEach(r => {
+    const dt = new Date(ymdToUtcMs(r.d));
+    dow[(dt.getUTCDay() + 6) % 7] += r.atks;       // Mon-first
+    month[dt.getUTCMonth()] += r.atks;
+    const y = dt.getUTCFullYear();
+    yearMap[y] = (yearMap[y] || 0) + r.atks;
+  });
+  const years = Object.keys(yearMap).map(Number);
+  const minYear = Math.min(2026, ...years);
+  const maxYear = Math.max(Number(clanHistoryDateKey(new Date()).slice(0, 4)), ...years);
+  const yearLabels = [], yearData = [];
+  for (let y = minYear; y <= maxYear; y++) { yearLabels.push(String(y)); yearData.push(yearMap[y] || 0); }
+
+  const barOptions = (data) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 22 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { title: (items) => items.length ? items[0].label : "", label: (ctx) => `${Number(ctx.raw).toLocaleString()} attacks` } },
+      barValueLabels: { color: isDark ? "#e2e8f0" : "#0f172a" }
+    },
+    scales: {
+      x: { grid: { display: false }, border: { display: false }, ticks: { color: tickColor, font: monoFont, maxRotation: 0 } },
+      y: { display: false, beginAtZero: true, grid: { display: false }, suggestedMax: Math.max(1, ...data) * 1.1 }
+    }
+  });
+  const makeBar = (canvasId, labels, data) => {
+    const el = document.getElementById(canvasId);
+    if (!el) return null;
+    return new Chart(el.getContext("2d"), {
+      type: "bar",
+      data: { labels: labels, datasets: [{ data: data, backgroundColor: green, borderRadius: 8, borderSkipped: false, maxBarThickness: 28 }] },
+      options: barOptions(data),
+      plugins: [barValueLabelsPlugin]
+    });
+  };
+  clanDowChart   = makeBar("clanDowCanvas", ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], dow);
+  clanMonthChart = makeBar("clanMonthCanvas", STATSFM_MONTHS, month);
+  clanYearChart  = makeBar("clanYearCanvas", yearLabels, yearData);
 }
 
 function renderMyAccountsStrip() {
