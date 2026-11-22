@@ -1405,7 +1405,6 @@ let state = {
   clanMeta: {},
   players: [],
   globalMeta: null,
-  maxLevels: {},
   staticDataMap: {},
   staticDataLower: {},
   lastSyncTs: 0,
@@ -1691,7 +1690,6 @@ async function loadDashboard() {
     state.bases = Array.isArray(data.bases) ? data.bases : [];
     state.myAccounts = loadMyAccounts();
     state.globalMeta = data.globalMeta || null;
-    state.maxLevels = (data.maxLevels && typeof data.maxLevels === "object") ? data.maxLevels : {};
     state.clanHistory = Array.isArray(data.clanHistory) ? data.clanHistory : [];
     state.lastSyncTs = data.lastSyncTs || 0;
     setStaticDataMap(data.staticDataMap || {});
@@ -2580,149 +2578,6 @@ function renderRankedMetaSection(p, normalizedLogs) {
       </div>
     </div>
   `;
-}
-
-
-/* ============================================================
-   RECOMMENDED META ARMIES (Top 100 readiness match)
-============================================================ */
-const ARMY_CURRENT_META_RATE = 40; // core troop already used in >= 40% of the player's own 30-day Ranked attacks
-
-function computeRecommendedArmies(player) {
-  const cohort = state.globalMeta && state.globalMeta.cohorts && state.globalMeta.cohorts.top100;
-  const archs = (cohort && Array.isArray(cohort.topArchetypes)) ? cohort.topArchetypes : [];
-  if (!archs.length) return [];
-
-  // Case-insensitive lookups so share-code names always resolve against profile names
-  const levelsLower = {};
-  Object.keys(player.unitLevels || {}).forEach(k => { levelsLower[k.toLowerCase()] = Number(player.unitLevels[k]) || 0; });
-  const maxLower = {};
-  Object.keys(state.maxLevels || {}).forEach(k => { maxLower[k.toLowerCase()] = Number(state.maxLevels[k]) || 0; });
-
-  const playerTopTroops = (player.rankedAnalytics && Array.isArray(player.rankedAnalytics.topTroops))
-    ? player.rankedAnalytics.topTroops : [];
-  const mainTroops = new Set(playerTopTroops
-    .filter(t => t && t.name && Number(t.appearanceRate) >= ARMY_CURRENT_META_RATE)
-    .map(t => String(t.name).trim().toLowerCase()));
-
-  const catOrder = { equipment: 0, troop: 1, spell: 2, pet: 3, siege: 3 };
-
-  const scored = archs.map(arch => {
-    const army = Array.isArray(arch.sampleArmy) ? arch.sampleArmy : [];
-
-    // Collect every required item once (heroes' equipment + pets, troops, spells, sieges). No hero levels, no CC.
-    const req = new Map();
-    const addReq = (name, cat) => {
-      const n = String(name || "").trim();
-      if (!n) return;
-      const key = n.toLowerCase();
-      if (!req.has(key)) req.set(key, { name: n, cat: cat });
-    };
-    army.forEach(u => {
-      if (!u || !u.name) return;
-      const cat = classifyUnitClient(u);
-      if (cat === "hero") {
-        (Array.isArray(u.equipment) ? u.equipment : []).forEach(eq => addReq(eq, "equipment"));
-        if (u.pet) addReq(typeof u.pet === "string" ? u.pet : u.pet.name, "pet");
-      } else if (cat === "equipment") addReq(u.name, "equipment");
-      else if (cat === "pet") addReq(u.name, "pet");
-      else if (cat === "siege") addReq(u.name, "siege");
-      else if (cat === "spell") addReq(u.name, "spell");
-      else addReq(u.name, "troop");
-    });
-    if (req.size === 0) return null;
-
-    const ratios = { equipment: [], troop: [], spell: [], petSiege: [] };
-    const bottlenecks = [];
-    req.forEach((item, key) => {
-      const lvl = levelsLower[key] || 0;
-      const max = maxLower[key] || 0;
-      // Unknown max level (nobody in the clan has it): treat an owned item as ready, a missing one as 0
-      const ratio = lvl > 0 ? (max > 0 ? Math.min(1, lvl / max) : 1) : 0;
-      const bucket = (item.cat === "pet" || item.cat === "siege") ? "petSiege" : item.cat;
-      ratios[bucket].push(ratio);
-      if (lvl <= 0 || (max > 0 && lvl < max)) {
-        bottlenecks.push({
-          name: item.name,
-          cat: item.cat,
-          level: lvl,
-          max: max,
-          gap: max > 0 ? (max - lvl) : 1,
-          label: `${item.name} Lvl ${lvl}/${max || "?"}`
-        });
-      }
-    });
-
-    const avg = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 1.0;
-    const matchPct = 100 * ((0.45 * avg(ratios.equipment)) + (0.30 * avg(ratios.troop)) + (0.15 * avg(ratios.spell)) + (0.10 * avg(ratios.petSiege)));
-
-    bottlenecks.sort((a, b) => {
-      const ca = catOrder[a.cat] ?? 9, cb = catOrder[b.cat] ?? 9;
-      if (ca !== cb) return ca - cb;
-      return b.gap - a.gap || a.name.localeCompare(b.name);
-    });
-
-    const archTroops = (Array.isArray(arch.troops) ? arch.troops : []).map(t => String(t || "").trim().toLowerCase());
-    const isCurrentMeta = archTroops.some(t => mainTroops.has(t));
-
-    return { arch: arch, matchPct: matchPct, bottlenecks: bottlenecks, isCurrentMeta: isCurrentMeta };
-  }).filter(Boolean);
-
-  const byMatch = (a, b) => (b.matchPct - a.matchPct) || ((Number(b.arch.threeStarRate) || 0) - (Number(a.arch.threeStarRate) || 0));
-  const fresh   = scored.filter(r => !r.isCurrentMeta).sort(byMatch);
-  const current = scored.filter(r => r.isCurrentMeta).sort(byMatch);
-
-  // Fresh armies first; "Your Current Meta" armies only backfill if there aren't 4 fresh ones
-  return fresh.concat(current).slice(0, 4);
-}
-
-function renderRecommendedArmiesSection(p) {
-  const label = "Recommended Meta Armies (Top 100 Match)";
-  const cohort = state.globalMeta && state.globalMeta.cohorts && state.globalMeta.cohorts.top100;
-  const hasMeta = Boolean(cohort && Array.isArray(cohort.topArchetypes) && cohort.topArchetypes.length);
-  const emptyBox = (msg) => `
-    <div class="sec-label">${label}</div>
-    <div class="cat-box" style="text-align:center;color:var(--text-muted);font-size:12px;padding:16px 12px;">${msg}</div>`;
-
-  if (!hasMeta) {
-    return emptyBox("Tap ↻ Refresh Global Meta in the Clan Command panel above to unlock Top 100 army recommendations.");
-  }
-  if (!p.unitLevels || !Object.keys(p.unitLevels).length || !state.maxLevels || !Object.keys(state.maxLevels).length) {
-    return emptyBox("Unit levels haven't been synced yet — tap Force Sync to load them, then reopen this profile.");
-  }
-
-  const recs = computeRecommendedArmies(p);
-  if (!recs.length) {
-    return emptyBox("No Top 100 armies with full unit data yet — tap ↻ Refresh Global Meta to re-pull them.");
-  }
-
-  const cards = recs.map(r => {
-    const arch = r.arch;
-    const pct = Math.round(r.matchPct);
-    const cls = r.matchPct >= 85 ? "in" : r.matchPct >= 65 ? "amb" : "out";
-    const three = Number(arch.threeStarRate) || 0;
-    const copyUrl = buildArchetypeCopyUrl(arch);
-    const shown = r.bottlenecks.slice(0, 3).map(b => `${escHtml(b.name)} L${b.level}/${b.max || "?"}`);
-    const extra = r.bottlenecks.length - shown.length;
-    const sub = r.bottlenecks.length === 0
-      ? "✅ All required troops, spells &amp; gear maxed!"
-      : `Needs: ${shown.join(" · ")}${extra > 0 ? ` · +${extra} more` : ""}`;
-    return `
-      <div class="cat-box meta-arch">
-        <div class="meta-arch-top">
-          <span class="meta-arch-name">${escHtml(arch.name || "Unknown Army")}</span>
-          <div style="display:flex;align-items:center;gap:5px;flex-shrink:0;">
-            <span class="mini-badge ${cls}">${pct}% Ready</span>
-            <span class="mini-badge in">${three}% 3★</span>
-          </div>
-        </div>
-        ${r.isCurrentMeta ? `<div><span class="mini-badge ds">Your Current Meta</span></div>` : ""}
-        <div style="font-size:11px;color:var(--text-muted);line-height:1.45;">${sub}</div>
-        ${copyUrl ? `<div><a class="copy-army-btn" href="${escHtml(copyUrl)}" target="_blank" rel="noopener noreferrer">⚔️ Copy Army</a></div>` : ""}
-      </div>`;
-  }).join("");
-
-  return `<div class="sec-label">${label}</div>${cards}`;
 }
 
 function renderLastArmySection(p, normalizedLogs) {
@@ -3836,7 +3691,6 @@ function renderDrawerContent(p) {
   const clockProfile     = computeHourlyAttackProfile(p, normalizedLogs);
   const clockHtml        = renderAttackClockSection(clockProfile);
   const lastArmyHtml     = renderLastArmySection(p, normalizedLogs);
-  const recArmiesHtml    = renderRecommendedArmiesSection(p);
   const rankedMetaHtml   = renderRankedMetaSection(p, normalizedLogs);
   const battleLogHtml    = renderBattleLogSection(p, normalizedLogs);
 
@@ -3873,8 +3727,6 @@ function renderDrawerContent(p) {
     ${clockHtml}
 
     ${lastArmyHtml}
-
-    ${recArmiesHtml}
 
     ${rankedMetaHtml}
 
