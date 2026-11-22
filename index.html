@@ -2347,7 +2347,7 @@ function renderMetaUpgradesSection(p) {
     const usageBadgeText = isEquip ? `${usagePct}% Equipped` : `${usagePct}% Ranked Pick`;
     const usageBadgeCls  = isEquip ? "purp" : "ds";
     const subText = isEquip
-      ? `Active on <strong style="color:var(--text);">${usagePct}%</strong> of Top 100${heroSuffix}`
+      ? `Equipped in <strong style="color:var(--text);">${usagePct}%</strong> of Top 100 Ranked attacks${heroSuffix}`
       : `Used in <strong style="color:var(--text);">${usagePct}%</strong> of Ranked hits${threeStarSuffix}`;
 
     return `
