@@ -1375,6 +1375,9 @@
   <!-- DUPLICATE / STATUS BANNER -->
   <div id="duplicateBanner" class="banner"></div>
 
+  <!-- ROSTER DEEP-LINK BANNER (?assignTag=...) -->
+  <div id="assignBanner" class="banner"></div>
+
   <!-- KPI OVERVIEW STRIP -->
   <div class="kpi-grid">
     <div class="kpi-card">
@@ -1813,6 +1816,8 @@ const state = {
   launchSelectedLinkLabel: "",
   equipSelectedTags: new Set(),
   equipRosterFilter: "",
+  preselectAssignTag: "",
+  pendingDeepLink: null, // { baseId, action } from ?baseId=...&action=equip
 
   // Manual Upload & Lightbox & Confirm
   manualImageDataUrl: "",
@@ -1830,6 +1835,7 @@ window.addEventListener("DOMContentLoaded", () => {
   applyTheme(savedTheme);
   loadLocalPreferences();
   bindStaticEvents();
+  initDeepLinkFromUrl();
   renderAll();
   loadVaultAndRosterFromBackend(false);
 });
@@ -2151,6 +2157,7 @@ async function loadVaultAndRosterFromBackend(showSuccessToast = false) {
 
     saveLocalCache();
     renderAll();
+    resolveMissingDeepLink();
 
     if (showSuccessToast) {
       showToast(`Synced ${state.bases.length} base post(s) & live telemetry!`);
@@ -2365,6 +2372,11 @@ async function selectLinkAndGoToStep2(linkObj) {
   if (state.roster.length > 0) {
     const validSet = new Set(state.roster.map(p => p.tag));
     state.equipSelectedTags = new Set(Array.from(state.equipSelectedTags).filter(t => validSet.has(t)));
+
+    // Roster deep link: auto-select the target clanmate so equip + launch is one tap
+    if (state.preselectAssignTag && validSet.has(state.preselectAssignTag)) {
+      state.equipSelectedTags.add(state.preselectAssignTag);
+    }
   }
   renderEquipRosterList();
 }
@@ -2387,8 +2399,9 @@ function renderEquipRosterList() {
     return;
   }
 
-  const pinned = filtered.filter(p => mySet.has(p.tag));
-  const others = filtered.filter(p => !mySet.has(p.tag));
+  const target = state.preselectAssignTag ? filtered.find(p => p.tag === state.preselectAssignTag) : null;
+  const pinned = filtered.filter(p => mySet.has(p.tag) && p !== target);
+  const others = filtered.filter(p => !mySet.has(p.tag) && p !== target);
 
   const renderRow = (p, isPinned) => {
     const checked = state.equipSelectedTags.has(p.tag);
@@ -2410,9 +2423,15 @@ function renderEquipRosterList() {
   };
 
   let html = "";
+  if (target) {
+    html += `
+      <div class="roster-group-head"><span>Target Player</span></div>
+      ${renderRow(target, mySet.has(target.tag))}
+    `;
+  }
   if (pinned.length > 0) {
     html += `
-      <div class="roster-group-head">
+      <div class="roster-group-head"${target ? ' style="margin-top:8px;"' : ""}>
         <span>My Accounts (Pinned)</span>
         <button type="button" style="border:none;background:none;color:var(--accent);font-size:11px;font-weight:700;cursor:pointer;" onclick="toggleAllPinnedAccounts()">Toggle All Mine</button>
       </div>
@@ -2420,7 +2439,7 @@ function renderEquipRosterList() {
     `;
   }
   if (others.length > 0) {
-    if (pinned.length > 0) {
+    if (pinned.length > 0 || target) {
       html += `<div class="roster-group-head" style="margin-top:8px;"><span>Clan Roster (${others.length})</span></div>`;
     }
     html += others.map(p => renderRow(p, false)).join("");
@@ -3502,6 +3521,128 @@ function renderAll() {
   renderInsightsPanel();
   renderFilterChips();
   renderGallery();
+  renderAssignBanner();
+  tryHandleDeepLink();
+}
+
+/* ============================================================
+   ROSTER DEEP LINKS — ?assignTag=#TAG  ·  ?baseId=...  ·  &action=equip
+============================================================ */
+function replaceUrlParams(mutator) {
+  try {
+    const u = new URL(window.location.href);
+    mutator(u.searchParams);
+    const qs = u.searchParams.toString();
+    window.history.replaceState(null, "", u.pathname + (qs ? "?" + qs : "") + u.hash);
+  } catch (_) {}
+}
+
+function initDeepLinkFromUrl() {
+  let params;
+  try { params = new URLSearchParams(window.location.search); } catch (_) { return; }
+
+  const rawTag = params.get("assignTag");
+  if (rawTag) {
+    const tag = normalizeTag(rawTag);
+    if (/^#[0-9A-Z]+$/.test(tag)) state.preselectAssignTag = tag;
+  }
+
+  const baseId = (params.get("baseId") || "").trim();
+  if (baseId) {
+    state.pendingDeepLink = {
+      baseId: baseId,
+      action: String(params.get("action") || "").trim().toLowerCase()
+    };
+  }
+}
+
+function renderAssignBanner() {
+  const el = document.getElementById("assignBanner");
+  if (!el) return;
+  const tag = state.preselectAssignTag;
+  if (!tag) {
+    el.className = "banner";
+    el.innerHTML = "";
+    return;
+  }
+  const player = state.roster.find(p => p.tag === tag);
+  const label = player ? `${player.name} / ${tag}` : tag;
+  el.className = "banner open success";
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+      <strong>Select any base below to equip for ${escHtml(label)}</strong>
+      <button type="button" class="action-btn subtle" style="padding:5px 10px;font-size:11px;" onclick="clearAssignPreselect()">Clear</button>
+    </div>
+  `;
+}
+
+function clearAssignPreselect() {
+  state.preselectAssignTag = "";
+  replaceUrlParams(sp => sp.delete("assignTag"));
+  renderAssignBanner();
+  const modal = document.getElementById("launchModal");
+  if (modal && modal.classList.contains("open") && state.launchBaseId &&
+      document.getElementById("launchStep2Body").style.display !== "none") {
+    renderEquipRosterList();
+  }
+}
+
+function findBaseCardEl(baseId) {
+  const safe = (window.CSS && typeof CSS.escape === "function") ? CSS.escape(baseId) : String(baseId).replace(/["\\]/g, "\\$&");
+  return document.querySelector(`[data-base-id="${safe}"]`);
+}
+
+function tryHandleDeepLink() {
+  const dl = state.pendingDeepLink;
+  if (!dl || !dl.baseId) return;
+  if (!state.bases.some(b => b.id === dl.baseId)) return; // wait until the base is loaded (cache or backend)
+
+  state.pendingDeepLink = null;
+  replaceUrlParams(sp => { sp.delete("baseId"); sp.delete("action"); }); // one-shot: refresh must not re-trigger
+
+  let card = findBaseCardEl(dl.baseId);
+  if (!card) {
+    // An active filter/search may be hiding it: reset and re-render the gallery
+    state.selectedTh = "All";
+    state.selectedCategory = "All";
+    state.selectedCreator = "";
+    state.searchQuery = "";
+    const searchEl = document.getElementById("searchInput");
+    if (searchEl) searchEl.value = "";
+    renderFilterChips();
+    renderGallery();
+    card = findBaseCardEl(dl.baseId);
+  }
+
+  if (card) {
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    const prevBorder = card.style.borderColor;
+    const prevShadow = card.style.boxShadow;
+    card.style.borderColor = "var(--accent)";
+    card.style.boxShadow = "0 0 0 2px var(--accent)";
+    setTimeout(() => {
+      if (card.isConnected) {
+        card.style.borderColor = prevBorder;
+        card.style.boxShadow = prevShadow;
+      }
+    }, 2200);
+  }
+
+  setTimeout(() => {
+    if (dl.action === "equip") openLaunchModal(dl.baseId);
+    else openLightbox(dl.baseId);
+  }, 450);
+}
+
+// Called after a successful backend load: if the requested base still doesn't exist, stop waiting
+function resolveMissingDeepLink() {
+  const dl = state.pendingDeepLink;
+  if (!dl) return;
+  if (!state.bases.some(b => b.id === dl.baseId)) {
+    state.pendingDeepLink = null;
+    replaceUrlParams(sp => { sp.delete("baseId"); sp.delete("action"); });
+    showToast("That base is no longer in the Vault.");
+  }
 }
 
 /* ============================================================
