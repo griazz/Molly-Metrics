@@ -1564,6 +1564,7 @@
     <div class="modal-body">
       <div class="tab-switch">
         <button type="button" id="tabBtnXImport" class="tab-switch-btn active" onclick="switchAddMode('x')">X / Twitter Post</button>
+        <button type="button" id="tabBtnDiscord" class="tab-switch-btn" onclick="switchAddMode('discord')">Discord</button>
         <button type="button" id="tabBtnManual" class="tab-switch-btn" onclick="switchAddMode('manual')">Manual / Screenshot</button>
       </div>
 
@@ -1578,6 +1579,84 @@
           <button type="submit" id="btnFetchXSubmit" class="btn-sync-primary" style="flex:1;height:40px;">Fetch &amp; Save Grouped Post</button>
         </div>
         <div id="xImportError" class="banner error" style="margin:0;"></div>
+      </form>
+
+      <!-- MODE C: DISCORD SCREENSHOT (OCR + AUTO-CROP) -->
+      <form id="discordImportForm" style="display:none;flex-direction:column;gap:10px;">
+        <div>
+          <label class="field-label">Discord Message Screenshot * (Ctrl+V, drop, or tap)</label>
+          <div id="discordDropZone" class="drop-zone">
+            <input id="discordFileInput" type="file" accept="image/*" style="display:none;" />
+            <div id="discordDropPlaceholder">
+              <div style="font-size:13px;font-weight:700;">Paste a Discord post screenshot or tap to browse</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Base is auto-cropped; text is read with Google Drive OCR</div>
+            </div>
+            <div id="discordPreviewWrap" style="display:none;">
+              <img id="discordImagePreview" src="" alt="Cropped base preview" />
+              <div id="discordCropStatus" style="font-size:11px;color:var(--text-muted);margin-top:6px;"></div>
+              <div style="margin-top:8px;">
+                <button type="button" class="action-btn danger" onclick="clearDiscordImage(event)">Remove Image</button>
+              </div>
+            </div>
+          </div>
+          <label id="discordUseFullRow" style="display:none;align-items:center;gap:7px;margin-top:7px;font-size:12px;font-weight:700;cursor:pointer;">
+            <input type="checkbox" id="discordUseFull" onchange="toggleDiscordUseFull(this.checked)" />
+            Use Full Uncropped Screenshot
+          </label>
+        </div>
+
+        <div>
+          <label class="field-label" for="discordPasteText">Or paste the Discord message text (skips OCR)</label>
+          <textarea id="discordPasteText" class="form-textarea" rows="3" placeholder="TenZz_GG Yesterday at 1:18 AM&#10;Caption...&#10;https://link.clashofclans.com/..."></textarea>
+          <div style="margin-top:6px;">
+            <button type="button" class="action-btn" onclick="parseDiscordPastedText()">Parse Text</button>
+          </div>
+        </div>
+
+        <div id="discordOcrStatus" style="font-size:12px;color:var(--text-muted);"></div>
+
+        <div id="discordReviewCard" class="panel" style="display:none;margin:0;padding:12px;flex-direction:column;gap:10px;">
+          <div style="font-size:12px;font-weight:800;">Review &amp; Confirm</div>
+          <div class="form-row-2">
+            <div>
+              <label class="field-label" for="discordCreator">Creator @Handle</label>
+              <input id="discordCreator" type="text" class="form-input" placeholder="@creator" />
+            </div>
+            <div>
+              <label class="field-label" for="discordPostDate">Post Date / Time</label>
+              <input id="discordPostDate" type="datetime-local" class="form-input" />
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div>
+              <label class="field-label" for="discordTh">Town Hall</label>
+              <input id="discordTh" type="text" class="form-input" value="TH19" />
+            </div>
+            <div>
+              <label class="field-label" for="discordCc">CC Troops</label>
+              <input id="discordCc" type="text" class="form-input" placeholder="2 IG, 1 Furnace..." />
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="discordLinks">Clash Link(s) * (one per line)</label>
+            <textarea id="discordLinks" class="form-textarea" rows="3" placeholder="https://link.clashofclans.com/en/?action=OpenLayout&amp;id=..."></textarea>
+          </div>
+          <div class="form-row-2">
+            <div>
+              <label class="field-label" for="discordTags">Tags (comma-separated)</label>
+              <input id="discordTags" type="text" class="form-input" placeholder="Legend, Discord" />
+            </div>
+            <div>
+              <label class="field-label" for="discordNotes">Notes / Caption</label>
+              <input id="discordNotes" type="text" class="form-input" maxlength="140" />
+            </div>
+          </div>
+          <details>
+            <summary style="font-size:11px;color:var(--text-muted);cursor:pointer;">Raw OCR text</summary>
+            <pre id="discordRawText" class="mono" style="white-space:pre-wrap;font-size:10px;color:var(--text-muted);margin:6px 0 0;max-height:140px;overflow:auto;"></pre>
+          </details>
+          <button type="submit" id="btnDiscordSaveSubmit" class="btn-sync-primary" style="width:100%;">Save to Vault</button>
+        </div>
       </form>
 
       <!-- MODE B: MANUAL / PASTE SCREENSHOT -->
@@ -1802,7 +1881,7 @@ const STORAGE_KEYS = {
 };
 
 const STANDARD_THS = ["All", "TH19", "TH18", "TH17", "TH16"];
-const STANDARD_CATS = ["All", "Legend", "L1", "Ranked", "War", "Pro / ESL", "Tested", "Untested", "Progress", "Anti-Bowler", "Anti-LaLo", "Rage/Poison", "Auto-X", "Favorites"];
+const STANDARD_CATS = ["All", "Legend", "L1", "Ranked", "War", "Pro / ESL", "Tested", "Untested", "Progress", "Anti-Bowler", "Anti-LaLo", "Rage/Poison", "Auto-X", "Discord", "Favorites"];
 
 /* ============================================================
    APPLICATION STATE
@@ -1839,6 +1918,8 @@ const state = {
 
   // Manual Upload & Lightbox & Confirm
   manualImageDataUrl: "",
+  addMode: "x",
+  discord: { origDataUrl: "", croppedDataUrl: "", cropped: false, useFull: false, parsed: null, busy: false, seq: 0 },
   lightboxBaseId: null,
   lightboxImageIndex: 0,
   lightboxZoomed: false,
@@ -3060,11 +3141,14 @@ function openAddBaseModal(mode = "x") {
 }
 
 function switchAddMode(mode) {
-  const isX = mode === "x";
-  document.getElementById("tabBtnXImport").classList.toggle("active", isX);
-  document.getElementById("tabBtnManual").classList.toggle("active", !isX);
-  document.getElementById("xImportForm").style.display = isX ? "flex" : "none";
-  document.getElementById("manualBaseForm").style.display = isX ? "none" : "flex";
+  if (mode !== "x" && mode !== "discord" && mode !== "manual") mode = "x";
+  state.addMode = mode;
+  document.getElementById("tabBtnXImport").classList.toggle("active", mode === "x");
+  document.getElementById("tabBtnDiscord").classList.toggle("active", mode === "discord");
+  document.getElementById("tabBtnManual").classList.toggle("active", mode === "manual");
+  document.getElementById("xImportForm").style.display = mode === "x" ? "flex" : "none";
+  document.getElementById("discordImportForm").style.display = mode === "discord" ? "flex" : "none";
+  document.getElementById("manualBaseForm").style.display = mode === "manual" ? "flex" : "none";
 }
 
 async function pasteFromClipboardToX() {
@@ -3093,30 +3177,122 @@ function autoFillManualFromCaption(caption) {
   }
 }
 
-function compressImageToDataUrl(file) {
+const IMAGE_MAX_DIM = 1600;
+const IMAGE_JPEG_QUALITY = 0.90;
+
+function loadImageFromFile(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = ev => {
       const img = new Image();
-      img.onload = () => {
-        const maxDim = 1280;
-        let { width, height } = img;
-        if (width > maxDim || height > maxDim) {
-          if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
-          else { width = Math.round((width * maxDim) / height); height = maxDim; }
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL("image/jpeg", 0.86));
-      };
+      img.onload = () => resolve(img);
       img.onerror = reject;
       img.src = ev.target.result;
     };
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
+}
+
+// Draws a source rect of `img` into a JPEG data URL, capped at IMAGE_MAX_DIM on the long edge
+function imageRegionToJpegDataUrl(img, sx, sy, sw, sh) {
+  let width = sw, height = sh;
+  if (width > IMAGE_MAX_DIM || height > IMAGE_MAX_DIM) {
+    if (width > height) { height = Math.round((height * IMAGE_MAX_DIM) / width); width = IMAGE_MAX_DIM; }
+    else { width = Math.round((width * IMAGE_MAX_DIM) / height); height = IMAGE_MAX_DIM; }
+  }
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  canvas.getContext("2d").drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
+  return canvas.toDataURL("image/jpeg", IMAGE_JPEG_QUALITY);
+}
+
+async function compressImageToDataUrl(file) {
+  const img = await loadImageFromFile(file);
+  return imageRegionToJpegDataUrl(img, 0, 0, img.width, img.height);
+}
+
+/* Finds the colorful game viewport inside a Discord screenshot (dark chat background) and crops to it.
+   Returns { dataUrl, cropped } and falls back to the full image when no distinct inner bounds exist. */
+function autoCropDiscordBaseImage(img) {
+  const fullResult = () => ({ dataUrl: imageRegionToJpegDataUrl(img, 0, 0, img.width, img.height), cropped: false });
+  try {
+    const scale = Math.min(1, 700 / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const c = document.createElement("canvas");
+    c.width = w; c.height = h;
+    const ctx = c.getContext("2d", { willReadFrequently: true });
+    ctx.drawImage(img, 0, 0, w, h);
+    const px = ctx.getImageData(0, 0, w, h).data;
+
+    // Chat background = most common quantized color along the left/right edges (Discord: #313338 / #1a1a1e / #000)
+    const votes = {};
+    const sample = (x, y) => {
+      const i = (y * w + x) * 4;
+      const k = (px[i] >> 3) + "," + (px[i + 1] >> 3) + "," + (px[i + 2] >> 3);
+      const e = votes[k] || (votes[k] = { n: 0, r: 0, g: 0, b: 0 });
+      e.n++; e.r += px[i]; e.g += px[i + 1]; e.b += px[i + 2];
+    };
+    for (let y = 0; y < h; y++) { sample(1, y); sample(w - 2, y); }
+    let best = null;
+    Object.keys(votes).forEach(k => { if (!best || votes[k].n > best.n) best = votes[k]; });
+    if (!best) return fullResult();
+    const bg = { r: best.r / best.n, g: best.g / best.n, b: best.b / best.n };
+
+    const isBg = (i) => {
+      const r = px[i], g = px[i + 1], b = px[i + 2];
+      if (Math.abs(r - bg.r) <= 26 && Math.abs(g - bg.g) <= 26 && Math.abs(b - bg.b) <= 26) return true;
+      const mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+      return mx <= 64 && (mx - mn) <= 20; // near-black / dark gray chat range
+    };
+
+    // Rows: fraction of non-background pixels. Text rows stay sparse; the game viewport is dense.
+    const rowDense = new Array(h);
+    for (let y = 0; y < h; y++) {
+      let fg = 0;
+      for (let x = 0; x < w; x++) if (!isBg((y * w + x) * 4)) fg++;
+      rowDense[y] = fg / w > 0.30;
+    }
+    // Longest dense vertical run (tolerating tiny gaps)
+    let bestRun = null, runStart = -1, gap = 0, lastDense = -1;
+    for (let y = 0; y <= h; y++) {
+      const d = y < h && rowDense[y];
+      if (d) { if (runStart < 0) runStart = y; lastDense = y; gap = 0; }
+      else if (runStart >= 0) {
+        gap++;
+        if (gap > 3 || y === h) {
+          if (!bestRun || (lastDense - runStart) > (bestRun.b - bestRun.a)) bestRun = { a: runStart, b: lastDense };
+          runStart = -1; gap = 0;
+        }
+      }
+    }
+    if (!bestRun || (bestRun.b - bestRun.a) < h * 0.15) return fullResult();
+    const top = bestRun.a, bottom = bestRun.b;
+
+    // Columns inside that band: trim dark avatar gutter + right margin
+    const bandH = bottom - top + 1;
+    const colDense = (x) => {
+      let fg = 0;
+      for (let y = top; y <= bottom; y++) if (!isBg((y * w + x) * 4)) fg++;
+      return fg / bandH > 0.5;
+    };
+    let left = 0, right = w - 1;
+    while (left < w && !colDense(left)) left++;
+    while (right > left && !colDense(right)) right--;
+    if (right - left < w * 0.15) return fullResult();
+
+    const area = ((right - left + 1) * (bottom - top + 1)) / (w * h);
+    if (area > 0.97 || area < 0.08) return fullResult();
+
+    const sx = Math.round(left / scale), sy = Math.round(top / scale);
+    const sw = Math.min(img.width - sx, Math.round((right - left + 1) / scale));
+    const sh = Math.min(img.height - sy, Math.round((bottom - top + 1) / scale));
+    return { dataUrl: imageRegionToJpegDataUrl(img, sx, sy, sw, sh), cropped: true };
+  } catch (_) {
+    return fullResult();
+  }
 }
 
 async function attachManualImageFile(file) {
@@ -3142,6 +3318,176 @@ function clearManualImage(e) {
   document.getElementById("manualFileInput").value = "";
   document.getElementById("manualDropPlaceholder").style.display = "block";
   document.getElementById("manualPreviewWrap").style.display = "none";
+}
+
+/* ============================================================
+   DISCORD SCREENSHOT IMPORTER (AUTO-CROP + DRIVE OCR)
+============================================================ */
+function formatDiscordStatus(msg, isErr) {
+  const el = document.getElementById("discordOcrStatus");
+  el.textContent = msg || "";
+  el.style.color = isErr ? "var(--red)" : "var(--text-muted)";
+}
+
+function currentDiscordImageDataUrl() {
+  const d = state.discord;
+  return d.useFull || !d.cropped ? d.origDataUrl : d.croppedDataUrl;
+}
+
+function refreshDiscordPreview() {
+  const d = state.discord;
+  const has = Boolean(d.origDataUrl);
+  document.getElementById("discordDropPlaceholder").style.display = has ? "none" : "block";
+  document.getElementById("discordPreviewWrap").style.display = has ? "block" : "none";
+  document.getElementById("discordUseFullRow").style.display = has ? "flex" : "none";
+  document.getElementById("discordUseFull").checked = d.useFull;
+  document.getElementById("discordUseFull").disabled = !d.cropped;
+  if (has) {
+    document.getElementById("discordImagePreview").src = currentDiscordImageDataUrl();
+    document.getElementById("discordCropStatus").textContent = !d.cropped
+      ? "No distinct base bounds detected — using the full screenshot."
+      : (d.useFull ? "Using the full uncropped screenshot." : "✂️ Auto-cropped to the base image.");
+  }
+}
+
+function toggleDiscordUseFull(on) {
+  state.discord.useFull = Boolean(on);
+  refreshDiscordPreview();
+}
+
+function clearDiscordImage(e) {
+  if (e) e.stopPropagation();
+  state.discord = { origDataUrl: "", croppedDataUrl: "", cropped: false, useFull: false, parsed: null, busy: false, seq: state.discord.seq + 1 };
+  document.getElementById("discordFileInput").value = "";
+  refreshDiscordPreview();
+  formatDiscordStatus("");
+}
+
+function fillDiscordReview(parsed) {
+  const p = parsed || {};
+  document.getElementById("discordReviewCard").style.display = "flex";
+  document.getElementById("discordCreator").value = p.creatorHandle || "";
+  document.getElementById("discordPostDate").value = toDatetimeLocalValue(Number(p.postTimestamp) || Date.now());
+  document.getElementById("discordTh").value = p.thLevel || "TH19";
+  document.getElementById("discordCc").value = p.ccTroops || "";
+  document.getElementById("discordLinks").value = (p.baseLinks || []).map(l => (typeof l === "string" ? l : l.url)).join("\n");
+  document.getElementById("discordTags").value = (p.tags && p.tags.length ? p.tags : ["Discord"]).join(", ");
+  document.getElementById("discordNotes").value = p.notes || "";
+  document.getElementById("discordRawText").textContent = p.rawOcrText || "";
+}
+
+async function requestDiscordParse(body, seq) {
+  state.discord.busy = true;
+  formatDiscordStatus(body.text ? "Parsing message text..." : "Reading screenshot text with Google Drive OCR...");
+  try {
+    const res = await apiPost(Object.assign({
+      action: "parseDiscordScreenshot",
+      clientNowMs: Date.now(),
+      tzOffsetMinutes: new Date().getTimezoneOffset()
+    }, body));
+    if (seq !== state.discord.seq) return;
+    state.discord.parsed = res.parsed || null;
+    fillDiscordReview(res.parsed);
+    const n = res.parsed && res.parsed.baseLinks ? res.parsed.baseLinks.length : 0;
+    formatDiscordStatus(n > 0 ? `Found ${n} Clash link${n === 1 ? "" : "s"}. Check the details below.` : "No Clash link found — add one below before saving.", n === 0);
+  } catch (err) {
+    if (seq !== state.discord.seq) return;
+    fillDiscordReview({ postTimestamp: Date.now(), tags: ["Discord"] });
+    formatDiscordStatus("Auto-read failed: " + err.message + " — you can still fill the fields manually.", true);
+  } finally {
+    if (seq === state.discord.seq) state.discord.busy = false;
+  }
+}
+
+async function attachDiscordImageFile(file) {
+  if (!file || !file.type.startsWith("image/")) {
+    showToast("Please select a valid image file.");
+    return;
+  }
+  const seq = ++state.discord.seq;
+  try {
+    const img = await loadImageFromFile(file);
+    const full = imageRegionToJpegDataUrl(img, 0, 0, img.width, img.height);
+    const crop = autoCropDiscordBaseImage(img);
+    state.discord.origDataUrl = full;
+    state.discord.croppedDataUrl = crop.dataUrl;
+    state.discord.cropped = crop.cropped;
+    state.discord.useFull = false;
+    refreshDiscordPreview();
+    requestDiscordParse({ imageDataUrl: full }, seq);
+  } catch (_) {
+    showToast("Failed to process image.");
+  }
+}
+
+function parseDiscordPastedText() {
+  const txt = document.getElementById("discordPasteText").value.trim();
+  if (!txt) { showToast("Paste the Discord message text first."); return; }
+  requestDiscordParse({ text: txt }, ++state.discord.seq);
+}
+
+async function handleDiscordFormSubmit(e) {
+  e.preventDefault();
+  const rawLinks = document.getElementById("discordLinks").value.trim();
+  const found = extractClashBaseLinks(rawLinks);
+  const urls = found.length > 0 ? found : rawLinks.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (urls.length === 0) { showToast("Enter at least one Clash of Clans base link."); return; }
+  const image = currentDiscordImageDataUrl();
+  if (!image) { showToast("Attach or paste a screenshot first."); return; }
+
+  const btn = document.getElementById("btnDiscordSaveSubmit");
+  btn.disabled = true;
+  btn.textContent = "Uploading to Drive...";
+  try {
+    const baseLinks = extractLinkObjectsFromText(rawLinks, urls);
+    const primary = baseLinks[0];
+    const notes = document.getElementById("discordNotes").value.trim();
+    const thLevel = document.getElementById("discordTh").value.trim().toUpperCase() || extractTownHallFromLinkOrText(primary.url, notes);
+    const rawCreator = document.getElementById("discordCreator").value.trim();
+    const creatorHandle = rawCreator ? (rawCreator.startsWith("@") ? rawCreator : `@${rawCreator}`) : "@discord";
+    const tags = document.getElementById("discordTags").value.split(",").map(s => s.trim()).filter(Boolean);
+    if (!tags.some(t => t.toLowerCase() === "discord")) tags.push("Discord");
+    const dateVal = document.getElementById("discordPostDate").value;
+    const ts = dateVal ? Date.parse(dateVal) : NaN;
+
+    const candidate = {
+      id: `base_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      thLevel,
+      baseLink: primary.url,
+      canonicalId: primary.canonicalId,
+      baseLinks,
+      imageUrl: image,
+      images: [image],
+      creatorHandle,
+      postUrl: "",
+      postTimestamp: Number.isNaN(ts) ? Date.now() : ts,
+      likes: 0,
+      ccTroops: document.getElementById("discordCc").value.trim(),
+      tags,
+      notes: notes.slice(0, 140),
+      copies: 0,
+      createdAt: Date.now()
+    };
+
+    const res = await saveBaseToBackend(candidate);
+    document.getElementById("discordImportForm").reset();
+    document.getElementById("discordReviewCard").style.display = "none";
+    clearDiscordImage();
+    closeModal("addBaseModal");
+    renderAll();
+
+    if (res.action === "blocked" || res.action === "replaced_with_earlier") {
+      showDuplicateBanner(res);
+      showToast(res.action === "blocked" ? "Duplicate base link blocked." : "Earlier post replaced newer duplicate.");
+    } else {
+      showToast(`Saved ${thLevel} base to Google Sheets & Drive!`);
+    }
+  } catch (err) {
+    showToast("Save failed: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save to Vault";
+  }
 }
 
 async function handleManualFormSubmit(e) {
@@ -3972,6 +4318,19 @@ function bindStaticEvents() {
 
   document.getElementById("xImportForm").addEventListener("submit", handleXImportSubmit);
   document.getElementById("manualBaseForm").addEventListener("submit", handleManualFormSubmit);
+  document.getElementById("discordImportForm").addEventListener("submit", handleDiscordFormSubmit);
+  const ddz = document.getElementById("discordDropZone");
+  const dfi = document.getElementById("discordFileInput");
+  ddz.addEventListener("click", e => { if (!e.target.closest("button")) dfi.click(); });
+  dfi.addEventListener("click", e => e.stopPropagation());
+  dfi.addEventListener("change", e => { if (e.target.files && e.target.files[0]) attachDiscordImageFile(e.target.files[0]); });
+  ddz.addEventListener("dragover", e => { e.preventDefault(); ddz.classList.add("drag-over"); });
+  ddz.addEventListener("dragleave", () => ddz.classList.remove("drag-over"));
+  ddz.addEventListener("drop", e => {
+    e.preventDefault();
+    ddz.classList.remove("drag-over");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) attachDiscordImageFile(e.dataTransfer.files[0]);
+  });
   document.getElementById("manualCaption").addEventListener("input", e => autoFillManualFromCaption(e.target.value));
 
   const dz = document.getElementById("manualDropZone");
@@ -3993,8 +4352,9 @@ function bindStaticEvents() {
     for (const item of items) {
       if (item.type && item.type.startsWith("image/")) {
         e.preventDefault();
-        switchAddMode("manual");
         const f = item.getAsFile();
+        if (state.addMode === "discord") { if (f) attachDiscordImageFile(f); return; }
+        switchAddMode("manual");
         if (f) attachManualImageFile(f);
         return;
       }
