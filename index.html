@@ -1409,6 +1409,7 @@ let state = {
   staticDataLower: {},
   lastSyncTs: 0,
   bases: [],
+  playerSlotCounts: {},
   myAccounts: loadMyAccounts(),
   activeDrawerTag: null,
   rosterFilter: "all",
@@ -1688,6 +1689,7 @@ async function loadDashboard() {
     state.clanMeta   = data.clanMeta || {};
     state.players    = Array.isArray(data.players) ? data.players : [];
     state.bases = Array.isArray(data.bases) ? data.bases : [];
+    state.playerSlotCounts = (data.playerSlotCounts && typeof data.playerSlotCounts === "object") ? data.playerSlotCounts : {};
     state.myAccounts = loadMyAccounts();
     state.globalMeta = data.globalMeta || null;
     state.clanHistory = Array.isArray(data.clanHistory) ? data.clanHistory : [];
@@ -2758,6 +2760,26 @@ function parseEffectiveMs(v) {
 }
 
 // Returns { kind: "active", base, entry } | { kind: "scheduled", base, entry } | { kind: "none" }
+function entryHasRole(e, role) {
+  // Legacy entries without roles were Ranked-only claims
+  const roles = (e && typeof e === "object" && Array.isArray(e.roles) && e.roles.length) ? e.roles : ["ranked"];
+  return roles.indexOf(role) !== -1;
+}
+
+function countVaultSlotsForPlayer(tag) {
+  const target = normalizeTag(tag);
+  if (state.playerSlotCounts && state.playerSlotCounts[target] !== undefined) return Number(state.playerSlotCounts[target]) || 0;
+  let n = 0;
+  (Array.isArray(state.bases) ? state.bases : []).forEach(base => {
+    const entries = (base && base.defenseStats && Array.isArray(base.defenseStats.activePlayers)) ? base.defenseStats.activePlayers : [];
+    const links = new Set();
+    entries.forEach(e => { if (e && normalizeTag(e.tag || "") === target) links.add(e.linkId || ""); });
+    n += links.size;
+  });
+  return n;
+}
+
+// Only the player's RANKED claim is returned, so War / FC-only bases never overwrite the drawer's Ranked stats.
 function findVaultBaseForPlayer(tag) {
   const now = Date.now();
   const target = normalizeTag(tag);
@@ -2770,6 +2792,7 @@ function findVaultBaseForPlayer(tag) {
       const isObj = e && typeof e === "object";
       const t = normalizeTag(isObj ? (e.tag || e.playerTag || "") : e);
       if (t !== target) continue;
+      if (isObj && !entryHasRole(e, "ranked")) continue;
       const until = isObj ? e.effectiveUntil : null;
       const from  = isObj ? parseEffectiveMs(e.effectiveFrom) : null;
       const untilMs = parseEffectiveMs(until);
@@ -3595,12 +3618,14 @@ function selectDrawerCategory(label) {
 
 function renderEquippedBaseSection(p) {
   const v = findVaultBaseForPlayer(p.tag);
+  const slotsUsed = countVaultSlotsForPlayer(p.tag);
+  const slotBadge = slotsUsed > 0 ? `<span class="mini-badge">${slotsUsed}/6 Vault Slots Saved</span>` : "";
 
   if (v.kind === "none" || !v.base) {
     return `
       <div class="sec-label">Equipped Vault Base</div>
       <div class="cat-box" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-        <span style="font-size:12px;color:var(--text-muted);">Not tracking a Vault base yet — assign one to see live defense results.</span>
+        <span style="font-size:12px;color:var(--text-muted);">No Ranked Vault base tracked yet — assign one to see live defense results. ${slotBadge}</span>
         <a class="copy-army-btn" href="bases.html?assignTag=${encodeURIComponent(p.tag)}">+ Assign Vault Base</a>
       </div>
     `;
@@ -3646,7 +3671,8 @@ function renderEquippedBaseSection(p) {
         <div style="min-width:0;display:flex;flex-direction:column;gap:6px;">
           <div class="badge-row">
             <span class="mini-badge ds">${escHtml(thTxt)}</span>
-            <span class="mini-badge ${isScheduled ? "amb" : "in"}">${isScheduled ? "⏳ Scheduled Sun 11 PM" : "Active"}</span>
+            <span class="mini-badge ${isScheduled ? "amb" : "in"}">${isScheduled ? "⏳ Scheduled Sun 11 PM" : "🏆 Ranked Active"}</span>
+            ${slotBadge}
           </div>
           <div style="font-size:12px;font-weight:700;overflow-wrap:anywhere;">${escHtml(creatorTxt)}</div>
         </div>
