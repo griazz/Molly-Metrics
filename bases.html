@@ -1592,7 +1592,7 @@
               <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Base is auto-cropped; text is read with Google Drive OCR</div>
             </div>
             <div id="discordPreviewWrap" style="display:none;">
-              <img id="discordImagePreview" src="" alt="Cropped base preview" />
+              <div id="discordImagePreviewRow" style="display:flex;gap:6px;justify-content:center;align-items:center;"></div>
               <div id="discordCropStatus" style="font-size:11px;color:var(--text-muted);margin-top:6px;"></div>
               <div style="margin-top:8px;">
                 <button type="button" class="action-btn danger" onclick="clearDiscordImage(event)">Remove Image</button>
@@ -1919,7 +1919,7 @@ const state = {
   // Manual Upload & Lightbox & Confirm
   manualImageDataUrl: "",
   addMode: "x",
-  discord: { origDataUrl: "", croppedDataUrl: "", cropped: false, useFull: false, parsed: null, busy: false, seq: 0 },
+  discord: { origDataUrl: "", croppedDataUrls: [], cropped: false, split: false, useFull: false, parsed: null, busy: false, seq: 0 },
   lightboxBaseId: null,
   lightboxImageIndex: 0,
   lightboxZoomed: false,
@@ -2910,45 +2910,83 @@ function extractTownHallFromLinkOrText(baseLink, fallbackText = "") {
   return "TH19";
 }
 
+// "Base I" / "Base II" / "Base 1" section headers (OCR often reads a capital I as l or |)
+function parseBaseSectionLabel(line) {
+  const m = String(line || "").match(/^\W*base\s*#?\s*([ivxl|]{1,4}|\d{1,2})\b/i);
+  if (!m) return "";
+  const tok = m[1];
+  if (/^\d+$/.test(tok)) return "Base " + tok;
+  const roman = tok.replace(/[l|]/gi, "I").toUpperCase();
+  return /^[IVX]+$/.test(roman) ? "Base " + roman : "";
+}
+
+function cleanCcText(raw) {
+  const KEEP_UPPER = { IG: 1, HH: 1, CC: 1, TH: 1, BH: 1, LO: 1, PEKKA: 1 };
+  return String(raw || "")
+    .replace(/https?:\/\/\S+/gi, "")                                   // trailing URLs
+    .replace(/\(\s*[^\p{L}\p{N})]*\s*\)/gu, "")                        // empty / icon-only OCR parentheses: ( ), ( 💨 )
+    .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "")          // emojis
+    .replace(/(\d+)\s*[xX×]\s*(?=[A-Za-z])/g, "$1x ")                  // "1xICE" -> "1x ICE"
+    .replace(/\b([A-Z]{2,})\b/g, w => KEEP_UPPER[w] ? w : w.charAt(0) + w.slice(1).toLowerCase())
+    .replace(/\s*,\s*(?:,\s*)*/g, ", ")
+    .replace(/\s+/g, " ")
+    .replace(/^[:\-–—=：,\s]+|[:\-–—=：,\s]+$/g, "")
+    .trim();
+}
+
+// Returns one cleaned CC string; multi-base posts with several CC blocks come back as "Base I: ... | Base II: ..."
 function extractCcTroops(text) {
   if (!text) return "";
   const lines = String(text).split(/\r?\n/);
+  const stripLead = l => l.replace(/^[\s\p{Extended_Pictographic}\uFE0F\u200D•\-–—|>]+/gu, "").trim();
+  const blocks = [];
+  let section = "";
 
-  for (const rawLine of lines) {
-    const line = rawLine
-      .replace(/^[\s\p{Extended_Pictographic}\uFE0F\u200D•\-–—|>]+/gu, "")
-      .trim();
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i];
+    const lab = parseBaseSectionLabel(rawLine);
+    if (lab) section = lab;
+
+    const line = stripLead(rawLine);
     if (!line) continue;
 
-    let m = line.match(
-      /^(?:cc(?:\s*(?:troops|comp(?:osition)?))?|clan\s*castle)\s*(?:[:\-–—=：]\s*|\s+)(.+)$/i
-    );
+    // 1. Standard prefixes: "CC:", "CC Composition:", "Clan Castle -", "CC 2 IG..."
+    let m = line.match(/^(?:cc(?:\s*(?:troops|comp(?:osition)?))?|clan\s*castle)\s*(?:[:\-–—=：]\s*|\s+)(.+)$/i);
 
-    if (!m && /^🏰/.test(rawLine.trim())) {
-      m = [null, line];
-    }
+    // 2. Castle emoji shorthand without "CC" text
+    if (!m && /^🏰/.test(rawLine.trim())) m = [null, line];
 
+    // 3. Inline parenthetical CC (e.g., "Layout Link :- (2 Ice 1 Lava)")
     if (!m) {
       const paren = line.match(/\(([^()]{3,60})\)/);
-      if (paren && /\b(?:ig|ice|furnace|witch|witches|hh|head\s*hunter|hound|lava|gob|goblin|arch|archer|loon|balloon|dragon|super|valk|minion|titan|yeti|druid)\b/i.test(paren[1])) {
+      if (paren && /\b(?:ig|ice|furnace|witch|witches|hh|head\s*hunter|headhunter|hound|lava|gob|goblin|arch|archer|loon|balloon|dragon|super|valk|minion|titan|yeti|druid)\b/i.test(paren[1])) {
         m = [null, paren[1]];
       }
     }
+    if (!m || !m[1]) continue;
 
-    if (m && m[1]) {
-      const cleaned = m[1]
-        .replace(/https?:\/\/\S+/gi, "")
-        .replace(/[\p{Extended_Pictographic}\uFE0F\u200D]/gu, "")
-        .replace(/^[:\-–—=：\s]+|[:\-–—=：\s]+$/g, "")
-        .replace(/\s+/g, " ")
-        .trim();
+    let combined = m[1];
+    // Continuation lines of the same CC list ("1x Witch, 3x Archer")
+    for (let k = 1; k <= 2 && i + k < lines.length; k++) {
+      const nxt = stripLead(lines[i + k]);
+      if (!nxt || /https?:/i.test(nxt) || parseBaseSectionLabel(nxt)) break;
+      if (!/^\d+\s*[xX×]\s*[A-Za-z]/.test(nxt)) break;
+      combined += ", " + nxt;
+      i += 1;
+    }
 
-      if (cleaned && cleaned.length <= 80 && !/^link\b/i.test(cleaned)) {
-        return cleaned;
-      }
+    const cleaned = cleanCcText(combined);
+    // Reject false positives like "CC link below"
+    if (cleaned && cleaned.length <= 120 && !/^link\b/i.test(cleaned)) {
+      blocks.push({ label: section, cc: cleaned });
     }
   }
-  return "";
+
+  if (blocks.length === 0) return "";
+  const uniq = [];
+  blocks.forEach(b => { if (!uniq.some(u => u.cc.toLowerCase() === b.cc.toLowerCase())) uniq.push(b); });
+  if (uniq.length === 1) return uniq[0].cc;
+  return uniq.map(b => (b.label ? b.label + ": " : "") + b.cc).join(" | ");
 }
 
 function extractArchetypeTags(text) {
@@ -3213,10 +3251,55 @@ async function compressImageToDataUrl(file) {
   return imageRegionToJpegDataUrl(img, 0, 0, img.width, img.height);
 }
 
+/* Looks for a dark vertical gap (>85% of a column matches the chat background) between 42% and 58% of the
+   cropped box's width. Works at native resolution (capped at 1600px wide) so thin gaps are not smoothed away.
+   Returns { leftW, rightX } in source-pixel units relative to the box, or null. */
+function findSideBySideSplit(img, sx, sy, sw, sh, isBgAtScaled) {
+  const k = Math.min(1, 1600 / sw);
+  const w = Math.max(1, Math.round(sw * k));
+  const h = Math.max(1, Math.round(sh * k));
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const ctx = c.getContext("2d", { willReadFrequently: true });
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+  const px = ctx.getImageData(0, 0, w, h).data;
+
+  const darkEnough = (i) => {
+    const r = px[i], g = px[i + 1], b = px[i + 2];
+    const mx = Math.max(r, g, b);
+    return mx <= 0x22 || (mx <= 0x3c && mx - Math.min(r, g, b) <= 16); // #000–#222, plus Discord's #313338 family
+  };
+  const isDividerCol = (x) => {
+    let dark = 0;
+    for (let y = 0; y < h; y++) if (darkEnough((y * w + x) * 4)) dark++;
+    return dark / h > 0.85;
+  };
+
+  const lo = Math.floor(w * 0.42), hi = Math.ceil(w * 0.58);
+  let best = null, runStart = -1;
+  for (let x = lo; x <= hi + 1; x++) {
+    const d = x <= hi && isDividerCol(x);
+    if (d && runStart < 0) runStart = x;
+    if (!d && runStart >= 0) {
+      const run = { a: runStart, b: x - 1 };
+      const center = Math.abs((run.a + run.b) / 2 - w / 2);
+      if (!best || center < best.center) best = Object.assign(run, { center });
+      runStart = -1;
+    }
+  }
+  if (!best) return null;
+  const gapW = best.b - best.a + 1;
+  if (gapW > w * 0.12 || best.a < w * 0.2 || (w - best.b) < w * 0.2) return null;
+  return { leftW: Math.round(best.a / k), rightX: Math.round((best.b + 1) / k) };
+}
+
 /* Finds the colorful game viewport inside a Discord screenshot (dark chat background) and crops to it.
    Returns { dataUrl, cropped } and falls back to the full image when no distinct inner bounds exist. */
 function autoCropDiscordBaseImage(img) {
-  const fullResult = () => ({ dataUrl: imageRegionToJpegDataUrl(img, 0, 0, img.width, img.height), cropped: false });
+  const fullResult = () => {
+    const u = imageRegionToJpegDataUrl(img, 0, 0, img.width, img.height);
+    return { dataUrl: u, dataUrls: [u], cropped: false, split: false };
+  };
   try {
     const scale = Math.min(1, 700 / Math.max(img.width, img.height));
     const w = Math.max(1, Math.round(img.width * scale));
@@ -3289,7 +3372,24 @@ function autoCropDiscordBaseImage(img) {
     const sx = Math.round(left / scale), sy = Math.round(top / scale);
     const sw = Math.min(img.width - sx, Math.round((right - left + 1) / scale));
     const sh = Math.min(img.height - sy, Math.round((bottom - top + 1) / scale));
-    return { dataUrl: imageRegionToJpegDataUrl(img, sx, sy, sw, sh), cropped: true };
+    const whole = imageRegionToJpegDataUrl(img, sx, sy, sw, sh);
+
+    // Side-by-side multi-base screenshot: look for a dark vertical divider near the horizontal center
+    if (sw / sh > 1.8) {
+      const split = findSideBySideSplit(img, sx, sy, sw, sh, isBg);
+      if (split) {
+        return {
+          dataUrl: whole,
+          dataUrls: [
+            imageRegionToJpegDataUrl(img, sx, sy, split.leftW, sh),
+            imageRegionToJpegDataUrl(img, sx + split.rightX, sy, sw - split.rightX, sh)
+          ],
+          cropped: true,
+          split: true
+        };
+      }
+    }
+    return { dataUrl: whole, dataUrls: [whole], cropped: true, split: false };
   } catch (_) {
     return fullResult();
   }
@@ -3329,9 +3429,10 @@ function formatDiscordStatus(msg, isErr) {
   el.style.color = isErr ? "var(--red)" : "var(--text-muted)";
 }
 
-function currentDiscordImageDataUrl() {
+function currentDiscordImages() {
   const d = state.discord;
-  return d.useFull || !d.cropped ? d.origDataUrl : d.croppedDataUrl;
+  if (!d.origDataUrl) return [];
+  return (d.useFull || !d.cropped || d.croppedDataUrls.length === 0) ? [d.origDataUrl] : d.croppedDataUrls;
 }
 
 function refreshDiscordPreview() {
@@ -3343,10 +3444,15 @@ function refreshDiscordPreview() {
   document.getElementById("discordUseFull").checked = d.useFull;
   document.getElementById("discordUseFull").disabled = !d.cropped;
   if (has) {
-    document.getElementById("discordImagePreview").src = currentDiscordImageDataUrl();
+    const imgs = currentDiscordImages();
+    document.getElementById("discordImagePreviewRow").innerHTML = imgs.map((u, i) =>
+      `<img src="${escHtml(u)}" alt="Base image ${i + 1}" style="max-height:180px;max-width:${imgs.length > 1 ? "48%" : "100%"};border-radius:8px;object-fit:contain;" />`
+    ).join("");
     document.getElementById("discordCropStatus").textContent = !d.cropped
       ? "No distinct base bounds detected — using the full screenshot."
-      : (d.useFull ? "Using the full uncropped screenshot." : "✂️ Auto-cropped to the base image.");
+      : (d.useFull
+          ? "Using the full uncropped screenshot."
+          : (imgs.length > 1 ? `✂️ Split into ${imgs.length} base images (swipeable carousel card).` : "✂️ Auto-cropped to the base image."));
   }
 }
 
@@ -3357,7 +3463,7 @@ function toggleDiscordUseFull(on) {
 
 function clearDiscordImage(e) {
   if (e) e.stopPropagation();
-  state.discord = { origDataUrl: "", croppedDataUrl: "", cropped: false, useFull: false, parsed: null, busy: false, seq: state.discord.seq + 1 };
+  state.discord = { origDataUrl: "", croppedDataUrls: [], cropped: false, split: false, useFull: false, parsed: null, busy: false, seq: state.discord.seq + 1 };
   document.getElementById("discordFileInput").value = "";
   refreshDiscordPreview();
   formatDiscordStatus("");
@@ -3370,7 +3476,16 @@ function fillDiscordReview(parsed) {
   document.getElementById("discordPostDate").value = toDatetimeLocalValue(Number(p.postTimestamp) || Date.now());
   document.getElementById("discordTh").value = p.thLevel || "TH19";
   document.getElementById("discordCc").value = p.ccTroops || "";
-  document.getElementById("discordLinks").value = (p.baseLinks || []).map(l => (typeof l === "string" ? l : l.url)).join("\n");
+  state.discord.linkLabels = {};
+  document.getElementById("discordLinks").value = (p.baseLinks || []).map(l => {
+    if (typeof l === "string") return l;
+    const generic = !l.label || /^Base #\d+$/i.test(l.label);
+    if (!generic) {
+      state.discord.linkLabels[l.canonicalId || extractCanonicalLayoutId(l.url)] = l.label;
+      return `${l.label}: ${l.url}`;
+    }
+    return l.url;
+  }).join("\n");
   document.getElementById("discordTags").value = (p.tags && p.tags.length ? p.tags : ["Discord"]).join(", ");
   document.getElementById("discordNotes").value = p.notes || "";
   document.getElementById("discordRawText").textContent = p.rawOcrText || "";
@@ -3410,8 +3525,9 @@ async function attachDiscordImageFile(file) {
     const full = imageRegionToJpegDataUrl(img, 0, 0, img.width, img.height);
     const crop = autoCropDiscordBaseImage(img);
     state.discord.origDataUrl = full;
-    state.discord.croppedDataUrl = crop.dataUrl;
+    state.discord.croppedDataUrls = crop.dataUrls || [crop.dataUrl];
     state.discord.cropped = crop.cropped;
+    state.discord.split = Boolean(crop.split);
     state.discord.useFull = false;
     refreshDiscordPreview();
     requestDiscordParse({ imageDataUrl: full }, seq);
@@ -3432,14 +3548,19 @@ async function handleDiscordFormSubmit(e) {
   const found = extractClashBaseLinks(rawLinks);
   const urls = found.length > 0 ? found : rawLinks.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   if (urls.length === 0) { showToast("Enter at least one Clash of Clans base link."); return; }
-  const image = currentDiscordImageDataUrl();
-  if (!image) { showToast("Attach or paste a screenshot first."); return; }
+  const images = currentDiscordImages();
+  if (images.length === 0) { showToast("Attach or paste a screenshot first."); return; }
 
   const btn = document.getElementById("btnDiscordSaveSubmit");
   btn.disabled = true;
   btn.textContent = "Uploading to Drive...";
   try {
-    const baseLinks = extractLinkObjectsFromText(rawLinks, urls);
+    // Labels typed/parsed as "Base I: <url>" are kept; only unlabeled links stay generic ("Base #n")
+    const savedLabels = state.discord.linkLabels || {};
+    const baseLinks = extractLinkObjectsFromText(rawLinks, urls).map(l => {
+      const generic = /^Base #\d+$/i.test(l.label);
+      return generic && savedLabels[l.canonicalId] ? { ...l, label: savedLabels[l.canonicalId] } : l;
+    });
     const primary = baseLinks[0];
     const notes = document.getElementById("discordNotes").value.trim();
     const thLevel = document.getElementById("discordTh").value.trim().toUpperCase() || extractTownHallFromLinkOrText(primary.url, notes);
@@ -3456,8 +3577,8 @@ async function handleDiscordFormSubmit(e) {
       baseLink: primary.url,
       canonicalId: primary.canonicalId,
       baseLinks,
-      imageUrl: image,
-      images: [image],
+      imageUrl: images[0],
+      images: images,
       creatorHandle,
       postUrl: "",
       postTimestamp: Number.isNaN(ts) ? Date.now() : ts,
