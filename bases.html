@@ -1169,6 +1169,19 @@
       cursor: pointer;
       user-select: none;
     }
+    .role-pill-row { display:flex; gap:6px; flex-wrap:wrap; }
+    .role-pill {
+      flex:1 1 0; min-width:96px; padding:8px 9px; border-radius:11px; border:1px solid var(--border);
+      background:var(--bg-input); color:var(--text-muted); font-size:12px; font-weight:800; cursor:pointer;
+      text-align:center; line-height:1.25; font-family:inherit;
+    }
+    .role-pill small { display:block; font-size:10px; font-weight:600; opacity:.85; }
+    .role-pill.on { border-color:var(--green); background:var(--green-bg); color:var(--green); }
+    .role-pill.fixed { cursor:default; border-color:var(--accent); background:var(--accent-bg); color:var(--accent); }
+    .slot-badge { font-variant-numeric:tabular-nums; }
+    .slot-badge.full { background:var(--red-bg); color:var(--red); }
+    .roster-pick-row.slots-full { opacity:.55; cursor:not-allowed; }
+    .role-tag { font-size:11px; margin-right:2px; }
     .roster-pick-row.checked {
       border-color: var(--green);
       background: var(--green-bg);
@@ -1511,6 +1524,9 @@
         ⏱️ <strong>Ranked Lock-In:</strong> Bases equipped <strong>Thu 11 PM – Sun 11 PM CST</strong> automatically begin tracking defenses after Sunday's 11 PM CST reset.
       </div>
 
+      <div class="role-pill-row" id="equipRolePills"></div>
+      <div id="equipRoleHint" style="font-size:11px;color:var(--text-muted);margin-top:-2px;"></div>
+
       <input type="search" id="equipRosterSearch" class="search-input" style="flex:none;width:100%;" placeholder="Filter clanmates by name or #tag..." />
 
       <div id="equipRosterList" class="roster-pick-list"></div>
@@ -1815,6 +1831,8 @@ const state = {
   launchSelectedLinkUrl: "",
   launchSelectedLinkLabel: "",
   equipSelectedTags: new Set(),
+  equipRoles: { ranked: true, war: false },
+  playerSlotCounts: {},
   equipRosterFilter: "",
   preselectAssignTag: "",
   pendingDeepLink: null, // { baseId, action } from ?baseId=...&action=equip
@@ -2074,6 +2092,7 @@ function loadLocalPreferences() {
         if (Array.isArray(cached.roster)) state.roster = cached.roster;
         if (Array.isArray(cached.defenseKillers)) state.defenseKillers = cached.defenseKillers;
         if (Array.isArray(cached.topBuilders)) state.topBuilders = cached.topBuilders;
+        if (cached.playerSlotCounts && typeof cached.playerSlotCounts === "object") state.playerSlotCounts = cached.playerSlotCounts;
       }
     }
   } catch (_) {}
@@ -2087,7 +2106,8 @@ function saveLocalCache() {
       bases: state.bases,
       roster: state.roster,
       defenseKillers: state.defenseKillers,
-      topBuilders: state.topBuilders
+      topBuilders: state.topBuilders,
+      playerSlotCounts: state.playerSlotCounts
     }));
   } catch (_) {}
 }
@@ -2145,6 +2165,7 @@ async function loadVaultAndRosterFromBackend(showSuccessToast = false) {
       state.bases = data.bases.map(normalizeBaseRecord);
       state.defenseKillers = Array.isArray(data.defenseKillers) ? data.defenseKillers : [];
       state.topBuilders = Array.isArray(data.topBuilders) ? data.topBuilders : [];
+      state.playerSlotCounts = (data.playerSlotCounts && typeof data.playerSlotCounts === "object") ? data.playerSlotCounts : {};
     } else {
       const bRes = await fetch(`${getWebAppUrl()}?action=getBases`);
       if (bRes.ok) {
@@ -2152,6 +2173,7 @@ async function loadVaultAndRosterFromBackend(showSuccessToast = false) {
         state.bases = Array.isArray(bData.bases) ? bData.bases.map(normalizeBaseRecord) : [];
         state.defenseKillers = Array.isArray(bData.defenseKillers) ? bData.defenseKillers : [];
         state.topBuilders = Array.isArray(bData.topBuilders) ? bData.topBuilders : [];
+        state.playerSlotCounts = (bData.playerSlotCounts && typeof bData.playerSlotCounts === "object") ? bData.playerSlotCounts : {};
       }
     }
 
@@ -2364,6 +2386,7 @@ async function selectLinkAndGoToStep2(linkObj) {
 
   // Pre-select pinned My Accounts
   state.equipSelectedTags = new Set(state.myAccounts);
+  state.equipRoles = { ranked: true, war: false };
   if (state.roster.length === 0) {
     document.getElementById("equipRosterList").innerHTML =
       `<div style="text-align:center;padding:18px;font-size:12px;color:var(--text-muted);">Loading active clan roster...</div>`;
@@ -2381,7 +2404,68 @@ async function selectLinkAndGoToStep2(linkObj) {
   renderEquipRosterList();
 }
 
+const SLOT_CAP = 6;
+
+function getHeldClaimsForTag(tag) {
+  const out = [];
+  state.bases.forEach(b => {
+    const ds = normalizeDefenseStats(b.defenseStats);
+    (ds.activePlayers || []).forEach(p => {
+      if (p.tag === tag) out.push({ baseId: b.id, linkId: p.linkId || "", roles: Array.isArray(p.roles) && p.roles.length ? p.roles : ["ranked"] });
+    });
+  });
+  return out;
+}
+
+function getSlotCountForTag(tag) {
+  if (state.playerSlotCounts && state.playerSlotCounts[tag] !== undefined) return Number(state.playerSlotCounts[tag]) || 0;
+  const seen = new Set();
+  getHeldClaimsForTag(tag).forEach(c => seen.add(c.baseId + "|" + c.linkId));
+  return seen.size;
+}
+
+function holdsCurrentLaunchBase(tag) {
+  const linkId = state.launchSelectedLinkId || "";
+  return getHeldClaimsForTag(tag).some(c => c.baseId === state.launchBaseId && (!c.linkId || !linkId || c.linkId === linkId));
+}
+
+function isTagSlotBlocked(tag) {
+  return getSlotCountForTag(tag) >= SLOT_CAP && !holdsCurrentLaunchBase(tag);
+}
+
+function getEquipRoleList() {
+  const roles = [];
+  if (state.equipRoles.ranked) roles.push("ranked");
+  if (state.equipRoles.war) roles.push("war");
+  if (roles.length === 0) roles.push("fc");
+  return roles;
+}
+
+function toggleEquipRole(role) {
+  if (role !== "ranked" && role !== "war") return;
+  state.equipRoles[role] = !state.equipRoles[role];
+  renderEquipRosterList();
+}
+
+function renderEquipRolePills() {
+  const el = document.getElementById("equipRolePills");
+  const hint = document.getElementById("equipRoleHint");
+  if (!el) return;
+  const r = state.equipRoles;
+  el.innerHTML = `
+    <button type="button" class="role-pill ${r.ranked ? "on" : ""}" onclick="toggleEquipRole('ranked')">🏆 Ranked<small>Tracks defenses · 1 per account</small></button>
+    <button type="button" class="role-pill ${r.war ? "on" : ""}" onclick="toggleEquipRole('war')">⚔️ War / CWL<small>1 per account</small></button>
+    <div class="role-pill fixed">🛡️ FC Library<small>Always saved · up to ${SLOT_CAP} bases</small></div>
+  `;
+  if (hint) {
+    hint.textContent = (r.ranked || r.war)
+      ? (r.ranked && r.war ? "Ranked + War on one layout uses just 1 of the account's 6 slots." : (r.ranked ? "Replaces the account's current Ranked base (switches at Sunday 11 PM CST lock-in)." : "Replaces the account's current War / CWL base immediately."))
+      : "Neither selected: saved as a Friendly Challenge slot only (no defense tracking).";
+  }
+}
+
 function renderEquipRosterList() {
+  renderEquipRolePills();
   const container = document.getElementById("equipRosterList");
   const q = state.equipRosterFilter.trim().toLowerCase();
   const mySet = new Set(state.myAccounts);
@@ -2403,12 +2487,18 @@ function renderEquipRosterList() {
   const pinned = filtered.filter(p => mySet.has(p.tag) && p !== target);
   const others = filtered.filter(p => !mySet.has(p.tag) && p !== target);
 
+  // Accounts at 6/6 (without this base already) can't be selected
+  state.roster.forEach(p => { if (isTagSlotBlocked(p.tag)) state.equipSelectedTags.delete(p.tag); });
+
   const renderRow = (p, isPinned) => {
-    const checked = state.equipSelectedTags.has(p.tag);
+    const blocked = isTagSlotBlocked(p.tag);
+    const checked = !blocked && state.equipSelectedTags.has(p.tag);
+    const slots = getSlotCountForTag(p.tag);
+    const holds = holdsCurrentLaunchBase(p.tag);
     return `
-      <label class="roster-pick-row ${checked ? "checked" : ""}">
+      <label class="roster-pick-row ${checked ? "checked" : ""} ${blocked ? "slots-full" : ""}" ${blocked ? 'title="6/6 slots filled. Unassign an FC base first."' : ""}>
         <div class="roster-pick-left">
-          <input type="checkbox" ${checked ? "checked" : ""} onchange="toggleEquipTag('${escHtml(p.tag)}', this.checked)" />
+          <input type="checkbox" ${checked ? "checked" : ""} ${blocked ? "disabled" : ""} onchange="toggleEquipTag('${escHtml(p.tag)}', this.checked)" />
           <div style="min-width:0;">
             <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
               <span>${escHtml(p.name)}</span>
@@ -2417,7 +2507,11 @@ function renderEquipRosterList() {
             <div class="mono" style="font-size:10px;color:var(--text-muted);">${escHtml(p.tag)}</div>
           </div>
         </div>
-        <span class="mini-badge">TH${p.thLevel || "?"}</span>
+        <span style="display:flex;gap:4px;align-items:center;flex-shrink:0;">
+          ${holds ? `<span class="mini-badge in">HAS THIS</span>` : ""}
+          <span class="mini-badge slot-badge ${slots >= SLOT_CAP ? "full" : ""}">${slots}/${SLOT_CAP} slots</span>
+          <span class="mini-badge">TH${p.thLevel || "?"}</span>
+        </span>
       </label>
     `;
   };
@@ -2451,6 +2545,10 @@ function renderEquipRosterList() {
 
 function toggleEquipTag(tag, isChecked) {
   const clean = normalizeTag(tag);
+  if (isChecked && isTagSlotBlocked(clean)) {
+    showToast(`Account ${clean} already has 6/6 base slots filled. Unassign an FC base first.`);
+    return;
+  }
   if (isChecked) state.equipSelectedTags.add(clean);
   else state.equipSelectedTags.delete(clean);
   renderEquipRosterList();
@@ -2471,16 +2569,20 @@ function updateEquipButtonLabel() {
   const cnt = state.equipSelectedTags.size;
   const btn = document.getElementById("btnConfirmEquipLaunch");
   btn.disabled = cnt === 0;
-  btn.textContent = cnt > 0
-    ? `Equip (${cnt}) & Open in Clash of Clans`
-    : "Select Account(s) to Equip";
+  const roles = getEquipRoleList();
+  let label;
+  if (roles.indexOf("fc") !== -1) label = "Save to 6-Slot Library & Open";
+  else if (roles.length === 2) label = "Equip (Ranked + War) & Open";
+  else label = roles[0] === "ranked" ? "Equip (Ranked) & Open" : "Equip (War / CWL) & Open";
+  btn.textContent = cnt > 0 ? `${label} · ${cnt}` : "Select Account(s) to Equip";
 }
 
 async function handleEquipAndLaunch() {
   const base = state.bases.find(b => b.id === state.launchBaseId);
   if (!base) return;
 
-  const selectedTags = Array.from(state.equipSelectedTags);
+  const selectedTags = Array.from(state.equipSelectedTags).filter(t => !isTagSlotBlocked(t));
+  const roles = getEquipRoleList();
   if (selectedTags.length === 0) {
     showToast('Select at least 1 account or tap "Open Link Without Tagging".');
     return;
@@ -2504,17 +2606,21 @@ async function handleEquipAndLaunch() {
         baseId: base.id,
         linkId: state.launchSelectedLinkId,
         baseLink: targetUrl,
-        playerTags: selectedTags
+        playerTags: selectedTags,
+        roles: roles
       }, true),
       updateBaseOnBackend(base.id, null, { incrementCopies: true }, true).catch(() => null)
     ]);
 
     const isScheduled = Boolean(assignRes && assignRes.isScheduled);
-    showToast(
-      isScheduled
-        ? `Equipped ${state.launchSelectedLinkLabel} for ${selectedTags.length} acct(s) — active Sun 11 PM CST!`
-        : `Equipped ${state.launchSelectedLinkLabel} for ${selectedTags.length} acct(s) — tracking defenses!`
-    );
+    const full = (assignRes && Array.isArray(assignRes.fullTags)) ? assignRes.fullTags : [];
+    const hasRanked = roles.indexOf("ranked") !== -1;
+    let msg;
+    if (!hasRanked) msg = `Saved ${state.launchSelectedLinkLabel} to ${selectedTags.length} acct(s) — ${roles.indexOf("war") !== -1 ? "War / CWL" : "FC Library"}.`;
+    else if (isScheduled) msg = `Equipped ${state.launchSelectedLinkLabel} for ${selectedTags.length} acct(s) — Ranked active Sun 11 PM CST!`;
+    else msg = `Equipped ${state.launchSelectedLinkLabel} for ${selectedTags.length} acct(s) — tracking defenses!`;
+    if (full.length > 0) msg += ` ${full.join(", ")} had 6/6 slots — skipped.`;
+    showToast(msg);
     await loadVaultAndRosterFromBackend(false);
   } catch (err) {
     showToast("Opened base, but assignment sync failed: " + err.message);
@@ -3292,9 +3398,12 @@ function buildDefenseStripHtml(base) {
         <div class="runner-chips">
           ${players.map(p => {
             const sched = isPlayerScheduled(p);
+            const rl = Array.isArray(p.roles) && p.roles.length ? p.roles : ["ranked"];
+            const roleIcons = (rl.indexOf("ranked") !== -1 ? "🏆" : "") + (rl.indexOf("war") !== -1 ? "⚔️" : "") + (rl.indexOf("fc") !== -1 || rl.length === 0 ? "🛡️" : "");
+            const roleTitle = rl.map(r => r === "ranked" ? "Ranked" : (r === "war" ? "War / CWL" : "FC Library")).join(" + ");
             return `
-              <span class="runner-chip ${sched ? "sched" : ""}">
-                <span>${sched ? "⏳ " : ""}${escHtml(p.name)}</span>
+              <span class="runner-chip ${sched ? "sched" : ""}" title="${escHtml(roleTitle)}">
+                <span>${sched ? "⏳ " : ""}<span class="role-tag">${roleIcons}</span>${escHtml(p.name)}</span>
                 <button type="button" class="runner-x" title="Unassign" onclick="confirmUnassign('${escHtml(base.id)}','${escHtml(p.tag)}','${escHtml(p.name)}','${escHtml(p.linkId || "")}')">×</button>
               </span>
             `;
@@ -3686,7 +3795,7 @@ async function copyCc(ccText) {
 }
 
 function confirmUnassign(baseId, tag, name, linkId) {
-  openConfirmModal("Unassign Account?", `Stop tracking live defenses for ${name} (${tag}) on this base?`, "Unassign", () => {
+  openConfirmModal("Unassign Account?", `Remove this base from ${name}'s (${tag}) 6-slot library (all roles: Ranked, War, FC)?`, "Unassign", () => {
     unassignPlayerFromBase(baseId, tag, name, linkId);
   });
 }
