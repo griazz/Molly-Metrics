@@ -2040,7 +2040,7 @@ const state = {
   manualImageDataUrl: "",
   addMode: "x",
   discord: { origDataUrl: "", croppedDataUrls: [], cropped: false, split: false, useFull: false, parsed: null, busy: false, seq: 0 },
-  youtube: { parsed: null, frames: [], selected: 0, customDataUrl: "", busy: false, seq: 0 },
+  youtube: { parsed: null, frames: [], selected: 0, customDataUrl: "", likes: 0, busy: false, seq: 0 },
   lightboxBaseId: null,
   lightboxImageIndex: 0,
   lightboxZoomed: false,
@@ -3855,6 +3855,7 @@ function fillYoutubeReview(parsed) {
   }));
   const pref = y.frames.findIndex(f => /Frame 1/i.test(f.label));
   y.selected = pref > -1 ? pref : 0;
+  y.likes = Number(p.likes) || 0;
 
   document.getElementById("ytReviewCard").style.display = "flex";
   document.getElementById("ytCreator").value = p.creatorHandle || "";
@@ -3912,7 +3913,7 @@ async function fetchYoutubeVideo() {
 }
 
 function resetYoutubeForm() {
-  state.youtube = { parsed: null, frames: [], selected: 0, customDataUrl: "", busy: false, seq: state.youtube.seq + 1 };
+  state.youtube = { parsed: null, frames: [], selected: 0, customDataUrl: "", likes: 0, busy: false, seq: state.youtube.seq + 1 };
   document.getElementById("youtubeImportForm").reset();
   document.getElementById("ytReviewCard").style.display = "none";
   document.getElementById("ytFrameGrid").innerHTML = "";
@@ -3961,7 +3962,7 @@ async function saveYoutubeBase() {
       creatorHandle,
       postUrl: `https://www.youtube.com/watch?v=${videoId}`,
       postTimestamp: Number.isNaN(ts) ? Date.now() : ts,
-      likes: 0,
+      likes: state.youtube.likes,
       ccTroops: document.getElementById("ytCc").value.trim(),
       tags,
       notes: notes.slice(0, 140),
@@ -4382,7 +4383,7 @@ function renderGallery() {
                 return `<span class="mini-badge${badgeCls}">${escHtml(t)}</span>`;
               }).join("")}
             </div>
-            <span class="mini-badge def" title="X Likes">❤️ ${formatCompactNum(base.likes)}</span>
+            <span class="mini-badge def" title="Likes">❤️ ${formatCompactNum(base.likes)}</span>
           </div>
 
           ${base.notes ? `<div style="font-size:11px;color:var(--text-sec);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${escHtml(base.notes)}</div>` : ""}
