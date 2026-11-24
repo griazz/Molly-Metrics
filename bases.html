@@ -3749,9 +3749,15 @@ async function handleDiscordFormSubmit(e) {
     closeModal("addBaseModal");
     renderAll();
 
-    if (res.action === "blocked" || res.action === "replaced_with_earlier") {
+    if (res.action === "blocked" || res.action === "replaced_with_earlier" || res.action === "partial_skipped") {
       showDuplicateBanner(res);
-      showToast(res.action === "blocked" ? "Duplicate base link blocked." : "Earlier post replaced newer duplicate.");
+      showToast(
+        res.action === "blocked"
+          ? "Duplicate base link blocked."
+          : res.action === "partial_skipped"
+            ? `Saved new base(s) and skipped ${res.skipped.length} duplicate.`
+            : "Earlier post replaced newer duplicate."
+      );
     } else {
       showToast(`Saved ${thLevel} base to Google Sheets & Drive!`);
     }
