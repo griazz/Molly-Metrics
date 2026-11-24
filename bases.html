@@ -1220,42 +1220,53 @@
     }
 
     /* Dropzone for Manual Screenshot */
-    .yt-frame-grid {
+    .yt-slot-grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 8px;
     }
-    .yt-frame {
-      position: relative;
-      padding: 0;
+    .yt-slot {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 8px;
       border: 2px solid var(--border);
       border-radius: 10px;
       background: var(--bg-input);
-      color: var(--text);
-      font-family: inherit;
-      cursor: pointer;
-      overflow: hidden;
-      text-align: left;
+      min-width: 0;
     }
-    .yt-frame.selected { border-color: var(--accent); }
-    .yt-frame.failed { opacity: 0.4; cursor: not-allowed; }
-    .yt-frame-img {
-      display: block;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      object-fit: cover;
-      background: var(--bg-input);
-    }
-    .yt-frame-label {
+    .yt-slot.active { border-color: var(--accent); }
+    .yt-slot.drag-over { border-style: dashed; }
+    .yt-slot-head {
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 6px;
-      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .yt-slot-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+    .yt-slot-badge { color: var(--accent); font-size: 10px; flex-shrink: 0; }
+    .yt-slot-empty {
+      border: 2px dashed var(--border-strong);
+      border-radius: 8px;
+      padding: 14px 6px;
+      text-align: center;
       font-size: 11px;
       font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
     }
-    .yt-frame.selected .yt-frame-label { color: var(--accent); }
+    .yt-slot-img {
+      display: block;
+      width: 100%;
+      max-height: 150px;
+      object-fit: contain;
+      border-radius: 8px;
+      background: var(--bg-card);
+      cursor: pointer;
+    }
+    .yt-slot-actions { display: flex; gap: 6px; flex-wrap: wrap; }
     .drop-zone {
       border: 2px dashed var(--border-strong);
       border-radius: 12px;
@@ -1721,23 +1732,11 @@
           <div style="font-size:12px;font-weight:800;">Review &amp; Confirm</div>
 
           <div>
-            <label class="field-label">Base Image — pick the frame that shows the base</label>
-            <div id="ytFrameGrid" class="yt-frame-grid"></div>
-          </div>
-
-          <div>
-            <label class="field-label">Optional HD Screenshot Override (Ctrl+V, drop, or tap)</label>
-            <div id="ytDropZone" class="drop-zone" style="padding:10px;">
-              <input id="ytFileInput" type="file" accept="image/*" style="display:none;" />
-              <div id="ytDropPlaceholder">
-                <div style="font-size:12px;font-weight:700;">None of the frames clean? Paste a full-res screenshot</div>
-              </div>
-              <div id="ytPreviewWrap" style="display:none;">
-                <img id="ytImagePreview" src="" alt="Custom screenshot" />
-                <div style="margin-top:8px;">
-                  <button type="button" class="action-btn danger" onclick="clearYoutubeImage(event)">Remove Screenshot</button>
-                </div>
-              </div>
+            <label class="field-label">Base Screenshots — one per link (Ctrl+V fills the active slot, then moves on)</label>
+            <div id="ytSlotGrid" class="yt-slot-grid"></div>
+            <input id="ytFileInput" type="file" accept="image/*" style="display:none;" />
+            <div style="margin-top:8px;">
+              <button type="button" class="action-btn subtle" onclick="addYoutubeSlot()">+ Add Image Slot</button>
             </div>
           </div>
 
@@ -2040,7 +2039,7 @@ const state = {
   manualImageDataUrl: "",
   addMode: "x",
   discord: { origDataUrl: "", croppedDataUrls: [], cropped: false, split: false, useFull: false, parsed: null, busy: false, seq: 0 },
-  youtube: { parsed: null, frames: [], selected: 0, customDataUrl: "", likes: 0, busy: false, seq: 0 },
+  youtube: { parsed: null, slots: [], activeSlotIndex: 0, likes: 0, busy: false, seq: 0 },
   lightboxBaseId: null,
   lightboxImageIndex: 0,
   lightboxZoomed: false,
@@ -3756,105 +3755,123 @@ async function pasteFromClipboardToYoutube() {
   showToast("Tap and paste your YouTube URL.");
 }
 
-function youtubeFrameActiveUrl(f) {
-  return f.activeUrl || f.url;
+function youtubeCoverUrl(hd) {
+  const id = state.youtube.parsed && state.youtube.parsed.videoId;
+  return id ? `https://i.ytimg.com/vi/${id}/${hd ? "maxresdefault" : "hqdefault"}.jpg` : "";
 }
 
-function selectedYoutubeImage() {
-  const y = state.youtube;
-  if (y.customDataUrl) return y.customDataUrl;
-  const f = y.frames[y.selected];
-  return f && !f.failed ? youtubeFrameActiveUrl(f) : "";
+function ytLineLabel(line, n) {
+  const before = String(line || "").split(/https?:\/\//i)[0].replace(/[\s:\-–—•|>]+$/, "").trim();
+  return before && before.length <= 42 ? before : `Base #${n}`;
 }
 
-function renderYoutubeFrames() {
+function nextEmptyYoutubeSlot(from) {
+  const slots = state.youtube.slots;
+  for (let k = 1; k <= slots.length; k++) {
+    const i = (from + k) % slots.length;
+    if (!slots[i].imageDataUrl) return i;
+  }
+  return from;   // every slot is filled — stay put
+}
+
+function renderYoutubeSlots() {
   const y = state.youtube;
-  const grid = document.getElementById("ytFrameGrid");
-  grid.innerHTML = y.frames.map((f, i) => {
-    const sel = !y.customDataUrl && y.selected === i;
-    return `
-      <button type="button" class="yt-frame${sel ? " selected" : ""}${f.failed ? " failed" : ""}" data-idx="${i}" ${f.failed ? "disabled" : ""} aria-pressed="${sel}">
-        <img class="yt-frame-img" data-idx="${i}" style="${f.failed ? "visibility:hidden;" : ""}" src="${escHtml(youtubeFrameActiveUrl(f))}" alt="${escHtml(f.label)}" loading="lazy" referrerpolicy="no-referrer" />
-        <span class="yt-frame-label"><span>${escHtml(f.label)}</span>${f.failed ? "<span>Unavailable</span>" : (sel ? "<span>✓ Selected</span>" : "")}</span>
-      </button>`;
+  document.getElementById("ytSlotGrid").innerHTML = y.slots.map((sl, i) => {
+    const active = y.activeSlotIndex === i;
+    const body = sl.imageDataUrl
+      ? `<img class="yt-slot-img" data-act="replace" data-i="${i}" src="${escHtml(sl.imageDataUrl)}" alt="${escHtml(sl.label)}" referrerpolicy="no-referrer" />
+         <div class="yt-slot-actions">
+           <button type="button" class="action-btn" data-act="replace" data-i="${i}">Replace</button>
+           <button type="button" class="action-btn danger" data-act="remove" data-i="${i}">✕ Remove</button>
+         </div>`
+      : `<div class="yt-slot-empty" data-act="attach" data-i="${i}">Paste (Ctrl+V) or tap to attach</div>
+         <div class="yt-slot-actions">
+           <button type="button" class="action-btn subtle" data-act="cover" data-i="${i}">Use Cover Thumbnail</button>
+         </div>`;
+    return `<div class="yt-slot${active ? " active" : ""}" data-slot="${i}">
+      <div class="yt-slot-head"><span class="yt-slot-label">${escHtml(sl.label)}</span>${active ? '<span class="yt-slot-badge">● Active</span>' : ""}</div>
+      ${body}
+    </div>`;
   }).join("");
-
-  grid.querySelectorAll(".yt-frame").forEach(btn => {
-    btn.addEventListener("click", () => selectYoutubeFrame(Number(btn.dataset.idx)));
-  });
-  grid.querySelectorAll(".yt-frame-img").forEach(img => {
-    const idx = Number(img.dataset.idx);
-    img.addEventListener("error", () => onYoutubeFrameError(idx));
-    // YouTube serves a 120px grey placeholder (HTTP 200) for some missing thumbnails
-    img.addEventListener("load", () => { if (img.naturalWidth > 0 && img.naturalWidth <= 120) onYoutubeFrameError(idx); });
-  });
 }
 
-function onYoutubeFrameError(idx) {
-  const y = state.youtube;
-  const f = y.frames[idx];
-  if (!f || f.failed) return;
-  if (f.fallbackUrl && youtubeFrameActiveUrl(f) !== f.fallbackUrl) {
-    f.activeUrl = f.fallbackUrl;               // maxresdefault.jpg -> hqdefault.jpg
-  } else {
-    f.failed = true;
-    if (!y.customDataUrl && y.selected === idx) {
-      const next = y.frames.findIndex(x => !x.failed);
-      y.selected = next > -1 ? next : 0;
-    }
-  }
-  renderYoutubeFrames();
+function setActiveYoutubeSlot(i) {
+  state.youtube.activeSlotIndex = i;
+  renderYoutubeSlots();
 }
 
-function selectYoutubeFrame(idx) {
-  const y = state.youtube;
-  if (!y.frames[idx] || y.frames[idx].failed) return;
-  y.selected = idx;
-  if (y.customDataUrl) clearYoutubeImage();   // picking a frame replaces the screenshot override
-  else renderYoutubeFrames();
-}
-
-function refreshYoutubeOverride() {
-  const has = Boolean(state.youtube.customDataUrl);
-  document.getElementById("ytImagePreview").src = state.youtube.customDataUrl || "";
-  document.getElementById("ytDropPlaceholder").style.display = has ? "none" : "block";
-  document.getElementById("ytPreviewWrap").style.display = has ? "block" : "none";
-  document.getElementById("ytDropZone").style.borderColor = has ? "var(--accent)" : "";
-}
-
-async function attachYoutubeImageFile(file) {
-  if (!file || !file.type.startsWith("image/")) {
-    showToast("Please select a valid image file.");
-    return;
-  }
+async function setYoutubeSlotImage(i, file) {
+  if (!file || !file.type.startsWith("image/")) { showToast("Please select a valid image file."); return false; }
   try {
-    state.youtube.customDataUrl = await compressImageToDataUrl(file);
-    refreshYoutubeOverride();
-    renderYoutubeFrames();
-    showToast("Screenshot attached — it will be used instead of the video frames.");
+    const dataUrl = await compressImageToDataUrl(file);
+    const sl = state.youtube.slots[i];
+    if (!sl) return false;
+    sl.imageDataUrl = dataUrl;
+    renderYoutubeSlots();
+    return true;
   } catch (_) {
     showToast("Failed to process image.");
+    return false;
   }
 }
 
-function clearYoutubeImage(e) {
-  if (e) e.stopPropagation();
-  state.youtube.customDataUrl = "";
-  document.getElementById("ytFileInput").value = "";
-  refreshYoutubeOverride();
-  renderYoutubeFrames();
+// Ctrl+V / sequential fill: reserve the slot and advance synchronously so rapid pastes never collide
+async function pasteYoutubeImageFile(file) {
+  const y = state.youtube;
+  if (!y.parsed || y.slots.length === 0) { showToast("Fetch a video first, then paste your screenshots."); return; }
+  const i = Math.min(y.activeSlotIndex, y.slots.length - 1);
+  const label = y.slots[i].label;
+  y.activeSlotIndex = nextEmptyYoutubeSlot(i);   // advance now so a rapid second Ctrl+V targets the next slot
+  const ok = await setYoutubeSlotImage(i, file);
+  if (ok) showToast(`Attached to ${label}.`);
+}
+
+function addYoutubeSlot() {
+  const y = state.youtube;
+  if (!y.parsed) { showToast("Fetch a video first."); return; }
+  y.slots.push({ label: `Extra #${y.slots.filter(s => s.extra).length + 1}`, imageDataUrl: "", extra: true });
+  y.activeSlotIndex = y.slots.length - 1;
+  renderYoutubeSlots();
+}
+
+// Keep one auto slot per non-empty link line (min 1); images in surviving slots are preserved.
+// "+ Add Image Slot" extras are never auto-removed.
+function syncYoutubeSlotsToLinks() {
+  const y = state.youtube;
+  if (!y.parsed) return;
+  const lines = document.getElementById("ytLinks").value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const target = Math.max(1, lines.length);
+  let auto = y.slots.filter(s => !s.extra);
+  const extras = y.slots.filter(s => s.extra);
+  const activeSlot = y.slots[y.activeSlotIndex];
+
+  while (auto.length < target) auto.push({ label: "", imageDataUrl: "" });
+  while (auto.length > target) {
+    let k = -1;                                   // drop the last EMPTY auto slot; never discard a filled one
+    for (let j = auto.length - 1; j >= 0; j--) if (!auto[j].imageDataUrl) { k = j; break; }
+    if (k === -1) break;
+    auto.splice(k, 1);
+  }
+  auto.forEach((sl, j) => { sl.label = ytLineLabel(lines[j], j + 1); });
+
+  y.slots = auto.concat(extras);
+  const idx = y.slots.indexOf(activeSlot);
+  y.activeSlotIndex = idx > -1 ? idx : 0;
+  renderYoutubeSlots();
+}
+
+function youtubeSlotImages() {
+  return state.youtube.slots.map(s => s.imageDataUrl).filter(u => u && u !== "pending");
 }
 
 function fillYoutubeReview(parsed) {
   const p = parsed || {};
   const y = state.youtube;
   y.parsed = p;
-  y.customDataUrl = "";
-  y.frames = (Array.isArray(p.frames) ? p.frames : []).map(f => ({
-    label: f.label, url: f.url, fallbackUrl: f.fallbackUrl || "", activeUrl: f.url, failed: false
-  }));
-  const pref = y.frames.findIndex(f => /Frame 1/i.test(f.label));
-  y.selected = pref > -1 ? pref : 0;
+  const links = Array.isArray(p.baseLinks) ? p.baseLinks : [];
+  y.slots = links.map((l, i) => ({ label: (l && l.label) || `Base #${i + 1}`, imageDataUrl: "" }));
+  if (y.slots.length === 0) y.slots.push({ label: "Base #1", imageDataUrl: "" });
+  y.activeSlotIndex = 0;
   y.likes = Number(p.likes) || 0;
 
   document.getElementById("ytReviewCard").style.display = "flex";
@@ -3871,8 +3888,7 @@ function fillYoutubeReview(parsed) {
   if (!tags.some(t => String(t).toLowerCase() === "youtube")) tags.push("YouTube");
   document.getElementById("ytTags").value = tags.join(", ");
   document.getElementById("ytNotes").value = p.notes || "";
-  refreshYoutubeOverride();
-  renderYoutubeFrames();
+  renderYoutubeSlots();
 }
 
 async function fetchYoutubeVideo() {
@@ -3898,7 +3914,7 @@ async function fetchYoutubeVideo() {
     if (res.status !== "success" || !res.parsed) throw new Error(res.error || "Unexpected response.");
     fillYoutubeReview(res.parsed);
     const n = (res.parsed.baseLinks || []).length;
-    formatYoutubeStatus(n > 0 ? `Found ${n} Clash link${n === 1 ? "" : "s"}. Pick a frame and check the details below.` : "No Clash link found in the description — add one below before saving.", n === 0);
+    formatYoutubeStatus(n > 0 ? `Found ${n} Clash link${n === 1 ? "" : "s"}. Add a screenshot for each base, then check the details below.` : "No Clash link found in the description — add one below before saving.", n === 0);
   } catch (err) {
     if (seq !== y.seq) return;
     errBox.textContent = err.message || "Could not fetch that video.";
@@ -3913,12 +3929,11 @@ async function fetchYoutubeVideo() {
 }
 
 function resetYoutubeForm() {
-  state.youtube = { parsed: null, frames: [], selected: 0, customDataUrl: "", likes: 0, busy: false, seq: state.youtube.seq + 1 };
+  state.youtube = { parsed: null, slots: [], activeSlotIndex: 0, likes: 0, busy: false, seq: state.youtube.seq + 1 };
   document.getElementById("youtubeImportForm").reset();
   document.getElementById("ytReviewCard").style.display = "none";
-  document.getElementById("ytFrameGrid").innerHTML = "";
+  document.getElementById("ytSlotGrid").innerHTML = "";
   document.getElementById("ytImportError").classList.remove("open");
-  refreshYoutubeOverride();
   formatYoutubeStatus("");
 }
 
@@ -3932,8 +3947,8 @@ async function saveYoutubeBase() {
   const urls = found.length > 0 ? found : rawLinks.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   if (urls.length === 0) { showToast("Enter at least one Clash of Clans base link."); return; }
 
-  const image = selectedYoutubeImage();
-  if (!image) { showToast("Pick a frame or attach a screenshot first."); return; }
+  const images = youtubeSlotImages();
+  if (images.length === 0) { showToast("Attach at least one base screenshot (or use the cover thumbnail)."); return; }
 
   const btn = document.getElementById("btnYtSaveSubmit");
   btn.disabled = true;
@@ -3957,8 +3972,8 @@ async function saveYoutubeBase() {
       baseLink: primary.url,
       canonicalId: primary.canonicalId,
       baseLinks,
-      imageUrl: image,
-      images: [image],
+      imageUrl: images[0],
+      images: images,
       creatorHandle,
       postUrl: `https://www.youtube.com/watch?v=${videoId}`,
       postTimestamp: Number.isNaN(ts) ? Date.now() : ts,
@@ -4215,15 +4230,10 @@ function getFilteredAndSortedBases() {
     if (state.sortBy === "most_likes") return (b.likes || 0) - (a.likes || 0);
     if (state.sortBy === "newest_post") return (b.postTimestamp || 0) - (a.postTimestamp || 0);
     if (state.sortBy === "most_copied") return (b.copies || 0) - (a.copies || 0);
-
-    // Trending (log-scaled likes with slight X preference, no extra equip/Discord weight)
+    // Trending (time-weighted likes)
     const score = x => {
       const ageDays = Math.max(0.25, (Date.now() - (x.postTimestamp || x.createdAt || Date.now())) / 86400000);
-      const isYouTube = /(?:youtube\.com|youtu\.be)/i.test(x.postUrl || "") ||
-        (x.tags || []).some(t => String(t).toLowerCase() === "youtube");
-      const platformWeight = isYouTube ? 1.0 : 1.15;
-      const logLikes = (Math.log10((x.likes || 0) + 1) * 12 * platformWeight) + 1;
-      return logLikes / Math.pow(ageDays + 1.5, 0.65);
+      return ((x.likes || 0) + 1) / Math.pow(ageDays + 1.5, 0.65);
     };
     return score(b) - score(a);
   });
@@ -4834,30 +4844,50 @@ function bindStaticEvents() {
   document.getElementById("ytReviewCard").addEventListener("keydown", e => {
     if (e.key === "Enter" && e.target.tagName === "INPUT") e.preventDefault();
   });
-  const ydz = document.getElementById("ytDropZone");
+  const ygrid = document.getElementById("ytSlotGrid");
   const yfi = document.getElementById("ytFileInput");
-  ydz.addEventListener("click", e => { if (!e.target.closest("button")) yfi.click(); });
+  let ytPickIndex = 0;
+  ygrid.addEventListener("click", e => {
+    const el = e.target.closest("[data-act]");
+    const card = e.target.closest("[data-slot]");
+    if (!card) return;
+    const i = Number(card.dataset.slot);
+    const sl = state.youtube.slots[i];
+    if (!el) { setActiveYoutubeSlot(i); return; }
+    const act = el.dataset.act;
+    if (act === "attach" || act === "replace") { state.youtube.activeSlotIndex = i; ytPickIndex = i; renderYoutubeSlots(); yfi.click(); }
+    else if (act === "remove") { sl.imageDataUrl = ""; state.youtube.activeSlotIndex = i; renderYoutubeSlots(); }
+    else if (act === "cover") { sl.imageDataUrl = youtubeCoverUrl(true); state.youtube.activeSlotIndex = nextEmptyYoutubeSlot(i); renderYoutubeSlots(); }
+  });
   yfi.addEventListener("click", e => e.stopPropagation());
-  yfi.addEventListener("change", e => { if (e.target.files && e.target.files[0]) attachYoutubeImageFile(e.target.files[0]); });
-  ydz.addEventListener("dragover", e => { e.preventDefault(); ydz.classList.add("drag-over"); });
-  ydz.addEventListener("dragleave", () => ydz.classList.remove("drag-over"));
-  ydz.addEventListener("drop", e => {
-    e.preventDefault();
-    ydz.classList.remove("drag-over");
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) attachYoutubeImageFile(e.dataTransfer.files[0]);
+  yfi.addEventListener("change", e => {
+    const f = e.target.files && e.target.files[0];
+    if (f) {
+      const i = ytPickIndex;
+      state.youtube.activeSlotIndex = nextEmptyYoutubeSlot(i);
+      setYoutubeSlotImage(i, f);
+    }
+    yfi.value = "";
   });
-  const ddz = document.getElementById("discordDropZone");
-  const dfi = document.getElementById("discordFileInput");
-  ddz.addEventListener("click", e => { if (!e.target.closest("button")) dfi.click(); });
-  dfi.addEventListener("click", e => e.stopPropagation());
-  dfi.addEventListener("change", e => { if (e.target.files && e.target.files[0]) attachDiscordImageFile(e.target.files[0]); });
-  ddz.addEventListener("dragover", e => { e.preventDefault(); ddz.classList.add("drag-over"); });
-  ddz.addEventListener("dragleave", () => ddz.classList.remove("drag-over"));
-  ddz.addEventListener("drop", e => {
+  ygrid.addEventListener("dragover", e => { const c = e.target.closest("[data-slot]"); if (c) { e.preventDefault(); c.classList.add("drag-over"); } });
+  ygrid.addEventListener("dragleave", e => { const c = e.target.closest("[data-slot]"); if (c) c.classList.remove("drag-over"); });
+  ygrid.addEventListener("drop", e => {
+    const c = e.target.closest("[data-slot]");
+    if (!c) return;
     e.preventDefault();
-    ddz.classList.remove("drag-over");
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) attachDiscordImageFile(e.dataTransfer.files[0]);
+    c.classList.remove("drag-over");
+    const f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) { const i = Number(c.dataset.slot); state.youtube.activeSlotIndex = nextEmptyYoutubeSlot(i); setYoutubeSlotImage(i, f); }
   });
+  // Cover thumbnail fallback: maxresdefault.jpg -> hqdefault.jpg (also catches YouTube's 120px grey placeholder)
+  const ytCoverFallback = img => {
+    const sl = state.youtube.slots[Number(img.dataset.i)];
+    if (sl && /maxresdefault\.jpg$/.test(sl.imageDataUrl)) { sl.imageDataUrl = youtubeCoverUrl(false); renderYoutubeSlots(); }
+    else if (sl && /^https?:/.test(sl.imageDataUrl)) { sl.imageDataUrl = ""; renderYoutubeSlots(); showToast("Cover thumbnail unavailable."); }
+  };
+  ygrid.addEventListener("error", e => { if (e.target.classList && e.target.classList.contains("yt-slot-img")) ytCoverFallback(e.target); }, true);
+  ygrid.addEventListener("load", e => { const t = e.target; if (t.classList && t.classList.contains("yt-slot-img") && /^https?:/.test(t.src) && t.naturalWidth > 0 && t.naturalWidth <= 120) ytCoverFallback(t); }, true);
+  document.getElementById("ytLinks").addEventListener("input", syncYoutubeSlotsToLinks);
   document.getElementById("manualCaption").addEventListener("input", e => autoFillManualFromCaption(e.target.value));
 
   const dz = document.getElementById("manualDropZone");
@@ -4882,8 +4912,7 @@ function bindStaticEvents() {
         const f = item.getAsFile();
         if (state.addMode === "discord") { if (f) attachDiscordImageFile(f); return; }
         if (state.addMode === "youtube") {
-          if (f && state.youtube.parsed) attachYoutubeImageFile(f);
-          else showToast("Fetch a video first, then paste your screenshot.");
+          if (f) pasteYoutubeImageFile(f);
           return;
         }
         switchAddMode("manual");
