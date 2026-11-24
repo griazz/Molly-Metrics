@@ -2427,6 +2427,13 @@ async function saveBaseToBackend(candidateBase) {
           duplicateBase: displaced || candidateBase
         };
       }
+      if (Array.isArray(res.partialDuplicatesSkipped) && res.partialDuplicatesSkipped.length > 0) {
+        return {
+          action: "partial_skipped",
+          base: saved,
+          skipped: res.partialDuplicatesSkipped
+        };
+      }
       return { action: "inserted", base: saved };
     }
     throw new Error("Unexpected saveBase response.");
@@ -3275,6 +3282,26 @@ async function handleXImportSubmit(e) {
 function showDuplicateBanner(res) {
   const el = document.getElementById("duplicateBanner");
   if (!res) return;
+
+  if (res.action === "partial_skipped") {
+    const keptCount = (res.base && res.base.baseLinks) ? res.base.baseLinks.length : 1;
+    const skipList = (res.skipped || []).map(s => {
+      const who = s.existingCreator ? ` (already posted by ${s.existingCreator})` : "";
+      return `${s.label}${who}`;
+    }).join(", ");
+    el.className = "banner open success";
+    el.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+        <strong>Saved ${keptCount} New Base(s) — Skipped ${res.skipped.length} Duplicate</strong>
+        <button type="button" style="border:none;background:none;color:var(--text);font-weight:800;cursor:pointer;" onclick="this.closest('.banner').classList.remove('open')">✕</button>
+      </div>
+      <div style="font-size:12px;color:var(--text-sec);">
+        Omitted duplicate: <strong>${escHtml(skipList)}</strong>
+      </div>
+    `;
+    return;
+  }
+
   const isReplaced = res.action === "replaced_with_earlier";
   el.className = `banner open ${isReplaced ? "success" : ""}`;
   el.innerHTML = `
