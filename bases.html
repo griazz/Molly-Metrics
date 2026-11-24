@@ -4215,10 +4215,15 @@ function getFilteredAndSortedBases() {
     if (state.sortBy === "most_likes") return (b.likes || 0) - (a.likes || 0);
     if (state.sortBy === "newest_post") return (b.postTimestamp || 0) - (a.postTimestamp || 0);
     if (state.sortBy === "most_copied") return (b.copies || 0) - (a.copies || 0);
-    // Trending (time-weighted likes)
+
+    // Trending (log-scaled likes with slight X preference, no extra equip/Discord weight)
     const score = x => {
       const ageDays = Math.max(0.25, (Date.now() - (x.postTimestamp || x.createdAt || Date.now())) / 86400000);
-      return ((x.likes || 0) + 1) / Math.pow(ageDays + 1.5, 0.65);
+      const isYouTube = /(?:youtube\.com|youtu\.be)/i.test(x.postUrl || "") ||
+        (x.tags || []).some(t => String(t).toLowerCase() === "youtube");
+      const platformWeight = isYouTube ? 1.0 : 1.15;
+      const logLikes = (Math.log10((x.likes || 0) + 1) * 12 * platformWeight) + 1;
+      return logLikes / Math.pow(ageDays + 1.5, 0.65);
     };
     return score(b) - score(a);
   });
