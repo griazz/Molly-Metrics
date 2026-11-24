@@ -1072,8 +1072,8 @@
     }
     .tab-switch {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
       background: var(--bg-input);
       padding: 4px;
       border-radius: 11px;
@@ -1089,6 +1089,14 @@
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+      min-width: 0;
+      padding: 0 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    @media (max-width: 480px) {
+      .tab-switch-btn { font-size: 11px; padding: 0 2px; }
     }
     .tab-switch-btn.active {
       background: var(--accent);
@@ -1212,6 +1220,42 @@
     }
 
     /* Dropzone for Manual Screenshot */
+    .yt-frame-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .yt-frame {
+      position: relative;
+      padding: 0;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg-input);
+      color: var(--text);
+      font-family: inherit;
+      cursor: pointer;
+      overflow: hidden;
+      text-align: left;
+    }
+    .yt-frame.selected { border-color: var(--accent); }
+    .yt-frame.failed { opacity: 0.4; cursor: not-allowed; }
+    .yt-frame-img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      background: var(--bg-input);
+    }
+    .yt-frame-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .yt-frame.selected .yt-frame-label { color: var(--accent); }
     .drop-zone {
       border: 2px dashed var(--border-strong);
       border-radius: 12px;
@@ -1563,9 +1607,10 @@
 
     <div class="modal-body">
       <div class="tab-switch">
-        <button type="button" id="tabBtnXImport" class="tab-switch-btn active" onclick="switchAddMode('x')">X / Twitter Post</button>
+        <button type="button" id="tabBtnXImport" class="tab-switch-btn active" onclick="switchAddMode('x')">X / Twitter</button>
         <button type="button" id="tabBtnDiscord" class="tab-switch-btn" onclick="switchAddMode('discord')">Discord</button>
-        <button type="button" id="tabBtnManual" class="tab-switch-btn" onclick="switchAddMode('manual')">Manual / Screenshot</button>
+        <button type="button" id="tabBtnYoutube" class="tab-switch-btn" onclick="switchAddMode('youtube')">YouTube</button>
+        <button type="button" id="tabBtnManual" class="tab-switch-btn" onclick="switchAddMode('manual')">Manual</button>
       </div>
 
       <!-- MODE A: X POST IMPORT -->
@@ -1656,6 +1701,81 @@
             <pre id="discordRawText" class="mono" style="white-space:pre-wrap;font-size:10px;color:var(--text-muted);margin:6px 0 0;max-height:140px;overflow:auto;"></pre>
           </details>
           <button type="submit" id="btnDiscordSaveSubmit" class="btn-sync-primary" style="width:100%;">Save to Vault</button>
+        </div>
+      </form>
+
+      <!-- MODE D: YOUTUBE VIDEO (metadata + link unwrapping + 4-frame picker) -->
+      <form id="youtubeImportForm" style="display:none;flex-direction:column;gap:10px;">
+        <div>
+          <label class="field-label" for="ytUrlInput">YouTube Video URL</label>
+          <input id="ytUrlInput" type="text" inputmode="url" class="form-input" placeholder="https://youtu.be/... or youtube.com/watch?v=... or /shorts/..." autocomplete="off" />
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="action-btn subtle" onclick="pasteFromClipboardToYoutube()">📋 Paste</button>
+          <button type="submit" id="btnFetchYtSubmit" class="btn-sync-primary" style="flex:1;height:40px;">Fetch Video</button>
+        </div>
+        <div id="ytImportError" class="banner error" style="margin:0;"></div>
+        <div id="ytStatus" style="font-size:12px;color:var(--text-muted);"></div>
+
+        <div id="ytReviewCard" class="panel" style="display:none;margin:0;padding:12px;flex-direction:column;gap:10px;">
+          <div style="font-size:12px;font-weight:800;">Review &amp; Confirm</div>
+
+          <div>
+            <label class="field-label">Base Image — pick the frame that shows the base</label>
+            <div id="ytFrameGrid" class="yt-frame-grid"></div>
+          </div>
+
+          <div>
+            <label class="field-label">Optional HD Screenshot Override (Ctrl+V, drop, or tap)</label>
+            <div id="ytDropZone" class="drop-zone" style="padding:10px;">
+              <input id="ytFileInput" type="file" accept="image/*" style="display:none;" />
+              <div id="ytDropPlaceholder">
+                <div style="font-size:12px;font-weight:700;">None of the frames clean? Paste a full-res screenshot</div>
+              </div>
+              <div id="ytPreviewWrap" style="display:none;">
+                <img id="ytImagePreview" src="" alt="Custom screenshot" />
+                <div style="margin-top:8px;">
+                  <button type="button" class="action-btn danger" onclick="clearYoutubeImage(event)">Remove Screenshot</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div>
+              <label class="field-label" for="ytCreator">Creator @Handle</label>
+              <input id="ytCreator" type="text" class="form-input" placeholder="@creator" />
+            </div>
+            <div>
+              <label class="field-label" for="ytPostDate">Post Date / Time</label>
+              <input id="ytPostDate" type="datetime-local" class="form-input" />
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div>
+              <label class="field-label" for="ytTh">Town Hall</label>
+              <input id="ytTh" type="text" class="form-input" value="TH19" />
+            </div>
+            <div>
+              <label class="field-label" for="ytCc">CC Troops</label>
+              <input id="ytCc" type="text" class="form-input" placeholder="2 IG, 1 Furnace..." />
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="ytLinks">Clash Link(s) * (one per line)</label>
+            <textarea id="ytLinks" class="form-textarea" rows="3" placeholder="https://link.clashofclans.com/en/?action=OpenLayout&amp;id=..."></textarea>
+          </div>
+          <div class="form-row-2">
+            <div>
+              <label class="field-label" for="ytTags">Tags (comma-separated)</label>
+              <input id="ytTags" type="text" class="form-input" placeholder="Legend, YouTube" />
+            </div>
+            <div>
+              <label class="field-label" for="ytNotes">Notes / Title</label>
+              <input id="ytNotes" type="text" class="form-input" maxlength="140" />
+            </div>
+          </div>
+          <button type="submit" id="btnYtSaveSubmit" class="btn-sync-primary" style="width:100%;">Save to Vault</button>
         </div>
       </form>
 
@@ -1881,7 +2001,7 @@ const STORAGE_KEYS = {
 };
 
 const STANDARD_THS = ["All", "TH19", "TH18", "TH17", "TH16"];
-const STANDARD_CATS = ["All", "Legend", "L1", "Ranked", "War", "Pro / ESL", "Tested", "Untested", "Progress", "Anti-Bowler", "Anti-LaLo", "Rage/Poison", "Auto-X", "Discord", "Favorites"];
+const STANDARD_CATS = ["All", "Legend", "L1", "Ranked", "War", "Pro / ESL", "Tested", "Untested", "Progress", "Anti-Bowler", "Anti-LaLo", "Rage/Poison", "Auto-X", "Discord", "YouTube", "Favorites"];
 
 /* ============================================================
    APPLICATION STATE
@@ -1920,6 +2040,7 @@ const state = {
   manualImageDataUrl: "",
   addMode: "x",
   discord: { origDataUrl: "", croppedDataUrls: [], cropped: false, split: false, useFull: false, parsed: null, busy: false, seq: 0 },
+  youtube: { parsed: null, frames: [], selected: 0, customDataUrl: "", busy: false, seq: 0 },
   lightboxBaseId: null,
   lightboxImageIndex: 0,
   lightboxZoomed: false,
@@ -3179,13 +3300,15 @@ function openAddBaseModal(mode = "x") {
 }
 
 function switchAddMode(mode) {
-  if (mode !== "x" && mode !== "discord" && mode !== "manual") mode = "x";
+  if (mode !== "x" && mode !== "discord" && mode !== "youtube" && mode !== "manual") mode = "x";
   state.addMode = mode;
   document.getElementById("tabBtnXImport").classList.toggle("active", mode === "x");
   document.getElementById("tabBtnDiscord").classList.toggle("active", mode === "discord");
+  document.getElementById("tabBtnYoutube").classList.toggle("active", mode === "youtube");
   document.getElementById("tabBtnManual").classList.toggle("active", mode === "manual");
   document.getElementById("xImportForm").style.display = mode === "x" ? "flex" : "none";
   document.getElementById("discordImportForm").style.display = mode === "discord" ? "flex" : "none";
+  document.getElementById("youtubeImportForm").style.display = mode === "youtube" ? "flex" : "none";
   document.getElementById("manualBaseForm").style.display = mode === "manual" ? "flex" : "none";
 }
 
@@ -3609,6 +3732,266 @@ async function handleDiscordFormSubmit(e) {
     btn.disabled = false;
     btn.textContent = "Save to Vault";
   }
+}
+
+/* ============================================================
+   YOUTUBE BASE IMPORTER (METADATA + 4-FRAME PICKER)
+============================================================ */
+function formatYoutubeStatus(msg, isErr) {
+  const el = document.getElementById("ytStatus");
+  el.textContent = msg || "";
+  el.style.color = isErr ? "var(--red)" : "var(--text-muted)";
+}
+
+async function pasteFromClipboardToYoutube() {
+  try {
+    const txt = await navigator.clipboard.readText();
+    if (txt && txt.trim()) {
+      document.getElementById("ytUrlInput").value = txt.trim();
+      showToast("Pasted from clipboard!");
+      return;
+    }
+  } catch (_) {}
+  document.getElementById("ytUrlInput").focus();
+  showToast("Tap and paste your YouTube URL.");
+}
+
+function youtubeFrameActiveUrl(f) {
+  return f.activeUrl || f.url;
+}
+
+function selectedYoutubeImage() {
+  const y = state.youtube;
+  if (y.customDataUrl) return y.customDataUrl;
+  const f = y.frames[y.selected];
+  return f && !f.failed ? youtubeFrameActiveUrl(f) : "";
+}
+
+function renderYoutubeFrames() {
+  const y = state.youtube;
+  const grid = document.getElementById("ytFrameGrid");
+  grid.innerHTML = y.frames.map((f, i) => {
+    const sel = !y.customDataUrl && y.selected === i;
+    return `
+      <button type="button" class="yt-frame${sel ? " selected" : ""}${f.failed ? " failed" : ""}" data-idx="${i}" ${f.failed ? "disabled" : ""} aria-pressed="${sel}">
+        <img class="yt-frame-img" data-idx="${i}" style="${f.failed ? "visibility:hidden;" : ""}" src="${escHtml(youtubeFrameActiveUrl(f))}" alt="${escHtml(f.label)}" loading="lazy" referrerpolicy="no-referrer" />
+        <span class="yt-frame-label"><span>${escHtml(f.label)}</span>${f.failed ? "<span>Unavailable</span>" : (sel ? "<span>✓ Selected</span>" : "")}</span>
+      </button>`;
+  }).join("");
+
+  grid.querySelectorAll(".yt-frame").forEach(btn => {
+    btn.addEventListener("click", () => selectYoutubeFrame(Number(btn.dataset.idx)));
+  });
+  grid.querySelectorAll(".yt-frame-img").forEach(img => {
+    const idx = Number(img.dataset.idx);
+    img.addEventListener("error", () => onYoutubeFrameError(idx));
+    // YouTube serves a 120px grey placeholder (HTTP 200) for some missing thumbnails
+    img.addEventListener("load", () => { if (img.naturalWidth > 0 && img.naturalWidth <= 120) onYoutubeFrameError(idx); });
+  });
+}
+
+function onYoutubeFrameError(idx) {
+  const y = state.youtube;
+  const f = y.frames[idx];
+  if (!f || f.failed) return;
+  if (f.fallbackUrl && youtubeFrameActiveUrl(f) !== f.fallbackUrl) {
+    f.activeUrl = f.fallbackUrl;               // maxresdefault.jpg -> hqdefault.jpg
+  } else {
+    f.failed = true;
+    if (!y.customDataUrl && y.selected === idx) {
+      const next = y.frames.findIndex(x => !x.failed);
+      y.selected = next > -1 ? next : 0;
+    }
+  }
+  renderYoutubeFrames();
+}
+
+function selectYoutubeFrame(idx) {
+  const y = state.youtube;
+  if (!y.frames[idx] || y.frames[idx].failed) return;
+  y.selected = idx;
+  if (y.customDataUrl) clearYoutubeImage();   // picking a frame replaces the screenshot override
+  else renderYoutubeFrames();
+}
+
+function refreshYoutubeOverride() {
+  const has = Boolean(state.youtube.customDataUrl);
+  document.getElementById("ytImagePreview").src = state.youtube.customDataUrl || "";
+  document.getElementById("ytDropPlaceholder").style.display = has ? "none" : "block";
+  document.getElementById("ytPreviewWrap").style.display = has ? "block" : "none";
+  document.getElementById("ytDropZone").style.borderColor = has ? "var(--accent)" : "";
+}
+
+async function attachYoutubeImageFile(file) {
+  if (!file || !file.type.startsWith("image/")) {
+    showToast("Please select a valid image file.");
+    return;
+  }
+  try {
+    state.youtube.customDataUrl = await compressImageToDataUrl(file);
+    refreshYoutubeOverride();
+    renderYoutubeFrames();
+    showToast("Screenshot attached — it will be used instead of the video frames.");
+  } catch (_) {
+    showToast("Failed to process image.");
+  }
+}
+
+function clearYoutubeImage(e) {
+  if (e) e.stopPropagation();
+  state.youtube.customDataUrl = "";
+  document.getElementById("ytFileInput").value = "";
+  refreshYoutubeOverride();
+  renderYoutubeFrames();
+}
+
+function fillYoutubeReview(parsed) {
+  const p = parsed || {};
+  const y = state.youtube;
+  y.parsed = p;
+  y.customDataUrl = "";
+  y.frames = (Array.isArray(p.frames) ? p.frames : []).map(f => ({
+    label: f.label, url: f.url, fallbackUrl: f.fallbackUrl || "", activeUrl: f.url, failed: false
+  }));
+  const pref = y.frames.findIndex(f => /Frame 1/i.test(f.label));
+  y.selected = pref > -1 ? pref : 0;
+
+  document.getElementById("ytReviewCard").style.display = "flex";
+  document.getElementById("ytCreator").value = p.creatorHandle || "";
+  document.getElementById("ytPostDate").value = toDatetimeLocalValue(Number(p.postTimestamp) || Date.now());
+  document.getElementById("ytTh").value = p.thLevel || "TH19";
+  document.getElementById("ytCc").value = p.ccTroops || "";
+  document.getElementById("ytLinks").value = (p.baseLinks || []).map(l => {
+    if (typeof l === "string") return l;
+    const generic = !l.label || /^Base #\d+$/i.test(l.label);
+    return generic ? l.url : `${l.label}: ${l.url}`;
+  }).join("\n");
+  const tags = (p.tags && p.tags.length ? p.tags.slice() : []);
+  if (!tags.some(t => String(t).toLowerCase() === "youtube")) tags.push("YouTube");
+  document.getElementById("ytTags").value = tags.join(", ");
+  document.getElementById("ytNotes").value = p.notes || "";
+  refreshYoutubeOverride();
+  renderYoutubeFrames();
+}
+
+async function fetchYoutubeVideo() {
+  const raw = document.getElementById("ytUrlInput").value.trim();
+  const errBox = document.getElementById("ytImportError");
+  errBox.classList.remove("open");
+  if (!raw) { showToast("Paste a YouTube video URL first."); return; }
+  if (!/(?:youtube\.com|youtu\.be)\//i.test(raw) && !/^[A-Za-z0-9_-]{11}$/.test(raw)) {
+    errBox.textContent = "Please paste a valid YouTube URL (watch, youtu.be, or Shorts).";
+    errBox.classList.add("open");
+    return;
+  }
+
+  const y = state.youtube;
+  const seq = ++y.seq;
+  const btn = document.getElementById("btnFetchYtSubmit");
+  btn.disabled = true;
+  btn.textContent = "Fetching...";
+  formatYoutubeStatus("Reading video details and resolving base links...");
+  try {
+    const res = await apiPost({ action: "fetchYouTubePost", url: raw });
+    if (seq !== y.seq) return;
+    if (res.status !== "success" || !res.parsed) throw new Error(res.error || "Unexpected response.");
+    fillYoutubeReview(res.parsed);
+    const n = (res.parsed.baseLinks || []).length;
+    formatYoutubeStatus(n > 0 ? `Found ${n} Clash link${n === 1 ? "" : "s"}. Pick a frame and check the details below.` : "No Clash link found in the description — add one below before saving.", n === 0);
+  } catch (err) {
+    if (seq !== y.seq) return;
+    errBox.textContent = err.message || "Could not fetch that video.";
+    errBox.classList.add("open");
+    formatYoutubeStatus("");
+  } finally {
+    if (seq === y.seq) {
+      btn.disabled = false;
+      btn.textContent = "Fetch Video";
+    }
+  }
+}
+
+function resetYoutubeForm() {
+  state.youtube = { parsed: null, frames: [], selected: 0, customDataUrl: "", busy: false, seq: state.youtube.seq + 1 };
+  document.getElementById("youtubeImportForm").reset();
+  document.getElementById("ytReviewCard").style.display = "none";
+  document.getElementById("ytFrameGrid").innerHTML = "";
+  document.getElementById("ytImportError").classList.remove("open");
+  refreshYoutubeOverride();
+  formatYoutubeStatus("");
+}
+
+async function saveYoutubeBase() {
+  const y = state.youtube;
+  const videoId = y.parsed && y.parsed.videoId;
+  if (!videoId) { showToast("Fetch a video first."); return; }
+
+  const rawLinks = document.getElementById("ytLinks").value.trim();
+  const found = extractClashBaseLinks(rawLinks);
+  const urls = found.length > 0 ? found : rawLinks.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  if (urls.length === 0) { showToast("Enter at least one Clash of Clans base link."); return; }
+
+  const image = selectedYoutubeImage();
+  if (!image) { showToast("Pick a frame or attach a screenshot first."); return; }
+
+  const btn = document.getElementById("btnYtSaveSubmit");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+  try {
+    // "Anti 2 Star: <url>" lines come back as "Anti 2 Star:" — trim the dangling separator
+    const baseLinks = extractLinkObjectsFromText(rawLinks, urls).map(l => ({ ...l, label: l.label.replace(/[\s:\-–—•|>]+$/, "") || l.label }));
+    const primary = baseLinks[0];
+    const notes = document.getElementById("ytNotes").value.trim();
+    const thLevel = document.getElementById("ytTh").value.trim().toUpperCase() || extractTownHallFromLinkOrText(primary.url, notes);
+    const rawCreator = document.getElementById("ytCreator").value.trim();
+    const creatorHandle = rawCreator ? (rawCreator.startsWith("@") ? rawCreator : `@${rawCreator}`) : "@youtube";
+    const tags = document.getElementById("ytTags").value.split(",").map(s => s.trim()).filter(Boolean);
+    if (!tags.some(t => t.toLowerCase() === "youtube")) tags.push("YouTube");
+    const dateVal = document.getElementById("ytPostDate").value;
+    const ts = dateVal ? Date.parse(dateVal) : NaN;
+
+    const candidate = {
+      id: `base_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      thLevel,
+      baseLink: primary.url,
+      canonicalId: primary.canonicalId,
+      baseLinks,
+      imageUrl: image,
+      images: [image],
+      creatorHandle,
+      postUrl: `https://www.youtube.com/watch?v=${videoId}`,
+      postTimestamp: Number.isNaN(ts) ? Date.now() : ts,
+      likes: 0,
+      ccTroops: document.getElementById("ytCc").value.trim(),
+      tags,
+      notes: notes.slice(0, 140),
+      copies: 0,
+      createdAt: Date.now()
+    };
+
+    const res = await saveBaseToBackend(candidate);
+    resetYoutubeForm();
+    closeModal("addBaseModal");
+    renderAll();
+
+    if (res.action === "blocked" || res.action === "replaced_with_earlier") {
+      showDuplicateBanner(res);
+      showToast(res.action === "blocked" ? "Duplicate base link blocked." : "Earlier post replaced newer duplicate.");
+    } else {
+      showToast(`Saved ${thLevel} base from YouTube!`);
+    }
+  } catch (err) {
+    showToast("Save failed: " + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save to Vault";
+  }
+}
+
+function handleYoutubeFormSubmit(e) {
+  e.preventDefault();
+  if (e.submitter && e.submitter.id === "btnYtSaveSubmit") saveYoutubeBase();
+  else fetchYoutubeVideo();
 }
 
 async function handleManualFormSubmit(e) {
@@ -4440,6 +4823,23 @@ function bindStaticEvents() {
   document.getElementById("xImportForm").addEventListener("submit", handleXImportSubmit);
   document.getElementById("manualBaseForm").addEventListener("submit", handleManualFormSubmit);
   document.getElementById("discordImportForm").addEventListener("submit", handleDiscordFormSubmit);
+  document.getElementById("youtubeImportForm").addEventListener("submit", handleYoutubeFormSubmit);
+  // Enter inside the review fields must not re-run "Fetch Video" (the form's default submit button)
+  document.getElementById("ytReviewCard").addEventListener("keydown", e => {
+    if (e.key === "Enter" && e.target.tagName === "INPUT") e.preventDefault();
+  });
+  const ydz = document.getElementById("ytDropZone");
+  const yfi = document.getElementById("ytFileInput");
+  ydz.addEventListener("click", e => { if (!e.target.closest("button")) yfi.click(); });
+  yfi.addEventListener("click", e => e.stopPropagation());
+  yfi.addEventListener("change", e => { if (e.target.files && e.target.files[0]) attachYoutubeImageFile(e.target.files[0]); });
+  ydz.addEventListener("dragover", e => { e.preventDefault(); ydz.classList.add("drag-over"); });
+  ydz.addEventListener("dragleave", () => ydz.classList.remove("drag-over"));
+  ydz.addEventListener("drop", e => {
+    e.preventDefault();
+    ydz.classList.remove("drag-over");
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) attachYoutubeImageFile(e.dataTransfer.files[0]);
+  });
   const ddz = document.getElementById("discordDropZone");
   const dfi = document.getElementById("discordFileInput");
   ddz.addEventListener("click", e => { if (!e.target.closest("button")) dfi.click(); });
@@ -4475,6 +4875,11 @@ function bindStaticEvents() {
         e.preventDefault();
         const f = item.getAsFile();
         if (state.addMode === "discord") { if (f) attachDiscordImageFile(f); return; }
+        if (state.addMode === "youtube") {
+          if (f && state.youtube.parsed) attachYoutubeImageFile(f);
+          else showToast("Fetch a video first, then paste your screenshot.");
+          return;
+        }
         switchAddMode("manual");
         if (f) attachManualImageFile(f);
         return;
